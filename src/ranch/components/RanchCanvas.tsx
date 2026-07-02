@@ -1,0 +1,65 @@
+import type { AgentSnapshot } from '../../types';
+import { AGENT_ANIMALS, getAgentDef } from '../data/agentAnimals';
+import { RANCH_ZONES } from '../data/ranchLayout';
+import { pickAnimalAction } from '../data/statusActions';
+import Animal from './Animal';
+import SelectedOverlay from './SelectedOverlay';
+
+interface RanchCanvasProps {
+  snapshot: AgentSnapshot;
+  selectedAgentId: string;
+  onSelectAgent: (agentId: string) => void;
+}
+
+export default function RanchCanvas({ snapshot, selectedAgentId, onSelectAgent }: RanchCanvasProps) {
+  const visibleAgents = AGENT_ANIMALS
+    .map((def) => {
+      const agent = snapshot.agents.find((item) => item.id === def.agentId);
+      const runtime = agent ? snapshot.runtime[agent.id] : null;
+      return agent && runtime ? { agent, def, runtime } : null;
+    })
+    .filter(Boolean);
+
+  const selectedItem = visibleAgents.find((item) => item?.agent.id === selectedAgentId) ?? visibleAgents[0] ?? null;
+
+  return (
+    <section className="ranch-canvas" aria-label="桌面牧场动物区">
+      <div className="ranch-field">
+        <div className="ranch-fence" aria-hidden="true" />
+        <div className="ranch-ground">
+          {RANCH_ZONES.map((zone) => (
+            <span key={zone.id} className={`ranch-zone ${zone.className}`}>
+              {zone.label}
+            </span>
+          ))}
+          {visibleAgents.map((item, index) => {
+            if (!item) {
+              return null;
+            }
+            const action = pickAnimalAction(item.agent, item.runtime, index);
+            return (
+              <Animal
+                key={item.agent.id}
+                agent={item.agent}
+                agentDef={getAgentDef(item.agent.id) ?? item.def}
+                runtime={item.runtime}
+                action={action}
+                selected={item.agent.id === selectedAgentId}
+                onSelect={onSelectAgent}
+              />
+            );
+          })}
+        </div>
+      </div>
+
+      {selectedItem ? (
+        <SelectedOverlay
+          agent={selectedItem.agent}
+          agentDef={selectedItem.def}
+          runtime={selectedItem.runtime}
+          action={pickAnimalAction(selectedItem.agent, selectedItem.runtime, selectedAgentId.length)}
+        />
+      ) : null}
+    </section>
+  );
+}

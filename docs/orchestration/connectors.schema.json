@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Multi Agent Connector Policy",
+  "type": "object",
+  "required": ["version", "defaults", "connectors"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "defaults": {
+      "type": "object",
+      "required": ["cwdPolicy", "envAllowlist", "confirmation", "timeoutSeconds", "dangerousCommandPatterns"],
+      "additionalProperties": false,
+      "properties": {
+        "cwdPolicy": {
+          "enum": ["workspace-root", "explicit-path"]
+        },
+        "envAllowlist": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "confirmation": {
+          "enum": ["none", "required", "required-for-write"]
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "dangerousCommandPatterns": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        }
+      }
+    },
+    "connectors": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "status",
+          "runner",
+          "command",
+          "args",
+          "cwdPolicy",
+          "envAllowlist",
+          "confirmation",
+          "timeoutSeconds",
+          "acceptanceGate",
+          "approvalStatus",
+          "acceptedBy",
+          "acceptedAt",
+          "approvalEvidence",
+          "enabledByDefault"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "label": { "type": "string", "minLength": 1 },
+          "status": { "enum": ["draft", "placeholder", "ready", "disabled"] },
+          "runner": { "enum": ["local-command"] },
+          "command": { "type": "string" },
+          "args": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "cwdPolicy": { "enum": ["workspace-root", "explicit-path"] },
+          "envAllowlist": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 },
+            "uniqueItems": true
+          },
+          "confirmation": { "enum": ["none", "required", "required-for-write"] },
+          "timeoutSeconds": { "type": "integer", "minimum": 1 },
+          "acceptanceGate": { "type": "string", "minLength": 1 },
+          "approvalStatus": { "enum": ["not-requested", "pending", "accepted", "rejected"] },
+          "acceptedBy": { "type": "string" },
+          "acceptedAt": { "type": "string" },
+          "approvalEvidence": { "type": "string" },
+          "enabledByDefault": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}

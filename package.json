@@ -1,0 +1,33 @@
+{
+  "name": "multi-agent-niuma",
+  "private": true,
+  "version": "0.1.0",
+  "description": "多 Agent 牛马核心部门桌面版",
+  "type": "module",
+  "main": "dist-electron/main.cjs",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "orchestration:check": "node scripts/check-orchestration.mjs",
+    "orchestration:report": "node scripts/orchestration-report.mjs",
+    "orchestration:preflight": "node scripts/connector-preflight.mjs",
+    "build": "vite build && esbuild electron/main.ts --bundle --platform=node --format=cjs --packages=external --outfile=dist-electron/main.cjs && esbuild electron/preload.ts --bundle --platform=node --format=cjs --packages=external --outfile=dist-electron/preload.cjs",
+    "start": "electron .",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^5.0.4",
+    "lucide-react": "^0.546.0",
+    "motion": "^12.23.24",
+    "react": "^19.0.1",
+    "react-dom": "^19.0.1",
+    "vite": "^6.2.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "@types/react": "^19.0.12",
+    "@types/react-dom": "^19.0.4",
+    "electron": "^43.0.0",
+    "esbuild": "^0.25.0",
+    "typescript": "~5.8.2"
+  }
+}

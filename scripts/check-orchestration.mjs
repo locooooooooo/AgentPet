@@ -1,0 +1,955 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
+const root = process.cwd();
+const errors = [];
+
+function filePath(relativePath) {
+  return path.join(root, relativePath);
+}
+
+function exists(relativePath) {
+  return fs.existsSync(filePath(relativePath));
+}
+
+function read(relativePath) {
+  if (!exists(relativePath)) {
+    errors.push(`missing file: ${relativePath}`);
+    return '';
+  }
+  return fs.readFileSync(filePath(relativePath), 'utf8');
+}
+
+function readJson(relativePath) {
+  const content = read(relativePath);
+  if (!content) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(content);
+  } catch (error) {
+    errors.push(`invalid json: ${relativePath}: ${error.message}`);
+    return null;
+  }
+}
+
+function requireText(name, content, snippets) {
+  snippets.forEach((snippet) => {
+    if (!content.includes(snippet)) {
+      errors.push(`${name} missing required text: ${snippet}`);
+    }
+  });
+}
+
+function forbidText(name, content, snippets) {
+  const normalizedContent = content.toLowerCase();
+  snippets.forEach((snippet) => {
+    if (normalizedContent.includes(snippet.toLowerCase())) {
+      errors.push(`${name} contains stale text: ${snippet}`);
+    }
+  });
+}
+
+function parseSessionState(relativePath, content) {
+  const loopState = content.match(/^loop state:\s*(.+)$/m)?.[1]?.trim();
+  const dispatchState = content.match(/^dispatch state:\s*(.+)$/m)?.[1]?.trim();
+  const identity = content.match(/^\[[^\]\r\n]+\]#[^\r\n]+$/m)?.[0]?.trim();
+
+  if (!loopState) {
+    errors.push(`${relativePath} missing loop state`);
+  }
+  if (!dispatchState) {
+    errors.push(`${relativePath} missing dispatch state`);
+  }
+  if (!identity) {
+    errors.push(`${relativePath} missing identity header`);
+  }
+
+  return { loopState, dispatchState, identity };
+}
+
+function strongestExpectedState(states) {
+  const priority = ['active', 'standby', 'blocked', 'summarized'];
+  return priority.find((state) => states.includes(state));
+}
+
+function requireSameValue(label, left, right) {
+  if (JSON.stringify(left) !== JSON.stringify(right)) {
+    errors.push(`${label} mismatch: ${JSON.stringify(left)} !== ${JSON.stringify(right)}`);
+  }
+}
+
+function requireUnique(label, values) {
+  const seen = new Set();
+  values.forEach((value) => {
+    if (!value) {
+      return;
+    }
+    if (seen.has(value)) {
+      errors.push(`${label} must be unique: ${value}`);
+    }
+    seen.add(value);
+  });
+}
+
+const index = read('docs/orchestration/index.md');
+const pmRole = read('docs/orchestration/roles/pm.md');
+const supervisorRole = read('docs/orchestration/roles/supervisor.md');
+const startupPrompt = read('docs/orchestration/startup-prompt.md');
+const callbackTemplate = read('docs/orchestration/callback-summary-template.md');
+const task = read('docs/orchestration/tasks/multi-agent-runtime-v0.1.md');
+const connectorTask = read('docs/orchestration/tasks/connector-policy-v0.1.md');
+const connectorAcceptanceReviewTask = read('docs/orchestration/tasks/connector-acceptance-review-v0.1.md');
+const dailyDecisionQueueTask = read('docs/orchestration/tasks/daily-decision-queue-2026-07-02.md');
+const dailyRoleAccountabilityTask = read('docs/orchestration/tasks/daily-role-accountability-2026-07-02.md');
+const gitRepairTask = read('docs/orchestration/tasks/git-repair-agentpet-v0.1.md');
+const ranchM4RequirementsTask = read('docs/orchestration/tasks/ranch-m4-requirements-v0.2.md');
+const ranchM4ImplementationTask = read('docs/orchestration/tasks/ranch-m4-implementation-v0.2.md');
+const ranchPointerSmokeTask = read('docs/orchestration/tasks/ranch-pointer-smoke-v0.2.md');
+const ranchPointerSmokeManualEvidenceTask = read('docs/orchestration/tasks/ranch-pointer-smoke-manual-evidence-v0.2.md');
+const session = read('docs/orchestration/sessions/main-thread-2026-07-01-runtime-bootstrap.md');
+const dailySupervisionSession = read('docs/orchestration/sessions/daily-supervision-2026-07-02.md');
+const gitManagerSession = read('docs/orchestration/sessions/git-manager-agentpet-2026-07-02.md');
+const statusJson = readJson('docs/orchestration/status.json');
+const connectorSchema = readJson('docs/orchestration/connectors.schema.json');
+const connectorConfig = readJson('docs/orchestration/connectors.json');
+const uiStatus = read('src/lib/orchestrationStatus.ts');
+const workspace = read('src/components/NiuMaWorkspace.tsx');
+const reportScript = read('scripts/orchestration-report.mjs');
+const preflightScript = read('scripts/connector-preflight.mjs');
+const packageJson = readJson('package.json');
+
+requireText('index', index, [
+  'loop state:',
+  'dispatch state:',
+  'read order:',
+  'tracked control cards:',
+  'tracked business cards:',
+  'dispatch gate:',
+  'current role split:',
+  'docs/orchestration/connectors.schema.json',
+  'docs/orchestration/connectors.json',
+  '⟦tag:v2|role|pm-control-v0.1⟧',
+  '⟦tag:v2|role|supervisor-control-v0.1⟧',
+  '⟦tag:v2|task|multi-agent-runtime-v0.1⟧',
+  '⟦tag:v2|task|connector-policy-v0.1⟧',
+  '⟦tag:v2|session|main-thread-2026-07-01-runtime-bootstrap⟧'
+]);
+
+requireText('pm role', pmRole, [
+  '[PM]#multi-agent-control@v0.1',
+  '⟦tag:v2|role|pm-control-v0.1⟧',
+  'dispatch',
+  'acceptance'
+]);
+
+requireText('supervisor role', supervisorRole, [
+  '[监督]#multi-agent-control@v0.1',
+  '⟦tag:v2|role|supervisor-control-v0.1⟧',
+  'drift',
+  'correction'
+]);
+
+requireText('startup prompt', startupPrompt, [
+  '[PM]#multi-agent-control@v0.1',
+  'read first:',
+  'role selection:',
+  'mandatory rules:',
+  'npm run orchestration:report'
+]);
+
+requireText('callback template', callbackTemplate, [
+  '[角色]#模块@版本',
+  'loop state: waiting_callback',
+  'dispatch state: waiting_callback',
+  'completed:',
+  'evidence:'
+]);
+
+requireText('task card', task, [
+  'objective:',
+  'scope:',
+  'acceptance:',
+  'current state:',
+  'blockers:',
+  'next action:'
+]);
+
+requireText('connector policy task card', connectorTask, [
+  '[短工]#connector-policy@v0.1',
+  '⟦tag:v2|task|connector-policy-v0.1⟧',
+  'command',
+  'cwd',
+  'env',
+  'acceptance:'
+]);
+
+requireText('connector acceptance review task card', connectorAcceptanceReviewTask, [
+  '[PM]#connector-acceptance-review@v0.1',
+  '⟦tag:v2|task|connector-acceptance-review-v0.1⟧',
+  'Standby. This is a future acceptance review package, not an execution binding lane.',
+  'Do not change `approvalStatus` to `accepted`, set `enabledByDefault` to `true`, or run connector commands from this package.',
+  'Codex is `draft / pending / enabled=false`',
+  'Trae is `placeholder / not-requested / enabled=false`',
+  'Qoder is `placeholder / not-requested / enabled=false`',
+  'No connector satisfies `status=ready + approvalStatus=accepted + enabledByDefault=true`.',
+  'Do not set `"approvalStatus": "accepted"`.',
+  'Do not set `"enabledByDefault": true`.',
+  'Do not dispatch connector-agent-core or execution binding.',
+  'Do not run Git repair, staging, commit, push, reset, clean, or file removal.',
+  'Do not edit M4/control-cockpit implementation files.',
+  'Standby connector acceptance review package; no connector accepted, enabled, or executed.'
+]);
+
+requireText('daily decision queue task card', dailyDecisionQueueTask, [
+  '[PM]#daily-decision-queue@2026-07-02',
+  '⟦tag:v2|task|daily-decision-queue-2026-07-02⟧',
+  'Standby decision queue.',
+  'This queue does not authorize work by itself; each item still requires its own explicit user/PM decision or external condition.',
+  '| AgentPet Git repair | `[短工]#git-repair-agentpet@v0.1` | Explicit same-message authorization for local Git metadata repair | Run only `git init -b main` -> `git remote add origin https://github.com/locooooooooo/AgentPet.git` -> `git fetch origin` -> `git status --ignored --short`, then stop | Authorization is absent |',
+  '| Connector acceptance | `[PM]#connector-acceptance-review@v0.1` | PM/user accepts, rejects, or revises connector machine gate fields | Update connector metadata only if the decision explicitly says so, then rerun `npm.cmd run orchestration:preflight` | No connector decision exists |',
+  '| M4 implementation | `[短工]#ranch-m4-implementation@v0.2` | Explicit M4 implementation dispatch | Open bounded M4 implementation lane with declared write scope | M4 dispatch is absent |',
+  '| Transparent pointer smoke | `[监督]#ranch-pointer-smoke-manual-evidence@v0.2` | Manual observer or alternate transparent-window capture route is available | Run parent pointer-smoke route and fill evidence table | Capture route is unavailable |',
+  '| Live sub-agent quota | `[监督]#multi-agent-control@v0.1` | Service-side `403 DAILY_LIMIT_EXCEEDED` can be rechecked without treating connectors as available | Recheck quota state and record exact result | Recheck route is unavailable |',
+  'Do not repair Git, stage, commit, push, reset, clean, or remove files.',
+  'Do not accept, enable, execute, or bind Codex, Trae, Qoder, or any connector.',
+  'Do not run M4 implementation or edit locked M4/control-cockpit files.',
+  'Do not run Electron pointer input or mark pointer smoke accepted.',
+  'Do not create duplicate long-worker threads.',
+  'Standby daily decision queue; no blocked item executed.'
+]);
+
+requireText('daily role accountability task card', dailyRoleAccountabilityTask, [
+  '[PM]#daily-role-accountability@2026-07-02',
+  '⟦tag:v2|task|daily-role-accountability-2026-07-02⟧',
+  'Standby accountability ledger.',
+  'This ledger is a supervision artifact only; it does not authorize Git repair, connector execution, M4 implementation, pointer input, or duplicate worker creation.',
+  '| `[PM]#multi-agent-control@v0.1` | active | `docs/orchestration/index.md`, `docs/orchestration/status.json` | Keep dispatch/state truth aligned and record each supervision pass. |',
+  '| `[监督]#multi-agent-control@v0.1` | active | `docs/orchestration/roles/supervisor.md`, `scripts/check-orchestration.mjs` | Keep drift checks strict and preserve blocked/standby boundaries. |',
+  '| `[短工]#connector-policy@v0.1` | standby | `docs/orchestration/tasks/connector-policy-v0.1.md` | Wait for connector machine-gate acceptance or revision. |',
+  '| `[PM]#connector-acceptance-review@v0.1` | standby | `docs/orchestration/tasks/connector-acceptance-review-v0.1.md` | Keep no accepted/no enabled/no execution until a decision exists. |',
+  '| `[PM]#daily-decision-queue@2026-07-02` | standby | `docs/orchestration/tasks/daily-decision-queue-2026-07-02.md` | Use as the next PM callback surface for blocked decisions. |',
+  '| `[长工]#git-manager@AgentPet` | standby | `docs/orchestration/sessions/git-manager-agentpet-2026-07-02.md` | Keep read-only diagnosis; wait for Git repair authorization. |',
+  '| `[短工]#git-repair-agentpet@v0.1` | standby | `docs/orchestration/tasks/git-repair-agentpet-v0.1.md` | Wait for same-message Git repair authorization. |',
+  '| `[短工]#ranch-m4-implementation@v0.2` | standby | `docs/orchestration/tasks/ranch-m4-implementation-v0.2.md` | Wait for explicit M4 implementation dispatch. |',
+  '| `[监督]#ranch-pointer-smoke@v0.2` | standby | `docs/orchestration/tasks/ranch-pointer-smoke-v0.2.md` | Wait for a transparent-window capture route. |',
+  '| `[监督]#multi-agent-control@v0.1` live-subagents lane | blocked | `docs/orchestration/status.json` | Recheck `403 DAILY_LIMIT_EXCEEDED` only when a safe route exists. |',
+  'Standby roles are not called complete.',
+  'Blocked lanes retain the exact blocker and do not imply a connector or sub-agent is available.',
+  'Do not run Git repair, staging, commit, push, reset, clean, or file removal.',
+  'Do not accept, enable, execute, or bind Codex, Trae, Qoder, or any connector.',
+  'Do not dispatch or implement M4.',
+  'Do not launch Electron for pointer smoke or run pointer input.',
+  'Standby accountability ledger; no role state changed by this ledger.'
+]);
+
+requireText('AgentPet Git repair task card', gitRepairTask, [
+  '[短工]#git-repair-agentpet@v0.1',
+  '⟦tag:v2|task|git-repair-agentpet-v0.1⟧',
+  'Standby. This is a future repair dispatch package, not an active Git repair lane.',
+  'explicit same-message authorization',
+  'Do not run `git init`, `git remote add`, `git fetch`, staging, commit, push, reset, clean, or file removal from this package until PM/user explicitly authorizes Git repair in the same message.',
+  'git init -b main',
+  'git remote add origin https://github.com/locooooooooo/AgentPet.git',
+  'git fetch origin',
+  'git status --ignored --short',
+  'Stop immediately after status review output is collected.',
+  'Do not stage files.',
+  'Do not commit.',
+  'Do not push.',
+  'Do not remove, reset, clean, or overwrite project files.',
+  'Do not enable or execute Codex, Trae, Qoder, or any connector.',
+  'Do not edit M4/control-cockpit implementation files.',
+  'Standby Git repair dispatch package; no Git repair started.'
+]);
+
+requireText('ranch M4 requirements task card', ranchM4RequirementsTask, [
+  '[PM]#ranch-m4-requirements@v0.2',
+  '⟦tag:v2|task|ranch-m4-requirements-v0.2⟧',
+  'Requirements readiness is summarized.',
+  'Future implementation dispatch package exists at `docs/orchestration/tasks/ranch-m4-implementation-v0.2.md`.',
+  'M4 implementation is not started.',
+  'M4 implementation requires a separate explicit dispatch before touching locked control-cockpit or rename files.',
+  'not in scope:',
+  'Editing `src/components/NiuMaAvatar.tsx`.',
+  'Editing the central 4x2 control-cockpit grid in `src/components/NiuMaWorkspace.tsx`.',
+  'Editing `src/index.css`, `src/lib/agentCore.ts`, or `icon/**`.',
+  'Enabling Codex, Trae, Qoder, or any connector.',
+  'Future M4 implementation task declares its write scope before editing files.',
+  'Keep the future M4 implementation package standby until PM/user explicitly dispatches implementation.'
+]);
+
+requireText('ranch M4 implementation task card', ranchM4ImplementationTask, [
+  '[短工]#ranch-m4-implementation@v0.2',
+  '⟦tag:v2|task|ranch-m4-implementation-v0.2⟧',
+  'Standby. This is a future implementation package, not an active implementation lane.',
+  'Do not edit files from this package until PM/user explicitly dispatches M4 implementation.',
+  'Pending: `package.json` still describes `多 Agent 牛马核心部门桌面版`.',
+  'Pending: `README.md` still starts with `# 多 Agent 牛马核心部门`.',
+  'Pending: `src/App.tsx` boot screens still show `多 Agent 牛马核心部门`.',
+  'Pending: control cockpit has no compact app-header ranch settings entry yet.',
+  'Do not edit `src/components/NiuMaAvatar.tsx`.',
+  'Do not edit the central 4x2 control-cockpit grid inside `src/components/NiuMaWorkspace.tsx`.',
+  'Do not edit `src/index.css`, `src/lib/agentCore.ts`, or `icon/**`.',
+  'Do not edit `docs/orchestration/connectors.json` to accept or enable any connector.',
+  'Implementation is not authorized yet.',
+  'Standby implementation dispatch package; no implementation started.'
+]);
+
+requireText('ranch pointer smoke task card', ranchPointerSmokeTask, [
+  '[监督]#ranch-pointer-smoke@v0.2',
+  '⟦tag:v2|task|ranch-pointer-smoke-v0.2⟧',
+  'Standby verification package.',
+  'Do not run destructive commands, Git repair, connector execution, or M4 implementation while executing this package.',
+  'SetIsBorderRequired failed',
+  'Treating browser-only rendering proof as sufficient for transparent desktop pointer behavior.',
+  'Verify desktop mode click-through outside animal hot zones.',
+  'Verify animal double-click summons/focuses the control cockpit.',
+  'Verify animal right-click opens the ranch context menu.',
+  'Switch to floating mode and verify drag + edge docking persists bounds.',
+  'If any pointer step cannot be observed, the callback records it as incomplete with the exact blocked route.',
+  'Standby pointer-smoke verification package; no implementation started.'
+]);
+
+requireText('ranch pointer smoke manual evidence task card', ranchPointerSmokeManualEvidenceTask, [
+  '[监督]#ranch-pointer-smoke-manual-evidence@v0.2',
+  '⟦tag:v2|task|ranch-pointer-smoke-manual-evidence-v0.2⟧',
+  'Standby evidence package.',
+  'Do not execute this package until a manual observer or alternate transparent-window capture route is available.',
+  'Do not treat browser-only rendering, accessibility tree output, or build success as sufficient proof for desktop transparent pointer behavior.',
+  'SetIsBorderRequired failed',
+  '| desktop click-through | click outside animal hot zones reaches the underlying desktop/app | pending | route notes or recording timestamp |  |',
+  '| double-click | double-clicking an animal summons/focuses the control cockpit | pending | route notes or recording timestamp |  |',
+  '| right-click | right-clicking an animal opens the ranch context menu | pending | route notes or recording timestamp |  |',
+  '| floating drag | floating mode drag moves the ranch | pending | route notes or recording timestamp |  |',
+  '| edge docking | edge dock preview and persisted bounds are observed after drag | pending | route notes or recording timestamp |  |',
+  'Use `pass` only when the current run directly observes the expected desktop behavior.',
+  'A callback with any `fail`, `blocked`, or `not-run` pointer behavior remains incomplete.',
+  'Do not run Git repair, staging, commit, push, reset, clean, or file removal.',
+  'Do not enable, accept, execute, or bind Codex, Trae, Qoder, or any connector.',
+  'Do not mark pointer smoke accepted from browser-only proof.',
+  'Do not mark M4 implementation active.',
+  'Standby manual evidence package; no pointer smoke executed.'
+]);
+
+requireText('session card', session, [
+  'completed:',
+  'incomplete:',
+  'blockers:',
+  'next action:',
+  'evidence:'
+]);
+
+requireText('daily supervision session', dailySupervisionSession, [
+  '[PM]#daily-supervision@2026-07-02',
+  '⟦tag:v2|session|daily-supervision-2026-07-02⟧',
+  'loop state: active',
+  'dispatch state: active',
+  'completed:',
+  'incomplete:',
+  'blockers:',
+  'next action:',
+  'evidence:',
+  'Transparent ranch window pointer smoke is still not fully automated',
+  'Git repair standby package exists, but execution is waiting for explicit same-message confirmation',
+  'git-repair-agentpet-v0.1',
+  'Connector acceptance review package exists, but connector policy acceptance is waiting for PM/user decision',
+  'connector-acceptance-review-v0.1',
+  'Live sub-agent execution remains blocked by the previously recorded service-side `403 DAILY_LIMIT_EXCEEDED`',
+  'Control-cockpit selling-point files remain locked until M4 or explicit user approval',
+  'Keep `ranch-pointer-smoke-v0.2` and `ranch-pointer-smoke-manual-evidence-v0.2` standby until a manual or alternate transparent-window capture route is available.',
+  'ranch-pointer-smoke-manual-evidence-v0.2',
+  'Keep connector-policy and `connector-acceptance-review-v0.1` on standby',
+  'Keep Git manager and `git-repair-agentpet-v0.1` on standby',
+  'Daily decision queue is standby and does not authorize any queue item by itself.',
+  'daily-decision-queue-2026-07-02',
+  'Daily role accountability ledger is standby and records state/evidence/action without changing role states.',
+  'daily-role-accountability-2026-07-02'
+]);
+
+requireText('AgentPet Git manager session', gitManagerSession, [
+  '[长工]#git-manager@AgentPet',
+  'thread: `019f20fc-9b77-74f3-aa3d-ba8348cdec1c`',
+  'model: `gpt-5.4`',
+  'thinking: `xhigh`',
+  'loop state: standby',
+  'dispatch state: standby',
+  'Do not repair `.git`, edit files, stage, commit, push, reset, clean, or remove files without explicit same-message user authorization.',
+  'git init -b main'
+]);
+
+requireText('orchestration status source', uiStatus, [
+  'ORCHESTRATION_STATUS',
+  'CONNECTOR_POLICY',
+  "import orchestrationStatus from '../../docs/orchestration/status.json';",
+  "import connectorPolicy from '../../docs/orchestration/connectors.json';",
+  'status.json',
+  'connectors.json',
+  'OrchestrationStatus'
+]);
+
+requireText('workspace UI', workspace, [
+  'ORCHESTRATION_STATUS',
+  '角色分工与监督',
+  'role-card',
+  'lane-chip',
+  'connector-policy-grid'
+]);
+
+requireText('orchestration report script', reportScript, [
+  'docs/orchestration/status.json',
+  'docs/orchestration/connectors.json',
+  'commandState',
+  'loop state:',
+  'dispatch state:',
+  'connectors:'
+]);
+
+requireText('connector preflight script', preflightScript, [
+  'docs/orchestration/connectors.json',
+  'where.exe',
+  'connector preflight passed',
+  'enabledByDefault',
+  'ready connector command is not resolvable'
+]);
+
+const referencedMarkdown = [...index.matchAll(/`(docs\/orchestration\/[^`]+\.md)`/g)].map((match) => match[1]);
+referencedMarkdown.forEach((relativePath) => {
+  if (!exists(relativePath)) {
+    errors.push(`index references missing file: ${relativePath}`);
+  }
+});
+
+referencedMarkdown.forEach((relativePath) => {
+  const content = read(relativePath);
+  forbidText(relativePath, content, [
+    'active business card',
+    'active business cards',
+    'Active task/session cards exist and are referenced by the index.'
+  ]);
+});
+
+if (task.includes('summary:\n- Active.') || task.includes('summary:\r\n- Active.')) {
+  errors.push('task card summary must describe tracked/summarized state, not bare Active.');
+}
+
+const referencedSessions = referencedMarkdown.filter((relativePath) =>
+  relativePath.startsWith('docs/orchestration/sessions/')
+);
+const referencedMarkdownSet = new Set(referencedMarkdown);
+const trackedIndexEntries = [...index.matchAll(/^- (role|task|session):\s*(⟦tag:v2\|[^⟧]+⟧)\s*->\s*`(docs\/orchestration\/[^`]+\.md)`/gm)]
+  .map((match) => ({
+    kind: match[1],
+    tag: match[2],
+    relativePath: match[3]
+  }));
+const indexState = parseSessionState('docs/orchestration/index.md', index);
+
+trackedIndexEntries.forEach((entry) => {
+  const expectedPrefix = `docs/orchestration/${entry.kind}s/`;
+  if (!entry.relativePath.startsWith(expectedPrefix)) {
+    errors.push(`index ${entry.kind} tag points outside ${expectedPrefix}: ${entry.relativePath}`);
+  }
+  const content = read(entry.relativePath);
+  if (!content.includes(entry.tag)) {
+    errors.push(`index ${entry.kind} tag missing from referenced file ${entry.relativePath}: ${entry.tag}`);
+  }
+});
+
+if (statusJson) {
+  const allowedStates = new Set(['active', 'blocked', 'standby', 'summarized']);
+  ['identity', 'loopState', 'dispatchState', 'target', 'source', 'blocker'].forEach((key) => {
+    if (typeof statusJson[key] !== 'string' || statusJson[key].trim() === '') {
+      errors.push(`status.json missing string field: ${key}`);
+    }
+  });
+
+  if (!Array.isArray(statusJson.roles) || statusJson.roles.length === 0) {
+    errors.push('status.json needs at least one role');
+  } else {
+    requireUnique('status.json role id', statusJson.roles.map((role) => role.id));
+    requireUnique('status.json role title', statusJson.roles.map((role) => role.title));
+    statusJson.roles.forEach((role, roleIndex) => {
+      ['id', 'title', 'owner', 'responsibility', 'tag', 'evidence'].forEach((key) => {
+        if (typeof role[key] !== 'string' || role[key].trim() === '') {
+          errors.push(`status.json roles[${roleIndex}] missing string field: ${key}`);
+        }
+      });
+      if (!allowedStates.has(role.status)) {
+        errors.push(`status.json roles[${roleIndex}] has invalid status: ${role.status}`);
+      }
+      if (role.evidence && !exists(role.evidence)) {
+        errors.push(`status.json roles[${roleIndex}] evidence missing: ${role.evidence}`);
+      }
+      if (role.title && !index.includes(`\`${role.title}\``)) {
+        errors.push(`status.json roles[${roleIndex}] title is not listed in index current role split: ${role.title}`);
+      }
+      if (role.evidence?.startsWith('docs/orchestration/') && role.evidence.endsWith('.md')) {
+        if (!referencedMarkdownSet.has(role.evidence)) {
+          errors.push(`status.json roles[${roleIndex}] evidence is not tracked in index: ${role.evidence}`);
+        }
+        const evidenceContent = read(role.evidence);
+        if (role.tag && !evidenceContent.includes(role.tag)) {
+          errors.push(`status.json roles[${roleIndex}] evidence does not contain tag ${role.tag}: ${role.evidence}`);
+        }
+      }
+    });
+  }
+
+  if (!Array.isArray(statusJson.lanes) || statusJson.lanes.length === 0) {
+    errors.push('status.json needs at least one lane');
+  } else {
+    requireUnique('status.json lane id', statusJson.lanes.map((lane) => lane.id));
+    statusJson.lanes.forEach((lane, index) => {
+      ['id', 'title', 'role', 'nextAction'].forEach((key) => {
+        if (typeof lane[key] !== 'string' || lane[key].trim() === '') {
+          errors.push(`status.json lanes[${index}] missing string field: ${key}`);
+        }
+      });
+      if (!allowedStates.has(lane.state)) {
+        errors.push(`status.json lanes[${index}] has invalid state: ${lane.state}`);
+      }
+    });
+  }
+
+  const rolesByTitle = new Map((statusJson.roles ?? []).map((role) => [role.title, role]));
+  const sharedControlRoleIds = new Set(['pm', 'supervisor']);
+  (statusJson.lanes ?? []).forEach((lane, index) => {
+    const role = rolesByTitle.get(lane.role);
+    if (role && !sharedControlRoleIds.has(role.id) && lane.state !== role.status) {
+      errors.push(`status.json lanes[${index}] state ${lane.state} does not match role ${role.title} status ${role.status}`);
+    }
+  });
+
+  if (!statusJson.roles?.some((role) => role.tag === '⟦tag:v2|role|pm-control-v0.1⟧')) {
+    errors.push('status.json missing PM role tag');
+  }
+  if (!statusJson.roles?.some((role) => role.tag === '⟦tag:v2|role|supervisor-control-v0.1⟧')) {
+    errors.push('status.json missing supervisor role tag');
+  }
+  if (!statusJson.roles?.some((role) => role.tag === '⟦tag:v2|task|connector-policy-v0.1⟧')) {
+    errors.push('status.json missing connector policy lane role');
+  }
+
+  const dailyDecisionQueueRole = statusJson.roles?.find((role) => role.id === 'daily-decision-queue');
+  if (!dailyDecisionQueueRole) {
+    errors.push('status.json missing daily decision queue role');
+  } else {
+    if (dailyDecisionQueueRole.title !== '[PM]#daily-decision-queue@2026-07-02') {
+      errors.push(`daily decision queue role title mismatch: ${dailyDecisionQueueRole.title}`);
+    }
+    if (dailyDecisionQueueRole.status !== 'standby') {
+      errors.push(`daily decision queue must remain standby: ${dailyDecisionQueueRole.status}`);
+    }
+    if (dailyDecisionQueueRole.evidence !== 'docs/orchestration/tasks/daily-decision-queue-2026-07-02.md') {
+      errors.push(`daily decision queue evidence mismatch: ${dailyDecisionQueueRole.evidence}`);
+    }
+  }
+
+  const dailyDecisionQueueLane = statusJson.lanes?.find((lane) => lane.id === 'daily-decision-queue');
+  if (!dailyDecisionQueueLane) {
+    errors.push('status.json missing daily decision queue lane');
+  } else if (dailyDecisionQueueLane.state !== 'standby') {
+    errors.push(`daily decision queue lane must remain standby: ${dailyDecisionQueueLane.state}`);
+  }
+
+  const dailyRoleAccountabilityRole = statusJson.roles?.find((role) => role.id === 'daily-role-accountability');
+  if (!dailyRoleAccountabilityRole) {
+    errors.push('status.json missing daily role accountability role');
+  } else {
+    if (dailyRoleAccountabilityRole.title !== '[PM]#daily-role-accountability@2026-07-02') {
+      errors.push(`daily role accountability role title mismatch: ${dailyRoleAccountabilityRole.title}`);
+    }
+    if (dailyRoleAccountabilityRole.status !== 'standby') {
+      errors.push(`daily role accountability role must remain standby: ${dailyRoleAccountabilityRole.status}`);
+    }
+    if (dailyRoleAccountabilityRole.evidence !== 'docs/orchestration/tasks/daily-role-accountability-2026-07-02.md') {
+      errors.push(`daily role accountability evidence mismatch: ${dailyRoleAccountabilityRole.evidence}`);
+    }
+  }
+
+  const dailyRoleAccountabilityLane = statusJson.lanes?.find((lane) => lane.id === 'daily-role-accountability');
+  if (!dailyRoleAccountabilityLane) {
+    errors.push('status.json missing daily role accountability lane');
+  } else if (dailyRoleAccountabilityLane.state !== 'standby') {
+    errors.push(`daily role accountability lane must remain standby: ${dailyRoleAccountabilityLane.state}`);
+  }
+
+  const connectorAcceptanceReviewRole = statusJson.roles?.find((role) => role.id === 'connector-acceptance-review');
+  if (!connectorAcceptanceReviewRole) {
+    errors.push('status.json missing connector acceptance review role');
+  } else {
+    if (connectorAcceptanceReviewRole.title !== '[PM]#connector-acceptance-review@v0.1') {
+      errors.push(`connector acceptance review role title mismatch: ${connectorAcceptanceReviewRole.title}`);
+    }
+    if (connectorAcceptanceReviewRole.status !== 'standby') {
+      errors.push(`connector acceptance review role must remain standby until PM/user decision: ${connectorAcceptanceReviewRole.status}`);
+    }
+    if (connectorAcceptanceReviewRole.evidence !== 'docs/orchestration/tasks/connector-acceptance-review-v0.1.md') {
+      errors.push(`connector acceptance review evidence mismatch: ${connectorAcceptanceReviewRole.evidence}`);
+    }
+  }
+
+  const connectorAcceptanceReviewLane = statusJson.lanes?.find((lane) => lane.id === 'connector-acceptance-review');
+  if (!connectorAcceptanceReviewLane) {
+    errors.push('status.json missing connector acceptance review lane');
+  } else if (connectorAcceptanceReviewLane.state !== 'standby') {
+    errors.push(`connector acceptance review lane must remain standby until PM/user decision: ${connectorAcceptanceReviewLane.state}`);
+  }
+
+  const gitManagerRole = statusJson.roles?.find((role) => role.id === 'git-manager-agentpet');
+  if (!gitManagerRole) {
+    errors.push('status.json missing AgentPet Git manager role');
+  } else {
+    if (gitManagerRole.title !== '[长工]#git-manager@AgentPet') {
+      errors.push(`AgentPet Git manager role title mismatch: ${gitManagerRole.title}`);
+    }
+    if (gitManagerRole.status !== 'standby') {
+      errors.push(`AgentPet Git manager role must remain standby until repair is authorized: ${gitManagerRole.status}`);
+    }
+    if (gitManagerRole.evidence !== 'docs/orchestration/sessions/git-manager-agentpet-2026-07-02.md') {
+      errors.push(`AgentPet Git manager evidence mismatch: ${gitManagerRole.evidence}`);
+    }
+  }
+
+  const gitManagerLane = statusJson.lanes?.find((lane) => lane.id === 'git-manager-agentpet');
+  if (!gitManagerLane) {
+    errors.push('status.json missing AgentPet Git manager lane');
+  } else if (gitManagerLane.state !== 'standby') {
+    errors.push(`AgentPet Git manager lane must remain standby until repair is authorized: ${gitManagerLane.state}`);
+  }
+
+  const gitRepairRole = statusJson.roles?.find((role) => role.id === 'git-repair-agentpet');
+  if (!gitRepairRole) {
+    errors.push('status.json missing AgentPet Git repair role');
+  } else {
+    if (gitRepairRole.title !== '[短工]#git-repair-agentpet@v0.1') {
+      errors.push(`AgentPet Git repair role title mismatch: ${gitRepairRole.title}`);
+    }
+    if (gitRepairRole.status !== 'standby') {
+      errors.push(`AgentPet Git repair role must remain standby until repair is authorized: ${gitRepairRole.status}`);
+    }
+    if (gitRepairRole.evidence !== 'docs/orchestration/tasks/git-repair-agentpet-v0.1.md') {
+      errors.push(`AgentPet Git repair evidence mismatch: ${gitRepairRole.evidence}`);
+    }
+  }
+
+  const gitRepairLane = statusJson.lanes?.find((lane) => lane.id === 'git-repair-agentpet');
+  if (!gitRepairLane) {
+    errors.push('status.json missing AgentPet Git repair lane');
+  } else if (gitRepairLane.state !== 'standby') {
+    errors.push(`AgentPet Git repair lane must remain standby until repair is authorized: ${gitRepairLane.state}`);
+  }
+
+  const ranchM4RequirementsRole = statusJson.roles?.find((role) => role.id === 'ranch-m4-requirements');
+  if (!ranchM4RequirementsRole) {
+    errors.push('status.json missing ranch M4 requirements role');
+  } else if (ranchM4RequirementsRole.status !== 'summarized') {
+    errors.push(`ranch M4 requirements role must be summarized after dispatch package creation: ${ranchM4RequirementsRole.status}`);
+  }
+
+  const ranchM4ImplementationRole = statusJson.roles?.find((role) => role.id === 'ranch-m4-implementation');
+  if (!ranchM4ImplementationRole) {
+    errors.push('status.json missing ranch M4 implementation role');
+  } else if (ranchM4ImplementationRole.status !== 'standby') {
+    errors.push(`ranch M4 implementation role must remain standby until explicit dispatch: ${ranchM4ImplementationRole.status}`);
+  }
+
+  const ranchM4ImplementationLane = statusJson.lanes?.find((lane) => lane.id === 'ranch-m4-implementation');
+  if (!ranchM4ImplementationLane) {
+    errors.push('status.json missing ranch M4 implementation lane');
+  } else if (ranchM4ImplementationLane.state !== 'standby') {
+    errors.push(`ranch M4 implementation lane must remain standby until explicit dispatch: ${ranchM4ImplementationLane.state}`);
+  }
+
+  const ranchPointerSmokeRole = statusJson.roles?.find((role) => role.id === 'ranch-pointer-smoke');
+  if (!ranchPointerSmokeRole) {
+    errors.push('status.json missing ranch pointer smoke role');
+  } else if (ranchPointerSmokeRole.status !== 'standby') {
+    errors.push(`ranch pointer smoke role must remain standby until a transparent-window capture route is available: ${ranchPointerSmokeRole.status}`);
+  }
+
+  const ranchPointerSmokeLane = statusJson.lanes?.find((lane) => lane.id === 'ranch-pointer-smoke');
+  if (!ranchPointerSmokeLane) {
+    errors.push('status.json missing ranch pointer smoke lane');
+  } else if (ranchPointerSmokeLane.state !== 'standby') {
+    errors.push(`ranch pointer smoke lane must remain standby until a transparent-window capture route is available: ${ranchPointerSmokeLane.state}`);
+  }
+
+  const ranchPointerSmokeManualEvidenceRole = statusJson.roles?.find((role) => role.id === 'ranch-pointer-smoke-manual-evidence');
+  if (!ranchPointerSmokeManualEvidenceRole) {
+    errors.push('status.json missing ranch pointer smoke manual evidence role');
+  } else {
+    if (ranchPointerSmokeManualEvidenceRole.title !== '[监督]#ranch-pointer-smoke-manual-evidence@v0.2') {
+      errors.push(`ranch pointer smoke manual evidence role title mismatch: ${ranchPointerSmokeManualEvidenceRole.title}`);
+    }
+    if (ranchPointerSmokeManualEvidenceRole.status !== 'standby') {
+      errors.push(`ranch pointer smoke manual evidence role must remain standby until a transparent-window capture route is available: ${ranchPointerSmokeManualEvidenceRole.status}`);
+    }
+    if (ranchPointerSmokeManualEvidenceRole.evidence !== 'docs/orchestration/tasks/ranch-pointer-smoke-manual-evidence-v0.2.md') {
+      errors.push(`ranch pointer smoke manual evidence mismatch: ${ranchPointerSmokeManualEvidenceRole.evidence}`);
+    }
+  }
+
+  const ranchPointerSmokeManualEvidenceLane = statusJson.lanes?.find((lane) => lane.id === 'ranch-pointer-smoke-manual-evidence');
+  if (!ranchPointerSmokeManualEvidenceLane) {
+    errors.push('status.json missing ranch pointer smoke manual evidence lane');
+  } else if (ranchPointerSmokeManualEvidenceLane.state !== 'standby') {
+    errors.push(`ranch pointer smoke manual evidence lane must remain standby until a transparent-window capture route is available: ${ranchPointerSmokeManualEvidenceLane.state}`);
+  }
+
+  if (statusJson.source !== 'docs/orchestration/index.md') {
+    errors.push(`status.json source must be docs/orchestration/index.md, got: ${statusJson.source}`);
+  }
+  if (indexState.identity && statusJson.identity !== indexState.identity) {
+    errors.push(`status.json identity ${statusJson.identity} does not match index identity ${indexState.identity}`);
+  }
+  if (indexState.loopState && statusJson.loopState !== indexState.loopState) {
+    errors.push(`status.json loopState ${statusJson.loopState} does not match index loop state ${indexState.loopState}`);
+  }
+  if (indexState.dispatchState && statusJson.dispatchState !== indexState.dispatchState) {
+    errors.push(`status.json dispatchState ${statusJson.dispatchState} does not match index dispatch state ${indexState.dispatchState}`);
+  }
+  if (statusJson.target && !index.includes(statusJson.target)) {
+    errors.push('status.json target is not present in docs/orchestration/index.md current target');
+  }
+  if (index.includes('403 DAILY_LIMIT_EXCEEDED') && !statusJson.blocker.includes('403 DAILY_LIMIT_EXCEEDED')) {
+    errors.push('status.json blocker must include live-subagent 403 DAILY_LIMIT_EXCEEDED when index lists it');
+  }
+
+  if (!Array.isArray(statusJson.connectors) || statusJson.connectors.length === 0) {
+    errors.push('status.json needs connector policy entries');
+  } else {
+    const allowedConnectorStatuses = new Set(['draft', 'placeholder', 'ready', 'disabled']);
+    requireUnique('status.json connector id', statusJson.connectors.map((connector) => connector.id));
+    statusJson.connectors.forEach((connector, index) => {
+      ['id', 'label', 'cwdPolicy', 'confirmation', 'acceptanceGate'].forEach((key) => {
+        if (typeof connector[key] !== 'string' || connector[key].trim() === '') {
+          errors.push(`status.json connectors[${index}] missing string field: ${key}`);
+        }
+      });
+      if (!allowedConnectorStatuses.has(connector.status)) {
+        errors.push(`status.json connectors[${index}] has invalid status: ${connector.status}`);
+      }
+      if (!Array.isArray(connector.envAllowlist)) {
+        errors.push(`status.json connectors[${index}] envAllowlist must be an array`);
+      }
+      if (typeof connector.timeoutSeconds !== 'number' || connector.timeoutSeconds <= 0) {
+        errors.push(`status.json connectors[${index}] timeoutSeconds must be positive`);
+      }
+    });
+  }
+
+  const sessionStatesByPath = new Map();
+  const expectedStatesByIdentity = new Map();
+  const addExpectedState = (map, key, state) => {
+    if (!key || !state) {
+      return;
+    }
+    const states = map.get(key) ?? [];
+    states.push(state);
+    map.set(key, states);
+  };
+
+  (statusJson.roles ?? []).forEach((role) => {
+    addExpectedState(expectedStatesByIdentity, role.title, role.status);
+    if (role.evidence?.startsWith('docs/orchestration/sessions/')) {
+      addExpectedState(sessionStatesByPath, role.evidence, role.status);
+    }
+  });
+  (statusJson.lanes ?? []).forEach((lane) => {
+    addExpectedState(expectedStatesByIdentity, lane.role, lane.state);
+  });
+
+  const statusRoleTitles = new Set((statusJson.roles ?? []).map((role) => role.title));
+  const trackedSessionIdentities = new Set();
+
+  referencedSessions.forEach((relativePath) => {
+    const content = read(relativePath);
+    const sessionState = parseSessionState(relativePath, content);
+    if (sessionState.identity) {
+      trackedSessionIdentities.add(sessionState.identity);
+    }
+    const expectedStates = [
+      ...(sessionStatesByPath.get(relativePath) ?? []),
+      ...(expectedStatesByIdentity.get(sessionState.identity) ?? [])
+    ];
+    const expectedState = strongestExpectedState([...new Set(expectedStates)]);
+
+    if (expectedState) {
+      if (sessionState.loopState !== expectedState) {
+        errors.push(`${relativePath} loop state ${sessionState.loopState} does not match status source ${expectedState}`);
+      }
+      if (sessionState.dispatchState !== expectedState) {
+        errors.push(`${relativePath} dispatch state ${sessionState.dispatchState} does not match status source ${expectedState}`);
+      }
+    } else if (sessionState.loopState === 'active' || sessionState.dispatchState === 'active') {
+      errors.push(`${relativePath} is active but is not mapped to an active status role or lane`);
+    }
+  });
+
+  (statusJson.lanes ?? []).forEach((lane, index) => {
+    if (!statusRoleTitles.has(lane.role) && !trackedSessionIdentities.has(lane.role)) {
+      errors.push(`status.json lanes[${index}] role is not tracked as a role or session identity: ${lane.role}`);
+    }
+  });
+}
+
+if (connectorSchema) {
+  requireText('connector schema', JSON.stringify(connectorSchema), [
+    'Multi Agent Connector Policy',
+    'enabledByDefault',
+    'approvalStatus',
+    'acceptedBy',
+    'dangerousCommandPatterns',
+    'required-for-write'
+  ]);
+}
+
+if (connectorConfig) {
+  const connectorStatuses = new Set(['draft', 'placeholder', 'ready', 'disabled']);
+  const confirmations = new Set(['none', 'required', 'required-for-write']);
+  const cwdPolicies = new Set(['workspace-root', 'explicit-path']);
+  const approvalStatuses = new Set(['not-requested', 'pending', 'accepted', 'rejected']);
+
+  if (connectorConfig.version !== 1) {
+    errors.push('connectors.json version must be 1');
+  }
+  if (!connectorConfig.defaults || typeof connectorConfig.defaults !== 'object') {
+    errors.push('connectors.json missing defaults');
+  } else {
+    if (!cwdPolicies.has(connectorConfig.defaults.cwdPolicy)) {
+      errors.push(`connectors.json defaults invalid cwdPolicy: ${connectorConfig.defaults.cwdPolicy}`);
+    }
+    if (!Array.isArray(connectorConfig.defaults.envAllowlist) || connectorConfig.defaults.envAllowlist.length === 0) {
+      errors.push('connectors.json defaults envAllowlist must be non-empty');
+    }
+    if (!confirmations.has(connectorConfig.defaults.confirmation)) {
+      errors.push(`connectors.json defaults invalid confirmation: ${connectorConfig.defaults.confirmation}`);
+    }
+    if (!Array.isArray(connectorConfig.defaults.dangerousCommandPatterns) || connectorConfig.defaults.dangerousCommandPatterns.length === 0) {
+      errors.push('connectors.json defaults dangerousCommandPatterns must be non-empty');
+    }
+  }
+
+  if (!Array.isArray(connectorConfig.connectors) || connectorConfig.connectors.length === 0) {
+    errors.push('connectors.json needs connectors');
+  } else {
+    const ids = new Set();
+    connectorConfig.connectors.forEach((connector, index) => {
+      ['id', 'label', 'runner', 'cwdPolicy', 'confirmation', 'acceptanceGate', 'approvalStatus', 'acceptedBy', 'acceptedAt', 'approvalEvidence'].forEach((key) => {
+        if (typeof connector[key] !== 'string' || connector[key].trim() === '') {
+          const optionalUntilAccepted = ['acceptedBy', 'acceptedAt'].includes(key) && connector.approvalStatus !== 'accepted';
+          if (!optionalUntilAccepted) {
+            errors.push(`connectors.json connectors[${index}] missing string field: ${key}`);
+          }
+        }
+      });
+      if (ids.has(connector.id)) {
+        errors.push(`connectors.json duplicate connector id: ${connector.id}`);
+      }
+      ids.add(connector.id);
+      if (!connectorStatuses.has(connector.status)) {
+        errors.push(`connectors.json connectors[${index}] invalid status: ${connector.status}`);
+      }
+      if (connector.runner !== 'local-command') {
+        errors.push(`connectors.json connectors[${index}] invalid runner: ${connector.runner}`);
+      }
+      if (!Array.isArray(connector.args)) {
+        errors.push(`connectors.json connectors[${index}] args must be an array`);
+      }
+      if (!cwdPolicies.has(connector.cwdPolicy)) {
+        errors.push(`connectors.json connectors[${index}] invalid cwdPolicy: ${connector.cwdPolicy}`);
+      }
+      if (!Array.isArray(connector.envAllowlist) || connector.envAllowlist.length === 0) {
+        errors.push(`connectors.json connectors[${index}] envAllowlist must be non-empty`);
+      }
+      if (!confirmations.has(connector.confirmation)) {
+        errors.push(`connectors.json connectors[${index}] invalid confirmation: ${connector.confirmation}`);
+      }
+      if (!approvalStatuses.has(connector.approvalStatus)) {
+        errors.push(`connectors.json connectors[${index}] invalid approvalStatus: ${connector.approvalStatus}`);
+      }
+      if (typeof connector.timeoutSeconds !== 'number' || connector.timeoutSeconds <= 0) {
+        errors.push(`connectors.json connectors[${index}] timeoutSeconds must be positive`);
+      }
+      if (typeof connector.enabledByDefault !== 'boolean') {
+        errors.push(`connectors.json connectors[${index}] enabledByDefault must be boolean`);
+      }
+      if (connector.enabledByDefault && connector.status !== 'ready') {
+        errors.push(`connectors.json connector ${connector.id} cannot be enabled unless status is ready`);
+      }
+      if (connector.enabledByDefault && connector.approvalStatus !== 'accepted') {
+        errors.push(`connectors.json connector ${connector.id} cannot be enabled unless approvalStatus is accepted`);
+      }
+      if (connector.approvalStatus === 'accepted' && connector.status !== 'ready') {
+        errors.push(`connectors.json connector ${connector.id} cannot be accepted unless status is ready`);
+      }
+      if (connector.approvalStatus === 'accepted' && (!connector.acceptedBy.trim() || !connector.acceptedAt.trim())) {
+        errors.push(`connectors.json accepted connector ${connector.id} needs acceptedBy and acceptedAt`);
+      }
+      if (connector.status === 'placeholder' && connector.command.trim() !== '') {
+        errors.push(`connectors.json placeholder connector ${connector.id} must not define command`);
+      }
+      if (['draft', 'ready'].includes(connector.status) && connector.command.trim() === '') {
+        errors.push(`connectors.json ${connector.status} connector ${connector.id} needs command`);
+      }
+    });
+  }
+}
+
+if (statusJson && connectorConfig?.connectors) {
+  const configConnectorsById = new Map(connectorConfig.connectors.map((connector) => [connector.id, connector]));
+  const configIds = new Set(configConnectorsById.keys());
+  const statusIds = new Set((statusJson.connectors ?? []).map((connector) => connector.id));
+  configIds.forEach((id) => {
+    if (!statusIds.has(id)) {
+      errors.push(`status.json missing connector from connectors.json: ${id}`);
+    }
+  });
+  statusIds.forEach((id) => {
+    if (!configIds.has(id)) {
+      errors.push(`status.json has connector missing from connectors.json: ${id}`);
+    }
+  });
+  (statusJson.connectors ?? []).forEach((statusConnector) => {
+    const configConnector = configConnectorsById.get(statusConnector.id);
+    if (!configConnector) {
+      return;
+    }
+    [
+      'label',
+      'status',
+      'command',
+      'cwdPolicy',
+      'envAllowlist',
+      'confirmation',
+      'timeoutSeconds',
+      'acceptanceGate'
+    ].forEach((field) => {
+      requireSameValue(`connector ${statusConnector.id} ${field}`, statusConnector[field], configConnector[field]);
+    });
+  });
+}
+
+if (packageJson) {
+  if (packageJson.scripts?.['orchestration:report'] !== 'node scripts/orchestration-report.mjs') {
+    errors.push('package.json missing orchestration:report script');
+  }
+  if (packageJson.scripts?.['orchestration:check'] !== 'node scripts/check-orchestration.mjs') {
+    errors.push('package.json missing orchestration:check script');
+  }
+  if (packageJson.scripts?.['orchestration:preflight'] !== 'node scripts/connector-preflight.mjs') {
+    errors.push('package.json missing orchestration:preflight script');
+  }
+}
+
+if (errors.length > 0) {
+  console.error('Orchestration check failed:');
+  errors.forEach((error) => console.error(`- ${error}`));
+  process.exit(1);
+}
+
+console.log('Orchestration check passed.');
+console.log(`Referenced cards: ${referencedMarkdown.length}`);

@@ -1,0 +1,367 @@
+# Daily Supervision Session
+
+[PM]#daily-supervision@2026-07-02
+⟦tag:v2|session|daily-supervision-2026-07-02⟧
+role tag: ⟦tag:v2|role|pm-control-v0.1⟧
+
+loop state: active
+dispatch state: active
+
+completed:
+- Rechecked current LPS truth from `docs/orchestration/index.md`, `docs/orchestration/status.json`, tracked task cards, and current session cards.
+- Confirmed ranch v0.2 M3 code gates are complete and summarized:
+  - `m3-main-bridge` summarized.
+  - `m3-ranch-entry` summarized.
+  - `npm.cmd run lint`, `npm.cmd run build`, and `npm.cmd run orchestration:check` passed in the PM thread after merged M3 work.
+- Recorded the initial AgentPet Git management read-only diagnosis:
+  - local `.git` is unusable metadata.
+  - remote `https://github.com/locooooooooo/AgentPet.git` exists but has no first commit.
+  - no Git repair, commit, push, reset, or clean has been authorized or run.
+- Re-ran daily supervision commands:
+  - `npm.cmd run orchestration:report`
+  - `npm.cmd run orchestration:preflight`
+- Confirmed connector preflight remains non-executing:
+  - Codex command is discoverable but draft/pending/enabled=false.
+  - Trae and Qoder remain placeholder/not-requested/enabled=false.
+  - No connector is ready + accepted + enabled.
+- Corrected daily lane classification:
+  - `connector-policy` is standby for PM/user acceptance or revision, not an implementation-active lane.
+  - `runtime-blocked-path-closeout` is summarized because its closeout session is already complete.
+- Created Git management long-worker thread `019f20fc-9b77-74f3-aa3d-ba8348cdec1c` with `gpt-5.4` + `xhigh` reasoning for read-only AgentPet Git follow-up.
+- Added `docs/orchestration/sessions/git-manager-agentpet-2026-07-02.md`; Git management was temporarily opened for read-only callback collection, then moved to standby after the callback was collected.
+- Collected Git manager callback:
+  - local `.git` is an empty directory and not a valid Git repository.
+  - remote `https://github.com/locooooooooo/AgentPet.git` is reachable, empty, and reports `default_branch=main`.
+  - no Git write, repair, staging, commit, push, reset, or clean command was authorized or run.
+- 2026-07-02 12:09:44 +08:00 supervision pass:
+  - `npm.cmd run orchestration:check` passed with 18 referenced cards.
+  - `npm.cmd run orchestration:report` shows only `daily-supervision` as active implementation-control lane; Git manager and connector policy are standby.
+  - `npm.cmd run orchestration:preflight` passed with Codex draft/pending/enabled=false and Trae/Qoder placeholder/not-requested/enabled=false.
+- 2026-07-02 12:11:29 +08:00 supervision pass:
+  - Git manager thread `019f20fc-9b77-74f3-aa3d-ba8348cdec1c` is idle; latest callback remains the already-collected read-only Git diagnosis.
+  - `npm.cmd run orchestration:check` passed with 18 referenced cards.
+  - `npm.cmd run orchestration:report` still shows `daily-supervision` active, Git manager standby, connector policy standby, and live-subagents blocked.
+  - `npm.cmd run orchestration:preflight` passed with no connector enabled for execution.
+- 2026-07-02 12:14:21 +08:00 supervision pass:
+  - Corrected stale wording in this card so Git management history no longer reads as currently active; current state remains standby after callback collection.
+  - Git manager thread `019f20fc-9b77-74f3-aa3d-ba8348cdec1c` remains idle with no new repair action.
+  - `npm.cmd run orchestration:check` passed with 18 referenced cards.
+  - `npm.cmd run orchestration:report` still shows `daily-supervision` active, Git manager standby, connector policy standby, and no reopened implementation lane.
+  - `npm.cmd run orchestration:preflight` passed with Codex draft/pending/enabled=false and Trae/Qoder placeholder/not-requested/enabled=false.
+- 2026-07-02 12:17:11 +08:00 supervision pass:
+  - Corrected summarized session headers in `ranch-v0.2-2026-07-02.md` and `main-thread-2026-07-01-runtime-bootstrap.md` from active to summarized.
+  - Corrected `runtime-blocked-path-closeout-v0.1.md` acceptance wording so it no longer implies the global dispatch state should be waiting.
+  - Git manager thread `019f20fc-9b77-74f3-aa3d-ba8348cdec1c` remains idle with no new repair action.
+  - Local `.git` still exists as an empty directory (`git_dir_entry_count=0`); `git status --short` still reports `fatal: not a git repository`, confirming Git repair was not run.
+  - `npm.cmd run orchestration:check` passed with 18 referenced cards.
+  - `npm.cmd run orchestration:report` still shows `daily-supervision` as the only active lane; summarized and standby lanes remain closed or waiting.
+  - `npm.cmd run orchestration:preflight` passed with no connector enabled for execution.
+- 2026-07-02 12:51:21 +08:00 supervision pass:
+  - Strengthened `scripts/check-orchestration.mjs` so referenced session cards must expose `loop state` and `dispatch state`, and those states must match `docs/orchestration/status.json` role/lane truth.
+  - The new check exposed missing summarized state headers in `runtime-blocked-path-closeout-2026-07-01.md` and `codex-evidence-closeout-2026-07-01.md`; both were corrected to `loop state: summarized` and `dispatch state: summarized`.
+  - `npm.cmd run orchestration:check` passed with 18 referenced cards after the rule and card fixes.
+  - `npm.cmd run orchestration:report` still shows only `daily-supervision` active; Git manager and connector policy remain standby.
+  - `npm.cmd run orchestration:preflight` passed with no connector enabled for execution.
+- 2026-07-02 12:54:13 +08:00 supervision pass:
+  - Renamed index/report card-list wording to tracked cards/business cards, because the list includes summarized and standby cards.
+  - Updated `scripts/check-orchestration.mjs` to require the tracked-card headings and `scripts/orchestration-report.mjs` to print `tracked cards`.
+  - Updated PM/runtime wording so dispatch still happens only from active task/session cards or explicit user requests, while the index list is tracked truth.
+  - `node --check scripts/check-orchestration.mjs` and `node --check scripts/orchestration-report.mjs` passed.
+  - `npm.cmd run orchestration:check` passed with 18 referenced cards.
+  - `npm.cmd run orchestration:report` prints `tracked cards` and still shows only `daily-supervision` active.
+  - `npm.cmd run orchestration:preflight` passed with no connector enabled for execution.
+- 2026-07-02 12:58:17 +08:00 supervision pass:
+  - Strengthened `scripts/check-orchestration.mjs` so each `status.json` role evidence markdown must be tracked in `index.md` and contain its tag.
+  - Strengthened `scripts/check-orchestration.mjs` so every lane role must resolve to a tracked role title or tracked session identity.
+  - The new check exposed missing ownership for `[短工]#runtime-dispatch-cards@v0.1`; added it to `status.json.roles` as summarized.
+  - Corrected `runtime-connector-dispatch-v0.1.md` from stale active dispatch wording to summarized, with connector execution binding still intentionally not dispatched.
+  - `npm.cmd run orchestration:check` passed with 18 referenced cards.
+  - `npm.cmd run orchestration:report` shows `[短工]#runtime-dispatch-cards@v0.1` as a summarized role and still shows only `daily-supervision` active.
+  - `npm.cmd run orchestration:preflight` passed with no connector enabled for execution.
+- 2026-07-02 13:00:54 +08:00 supervision pass:
+  - Read Git manager long-worker thread `019f20fc-9b77-74f3-aa3d-ba8348cdec1c`; title is `长工｜AgentPet Git 管理`, status is idle, and the latest callback remains the collected read-only diagnosis.
+  - Re-ran `npm.cmd run orchestration:check`, `npm.cmd run orchestration:report`, and `npm.cmd run orchestration:preflight`; all passed, with only `daily-supervision` active and no connector enabled.
+  - Rechecked current AgentPet Git state read-only: local `.git` exists as an empty directory, `git status --short --branch` still reports `fatal: not a git repository`, and remote `locooooooooo/AgentPet` still reports `isEmpty=true` with `viewerPermission=ADMIN`.
+  - Git manager remains standby; no Git repair, staging, commit, push, reset, clean, or connector execution was run.
+- 2026-07-02 13:04:12 +08:00 supervision pass:
+  - Corrected `connector-policy-v0.1.md` acceptance wording from stale active-card phrasing to `tracked business card`, matching the current standby lane state.
+  - Strengthened `scripts/check-orchestration.mjs` so referenced orchestration markdown fails if the old active-card phrasing reappears.
+  - `node --check scripts/check-orchestration.mjs` passed.
+  - `npm.cmd run orchestration:check` passed with 18 referenced cards.
+  - `npm.cmd run orchestration:report` still shows only `daily-supervision` active; Git manager and connector policy remain standby.
+  - `npm.cmd run orchestration:preflight` passed with no connector enabled for execution.
+- 2026-07-02 13:07:09 +08:00 supervision pass:
+  - Strengthened `scripts/check-orchestration.mjs` so `docs/orchestration/status.json` must keep `source`, `identity`, `loopState`, and `dispatchState` aligned with `docs/orchestration/index.md`.
+  - `node --check scripts/check-orchestration.mjs` passed.
+  - `npm.cmd run orchestration:check` passed with 18 referenced cards under the stronger index/status consistency rule.
+  - `npm.cmd run orchestration:report` still shows only `daily-supervision` active; Git manager and connector policy remain standby.
+  - `npm.cmd run orchestration:preflight` passed with no connector enabled for execution.
+- 2026-07-02 13:09:44 +08:00 supervision pass:
+  - Strengthened `scripts/check-orchestration.mjs` so `status.json.connectors` must mirror shared connector fields from `docs/orchestration/connectors.json`: label, status, command, cwdPolicy, envAllowlist, confirmation, timeoutSeconds, and acceptanceGate.
+  - `node --check scripts/check-orchestration.mjs` passed.
+  - `npm.cmd run orchestration:check` passed with 18 referenced cards under the stronger connector mirror consistency rule.
+  - `npm.cmd run orchestration:report` still shows only `daily-supervision` active; connector policy remains standby and all connectors remain non-enabled.
+  - `npm.cmd run orchestration:preflight` passed with no connector enabled for execution.
+- 2026-07-02 13:12:13 +08:00 supervision pass:
+  - Strengthened `scripts/check-orchestration.mjs` so every tagged role/task/session entry in `docs/orchestration/index.md` must point to the matching `roles/`, `tasks/`, or `sessions/` directory and the referenced file must contain the same tag.
+  - `node --check scripts/check-orchestration.mjs` passed.
+  - `npm.cmd run orchestration:check` passed with 18 referenced cards under the stronger index tag consistency rule.
+  - `npm.cmd run orchestration:report` still shows only `daily-supervision` active; Git manager and connector policy remain standby.
+  - `npm.cmd run orchestration:preflight` passed with no connector enabled for execution.
+- 2026-07-02 13:15:27 +08:00 supervision pass:
+  - Strengthened `scripts/check-orchestration.mjs` so `status.json` role ids, role titles, lane ids, and connector ids must be unique.
+  - The first draft also required role tags to be unique; `npm.cmd run orchestration:check` correctly exposed that ranch/M3 roles intentionally share one session tag, so the rule was narrowed to preserve the current multi-role session evidence model.
+  - `node --check scripts/check-orchestration.mjs` passed.
+  - `npm.cmd run orchestration:check` passed with 18 referenced cards under the narrowed uniqueness rule.
+  - `npm.cmd run orchestration:report` still shows only `daily-supervision` active; Git manager and connector policy remain standby.
+  - `npm.cmd run orchestration:preflight` passed with no connector enabled for execution.
+- 2026-07-02 13:18:03 +08:00 supervision pass:
+  - Confirmed `src/lib/orchestrationStatus.ts` currently imports `docs/orchestration/status.json` and `docs/orchestration/connectors.json` directly, so the control cockpit is not using a hand-copied status snapshot.
+  - Strengthened `scripts/check-orchestration.mjs` so the UI status source must keep the exact repo-local JSON imports for orchestration status and connector policy.
+  - `node --check scripts/check-orchestration.mjs` passed.
+  - `npm.cmd run orchestration:check` passed with 18 referenced cards under the stronger UI status source import rule.
+  - `npm.cmd run orchestration:report` still shows only `daily-supervision` active; Git manager and connector policy remain standby.
+  - `npm.cmd run orchestration:preflight` passed with no connector enabled for execution.
+- 2026-07-02 13:20:49 +08:00 supervision pass:
+  - Strengthened `scripts/check-orchestration.mjs` so every `status.json.roles[].evidence` path must exist, including non-markdown evidence such as `src/components/NiuMaWorkspace.tsx`.
+  - `node --check scripts/check-orchestration.mjs` passed.
+  - `npm.cmd run orchestration:check` passed with 18 referenced cards under the stronger role evidence existence rule.
+  - `npm.cmd run orchestration:report` still shows only `daily-supervision` active; Git manager and connector policy remain standby.
+  - `npm.cmd run orchestration:preflight` passed with no connector enabled for execution.
+
+- 2026-07-02 13:24:26 +08:00 supervision pass:
+  - Read Git manager long-worker thread `019f20fc-9b77-74f3-aa3d-ba8348cdec1c`; the thread is idle and the latest callback remains the collected read-only AgentPet Git diagnosis.
+  - Re-ran `npm.cmd run orchestration:check`, `npm.cmd run orchestration:report`, and `npm.cmd run orchestration:preflight`; all passed before the new guard was added.
+  - Strengthened `scripts/check-orchestration.mjs` so non-shared status roles used directly by lanes must keep `role.status` and `lane.state` aligned; PM and Supervisor are excluded because they intentionally own multiple control lanes with different lane states.
+  - Corrected stale indexed-card wording in `docs/orchestration/roles/supervisor.md` and made the stale-wording guard case-insensitive.
+  - Git manager remains standby; no Git repair, staging, commit, push, reset, clean, or connector execution was run.
+- 2026-07-02 13:27:55 +08:00 supervision pass:
+  - Final verification after the guard and wording fixes passed: `node --check scripts/check-orchestration.mjs`, `npm.cmd run orchestration:check`, `npm.cmd run orchestration:report`, and `npm.cmd run orchestration:preflight`.
+  - Confirmed no stale indexed-card wording remains in `docs/orchestration/**/*.md`, and `docs/orchestration/connectors.json` still has no accepted or enabled connector.
+  - Rechecked AgentPet Git state read-only: local `.git` exists but contains zero entries, `git status --short --branch` still reports `fatal: not a git repository`, and `gh repo view locooooooooo/AgentPet` still reports `isEmpty=true` with `viewerPermission=ADMIN`.
+  - `git ls-remote --symref https://github.com/locooooooooo/AgentPet.git HEAD` hit a network connection reset in this pass; GitHub REST metadata still returned `default_branch=main` and admin/push permissions, so no Git state change was inferred from the transient `ls-remote` failure.
+- 2026-07-02 13:31:07 +08:00 supervision pass:
+  - Baseline checks passed before the new guard: `npm.cmd run orchestration:check`, `npm.cmd run orchestration:report`, and `npm.cmd run orchestration:preflight`.
+  - Read Git manager long-worker thread `019f20fc-9b77-74f3-aa3d-ba8348cdec1c`; the thread remains idle and its latest callback is still the read-only AgentPet Git diagnosis.
+  - Rechecked AgentPet Git state read-only: local `.git` exists with zero entries, `git status --short --branch` still reports `fatal: not a git repository`, and `gh repo view locooooooooo/AgentPet` still reports `isEmpty=true` with `viewerPermission=ADMIN`.
+  - Strengthened `scripts/check-orchestration.mjs` so `docs/orchestration/index.md` must expose `current role split:` and every `status.json.roles[].title` must be listed there.
+  - `node --check scripts/check-orchestration.mjs` and `npm.cmd run orchestration:check` passed after the guard; no Git repair, staging, commit, push, reset, clean, or connector execution was run.
+- 2026-07-02 13:34:51 +08:00 supervision pass:
+  - Baseline checks passed before the new guard: `npm.cmd run orchestration:check`, `npm.cmd run orchestration:report`, and `npm.cmd run orchestration:preflight`.
+  - Read Git manager long-worker thread `019f20fc-9b77-74f3-aa3d-ba8348cdec1c`; the thread remains non-running and its latest callback is still the read-only AgentPet Git diagnosis.
+  - Rechecked AgentPet Git state read-only: local `.git` exists with zero entries, `git status --short --branch` still reports `fatal: not a git repository`, and `gh repo view locooooooooo/AgentPet` still reports `isEmpty=true` with `viewerPermission=ADMIN`.
+  - Strengthened `scripts/check-orchestration.mjs` so `status.json.target` must be present in `docs/orchestration/index.md`, then corrected `docs/orchestration/status.json` to preserve the indexed project-name wording.
+  - `node --check scripts/check-orchestration.mjs`, `npm.cmd run orchestration:check`, and `npm.cmd run orchestration:report` passed after the target-source correction; no Git repair, staging, commit, push, reset, clean, or connector execution was run.
+- 2026-07-02 13:38:58 +08:00 supervision pass:
+  - Baseline checks passed before the new guard: `npm.cmd run orchestration:check`, `npm.cmd run orchestration:report`, and `npm.cmd run orchestration:preflight`.
+  - Read Git manager long-worker thread `019f20fc-9b77-74f3-aa3d-ba8348cdec1c`; the thread remains non-running and its latest callback is still the read-only AgentPet Git diagnosis.
+  - Rechecked AgentPet Git state read-only: local `.git` exists with zero entries, `git status --short --branch` still reports `fatal: not a git repository`, and `gh repo view locooooooooo/AgentPet` still reports `isEmpty=true` with `viewerPermission=ADMIN`.
+  - Strengthened `scripts/check-orchestration.mjs` so if `docs/orchestration/index.md` lists `403 DAILY_LIMIT_EXCEEDED`, then `status.json.blocker` must include it.
+  - Corrected `docs/orchestration/status.json` blocker summary so the top-level report carries the live-subagents `403 DAILY_LIMIT_EXCEEDED` blocker.
+  - `npm.cmd run orchestration:check` and `npm.cmd run orchestration:report` passed after the blocker correction; no Git repair, staging, commit, push, reset, clean, or connector execution was run.
+- 2026-07-02 13:45:54 +08:00 supervision pass:
+  - Confirmed AgentPet Git long-worker thread `019f20fc-9b77-74f3-aa3d-ba8348cdec1c` already exists as `长工｜AgentPet Git 管理`; no duplicate long-worker thread was created.
+  - Read the latest Git manager callback: local `.git` is still empty metadata, remote `locooooooooo/AgentPet` is still an empty repo with default `main`, and repair remains pending explicit same-message authorization.
+  - Corrected `multi-agent-runtime-v0.1.md` so tracked task/session cards are not described as current active cards, and its summary now records runtime bootstrap as summarized with daily supervision active.
+  - Strengthened `scripts/check-orchestration.mjs` so referenced markdown fails if the stale active task/session-card acceptance sentence returns.
+  - No Git repair, staging, commit, push, reset, clean, connector execution, or M4/control-cockpit locked-file edit was run.
+- 2026-07-02 13:47:00 +08:00 verification pass:
+  - `node --check scripts/check-orchestration.mjs` passed.
+  - `npm.cmd run orchestration:check` passed with 18 referenced cards.
+  - `npm.cmd run orchestration:report` still shows only `daily-supervision` active; Git manager and connector policy remain standby, and live-subagents remain blocked by `403 DAILY_LIMIT_EXCEEDED`.
+  - `npm.cmd run orchestration:preflight` passed with no connector enabled; Codex remains draft/pending/enabled=false and Trae/Qoder remain placeholder/not-requested/enabled=false.
+  - Stale wording scans found no old active-card wording, no stale active task/session-card acceptance sentence, and no bare `summary: - Active.` pattern in tracked orchestration markdown.
+  - Connector config scan found no accepted approval and no `enabledByDefault=true`.
+  - AgentPet Git read-only check remains unchanged: `.git` entry count is `0`, `git status --short --branch` fails with `fatal: not a git repository`, `gh repo view` reports `isEmpty=true` and `viewerPermission=ADMIN`, and GitHub REST reports `default_branch=main` plus admin/push permissions.
+  - No Git repair, staging, commit, push, reset, clean, connector execution, or M4/control-cockpit locked-file edit was run.
+- 2026-07-02 13:49:46 +08:00 supervision pass:
+  - Re-read current orchestration truth from `index.md`, `status.json`, daily supervision, and AgentPet Git manager session.
+  - Read Codex thread `019f20fc-9b77-74f3-aa3d-ba8348cdec1c`; it is idle, titled `长工｜AgentPet Git 管理`, and has no unread follow-up.
+  - `list_threads` for AgentPet Git management returned the same single long-worker thread; no duplicate long-worker was created.
+  - `npm.cmd run orchestration:report` still shows only `daily-supervision` active; AgentPet Git manager and connector policy remain standby.
+  - `npm.cmd run orchestration:preflight` passed with Codex draft/pending/enabled=false and Trae/Qoder placeholder/not-requested/enabled=false.
+  - Added an `orchestration:check` guard that pins the AgentPet Git manager session to thread `019f20fc-9b77-74f3-aa3d-ba8348cdec1c`, `gpt-5.4`, `xhigh`, standby state, and same-message authorization before any Git repair.
+  - No Git repair, staging, commit, push, reset, clean, connector execution, duplicate thread creation, or M4/control-cockpit locked-file edit was run.
+- 2026-07-02 13:50:54 +08:00 verification pass:
+  - `node --check scripts/check-orchestration.mjs` passed.
+  - `npm.cmd run orchestration:check` passed with 18 referenced cards under the AgentPet Git manager long-worker guard.
+  - `npm.cmd run orchestration:report` still shows only `daily-supervision` active; AgentPet Git manager remains standby with repair waiting for explicit authorization.
+  - `npm.cmd run orchestration:preflight` passed with no connector enabled for execution.
+  - Stale wording scan found no old active-card wording, no stale task/session acceptance sentence, and no bare active summary pattern in tracked orchestration markdown.
+  - Connector config scan found no accepted approval and no enabled connector.
+  - AgentPet Git read-only check remains unchanged: `.git` entry count is `0`, `git status --short --branch` fails with `fatal: not a git repository`, `gh repo view` reports `isEmpty=true` and `viewerPermission=ADMIN`, and GitHub REST reports `default_branch=main` plus admin/push permissions.
+  - No Git repair, staging, commit, push, reset, clean, connector execution, duplicate thread creation, or M4/control-cockpit locked-file edit was run.
+- 2026-07-02 13:52:39 +08:00 supervision pass:
+  - Re-read `index.md`, `status.json`, this daily supervision card, and AgentPet Git manager thread `019f20fc-9b77-74f3-aa3d-ba8348cdec1c`.
+  - `npm.cmd run orchestration:report` still shows `daily-supervision` as the only active lane; Git manager and connector policy remain standby, and live-subagents remain blocked.
+  - `npm.cmd run orchestration:preflight` passed with no connector enabled for execution.
+  - Strengthened `scripts/check-orchestration.mjs` so this daily supervision card must keep the current open gates visible: transparent pointer smoke, Git repair authorization, connector policy acceptance, live-subagent `403 DAILY_LIMIT_EXCEEDED`, control-cockpit M4 lock, connector standby, and Git manager standby.
+  - No Git repair, staging, commit, push, reset, clean, connector execution, duplicate thread creation, or M4/control-cockpit locked-file edit was run.
+- 2026-07-02 13:56:41 +08:00 requirements development pass:
+  - Created `docs/orchestration/tasks/ranch-m4-requirements-v0.2.md` as an active docs-only M4 requirements readiness lane.
+  - Updated `docs/orchestration/index.md` and `docs/orchestration/status.json` so `ranch-m4-requirements` is represented as active while M4 implementation remains held behind explicit dispatch.
+  - Strengthened `scripts/check-orchestration.mjs` so the M4 requirements card must keep implementation out of scope, preserve locked-file boundaries, and require a future implementation task to declare write scope before edits.
+  - `node --check scripts/check-orchestration.mjs` passed.
+  - `npm.cmd run orchestration:check` passed with 19 referenced cards.
+  - `npm.cmd run orchestration:report` shows `daily-supervision` and `M4 requirements readiness` active; Git manager and connector policy remain standby.
+  - `npm.cmd run orchestration:preflight` passed with no connector enabled for execution.
+  - `npm.cmd run lint` and `npm.cmd run build` passed after the status/index/task changes.
+  - Stale wording and connector enablement scans found no old active-card wording, no accepted connector, and no enabled connector.
+  - AgentPet Git read-only check remains unchanged: `.git` entry count is `0`, `git status --short --branch` fails with `fatal: not a git repository`, and `gh repo view` reports `isEmpty=true` and `viewerPermission=ADMIN`.
+  - No Git repair, staging, commit, push, reset, clean, connector execution, duplicate thread creation, or M4 implementation/locked-file edit was run.
+- 2026-07-02 14:00:33 +08:00 requirements dispatch-package pass:
+  - Read M4 plan and current candidate implementation files before writing the dispatch package.
+  - Confirmed current M4 preflight: `electron/main.ts` already has `桌面牧场 · 控制舱`, ranch window title `桌面牧场`, and tray tooltip `桌面牧场`; `ranch.html` already has `<title>桌面牧场</title>`.
+  - Confirmed pending M4 implementation items: `package.json` description, `README.md` H1/intro, `src/App.tsx` boot title, and compact app-header ranch settings entry.
+  - Added `docs/orchestration/tasks/ranch-m4-implementation-v0.2.md` as a standby future implementation dispatch package.
+  - Moved `ranch-m4-requirements` from active to summarized in `docs/orchestration/status.json`; added `ranch-m4-implementation` as standby.
+  - Updated `docs/orchestration/index.md` so M4 requirements are summarized and the implementation package is standby.
+  - Strengthened `scripts/check-orchestration.mjs` so M4 requirements must remain summarized after package creation and M4 implementation must remain standby until explicit dispatch.
+  - `node --check scripts/check-orchestration.mjs` passed.
+  - `npm.cmd run orchestration:check` passed with 20 referenced cards.
+  - `npm.cmd run orchestration:report` shows `daily-supervision` active, M4 requirements summarized, and M4 implementation standby.
+  - No Git repair, staging, commit, push, reset, clean, connector execution, duplicate thread creation, or M4 implementation/locked-file edit was run.
+- 2026-07-02 14:03:12 +08:00 verification pass:
+  - `node --check scripts/check-orchestration.mjs` passed.
+  - `npm.cmd run orchestration:check` passed with 20 referenced cards.
+  - `npm.cmd run orchestration:report` still shows `daily-supervision` active, M4 requirements summarized, and M4 implementation standby.
+  - `npm.cmd run orchestration:preflight` passed with no connector enabled for execution.
+  - `npm.cmd run lint` and `npm.cmd run build` passed after the M4 dispatch package and status changes.
+  - Stale wording and connector enablement scans found no old active-card wording, no accepted connector, and no enabled connector.
+  - AgentPet Git read-only check remains unchanged: `.git` entry count is `0`, `git status --short --branch` fails with `fatal: not a git repository`, and `gh repo view` reports `isEmpty=true` and `viewerPermission=ADMIN`.
+  - No Git repair, staging, commit, push, reset, clean, connector execution, duplicate thread creation, or M4 implementation/locked-file edit was run.
+- 2026-07-02 14:07:05 +08:00 pointer-smoke verification-package pass:
+  - Added `docs/orchestration/tasks/ranch-pointer-smoke-v0.2.md` as a standby verification package for the remaining transparent Electron ranch pointer-smoke risk.
+  - Updated `docs/orchestration/index.md` and `docs/orchestration/status.json` so pointer smoke is represented as standby, not as completed or active implementation.
+  - Strengthened `scripts/check-orchestration.mjs` so the pointer-smoke package must stay standby, preserve no-implementation/no-connector/no-Git-repair boundaries, and require desktop pointer evidence rather than browser-only proof.
+  - Updated the daily-supervision lane next action so it explicitly keeps pointer-smoke verification standby until a manual or alternate transparent-window capture route is available.
+  - `node --check scripts/check-orchestration.mjs` passed.
+  - `npm.cmd run orchestration:check` passed with 21 referenced cards.
+  - `npm.cmd run orchestration:report` shows pointer-smoke verification as standby and M4 implementation as standby.
+  - `npm.cmd run orchestration:preflight` passed with no connector enabled for execution.
+  - `npm.cmd run lint` and `npm.cmd run build` passed after the pointer-smoke package and status changes.
+  - Stale wording and connector enablement scans found no old active-card wording, no accepted connector, and no enabled connector.
+  - AgentPet Git read-only check remains unchanged: `git status --short --branch` fails with `fatal: not a git repository`.
+  - No Git repair, staging, commit, push, reset, clean, connector execution, duplicate thread creation, M4 implementation, or pointer input execution was run.
+- 2026-07-02 14:10:47 +08:00 Git repair dispatch-package pass:
+  - Added `docs/orchestration/tasks/git-repair-agentpet-v0.1.md` as a standby future repair package for the existing AgentPet Git manager callback.
+  - Updated `docs/orchestration/index.md` and `docs/orchestration/status.json` so Git repair is represented separately from the long-worker diagnosis and remains standby.
+  - Defined the only authorized future repair scope as `git init -b main` -> `git remote add origin https://github.com/locooooooooo/AgentPet.git` -> `git fetch origin` -> `git status --ignored --short`, then stop for staging review.
+  - Strengthened `scripts/check-orchestration.mjs` so the Git repair package must remain standby, require same-message authorization, and forbid staging, commit, push, reset, clean, connector execution, and M4 edits.
+  - No Git repair, staging, commit, push, reset, clean, connector execution, duplicate thread creation, M4 implementation, or pointer input execution was run.
+- 2026-07-02 14:13:43 +08:00 verification pass:
+  - `node --check scripts/check-orchestration.mjs` passed.
+  - `npm.cmd run orchestration:check` passed with 23 referenced cards.
+  - `npm.cmd run orchestration:report` shows `daily-supervision` active, AgentPet Git manager standby, and `git-repair-agentpet` standby.
+  - `npm.cmd run orchestration:preflight` passed with Codex draft/pending/enabled=false and Trae/Qoder placeholder/not-requested/enabled=false.
+  - `npm.cmd run lint` and `npm.cmd run build` passed after the Git repair dispatch package and status changes.
+  - Stale wording scan found no old active-card wording, no stale active task/session-card acceptance sentence, and no bare active summary pattern in tracked orchestration markdown.
+  - Connector config scan found no accepted approval and no enabled connector.
+  - AgentPet Git read-only check remains unchanged: `.git` entry count is `0`, `git status --short --branch` fails with `fatal: not a git repository`, and `gh repo view` reports `isEmpty=true` with `viewerPermission=ADMIN`.
+  - No Git repair, staging, commit, push, reset, clean, connector execution, duplicate thread creation, M4 implementation, or pointer input execution was run.
+- 2026-07-02 14:16:19 +08:00 connector acceptance review-package pass:
+  - Added `docs/orchestration/tasks/connector-acceptance-review-v0.1.md` as a standby decision-review package for connector policy acceptance.
+  - Updated `docs/orchestration/index.md` and `docs/orchestration/status.json` so connector acceptance review is represented separately from connector policy and remains standby.
+  - Defined explicit review criteria for Codex, Trae, and Qoder without accepting, enabling, executing, or wiring any connector.
+  - Strengthened `scripts/check-orchestration.mjs` so the connector acceptance review package must remain standby and must forbid accepted approval, enabled defaults, connector execution, runtime binding, Git repair, and M4 edits.
+  - No connector was accepted, enabled, executed, or bound; no Git repair, staging, commit, push, reset, clean, duplicate thread creation, M4 implementation, or pointer input execution was run.
+- 2026-07-02 14:19:31 +08:00 verification pass:
+  - `node --check scripts/check-orchestration.mjs` passed.
+  - `npm.cmd run orchestration:check` passed with 24 referenced cards.
+  - `npm.cmd run orchestration:report` shows `connector-acceptance-review` standby, `connector-policy` standby, AgentPet Git manager standby, and `git-repair-agentpet` standby.
+  - `npm.cmd run orchestration:preflight` passed with Codex draft/pending/enabled=false and Trae/Qoder placeholder/not-requested/enabled=false.
+  - `npm.cmd run lint` and `npm.cmd run build` passed after the connector acceptance review package and status changes.
+  - Stale wording scan found no old active-card wording, no stale active task/session-card acceptance sentence, and no bare active summary pattern in tracked orchestration markdown.
+  - Connector config scan found no accepted approval and no enabled connector.
+  - AgentPet Git read-only check remains unchanged: `.git` entry count is `0` and `git status --short --branch` fails with `fatal: not a git repository`.
+  - No connector was accepted, enabled, executed, or bound; no Git repair, staging, commit, push, reset, clean, duplicate thread creation, M4 implementation, or pointer input execution was run.
+- 2026-07-02 14:22:47 +08:00 pointer-smoke manual-evidence package pass:
+  - Added `docs/orchestration/tasks/ranch-pointer-smoke-manual-evidence-v0.2.md` as a standby evidence table for manual or alternate transparent-window pointer-smoke verification.
+  - Updated `docs/orchestration/index.md` and `docs/orchestration/status.json` so the manual evidence package is represented separately from the parent pointer-smoke route and remains standby.
+  - Defined pass/fail/blocked/not-run result rules so browser-only proof, accessibility output, or build success cannot be used as desktop transparent pointer proof.
+  - Strengthened `scripts/check-orchestration.mjs` so the manual evidence package must stay standby and must forbid implementation edits, connector enablement/execution, Git repair, M4 activation, and browser-only acceptance.
+  - No pointer input, Electron launch, connector action, Git repair, staging, commit, push, reset, clean, duplicate thread creation, or M4 implementation was run.
+- 2026-07-02 14:26:13 +08:00 verification pass:
+  - `node --check scripts/check-orchestration.mjs` passed.
+  - `npm.cmd run orchestration:check` passed with 25 referenced cards.
+  - `npm.cmd run orchestration:report` shows `ranch-pointer-smoke` standby and `ranch-pointer-smoke-manual-evidence` standby.
+  - `npm.cmd run orchestration:preflight` passed with Codex draft/pending/enabled=false and Trae/Qoder placeholder/not-requested/enabled=false.
+  - `npm.cmd run lint` and `npm.cmd run build` passed after the manual evidence package and status changes.
+  - Stale wording scan found no old active-card wording, no stale active task/session-card acceptance sentence, and no bare active summary pattern in tracked orchestration markdown.
+  - Connector config scan found no accepted approval and no enabled connector.
+  - AgentPet Git read-only check remains unchanged: `.git` entry count is `0` and `git status --short --branch` fails with `fatal: not a git repository`.
+  - No Electron launch, pointer input, connector action, Git repair, staging, commit, push, reset, clean, duplicate thread creation, or M4 implementation was run.
+- 2026-07-02 14:29:07 +08:00 daily decision-queue pass:
+  - Added `docs/orchestration/tasks/daily-decision-queue-2026-07-02.md` as a standby PM callback surface for the remaining daily decisions.
+  - Updated `docs/orchestration/index.md` and `docs/orchestration/status.json` so the decision queue is represented as standby and does not authorize work by itself.
+  - Consolidated five open queue items: AgentPet Git repair, connector acceptance, M4 implementation, transparent pointer smoke, and live sub-agent quota.
+  - Strengthened `scripts/check-orchestration.mjs` so the queue must keep named owner, required decision/condition, allowed first action, and blocked-until fields for each item.
+  - No Git repair, connector acceptance/execution, M4 implementation, Electron launch, pointer input, duplicate thread creation, staging, commit, push, reset, clean, or file removal was run.
+- 2026-07-02 14:36:13 +08:00 verification pass:
+  - `node --check scripts/check-orchestration.mjs` passed.
+  - `npm.cmd run orchestration:check` passed with 27 referenced cards.
+  - `npm.cmd run orchestration:report` shows `daily-decision-queue` standby and daily supervision active.
+  - `npm.cmd run orchestration:preflight` passed with Codex draft/pending/enabled=false and Trae/Qoder placeholder/not-requested/enabled=false.
+  - `npm.cmd run lint` and `npm.cmd run build` passed after the daily decision queue and status changes.
+  - Stale wording scan found no old active-card wording, no stale active task/session-card acceptance sentence, and no bare active summary pattern in tracked orchestration markdown.
+  - Connector config scan found no accepted approval and no enabled connector.
+  - AgentPet Git read-only check remains unchanged: `.git` entry count is `0` and `git status --short --branch` fails with `fatal: not a git repository`.
+  - No decision queue item was authorized or executed; no Git repair, connector acceptance/execution, M4 implementation, Electron launch, pointer input, duplicate thread creation, staging, commit, push, reset, clean, or file removal was run.
+- 2026-07-02 14:40:41 +08:00 role accountability-ledger pass:
+  - Added `docs/orchestration/tasks/daily-role-accountability-2026-07-02.md` as a standby ledger mapping each current role to state, evidence, and accountability action.
+  - Updated `docs/orchestration/index.md` and `docs/orchestration/status.json` so the accountability ledger is tracked and remains standby.
+  - Strengthened `scripts/check-orchestration.mjs` so the ledger must keep PM/Supervisor active, completed implementation work summarized, open packages standby, and live-subagents blocked.
+  - The ledger is supervision-only and does not authorize or execute any role action.
+  - No Git repair, connector acceptance/execution, M4 implementation, Electron launch, pointer input, duplicate thread creation, staging, commit, push, reset, clean, or file removal was run.
+
+incomplete:
+- Transparent ranch window pointer smoke is still not fully automated because Windows capture reports `SetIsBorderRequired failed: 不支持此接口 (0x80004002)`.
+- Git repair standby package exists, but execution is waiting for explicit same-message confirmation before any `git init`, remote write, staging, commit, or push.
+- Connector acceptance review package exists, but connector policy acceptance is waiting for PM/user decision; no execution binding should be dispatched before that.
+- M4 requirements readiness is summarized; M4 implementation package is standby and still requires explicit dispatch before touching locked or rename files.
+- Ranch pointer-smoke verification and manual evidence packages are standby until a manual or alternate transparent-window capture route is available.
+- Daily decision queue is standby and does not authorize any queue item by itself.
+- Daily role accountability ledger is standby and records state/evidence/action without changing role states.
+
+blockers:
+- External connector execution remains disabled.
+- Live sub-agent execution remains blocked by the previously recorded service-side `403 DAILY_LIMIT_EXCEEDED` until rechecked.
+- Control-cockpit selling-point files remain locked until M4 or explicit user approval.
+
+next action:
+- Keep PM and Supervisor active for drift checks.
+- Keep `ranch-m4-implementation-v0.2` standby until PM/user explicitly dispatches implementation.
+- Keep `ranch-pointer-smoke-v0.2` and `ranch-pointer-smoke-manual-evidence-v0.2` standby until a manual or alternate transparent-window capture route is available.
+- Keep connector-policy and `connector-acceptance-review-v0.1` on standby until PM/user accepts or revises machine gate fields.
+- Keep Git manager and `git-repair-agentpet-v0.1` on standby; Git repair stays on hold until explicit authorization.
+- If PM/user explicitly authorizes M4 implementation, open a fresh bounded implementation lane instead of touching locked control-cockpit files opportunistically.
+- Use `daily-decision-queue-2026-07-02` as the next PM callback surface for standby decisions.
+- Keep `daily-role-accountability-2026-07-02` aligned with role states before closing any daily supervision pass.
+
+evidence:
+- `docs/orchestration/index.md`
+- `docs/orchestration/status.json`
+- `docs/orchestration/sessions/ranch-v0.2-2026-07-02.md`
+- `docs/orchestration/sessions/git-manager-agentpet-2026-07-02.md`
+- `docs/orchestration/sessions/runtime-blocked-path-closeout-2026-07-01.md`
+- `docs/orchestration/sessions/codex-evidence-closeout-2026-07-01.md`
+- `docs/orchestration/tasks/connector-policy-v0.1.md`
+- `docs/orchestration/tasks/connector-acceptance-review-v0.1.md`
+- `docs/orchestration/tasks/multi-agent-runtime-v0.1.md`
+- `docs/orchestration/tasks/runtime-connector-dispatch-v0.1.md`
+- `docs/orchestration/tasks/runtime-blocked-path-closeout-v0.1.md`
+- `docs/orchestration/tasks/daily-decision-queue-2026-07-02.md`
+- `docs/orchestration/tasks/daily-role-accountability-2026-07-02.md`
+- `docs/orchestration/tasks/git-repair-agentpet-v0.1.md`
+- `docs/orchestration/tasks/ranch-m4-requirements-v0.2.md`
+- `docs/orchestration/tasks/ranch-m4-implementation-v0.2.md`
+- `docs/orchestration/tasks/ranch-pointer-smoke-v0.2.md`
+- `docs/orchestration/tasks/ranch-pointer-smoke-manual-evidence-v0.2.md`
+- `scripts/check-orchestration.mjs`
+- `scripts/orchestration-report.mjs`
+- Codex thread `019f20fc-9b77-74f3-aa3d-ba8348cdec1c`
+- `npm.cmd run orchestration:report`
+- `npm.cmd run orchestration:preflight`
+- `npm.cmd run orchestration:check`
+- `npm.cmd run lint`
+- `npm.cmd run build`

@@ -1,0 +1,6 @@
+{
+  "name": "个人服务导航面板",
+  "description": "用于本地及远程服务管理、端口检测、软件启动、消息监控及自定义插件的高性能个人导航面板",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

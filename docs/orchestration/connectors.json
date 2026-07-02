@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "defaults": {
+    "cwdPolicy": "workspace-root",
+    "envAllowlist": ["PATH", "HOME", "USERPROFILE"],
+    "confirmation": "required",
+    "timeoutSeconds": 1800,
+    "dangerousCommandPatterns": [
+      "rm -rf",
+      "Remove-Item",
+      "del /s",
+      "format ",
+      "git reset --hard",
+      "git clean"
+    ]
+  },
+  "connectors": [
+    {
+      "id": "codex",
+      "label": "Codex",
+      "status": "draft",
+      "runner": "local-command",
+      "command": "codex",
+      "args": [],
+      "cwdPolicy": "workspace-root",
+      "envAllowlist": ["PATH", "HOME", "USERPROFILE", "CODEX_HOME"],
+      "confirmation": "required-for-write",
+      "timeoutSeconds": 3600,
+      "acceptanceGate": "orchestration:check + lint/build when code changes",
+      "approvalStatus": "pending",
+      "acceptedBy": "",
+      "acceptedAt": "",
+      "approvalEvidence": "Codex command is discoverable, but PM has not accepted execution binding.",
+      "enabledByDefault": false
+    },
+    {
+      "id": "trae",
+      "label": "Trae",
+      "status": "placeholder",
+      "runner": "local-command",
+      "command": "",
+      "args": [],
+      "cwdPolicy": "workspace-root",
+      "envAllowlist": ["PATH", "HOME", "USERPROFILE"],
+      "confirmation": "required",
+      "timeoutSeconds": 1800,
+      "acceptanceGate": "PM must confirm executable and non-interactive args",
+      "approvalStatus": "not-requested",
+      "acceptedBy": "",
+      "acceptedAt": "",
+      "approvalEvidence": "Executable command is not confirmed.",
+      "enabledByDefault": false
+    },
+    {
+      "id": "qoder",
+      "label": "Qoder",
+      "status": "placeholder",
+      "runner": "local-command",
+      "command": "",
+      "args": [],
+      "cwdPolicy": "workspace-root",
+      "envAllowlist": ["PATH", "HOME", "USERPROFILE"],
+      "confirmation": "required",
+      "timeoutSeconds": 1800,
+      "acceptanceGate": "PM must confirm executable and verification surface",
+      "approvalStatus": "not-requested",
+      "acceptedBy": "",
+      "acceptedAt": "",
+      "approvalEvidence": "Executable command is not confirmed.",
+      "enabledByDefault": false
+    }
+  ]
+}

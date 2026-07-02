@@ -1,0 +1,381 @@
+{
+  "identity": "[PM]#multi-agent-control@v0.1",
+  "loopState": "active",
+  "dispatchState": "active",
+  "target": "按 LPS 建立角色分工，并持续监督各个角色推进“多 Agent 牛马核心部门”项目；今日督办重点是保持 M3 已收口、Git 管理长工回调已收且 Git repair standby 派工包已落成但修复待授权、connector acceptance review 已落成但 policy 待决不误报 active，M4 需求准入已总结为 standby 实现派工包，透明窗口 pointer smoke 与手工证据包均为 standby，日内决策队列与角色问责台账已落成。",
+  "source": "docs/orchestration/index.md",
+  "blocker": "外部 connector 仍 disabled；live-subagents 仍受 403 DAILY_LIMIT_EXCEEDED 阻塞直到复查；control-cockpit 卖点文件保持锁定；透明 Electron 窗口自动截图仍报 SetIsBorderRequired failed；Git repair/commit/push 和 M4 都需明确确认。",
+  "roles": [
+    {
+      "id": "pm",
+      "title": "[PM]#multi-agent-control@v0.1",
+      "owner": "主控",
+      "status": "active",
+      "responsibility": "派工、验收、纠偏、收口；维护 index/task/session 真源。",
+      "tag": "⟦tag:v2|role|pm-control-v0.1⟧",
+      "evidence": "docs/orchestration/roles/pm.md"
+    },
+    {
+      "id": "supervisor",
+      "title": "[监督]#multi-agent-control@v0.1",
+      "owner": "监督",
+      "status": "active",
+      "responsibility": "检查 loop/dispatch 状态、卡片一致性、阻塞与漂移。",
+      "tag": "⟦tag:v2|role|supervisor-control-v0.1⟧",
+      "evidence": "docs/orchestration/roles/supervisor.md"
+    },
+    {
+      "id": "local-runner",
+      "title": "[短工]#local-runner@v0.1",
+      "owner": "短工",
+      "status": "summarized",
+      "responsibility": "Electron 本地命令 runner、日志流、停止和退出码。",
+      "tag": "⟦tag:v2|session|main-thread-2026-07-01-runtime-bootstrap⟧",
+      "evidence": "docs/orchestration/sessions/main-thread-2026-07-01-runtime-bootstrap.md"
+    },
+    {
+      "id": "orchestration-ui",
+      "title": "[短工]#orchestration-ui@v0.1",
+      "owner": "短工",
+      "status": "summarized",
+      "responsibility": "把角色分工、监督状态和当前阻塞显示在桌面控制舱。",
+      "tag": "⟦tag:v2|task|multi-agent-runtime-v0.1⟧",
+      "evidence": "src/components/NiuMaWorkspace.tsx"
+    },
+    {
+      "id": "connector-policy",
+      "title": "[短工]#connector-policy@v0.1",
+      "owner": "短工",
+      "status": "standby",
+      "responsibility": "定义真实外部 agent connector 的 command、cwd、env、安全确认和验收策略；当前等待 PM/user 接受或修订。",
+      "tag": "⟦tag:v2|task|connector-policy-v0.1⟧",
+      "evidence": "docs/orchestration/tasks/connector-policy-v0.1.md"
+    },
+    {
+      "id": "connector-acceptance-review",
+      "title": "[PM]#connector-acceptance-review@v0.1",
+      "owner": "主控",
+      "status": "standby",
+      "responsibility": "Connector 接受/拒绝/修订的决策评审包；不接受、不启用、不执行 connector。",
+      "tag": "⟦tag:v2|task|connector-acceptance-review-v0.1⟧",
+      "evidence": "docs/orchestration/tasks/connector-acceptance-review-v0.1.md"
+    },
+    {
+      "id": "runtime-dispatch-cards",
+      "title": "[短工]#runtime-dispatch-cards@v0.1",
+      "owner": "短工",
+      "status": "summarized",
+      "responsibility": "connector runtime blocked-safe implementation lanes 的控制卡 setup；当前已收口并暂停 execution binding。",
+      "tag": "⟦tag:v2|task|runtime-connector-dispatch-v0.1⟧",
+      "evidence": "docs/orchestration/tasks/runtime-connector-dispatch-v0.1.md"
+    },
+    {
+      "id": "daily-decision-queue",
+      "title": "[PM]#daily-decision-queue@2026-07-02",
+      "owner": "主控",
+      "status": "standby",
+      "responsibility": "汇总今日 Git repair、connector acceptance、M4、pointer smoke、live-subagent quota 的待决条件；不授权、不执行。",
+      "tag": "⟦tag:v2|task|daily-decision-queue-2026-07-02⟧",
+      "evidence": "docs/orchestration/tasks/daily-decision-queue-2026-07-02.md"
+    },
+    {
+      "id": "daily-role-accountability",
+      "title": "[PM]#daily-role-accountability@2026-07-02",
+      "owner": "主控",
+      "status": "standby",
+      "responsibility": "按角色记录当前状态、证据和问责动作；防止 summarized/standby/blocked 被误报完成。",
+      "tag": "⟦tag:v2|task|daily-role-accountability-2026-07-02⟧",
+      "evidence": "docs/orchestration/tasks/daily-role-accountability-2026-07-02.md"
+    },
+    {
+      "id": "ranch-m1-m2-correction",
+      "title": "[长工]#ranch-m1-m2-correction@v0.2",
+      "owner": "长工",
+      "status": "summarized",
+      "responsibility": "纠偏桌面牧场 M1/M2：真实 RanchCanvas/StatusBand 接入、desktop|floating 合同、旧默认 prefs 迁移和桌面窗口启动证据。",
+      "tag": "⟦tag:v2|session|ranch-v0.2-2026-07-02⟧",
+      "evidence": "docs/orchestration/sessions/ranch-v0.2-2026-07-02.md"
+    },
+    {
+      "id": "ranch-m3-plan",
+      "title": "[长工]#ranch-m3-plan@v0.2",
+      "owner": "长工",
+      "status": "summarized",
+      "responsibility": "只读整理 M3 ownership 与验收方案；已被两个 M3 实现长工接续。",
+      "tag": "⟦tag:v2|session|ranch-v0.2-2026-07-02⟧",
+      "evidence": "docs/orchestration/sessions/ranch-v0.2-2026-07-02.md"
+    },
+    {
+      "id": "ranch-v0.2-audit",
+      "title": "[监督]#ranch-v0.2-audit@v0.2",
+      "owner": "监督",
+      "status": "summarized",
+      "responsibility": "只读审计 M0/M1/M2 漂移；纠偏前结论已被当前工作区证据更新。",
+      "tag": "⟦tag:v2|session|ranch-v0.2-2026-07-02⟧",
+      "evidence": "docs/orchestration/sessions/ranch-v0.2-2026-07-02.md"
+    },
+    {
+      "id": "m3-main-bridge",
+      "title": "[长工]#m3-main-bridge@v0.2",
+      "owner": "长工",
+      "status": "summarized",
+      "responsibility": "实现 M3 主进程、preload、types、browser fallback 合同：召唤控制舱、系统菜单、bounds/prefs、未读计数。",
+      "tag": "⟦tag:v2|session|ranch-v0.2-2026-07-02⟧",
+      "evidence": "docs/orchestration/sessions/ranch-v0.2-2026-07-02.md"
+    },
+    {
+      "id": "m3-ranch-entry",
+      "title": "[长工]#m3-ranch-entry@v0.2",
+      "owner": "长工",
+      "status": "summarized",
+      "responsibility": "实现 M3 ranch renderer 交互：双击召唤、右键入口、floating 拖拽吸边，并保持 M1/M2 渲染不回退；已通过 lint/build/orchestration:check。",
+      "tag": "⟦tag:v2|session|ranch-v0.2-2026-07-02⟧",
+      "evidence": "docs/orchestration/sessions/ranch-v0.2-2026-07-02.md"
+    },
+    {
+      "id": "git-manager-agentpet",
+      "title": "[长工]#git-manager@AgentPet",
+      "owner": "长工",
+      "status": "standby",
+      "responsibility": "只读回调已收：本地 .git 为空元数据，远端 https://github.com/locooooooooo/AgentPet.git 为空仓且 default_branch=main；不修复、不提交、不推送、不清理，等待明确授权。",
+      "tag": "⟦tag:v2|session|git-manager-agentpet-2026-07-02⟧",
+      "evidence": "docs/orchestration/sessions/git-manager-agentpet-2026-07-02.md"
+    },
+    {
+      "id": "git-repair-agentpet",
+      "title": "[短工]#git-repair-agentpet@v0.1",
+      "owner": "短工",
+      "status": "standby",
+      "responsibility": "AgentPet Git 元数据最小修复派工包；未获同消息授权前不执行 git init/remote/fetch/stage/commit/push。",
+      "tag": "⟦tag:v2|task|git-repair-agentpet-v0.1⟧",
+      "evidence": "docs/orchestration/tasks/git-repair-agentpet-v0.1.md"
+    },
+    {
+      "id": "ranch-m4-requirements",
+      "title": "[PM]#ranch-m4-requirements@v0.2",
+      "owner": "主控",
+      "status": "summarized",
+      "responsibility": "M4 rename + 控制舱联动的需求准入、范围冻结和验收拆解；已产出 standby 实现派工包。",
+      "tag": "⟦tag:v2|task|ranch-m4-requirements-v0.2⟧",
+      "evidence": "docs/orchestration/tasks/ranch-m4-requirements-v0.2.md"
+    },
+    {
+      "id": "ranch-m4-implementation",
+      "title": "[短工]#ranch-m4-implementation@v0.2",
+      "owner": "短工",
+      "status": "standby",
+      "responsibility": "M4 rename + 控制舱联动未来实现包；未获明确派工前不编辑文件。",
+      "tag": "⟦tag:v2|task|ranch-m4-implementation-v0.2⟧",
+      "evidence": "docs/orchestration/tasks/ranch-m4-implementation-v0.2.md"
+    },
+    {
+      "id": "ranch-pointer-smoke",
+      "title": "[监督]#ranch-pointer-smoke@v0.2",
+      "owner": "监督",
+      "status": "standby",
+      "responsibility": "透明 Electron 牧场 pointer-smoke 验证包；等待手工或替代捕获路线，不改实现。",
+      "tag": "⟦tag:v2|task|ranch-pointer-smoke-v0.2⟧",
+      "evidence": "docs/orchestration/tasks/ranch-pointer-smoke-v0.2.md"
+    },
+    {
+      "id": "ranch-pointer-smoke-manual-evidence",
+      "title": "[监督]#ranch-pointer-smoke-manual-evidence@v0.2",
+      "owner": "监督",
+      "status": "standby",
+      "responsibility": "透明 Electron 牧场 pointer-smoke 手工证据记录包；等待手工或替代捕获路线，不执行输入、不改实现。",
+      "tag": "⟦tag:v2|task|ranch-pointer-smoke-manual-evidence-v0.2⟧",
+      "evidence": "docs/orchestration/tasks/ranch-pointer-smoke-manual-evidence-v0.2.md"
+    }
+  ],
+  "lanes": [
+    {
+      "id": "runtime",
+      "title": "真实本地 runner",
+      "role": "[短工]#local-runner@v0.1",
+      "state": "summarized",
+      "nextAction": "等待真实外部 agent 命令、cwd、env、安全策略进入下一任务卡。"
+    },
+    {
+      "id": "ui",
+      "title": "控制舱监督面板",
+      "role": "[短工]#orchestration-ui@v0.1",
+      "state": "summarized",
+      "nextAction": "已完成 UI 集成；后续以 status.json 和 orchestration:check 防漂移。"
+    },
+    {
+      "id": "connector-policy",
+      "title": "外部 connector 策略",
+      "role": "[短工]#connector-policy@v0.1",
+      "state": "standby",
+      "nextAction": "等待 PM/user 接受或修订 machine gate fields；决策面转入 connector-acceptance-review standby 包，不执行绑定。"
+    },
+    {
+      "id": "connector-acceptance-review",
+      "title": "Connector acceptance review",
+      "role": "[PM]#connector-acceptance-review@v0.1",
+      "state": "standby",
+      "nextAction": "等待 PM/user 决定接受、拒绝或修订 connector 机器闸门；保持 no accepted/no enabled/no execution。"
+    },
+    {
+      "id": "daily-supervision",
+      "title": "每日计划督办",
+      "role": "[PM]#daily-supervision@2026-07-02",
+      "state": "active",
+      "nextAction": "保持 M3 summarized；保持 Git 管理 standby 等待修复授权；connector-policy standby；M4 implementation standby；pointer-smoke verification standby 等待可用捕获路线。"
+    },
+    {
+      "id": "codex-evidence-closeout",
+      "title": "Codex 执行证据收口",
+      "role": "[短工]#codex-evidence-closeout@v0.1",
+      "state": "summarized",
+      "nextAction": "记录 codex exec 形态存在但证据不足；保持 Codex pending/disabled。"
+    },
+    {
+      "id": "runtime-connector-dispatch",
+      "title": "connector runtime 派工卡",
+      "role": "[短工]#runtime-dispatch-cards@v0.1",
+      "state": "summarized",
+      "nextAction": "blocked-path 已验收：types/main-gate/preload-api/ui-binding；agentCore/execution binding 暂停。"
+    },
+    {
+      "id": "runtime-blocked-path-closeout",
+      "title": "connector blocked-path 收口",
+      "role": "[短工]#runtime-blocked-path-closeout@v0.1",
+      "state": "summarized",
+      "nextAction": "closeout 已完成；后续只在 PM/user 接受或修订 connector machine gate 后重开新 lane。"
+    },
+    {
+      "id": "daily-decision-queue",
+      "title": "Daily standby decision queue",
+      "role": "[PM]#daily-decision-queue@2026-07-02",
+      "state": "standby",
+      "nextAction": "作为下一次 PM 回调面；等待 Git repair、connector acceptance、M4、pointer smoke 或 live-subagent quota 的明确决策/条件。"
+    },
+    {
+      "id": "daily-role-accountability",
+      "title": "Daily role accountability ledger",
+      "role": "[PM]#daily-role-accountability@2026-07-02",
+      "state": "standby",
+      "nextAction": "作为角色落实台账；任一角色状态变化后同步更新 evidence 和 accountability action。"
+    },
+    {
+      "id": "live-subagents",
+      "title": "实时子 agent 协同",
+      "role": "[监督]#multi-agent-control@v0.1",
+      "state": "blocked",
+      "nextAction": "service-side 403 DAILY_LIMIT_EXCEEDED 需复查；今日已使用用户授权的 Codex app 长工线程，但不要把外部 connector 当成可用执行资源。"
+    },
+    {
+      "id": "ranch-m1-m2-correction",
+      "title": "桌面牧场 M1/M2 纠偏验收",
+      "role": "[长工]#ranch-m1-m2-correction@v0.2",
+      "state": "summarized",
+      "nextAction": "已接受进入 M3；M3 后仍保留透明窗口 pointer smoke 自动化风险。"
+    },
+    {
+      "id": "ranch-m3-plan",
+      "title": "桌面牧场 M3 方案与准入闸门",
+      "role": "[长工]#ranch-m3-plan@v0.2",
+      "state": "summarized",
+      "nextAction": "方案已用于派出 m3-main-bridge 与 m3-ranch-entry；不再单独阻塞。"
+    },
+    {
+      "id": "ranch-v0.2-audit",
+      "title": "桌面牧场纠偏监督审计",
+      "role": "[监督]#ranch-v0.2-audit@v0.2",
+      "state": "summarized",
+      "nextAction": "纠偏前审计已收口；后续以当前代码证据和 ranch-v0.2-2026-07-02 会话卡为准。"
+    },
+    {
+      "id": "m3-main-bridge",
+      "title": "M3 main/preload/types/fallback",
+      "role": "[长工]#m3-main-bridge@v0.2",
+      "state": "summarized",
+      "nextAction": "主进程桥接已完成并通过主控复核；等待 M4 或手工 pointer smoke。"
+    },
+    {
+      "id": "m3-ranch-entry",
+      "title": "M3 ranch renderer interactions",
+      "role": "[长工]#m3-ranch-entry@v0.2",
+      "state": "summarized",
+      "nextAction": "renderer 交互已完成并通过 lint/build/orchestration:check；透明窗口右键/双击/拖拽 pointer smoke 需手工或替代捕获路线复查。"
+    },
+    {
+      "id": "git-manager-agentpet",
+      "title": "AgentPet Git management",
+      "role": "[长工]#git-manager@AgentPet",
+      "state": "standby",
+      "nextAction": "只读回调已收；修复执行转入 git-repair-agentpet standby 派工包，仍等待明确授权。"
+    },
+    {
+      "id": "git-repair-agentpet",
+      "title": "AgentPet Git repair dispatch",
+      "role": "[短工]#git-repair-agentpet@v0.1",
+      "state": "standby",
+      "nextAction": "等待 PM/user 同消息明确授权；授权后只运行 git init/remote add/fetch/status 并停止等待 staging review。"
+    },
+    {
+      "id": "ranch-m4-requirements",
+      "title": "M4 requirements readiness",
+      "role": "[PM]#ranch-m4-requirements@v0.2",
+      "state": "summarized",
+      "nextAction": "需求准入已总结；后续以 M4 implementation standby package 为准。"
+    },
+    {
+      "id": "ranch-m4-implementation",
+      "title": "M4 implementation package",
+      "role": "[短工]#ranch-m4-implementation@v0.2",
+      "state": "standby",
+      "nextAction": "等待 PM/user 明确派工；派工前不编辑 rename/control-cockpit 文件。"
+    },
+    {
+      "id": "ranch-pointer-smoke",
+      "title": "Transparent ranch pointer smoke",
+      "role": "[监督]#ranch-pointer-smoke@v0.2",
+      "state": "standby",
+      "nextAction": "等待手工或替代透明窗口捕获路线；验证前不改实现，执行时同步填写 manual evidence 包。"
+    },
+    {
+      "id": "ranch-pointer-smoke-manual-evidence",
+      "title": "Transparent ranch pointer smoke manual evidence",
+      "role": "[监督]#ranch-pointer-smoke-manual-evidence@v0.2",
+      "state": "standby",
+      "nextAction": "等待可观察透明 Electron 窗口的手工或替代捕获路线；未观察前保持 pending evidence。"
+    }
+  ],
+  "connectors": [
+    {
+      "id": "codex",
+      "label": "Codex",
+      "status": "draft",
+      "command": "codex",
+      "cwdPolicy": "workspace-root",
+      "envAllowlist": ["PATH", "HOME", "USERPROFILE", "CODEX_HOME"],
+      "confirmation": "required-for-write",
+      "timeoutSeconds": 3600,
+      "acceptanceGate": "orchestration:check + lint/build when code changes"
+    },
+    {
+      "id": "trae",
+      "label": "Trae",
+      "status": "placeholder",
+      "command": "",
+      "cwdPolicy": "workspace-root",
+      "envAllowlist": ["PATH", "HOME", "USERPROFILE"],
+      "confirmation": "required",
+      "timeoutSeconds": 1800,
+      "acceptanceGate": "PM must confirm executable and non-interactive args"
+    },
+    {
+      "id": "qoder",
+      "label": "Qoder",
+      "status": "placeholder",
+      "command": "",
+      "cwdPolicy": "workspace-root",
+      "envAllowlist": ["PATH", "HOME", "USERPROFILE"],
+      "confirmation": "required",
+      "timeoutSeconds": 1800,
+      "acceptanceGate": "PM must confirm executable and verification surface"
+    }
+  ]
+}
