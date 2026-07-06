@@ -61,6 +61,9 @@ tracked business cards:
 - session: ⟦tag:v2|session|main-thread-2026-07-01-runtime-bootstrap⟧ -> `docs/orchestration/sessions/main-thread-2026-07-01-runtime-bootstrap.md`
 - session: ⟦tag:v2|session|runtime-blocked-path-closeout-2026-07-01⟧ -> `docs/orchestration/sessions/runtime-blocked-path-closeout-2026-07-01.md`
 - session: ⟦tag:v2|session|codex-evidence-closeout-2026-07-01⟧ -> `docs/orchestration/sessions/codex-evidence-closeout-2026-07-01.md`
+- session: ⟦tag:v2|session|daily-closeout-2026-07-06⟧ -> `docs/orchestration/sessions/daily-closeout-2026-07-06.md`
+- session: ⟦tag:v2|session|daily-supervision-2026-07-06⟧ -> `docs/orchestration/sessions/daily-supervision-2026-07-06.md`
+- session: ⟦tag:v2|session|ranch-smoke-desktop-exe-2026-07-06⟧ -> `docs/orchestration/sessions/ranch-smoke-desktop-exe-2026-07-06.md`
 
 recently closed cards:
 - accepted blocked-path lanes: ⟦tag:v2|task|connector-types-v0.1⟧, ⟦tag:v2|task|connector-main-gate-v0.1⟧, ⟦tag:v2|task|connector-preload-api-v0.1⟧, ⟦tag:v2|task|connector-ui-binding-v0.1⟧
@@ -73,7 +76,7 @@ dispatch gate:
 - Supervisor owns drift detection, blocker surfacing, and minimum correction.
 
 current target:
-- 按 LPS 建立角色分工，并持续监督各个角色推进“多 Agent 牛马核心部门”项目；今日督办重点是保持 M3 已收口、Git 管理长工已在用户授权后完成 AgentPet repair/import commit/push 并转入 post-push 只读复核，connector acceptance review 已落成但 policy 待决不误报 active，M4 需求已由长工线程 `019f227a-8978-7df1-8b3f-738ccdb01b18` 完成并通过 PM 验证收口为 summarized，M5 window/status/personality 验证摘要卡已补齐为 summarized，桌面牧场本体已按 v0.3 简洁 3 级层级完成 UI 收敛并通过浏览器 smoke，透明窗口 pointer smoke 与手工证据包仍为 standby，日内决策队列与角色问责台账继续跟踪未决项。
+- 按 LPS 建立角色分工，并持续监督各个角色推进“多 Agent 牛马核心部门”项目；2026-07-06 主控在 root session 闭环 4 commit (e095764 gitignore / 3e91d4c ranch v0.3 修订 B 路径 / 3aa30f7 控制舱 P0 C0-1~C0-6 + 真实打通 R0-1/2/4/5 / 42e3f7f orchestration 控制面 v3.0) 并 push 到 origin/main、`npm run package:win` 产出 桌面牧场.exe 235.7MB、桌面牧场.exe smoke 验证 v0.3 视觉 (控制舱 8 卡 + StatusStrip + 任务卡分级 + 角部小三角 + ranch 本体透明 B 路径) 全部通过、7-3 旧 release 残留 4/6 回收成功；ranch-m4 v0.2 早已 summarized 无需重派、R0-3 connector 仍 deferred、transparent ranch pointer smoke blocker 仍 standby、`release-dir/win-unpacked.tmp` 嵌套文件锁顺延次日清理。
 
 current role split:
 - `[PM]#multi-agent-control@v0.1`: maintain this index, dispatch bounded lanes, collect callbacks, write acceptance.

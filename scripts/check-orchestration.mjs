@@ -786,10 +786,10 @@ if (statusJson) {
   if (!statusJson.todayPlan || typeof statusJson.todayPlan !== 'object') {
     errors.push('status.json missing todayPlan registration');
   } else {
-    if (statusJson.todayPlan.date !== '2026-07-03') {
+    if (statusJson.todayPlan.date !== '2026-07-06') {
       errors.push(`status.json todayPlan date mismatch: ${statusJson.todayPlan.date}`);
     }
-    if (statusJson.todayPlan.session !== 'docs/orchestration/sessions/daily-plan-2026-07-03.md') {
+    if (statusJson.todayPlan.session !== 'docs/orchestration/sessions/daily-closeout-2026-07-06.md') {
       errors.push(`status.json todayPlan session mismatch: ${statusJson.todayPlan.session}`);
     }
     if (!statusJson.todayPlan.selectedRoute?.trim()) {
