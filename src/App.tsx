@@ -35,7 +35,7 @@ export default function App() {
   if (error) {
     return (
       <div className="boot-screen">
-        <h1>多 Agent 牛马核心部门</h1>
+        <h1>桌面牧场 · 控制舱</h1>
         <p>{error}</p>
       </div>
     );
@@ -44,7 +44,7 @@ export default function App() {
   if (!snapshot) {
     return (
       <div className="boot-screen">
-        <h1>多 Agent 牛马核心部门</h1>
+        <h1>桌面牧场 · 控制舱</h1>
         <p>正在恢复本地工位、任务队列和牛马状态...</p>
       </div>
     );

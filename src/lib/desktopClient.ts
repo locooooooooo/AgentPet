@@ -117,6 +117,7 @@ export function getDesktopApi(): DesktopApi {
       },
       resetUnread: async () => {},
       setMousePassthrough: async (_passthrough: boolean) => {},
+      setInteractiveRegions: async (_regions) => {},
       requestSystemNotify: async (_payload: RanchNotifyPayload) => ranchPrefs.notifyPrefs.system,
       onPrefsChanged: (callback: (prefs: RanchPrefs) => void) => {
         ranchPrefsListeners.add(callback);

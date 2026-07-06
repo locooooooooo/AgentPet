@@ -13,7 +13,9 @@ export const PARTICLE_EFFECTS: Partial<Record<NiuMaStatus, ParticleEffect>> = {
   coding: { emoji: '🔥', position: 'top-right', motionClass: 'bounce' },
   coffee: { emoji: '☕', position: 'top-left', motionClass: 'pulse' },
   panicking: { emoji: '🚨', position: 'top-tr', motionClass: 'ping' },
-  overtime: { emoji: '💀', position: 'top-tl', motionClass: 'bounce' }
+  overtime: { emoji: '💀', position: 'top-tl', motionClass: 'bounce' },
+  slacking: { emoji: '🌴', position: 'top-right', motionClass: 'pulse' },
+  deploying: { emoji: '🚀', position: 'top-tr', motionClass: 'bounce' }
 };
 
 // framer-motion 14 态 keyframe 配置

@@ -7,6 +7,7 @@ import type {
   NiuMaAction,
   RanchBounds,
   RanchContextMenuInput,
+  RanchInteractiveRegion,
   RanchNotifyPayload,
   RanchPrefs,
   RanchPrefsPatch
@@ -31,6 +32,8 @@ const api = {
     resetUnread: (): Promise<void> => ipcRenderer.invoke('ranch:reset-unread'),
     setMousePassthrough: (passthrough: boolean): Promise<void> =>
       ipcRenderer.invoke('ranch:set-mouse-passthrough', passthrough),
+    setInteractiveRegions: (regions: RanchInteractiveRegion[]): Promise<void> =>
+      ipcRenderer.invoke('ranch:set-interactive-regions', regions),
     requestSystemNotify: (payload: RanchNotifyPayload): Promise<boolean> =>
       ipcRenderer.invoke('ranch:request-notify', payload),
     onPrefsChanged: (callback: (prefs: RanchPrefs) => void): (() => void) => {

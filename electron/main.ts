@@ -11,6 +11,7 @@ import type {
   CreateTaskInput,
   NiuMaAction,
   RanchContextMenuInput,
+  RanchInteractiveRegion,
   RanchNotifyPayload,
   RanchBounds,
   RanchMode,
@@ -19,6 +20,7 @@ import type {
 } from '../src/types';
 import { evaluateConnectorPolicyGate } from '../src/lib/connectorGate';
 import {
+  appendSystemMessage,
   applyNiuMaAction,
   clearCompletedTasks,
   createTask,
@@ -27,7 +29,8 @@ import {
   normalizeSnapshot,
   progressNiuMaTick,
   progressRunningTasks,
-  stopTask
+  stopTask,
+  syncAgentTaskRuntime
 } from '../src/lib/agentCore';
 
 let mainWindow: BrowserWindow | null = null;
@@ -37,16 +40,24 @@ let snapshot: AgentSnapshot;
 let ranchPrefs: RanchPrefs;
 let isQuitting = false;
 let ranchUnreadCount = 0;
+let ranchMousePassthrough = false;
+let ranchHotzonePoll: NodeJS.Timeout | null = null;
+let ranchInteractiveRegions: RanchInteractiveRegion[] = [];
 const runningProcesses = new Map<string, ChildProcessWithoutNullStreams>();
 
 const dataDir = path.join(app.getPath('userData'), 'agent-data');
 const snapshotPath = path.join(dataDir, 'agents.json');
 const ranchPrefsPath = path.join(app.getPath('userData'), 'ranch-prefs.json');
-const connectorPolicyPath = path.join(process.cwd(), 'docs/orchestration/connectors.json');
+const connectorPolicyPath = resolveAppPath('docs/orchestration/connectors.json');
 const ranchDefaultSize = { width: 640, height: 360 };
 const legacyRanchDefaultSize = { width: 720, height: 320 };
 const ranchEdgeOffset = 80;
 const legacyRanchBottomOffset = 24;
+const ranchHotzonePollMs = 80;
+const ranchNotifyIconAliases: Record<string, string[]> = {
+  openclaw: ['OpenClaw.jpeg'],
+  openccode: ['OpenCode .jpeg']
+};
 const ranchSizeLimits = {
   minWidth: 320,
   minHeight: 200,
@@ -54,6 +65,40 @@ const ranchSizeLimits = {
   maxHeight: 500
 };
 const mainWindowTitle = '桌面牧场 · 控制舱';
+const runningProgressTimers = new Map<string, NodeJS.Timeout>();
+
+function resolveAppPath(relativePath: string) {
+  return path.join(app.isPackaged ? app.getAppPath() : process.cwd(), relativePath);
+}
+
+function resolveRanchNotifyIcon(agentId: string) {
+  const normalized = agentId.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
+  if (!normalized) {
+    return null;
+  }
+
+  const iconDir = resolveAppPath('icon');
+  const candidates = [
+    `${normalized}.png`,
+    `${normalized}.jpg`,
+    `${normalized}.jpeg`,
+    ...(ranchNotifyIconAliases[normalized] ?? [])
+  ];
+
+  for (const fileName of candidates) {
+    const iconPath = path.join(iconDir, fileName);
+    if (!fs.existsSync(iconPath)) {
+      continue;
+    }
+
+    const icon = nativeImage.createFromPath(iconPath);
+    if (!icon.isEmpty()) {
+      return icon;
+    }
+  }
+
+  return null;
+}
 
 function ensureDataDir() {
   fs.mkdirSync(dataDir, { recursive: true });
@@ -230,6 +275,38 @@ function normalizeRanchBounds(bounds: RanchBounds): RanchBounds {
   };
 }
 
+function normalizeRanchInteractiveRegions(regions: unknown): RanchInteractiveRegion[] {
+  if (!Array.isArray(regions)) {
+    return [];
+  }
+
+  return regions
+    .slice(0, 32)
+    .map((region) => {
+      const candidate = asRecord(region);
+      if (!candidate) {
+        return null;
+      }
+
+      const x = numberOr(candidate.x, Number.NaN);
+      const y = numberOr(candidate.y, Number.NaN);
+      const width = numberOr(candidate.width, 0);
+      const height = numberOr(candidate.height, 0);
+
+      if (!Number.isFinite(x) || !Number.isFinite(y) || width <= 0 || height <= 0) {
+        return null;
+      }
+
+      return {
+        x,
+        y,
+        width: clampNumber(width, 1, ranchSizeLimits.maxWidth),
+        height: clampNumber(height, 1, ranchSizeLimits.maxHeight)
+      };
+    })
+    .filter((region): region is RanchInteractiveRegion => Boolean(region));
+}
+
 function asRecord(value: unknown): Record<string, unknown> | null {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
     ? value as Record<string, unknown>
@@ -373,7 +450,7 @@ function patchTask(agentId: string, taskId: string, patcher: (task: AgentTask) =
     };
   });
 
-  return changed ? { ...snapshot, agents, updatedAt: now } : snapshot;
+  return changed ? syncAgentTaskRuntime({ ...snapshot, agents, updatedAt: now }, agentId) : snapshot;
 }
 
 function appendTaskLog(agentId: string, taskId: string, line: string) {
@@ -389,10 +466,170 @@ function appendTaskLog(agentId: string, taskId: string, line: string) {
   }));
 }
 
+interface ResolvedLocalCommand {
+  file: string;
+  args: string[];
+  display: string;
+}
+
+function splitCommandLine(commandLine: string) {
+  const parts: string[] = [];
+  let current = '';
+  let quote: '"' | "'" | null = null;
+
+  for (let index = 0; index < commandLine.length; index += 1) {
+    const char = commandLine[index];
+    if ((char === '"' || char === "'") && (!quote || quote === char)) {
+      quote = quote ? null : char;
+      continue;
+    }
+
+    if (!quote && /\s/.test(char)) {
+      if (current) {
+        parts.push(current);
+        current = '';
+      }
+      continue;
+    }
+
+    current += char;
+  }
+
+  if (current) {
+    parts.push(current);
+  }
+
+  return parts;
+}
+
+function findCommandPath(command: string) {
+  const locator = process.platform === 'win32' ? 'where.exe' : 'which';
+  const result = spawnSync(locator, [command], {
+    encoding: 'utf8',
+    shell: false,
+    windowsHide: true
+  });
+
+  if (result.status !== 0 || !result.stdout) {
+    return null;
+  }
+
+  return result.stdout
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .find(Boolean) ?? null;
+}
+
+function findNodeExecutable() {
+  const versions = process.versions as NodeJS.ProcessVersions & { electron?: string };
+  if (!versions.electron) {
+    return process.execPath;
+  }
+
+  return findCommandPath(process.platform === 'win32' ? 'node.exe' : 'node');
+}
+
+function findNodePackageCli(command: 'npm' | 'npx') {
+  const cliFile = command === 'npm' ? 'npm-cli.js' : 'npx-cli.js';
+  const candidates = new Set<string>();
+  const locator = process.platform === 'win32' ? 'where.exe' : 'which';
+  const result = spawnSync(locator, [command], {
+    encoding: 'utf8',
+    shell: false,
+    windowsHide: true
+  });
+
+  if (result.status === 0 && result.stdout) {
+    result.stdout.split(/\r?\n/).forEach((line) => {
+      const shimPath = line.trim();
+      if (!shimPath) {
+        return;
+      }
+      const shimDir = path.dirname(shimPath);
+      candidates.add(path.join(shimDir, 'node_modules', 'npm', 'bin', cliFile));
+      candidates.add(path.join(path.dirname(shimDir), 'node_modules', 'npm', 'bin', cliFile));
+    });
+  }
+
+  candidates.add(path.join(path.dirname(process.execPath), 'node_modules', 'npm', 'bin', cliFile));
+  if (process.env.APPDATA) {
+    candidates.add(path.join(process.env.APPDATA, 'npm', 'node_modules', 'npm', 'bin', cliFile));
+  }
+
+  return [...candidates].find((candidate) => fs.existsSync(candidate)) ?? null;
+}
+
+function resolveLocalCommand(commandLine: string): ResolvedLocalCommand | null {
+  const parts = splitCommandLine(commandLine.trim());
+  const command = parts[0]?.toLowerCase();
+  const args = parts.slice(1);
+
+  if (!command) {
+    return null;
+  }
+
+  if (command === 'echo') {
+    const nodePath = findNodeExecutable();
+    if (!nodePath) {
+      return null;
+    }
+    return {
+      file: nodePath,
+      args: ['-e', `console.log(${JSON.stringify(args.join(' '))})`],
+      display: commandLine
+    };
+  }
+
+  if (command === 'exit' && args.length <= 1) {
+    const nodePath = findNodeExecutable();
+    if (!nodePath) {
+      return null;
+    }
+    const code = Number.parseInt(args[0] ?? '0', 10);
+    return {
+      file: nodePath,
+      args: ['-e', `process.exit(${Number.isFinite(code) ? code : 1})`],
+      display: commandLine
+    };
+  }
+
+  if (command === 'node' || command === 'node.exe') {
+    const nodePath = findNodeExecutable();
+    return nodePath ? { file: nodePath, args, display: commandLine } : null;
+  }
+
+  if (command === 'npm' || command === 'npm.cmd') {
+    const nodePath = findNodeExecutable();
+    const cliPath = findNodePackageCli('npm');
+    return nodePath && cliPath ? { file: nodePath, args: [cliPath, ...args], display: commandLine } : null;
+  }
+
+  if (command === 'npx' || command === 'npx.cmd') {
+    const nodePath = findNodeExecutable();
+    const cliPath = findNodePackageCli('npx');
+    return nodePath && cliPath ? { file: nodePath, args: [cliPath, ...args], display: commandLine } : null;
+  }
+
+  if (command === 'git' || command === 'git.exe') {
+    const gitPath = findCommandPath('git');
+    return gitPath ? { file: gitPath, args, display: commandLine } : null;
+  }
+
+  return null;
+}
+
 function completeLocalTask(agentId: string, taskId: string, exitCode: number | null) {
   runningProcesses.delete(taskId);
+  const progressTimer = runningProgressTimers.get(taskId);
+  if (progressTimer) {
+    clearInterval(progressTimer);
+    runningProgressTimers.delete(taskId);
+  }
   const success = exitCode === 0;
-  publishSnapshot(patchTask(agentId, taskId, (task) => {
+  const currentAgent = snapshot.agents.find((agent) => agent.id === agentId);
+  const currentTask = currentAgent?.tasks.find((task) => task.id === taskId);
+  const shouldNotify = currentTask?.status === 'running';
+  const nextSnapshot = patchTask(agentId, taskId, (task) => {
     if (task.status !== 'running') {
       return task;
     }
@@ -409,30 +646,68 @@ function completeLocalTask(agentId: string, taskId: string, exitCode: number | n
       ].slice(-80),
       artifact: success ? `本地命令完成：${task.command}` : `本地命令失败：${task.command}`
     };
-  }));
+  });
+
+  publishSnapshot(shouldNotify
+    ? appendSystemMessage(
+      nextSnapshot,
+      success ? 'success' : 'error',
+      success ? '任务已完成' : '任务失败',
+      `${currentAgent?.name ?? agentId} 的本地任务「${currentTask?.name ?? taskId}」${success ? '已完成。' : `失败，exit code: ${exitCode ?? 'unknown'}。`}`,
+      agentId
+    )
+    : nextSnapshot);
 }
 
 function startLocalRunner(agentId: string, task: AgentTask) {
-  if (!task.command.trim()) {
+  const resolved = resolveLocalCommand(task.command);
+  if (!resolved) {
+    appendTaskLog(agentId, task.id, `Blocked local command: ${task.command || '(empty)'}`);
     completeLocalTask(agentId, task.id, 1);
     return;
   }
 
-  const child = spawn(task.command, {
-    cwd: process.cwd(),
-    env: process.env,
-    shell: true,
-    windowsHide: true
-  });
+  let child: ChildProcessWithoutNullStreams;
+  try {
+    child = spawn(resolved.file, resolved.args, {
+      cwd: process.cwd(),
+      env: process.env,
+      shell: false,
+      windowsHide: true
+    });
+  } catch (error) {
+    appendTaskLog(agentId, task.id, `Failed to start local command: ${error instanceof Error ? error.message : String(error)}`);
+    completeLocalTask(agentId, task.id, 1);
+    return;
+  }
 
+  let settled = false;
   runningProcesses.set(task.id, child);
+  const progressTimer = setInterval(() => {
+    publishSnapshot(patchTask(agentId, task.id, (currentTask) => {
+      if (currentTask.status !== 'running') {
+        return currentTask;
+      }
+      const nextProgress = Math.min(90, Math.max(currentTask.progress + 6, 12));
+      if (nextProgress === currentTask.progress) {
+        return currentTask;
+      }
+      return {
+        ...currentTask,
+        progress: nextProgress
+      };
+    }));
+  }, 1000);
+  runningProgressTimers.set(task.id, progressTimer);
   publishSnapshot(patchTask(agentId, task.id, (currentTask) => ({
     ...currentTask,
     pid: child.pid,
+    progress: Math.max(currentTask.progress, 5),
     logs: [
       ...currentTask.logs,
-      `[${formatLogTime()}] 已启动本地进程 PID ${child.pid ?? 'unknown'}。`,
-      `[${formatLogTime()}] 工作目录：${process.cwd()}`
+      `[${formatLogTime()}] Started local process PID ${child.pid ?? 'unknown'}.`,
+      `[${formatLogTime()}] Command: ${resolved.display}`,
+      `[${formatLogTime()}] Workspace: ${process.cwd()}`
     ].slice(-80)
   })));
 
@@ -449,11 +724,20 @@ function startLocalRunner(agentId: string, task: AgentTask) {
   });
 
   child.on('error', (error) => {
+    if (settled) {
+      return;
+    }
+    settled = true;
+    appendTaskLog(agentId, task.id, `Local command error: ${error.message}`);
     appendTaskLog(agentId, task.id, `启动失败：${error.message}`);
     completeLocalTask(agentId, task.id, 1);
   });
 
-  child.on('exit', (code) => {
+  child.on('close', (code) => {
+    if (settled) {
+      return;
+    }
+    settled = true;
     completeLocalTask(agentId, task.id, code);
   });
 }
@@ -465,6 +749,11 @@ function stopLocalRunner(taskId: string) {
   }
 
   runningProcesses.delete(taskId);
+  const progressTimer = runningProgressTimers.get(taskId);
+  if (progressTimer) {
+    clearInterval(progressTimer);
+    runningProgressTimers.delete(taskId);
+  }
   child.kill();
   return true;
 }
@@ -618,6 +907,8 @@ function createRanchWindow() {
   });
 
   ranchWindow.on('closed', () => {
+    stopRanchHotzonePolling();
+    ranchMousePassthrough = false;
     ranchWindow = null;
   });
 
@@ -629,12 +920,57 @@ function setRanchMousePassthrough(passthrough: boolean) {
     return;
   }
 
-  if (ranchPrefs.mode === 'desktop' && passthrough) {
+  const nextPassthrough = ranchPrefs.mode === 'desktop' && passthrough;
+  if (ranchMousePassthrough === nextPassthrough) {
+    return;
+  }
+
+  ranchMousePassthrough = nextPassthrough;
+  ranchWindow.setFocusable(!nextPassthrough);
+  if (nextPassthrough) {
     ranchWindow.setIgnoreMouseEvents(true, { forward: true });
     return;
   }
 
   ranchWindow.setIgnoreMouseEvents(false);
+}
+
+function isPointInsideRanchRegion(point: { x: number; y: number }, region: RanchInteractiveRegion) {
+  return point.x >= region.x &&
+    point.x <= region.x + region.width &&
+    point.y >= region.y &&
+    point.y <= region.y + region.height;
+}
+
+function updateRanchPassthroughFromCursor() {
+  if (!ranchWindow || ranchPrefs.mode !== 'desktop') {
+    return;
+  }
+
+  const cursor = screen.getCursorScreenPoint();
+  const overInteractiveRegion = ranchInteractiveRegions.some((region) => (
+    isPointInsideRanchRegion(cursor, region)
+  ));
+  setRanchMousePassthrough(!overInteractiveRegion);
+}
+
+function startRanchHotzonePolling() {
+  if (ranchHotzonePoll) {
+    updateRanchPassthroughFromCursor();
+    return;
+  }
+
+  ranchHotzonePoll = setInterval(updateRanchPassthroughFromCursor, ranchHotzonePollMs);
+  updateRanchPassthroughFromCursor();
+}
+
+function stopRanchHotzonePolling() {
+  if (ranchHotzonePoll) {
+    clearInterval(ranchHotzonePoll);
+    ranchHotzonePoll = null;
+  }
+
+  ranchInteractiveRegions = [];
 }
 
 function applyRanchMode(mode: RanchMode) {
@@ -651,7 +987,13 @@ function applyRanchMode(mode: RanchMode) {
     ranchWindow.showInactive();
   }
 
-  setRanchMousePassthrough(!isFloating);
+  if (isFloating) {
+    stopRanchHotzonePolling();
+    setRanchMousePassthrough(false);
+    return;
+  }
+
+  startRanchHotzonePolling();
 }
 
 function applyRanchPrefsToWindow() {
@@ -843,9 +1185,23 @@ function registerRanchIpc() {
     setRanchMousePassthrough(Boolean(passthrough));
   });
 
+  ipcMain.handle('ranch:set-interactive-regions', (_event, regions: RanchInteractiveRegion[]) => {
+    const windowBounds = ranchWindow?.getBounds();
+    const nextRegions = normalizeRanchInteractiveRegions(regions);
+    ranchInteractiveRegions = windowBounds
+      ? nextRegions.map((region) => ({
+          ...region,
+          x: windowBounds.x + region.x,
+          y: windowBounds.y + region.y
+        }))
+      : [];
+    updateRanchPassthroughFromCursor();
+  });
+
   ipcMain.handle('ranch:request-notify', (_event, payload: RanchNotifyPayload) => {
     const title = typeof payload?.title === 'string' ? payload.title.trim() : '';
     const body = typeof payload?.body === 'string' ? payload.body.trim() : '';
+    const agentId = typeof payload?.agentId === 'string' ? payload.agentId.trim() : '';
 
     if (!ranchPrefs.notifyPrefs.system || !title || !body) {
       return false;
@@ -855,10 +1211,11 @@ function registerRanchIpc() {
       return false;
     }
 
-    new Notification({
-      title,
-      body
-    }).show();
+    const icon = agentId ? resolveRanchNotifyIcon(agentId) : null;
+    const notification = new Notification(icon
+      ? { title, body, icon }
+      : { title, body });
+    notification.show();
     return true;
   });
 }
@@ -952,6 +1309,8 @@ app.whenReady().then(() => {
 
 app.on('before-quit', () => {
   isQuitting = true;
+  runningProgressTimers.forEach((timer) => clearInterval(timer));
+  runningProgressTimers.clear();
   runningProcesses.forEach((child) => child.kill());
   runningProcesses.clear();
 });

@@ -205,6 +205,9 @@ export interface RanchBounds {
   height: number;
 }
 
+export interface RanchInteractiveRegion extends RanchBounds {
+}
+
 export interface RanchContextMenuInput {
   x?: number;
   y?: number;
@@ -246,6 +249,7 @@ export interface RanchPrefsPatch {
 export interface RanchNotifyPayload {
   title: string;
   body: string;
+  agentId?: string;
 }
 
 export type AnimalPose =
@@ -313,6 +317,7 @@ export interface AgentSystemMessage {
   type: 'info' | 'success' | 'warning' | 'error';
   title: string;
   content: string;
+  agentId?: string;
 }
 
 export interface CreateTaskInput {
@@ -335,6 +340,7 @@ export interface DesktopApi {
     setBounds: (bounds: RanchBounds) => Promise<RanchPrefs>;
     resetUnread: () => Promise<void>;
     setMousePassthrough: (passthrough: boolean) => Promise<void>;
+    setInteractiveRegions: (regions: RanchInteractiveRegion[]) => Promise<void>;
     requestSystemNotify: (payload: RanchNotifyPayload) => Promise<boolean>;
     onPrefsChanged: (callback: (prefs: RanchPrefs) => void) => () => void;
   };

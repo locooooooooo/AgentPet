@@ -400,14 +400,13 @@ export function createTask(snapshot: AgentSnapshot, input: CreateTaskInput): Age
     return snapshot;
   }
 
-  return withRuntimeStatus(
+  return syncAgentTaskRuntime(
     withMessage({
       ...snapshot,
       updatedAt: now,
       agents
-    }, 'info', '任务已下发', `${getAgentName(agents, input.agentId)} 开始执行「${taskName}」。`),
-    input.agentId,
-    'coding'
+    }, 'info', '任务已下发', `${getAgentName(agents, input.agentId)} 开始执行「${taskName}」。`, input.agentId),
+    input.agentId
   );
 }
 
@@ -446,10 +445,9 @@ export function stopTask(snapshot: AgentSnapshot, agentId: string, taskId: strin
     return snapshot;
   }
 
-  return withRuntimeStatus(
-    withMessage({ ...snapshot, agents, updatedAt: now }, 'warning', '任务已停止', `${getAgentName(agents, agentId)} 的任务已停止。`),
-    agentId,
-    'idle'
+  return syncAgentTaskRuntime(
+    withMessage({ ...snapshot, agents, updatedAt: now }, 'warning', '任务已停止', `${getAgentName(agents, agentId)} 的任务已停止。`, agentId),
+    agentId
   );
 }
 
@@ -476,7 +474,7 @@ export function clearCompletedTasks(snapshot: AgentSnapshot, agentId: string): A
     return snapshot;
   }
 
-  return withMessage({ ...snapshot, agents, updatedAt: now }, 'info', '历史已清理', `已清理 ${removed} 条已完成任务。`);
+  return withMessage({ ...snapshot, agents, updatedAt: now }, 'info', '历史已清理', `已清理 ${removed} 条已完成任务。`, agentId);
 }
 
 export function applyNiuMaAction(snapshot: AgentSnapshot, agentId: string, action: NiuMaAction): AgentSnapshot {
@@ -506,7 +504,7 @@ export function applyNiuMaAction(snapshot: AgentSnapshot, agentId: string, actio
       ...snapshot.runtime,
       [agentId]: nextRuntime
     }
-  }, patch.messageType, patch.messageTitle, `${getAgentName(snapshot.agents, agentId)}：${patch.messageBody}`);
+  }, patch.messageType, patch.messageTitle, `${getAgentName(snapshot.agents, agentId)}：${patch.messageBody}`, agentId);
 }
 
 export function progressRunningTasks(snapshot: AgentSnapshot): AgentSnapshot {
@@ -586,6 +584,85 @@ export function progressRunningTasks(snapshot: AgentSnapshot): AgentSnapshot {
   };
 }
 
+const REAL_TASK_BUSY_STATUSES: NiuMaStatus[] = ['coding', 'debugging', 'testing', 'demanding'];
+
+function isDeployCommand(command: string) {
+  const lower = command.toLowerCase();
+  return lower.includes('deploy') || lower.includes('release');
+}
+
+export function getNiuMaEffectiveStatus(agent: AIAgent, runtime: NiuMaRuntimeState): NiuMaStatus {
+  const runningTask = agent.tasks.find((task) => task.status === 'running');
+  if (runningTask) {
+    if (isDeployCommand(runningTask.command)) {
+      return 'deploying';
+    }
+    if (runningTask.progress < 10) {
+      return 'coding';
+    }
+
+    const index = Math.floor(runningTask.progress) % REAL_TASK_BUSY_STATUSES.length;
+    return REAL_TASK_BUSY_STATUSES[index] ?? 'coding';
+  }
+
+  const latestTask = agent.tasks[0];
+  if (latestTask?.status === 'error') {
+    return 'panicking';
+  }
+
+  if (latestTask?.status === 'success' && latestTask.endTime) {
+    const endedAt = Date.parse(latestTask.endTime);
+    if (Number.isFinite(endedAt) && Date.now() - endedAt < 10_000) {
+      return 'done';
+    }
+  }
+
+  return runtime.customState ?? 'idle';
+}
+
+export function syncAgentTaskRuntime(snapshot: AgentSnapshot, agentId: string): AgentSnapshot {
+  const agent = snapshot.agents.find((item) => item.id === agentId);
+  if (!agent) {
+    return snapshot;
+  }
+
+  const now = new Date().toISOString();
+  const current = snapshot.runtime[agentId] ?? createRuntimeState(agentId, now);
+  const hasRunning = agent.tasks.some((task) => task.status === 'running');
+  const nextCustomState = hasRunning ? null : current.customState;
+  const effectiveStatus = getNiuMaEffectiveStatus(agent, {
+    ...current,
+    customState: nextCustomState
+  });
+  const statusChanged = effectiveStatus !== current.status;
+
+  const nextRuntime: NiuMaRuntimeState = {
+    ...current,
+    status: effectiveStatus,
+    quote: statusChanged ? pickQuote(effectiveStatus, agent.id, agent.tasks.length) : current.quote,
+    lastInteractionAt: statusChanged ? now : current.lastInteractionAt,
+    customState: nextCustomState
+  };
+
+  if (
+    nextRuntime.status === current.status &&
+    nextRuntime.quote === current.quote &&
+    nextRuntime.lastInteractionAt === current.lastInteractionAt &&
+    nextRuntime.customState === current.customState
+  ) {
+    return snapshot;
+  }
+
+  return {
+    ...snapshot,
+    runtime: {
+      ...snapshot.runtime,
+      [agentId]: nextRuntime
+    },
+    updatedAt: now
+  };
+}
+
 /**
  * Ranch 物理 tick (2s 一次)
  *  - 任务运行中:能量 -2, 压力 +5, 温度 +4 (被画饼时 -4 / +8 / +8)
@@ -602,6 +679,13 @@ export function progressNiuMaTick(snapshot: AgentSnapshot): AgentSnapshot {
   for (const agent of snapshot.agents) {
     const current = nextRuntime[agent.id] ?? createRuntimeState(agent.id, now);
     const isRunning = agent.tasks.some((task) => task.status === 'running');
+    const nextCustomState = isRunning ? null : current.customState;
+    const effectiveStatus = getNiuMaEffectiveStatus(agent, {
+      ...current,
+      customState: nextCustomState
+    });
+    const statusChanged = effectiveStatus !== current.status;
+    const nextQuote = statusChanged ? pickQuote(effectiveStatus, agent.id, agent.tasks.length) : current.quote;
 
     const energyDelta = isRunning
       ? -(current.isFueledByPie ? 4 : 2)
@@ -616,9 +700,13 @@ export function progressNiuMaTick(snapshot: AgentSnapshot): AgentSnapshot {
 
     const updated: NiuMaRuntimeState = {
       ...current,
+      status: effectiveStatus,
       energy: clamp(current.energy + energyDelta),
       stress: clamp(current.stress + stressDelta),
       temperature: Math.max(31, Math.min(110, current.temperature + tempDelta)),
+      quote: nextQuote,
+      lastInteractionAt: statusChanged ? now : current.lastInteractionAt,
+      customState: nextCustomState,
       bubbleTimer: nextBubbleTimer,
       bubbleText
     };
@@ -627,6 +715,10 @@ export function progressNiuMaTick(snapshot: AgentSnapshot): AgentSnapshot {
       updated.energy !== current.energy ||
       updated.stress !== current.stress ||
       updated.temperature !== current.temperature ||
+      updated.status !== current.status ||
+      updated.quote !== current.quote ||
+      updated.lastInteractionAt !== current.lastInteractionAt ||
+      updated.customState !== current.customState ||
       updated.bubbleTimer !== current.bubbleTimer ||
       updated.bubbleText !== current.bubbleText
     ) {
@@ -707,7 +799,7 @@ export function cycleNiuMaState(snapshot: AgentSnapshot, agentId: string): Agent
     ...snapshot,
     updatedAt: now,
     runtime: { ...snapshot.runtime, [agentId]: nextRuntime }
-  }, 'info', '牛马状态变更', `${getAgentName(snapshot.agents, agentId)}：${meta.name}`);
+  }, 'info', '牛马状态变更', `${getAgentName(snapshot.agents, agentId)}：${meta.name}`, agentId);
 }
 
 function normalizeAgent(value: unknown, index: number): AIAgent {
@@ -812,7 +904,8 @@ function normalizeMessage(value: unknown): AgentSystemMessage | null {
     timestamp: stringOr(value.timestamp, new Date().toISOString()),
     type,
     title: stringOr(value.title, '系统消息'),
-    content: stringOr(value.content, '')
+    content: stringOr(value.content, ''),
+    agentId: typeof value.agentId === 'string' && value.agentId.trim() ? value.agentId.trim() : undefined
   };
 }
 
@@ -925,20 +1018,42 @@ function withRuntimeStatus(snapshot: AgentSnapshot, agentId: string, status: Niu
   };
 }
 
-function withMessage(snapshot: AgentSnapshot, type: AgentSystemMessage['type'], title: string, content: string): AgentSnapshot {
+export function appendSystemMessage(
+  snapshot: AgentSnapshot,
+  type: AgentSystemMessage['type'],
+  title: string,
+  content: string,
+  agentId?: string
+): AgentSnapshot {
+  return withMessage(snapshot, type, title, content, agentId);
+}
+
+function withMessage(
+  snapshot: AgentSnapshot,
+  type: AgentSystemMessage['type'],
+  title: string,
+  content: string,
+  agentId?: string
+): AgentSnapshot {
   return {
     ...snapshot,
-    messages: [createMessage(type, title, content), ...snapshot.messages].slice(0, 80)
+    messages: [createMessage(type, title, content, agentId), ...snapshot.messages].slice(0, 80)
   };
 }
 
-function createMessage(type: AgentSystemMessage['type'], title: string, content: string): AgentSystemMessage {
+function createMessage(
+  type: AgentSystemMessage['type'],
+  title: string,
+  content: string,
+  agentId?: string
+): AgentSystemMessage {
   return {
     id: `msg-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
     timestamp: new Date().toISOString(),
     type,
     title,
-    content
+    content,
+    agentId
   };
 }
 
