@@ -313,12 +313,261 @@ completed:
   - Strengthened `scripts/check-orchestration.mjs` so the ledger must keep PM/Supervisor active, completed implementation work summarized, open packages standby, and live-subagents blocked.
   - The ledger is supervision-only and does not authorize or execute any role action.
   - No Git repair, connector acceptance/execution, M4 implementation, Electron launch, pointer input, duplicate thread creation, staging, commit, push, reset, clean, or file removal was run.
+- 2026-07-02 14:54:09 +08:00 Git staging-review package pass:
+  - Read-only Git check now observes valid local Git metadata: `git rev-parse --is-inside-work-tree` returns `true`, branch is `main`, origin points to `https://github.com/locooooooooo/AgentPet.git`, and `git log --oneline -1` reports `d158cad Initial commit`.
+  - `git status --porcelain=v1 --branch` shows project files staged plus untracked local log files, which conflicts with the earlier empty `.git` diagnosis.
+  - Added `docs/orchestration/tasks/git-staging-review-agentpet-v0.1.md` as a standby review package for the then-observed valid repo and staged index.
+  - Updated `docs/orchestration/index.md`, `docs/orchestration/status.json`, `daily-decision-queue-2026-07-02`, and `daily-role-accountability-2026-07-02` so Git repair history and current staging review are separated.
+  - No Git repair, `git add`, unstage, commit, push, reset, clean, file removal, connector execution, duplicate thread creation, M4 implementation, Electron launch, or pointer input was run by this PM pass.
+- 2026-07-02 15:00:16 +08:00 Git state-review correction pass:
+  - Latest read-only Git check now reports `fa9e08b Import AgentPet workspace`, upstream `origin/main`, and no staged diff from `git diff --cached --name-status`.
+  - `git status --porcelain=v1 --branch --untracked-files=all` shows only this PM pass's unstaged orchestration docs/script changes plus untracked local log files and `docs/orchestration/tasks/git-staging-review-agentpet-v0.1.md`.
+  - Corrected the new Git review package and current orchestration text from "current staged index" to "current Git state / working-tree / index review".
+  - No Git repair, `git add`, unstage, commit, push, reset, clean, file removal, connector execution, duplicate thread creation, M4 implementation, Electron launch, or pointer input was run by this PM pass.
+- 2026-07-02 15:04:47 +08:00 final verification pass:
+  - `node --check scripts/check-orchestration.mjs` passed.
+  - `npm.cmd run orchestration:check` passed with 31 referenced cards.
+  - `npm.cmd run orchestration:report` shows `daily-supervision` active, `git-staging-review-agentpet` standby, connector policy/review standby, M4 implementation standby, and pointer-smoke packages standby.
+  - `npm.cmd run orchestration:preflight` passed with Codex draft/pending/enabled=false and Trae/Qoder placeholder/not-requested/enabled=false.
+  - `npm.cmd run lint` and `npm.cmd run build` passed after the Git state review package and guard updates.
+  - Stale wording scan found no old active-card wording, and connector config scan found no accepted approval or enabled connector.
+  - Latest read-only Git status is `main...origin/main` with this PM pass's orchestration docs/script changes unstaged and `git-staging-review-agentpet-v0.1.md` untracked; no staged diff was present.
+  - No Git repair, `git add`, unstage, commit, push, reset, clean, file removal, connector execution, duplicate thread creation, M4 implementation, Electron launch, or pointer input was run by this PM pass.
+- 2026-07-02 15:09:01 +08:00 handoff-format guard pass:
+  - Corrected `docs/orchestration/tasks/git-staging-review-agentpet-v0.1.md` so the tag line and `objective:` section are separated for human handoff readability.
+  - Strengthened `scripts/check-orchestration.mjs` so the Git state review card must keep explicit section headings: objective, dispatch state, truth sources, read-only observation history, allowed future read-only review, forbidden scope, acceptance, blockers, next action, and summary.
+  - `node --check scripts/check-orchestration.mjs` and `npm.cmd run orchestration:check` passed with 31 referenced cards.
+  - `npm.cmd run orchestration:report`, `npm.cmd run orchestration:preflight`, `npm.cmd run lint`, and `npm.cmd run build` passed.
+  - Stale wording scan found no old active-card wording, and connector config scan found no accepted approval or enabled connector.
+  - Latest read-only Git status is still `main...origin/main` with this PM pass's orchestration docs/script changes unstaged and `git-staging-review-agentpet-v0.1.md` untracked.
+  - No Git repair, `git add`, unstage, commit, push, reset, clean, file removal, connector execution, duplicate thread creation, M4 implementation, Electron launch, or pointer input was run by this PM pass.
+- 2026-07-02 15:23:49 +08:00 role accountability coverage pass:
+  - Completed `docs/orchestration/tasks/daily-role-accountability-2026-07-02.md` so the role ledger now covers every current `docs/orchestration/status.json` role, including the daily-role-accountability role itself and the summarized ranch/M3 roles.
+  - Strengthened `scripts/check-orchestration.mjs` so every `status.json.roles[].title` must appear in the daily role accountability ledger table.
+  - `node --check scripts/check-orchestration.mjs` and `npm.cmd run orchestration:check` passed with 31 referenced cards.
+  - `npm.cmd run orchestration:report`, `npm.cmd run orchestration:preflight`, `npm.cmd run lint`, and `npm.cmd run build` passed.
+  - Stale wording scan found no old active-card wording, and connector config scan found no accepted approval or enabled connector.
+  - Latest read-only Git status is still `main...origin/main` with this PM pass's orchestration docs/script changes unstaged and `git-staging-review-agentpet-v0.1.md` untracked.
+  - No role state changed; no Git repair, `git add`, unstage, commit, push, reset, clean, file removal, connector execution, duplicate thread creation, M4 implementation, Electron launch, or pointer input was run by this PM pass.
+- 2026-07-02 15:30:53 +08:00 decision queue coverage-guard pass:
+  - Added a `coverage guard` table to `docs/orchestration/tasks/daily-decision-queue-2026-07-02.md` mapping every current decision-bearing `standby` or `blocked` lane to a queue item.
+  - Strengthened `scripts/check-orchestration.mjs` so any new `standby` or `blocked` lane in `docs/orchestration/status.json` fails the check unless it is covered by the decision queue or explicitly exempted as a supervision artifact.
+  - `node --check scripts/check-orchestration.mjs` and `npm.cmd run orchestration:check` passed with 31 referenced cards.
+  - `npm.cmd run orchestration:report`, `npm.cmd run orchestration:preflight`, and `npm.cmd run lint` passed.
+  - A parallel `npm.cmd run build` attempt reached Vite output then hit `Assertion failed: !(handle->flags & UV_HANDLE_CLOSING)`; a standalone rerun of `npm.cmd run build` passed.
+  - Stale wording scan found no old active-card wording, and connector config scan found no accepted approval or enabled connector.
+  - `git diff --cached --name-status` remained empty; latest read-only Git status is still `main...origin/main` with unstaged orchestration docs/script changes, local log files, and `git-staging-review-agentpet-v0.1.md` untracked.
+  - No Git repair, `git add`, unstage, commit, push, reset, clean, file removal, connector execution, duplicate thread creation, M4 implementation, Electron launch, or pointer input was run by this PM pass.
+- 2026-07-02 15:35:49 +08:00 report decision-queue visibility pass:
+  - Updated `scripts/orchestration-report.mjs` so `npm.cmd run orchestration:report` now prints a `daily decision queue:` section parsed from `docs/orchestration/tasks/daily-decision-queue-2026-07-02.md`.
+  - The report now lists each queue item with current owner, required decision, allowed first action, and blocked-until condition, making the next PM callback visible without opening the task card separately.
+  - Added a non-empty parse guard so the report fails if the daily decision queue cannot be parsed.
+  - Strengthened `scripts/check-orchestration.mjs` so the report script must keep the decision-queue source, parser, non-empty guard, `first action`, and `blocked until` output.
+  - `node --check scripts/orchestration-report.mjs`, `node --check scripts/check-orchestration.mjs`, `npm.cmd run orchestration:report`, `npm.cmd run orchestration:check`, `npm.cmd run orchestration:preflight`, `npm.cmd run lint`, and `npm.cmd run build` passed.
+  - Stale wording scan found no old active-card wording, and connector config scan found no accepted approval or enabled connector.
+  - `git diff --cached --name-status` remained empty.
+  - No Git repair, `git add`, unstage, commit, push, reset, clean, file removal, connector execution, duplicate thread creation, M4 implementation, Electron launch, or pointer input was run by this PM pass.
+- 2026-07-02 15:41:18 +08:00 report role-accountability visibility pass:
+  - Updated `scripts/orchestration-report.mjs` so `npm.cmd run orchestration:report` now prints a `daily role accountability:` section parsed from `docs/orchestration/tasks/daily-role-accountability-2026-07-02.md`.
+  - The report now lists each role ledger row with current state, evidence, and accountability action, making role follow-up visible without opening the ledger separately.
+  - Added non-empty parse and status-role coverage guards so the report fails if the ledger cannot be parsed or if any `docs/orchestration/status.json` role is missing from the parsed accountability rows.
+  - Strengthened `scripts/check-orchestration.mjs` so the report script must keep the role-accountability source, parser, non-empty guard, missing-role guard, `evidence`, and `action` output.
+  - `node --check scripts/orchestration-report.mjs`, `node --check scripts/check-orchestration.mjs`, `npm.cmd run orchestration:report`, `npm.cmd run orchestration:check`, `npm.cmd run orchestration:preflight`, `npm.cmd run lint`, and `npm.cmd run build` passed.
+  - Stale wording scan found no old active-card wording, and connector config scan found no accepted approval or enabled connector.
+  - `git diff --cached --name-status` remained empty.
+  - No Git repair, `git add`, unstage, commit, push, reset, clean, file removal, connector execution, duplicate thread creation, M4 implementation, Electron launch, or pointer input was run by this PM pass.
+- 2026-07-02 15:45:26 +08:00 role-accountability state-sync guard pass:
+  - Strengthened `scripts/check-orchestration.mjs` so it parses the `role ledger:` table in `docs/orchestration/tasks/daily-role-accountability-2026-07-02.md` instead of relying only on string presence.
+  - The check now fails if the ledger has no parsed rows, duplicate role rows, a missing `docs/orchestration/status.json` role, a `current state` that differs from the corresponding status role, or an empty evidence/action cell.
+  - Updated the ledger acceptance text so every role ledger `current state` must match the corresponding `docs/orchestration/status.json` role status.
+  - `node --check scripts/check-orchestration.mjs`, `npm.cmd run orchestration:check`, `npm.cmd run orchestration:report`, `npm.cmd run orchestration:preflight`, `npm.cmd run lint`, and `npm.cmd run build` passed.
+  - Stale wording scan found no old active-card wording, and connector config scan found no accepted approval or enabled connector.
+  - `git diff --cached --name-status` remained empty.
+  - No role state changed; no Git repair, `git add`, unstage, commit, push, reset, clean, file removal, connector execution, duplicate thread creation, M4 implementation, Electron launch, or pointer input was run by this PM pass.
+- 2026-07-02 15:50:36 +08:00 decision-queue structural guard pass:
+  - Strengthened `scripts/check-orchestration.mjs` so it parses the `decision queue:` and `coverage guard:` tables in `docs/orchestration/tasks/daily-decision-queue-2026-07-02.md` instead of relying only on fixed text.
+  - The check now fails if the decision queue has no parsed rows, duplicate queue items, empty owner/decision/action/blocker fields, no parsed coverage rows, duplicate coverage lanes, coverage rows pointing to missing queue items, or an open `standby`/`blocked` lane whose parsed coverage differs from the expected queue item.
+  - Updated the decision queue acceptance text so queue and coverage tables must be parseable, unique, field-complete, and internally linked.
+  - `node --check scripts/check-orchestration.mjs`, `npm.cmd run orchestration:check`, `npm.cmd run orchestration:report`, `npm.cmd run orchestration:preflight`, `npm.cmd run lint`, and `npm.cmd run build` passed.
+  - Stale wording scan found no old active-card wording, and connector config scan found no accepted approval or enabled connector.
+  - `git diff --cached --name-status` remained empty.
+  - No queue item was executed; no Git repair, `git add`, unstage, commit, push, reset, clean, file removal, connector execution, duplicate thread creation, M4 implementation, Electron launch, or pointer input was run by this PM pass.
+- 2026-07-02 15:54:19 +08:00 decision-queue owner guard pass:
+  - Strengthened `scripts/check-orchestration.mjs` so every parsed daily decision queue `current owner` must resolve to a tracked `docs/orchestration/status.json` role title.
+  - Updated the decision queue acceptance text so owner resolution is explicit, preventing untracked or shadow owners from appearing in the PM callback queue.
+  - `node --check scripts/check-orchestration.mjs`, `node --check scripts/orchestration-report.mjs`, `npm.cmd run orchestration:check`, `npm.cmd run orchestration:report`, `npm.cmd run orchestration:preflight`, `npm.cmd run lint`, and `npm.cmd run build` passed.
+  - Stale wording scan found no old active-card wording, connector config scan found no accepted approval or enabled connector, and `git diff --cached --name-status` remained empty.
+  - No queue item was executed; no Git repair, `git add`, unstage, commit, push, reset, clean, file removal, connector execution, duplicate thread creation, M4 implementation, Electron launch, or pointer input was run by this PM pass.
+- 2026-07-02 15:58:28 +08:00 role-accountability row-source guard pass:
+  - Strengthened `scripts/check-orchestration.mjs` so every parsed daily role accountability row must resolve to either a tracked `docs/orchestration/status.json` role title or a real `docs/orchestration/status.json` lane responsibility label such as the `live-subagents` lane.
+  - Updated the role accountability acceptance text so parsed row state must match the resolved role or lane source.
+  - `node --check scripts/check-orchestration.mjs`, `node --check scripts/orchestration-report.mjs`, `npm.cmd run orchestration:check`, `npm.cmd run orchestration:report`, `npm.cmd run orchestration:preflight`, `npm.cmd run lint`, and `npm.cmd run build` passed.
+  - Stale wording scan found no old active-card wording, connector config scan found no accepted approval or enabled connector, and `git diff --cached --name-status` remained empty.
+  - No role state changed; no Git repair, `git add`, unstage, commit, push, reset, clean, file removal, connector execution, duplicate thread creation, M4 implementation, Electron launch, or pointer input was run by this PM pass.
+- 2026-07-02 16:00:55 +08:00 report role-accountability lane-source guard pass:
+  - Strengthened `scripts/orchestration-report.mjs` so report generation also validates daily role accountability rows against tracked `docs/orchestration/status.json` roles and open lane responsibility labels.
+  - Updated `scripts/check-orchestration.mjs` so the report script must keep the open-lane owner/lane-row guard and unresolved-row guard.
+  - `node --check scripts/orchestration-report.mjs`, `node --check scripts/check-orchestration.mjs`, `npm.cmd run orchestration:report`, `npm.cmd run orchestration:check`, `npm.cmd run orchestration:preflight`, `npm.cmd run lint`, and `npm.cmd run build` passed.
+  - Stale wording scan found no old active-card wording, connector config scan found no accepted approval or enabled connector, and `git diff --cached --name-status` remained empty.
+  - No role state changed; no Git repair, `git add`, unstage, commit, push, reset, clean, file removal, connector execution, duplicate thread creation, M4 implementation, Electron launch, or pointer input was run by this PM pass.
+- 2026-07-02 16:05:32 +08:00 report decision-queue coverage guard pass:
+  - Strengthened `scripts/orchestration-report.mjs` so report generation validates the daily decision queue owner, field completeness, queue uniqueness, coverage uniqueness, coverage-to-item links, and open-lane coverage before printing the PM callback surface.
+  - Updated `scripts/check-orchestration.mjs` so the report script must keep the decision-coverage parser and report-level decision queue guard errors.
+  - `node --check scripts/orchestration-report.mjs`, `node --check scripts/check-orchestration.mjs`, `npm.cmd run orchestration:report`, `npm.cmd run orchestration:check`, `npm.cmd run orchestration:preflight`, `npm.cmd run lint`, and `npm.cmd run build` passed.
+  - Stale wording scan found no old active-card wording, connector config scan found no accepted approval or enabled connector, and `git diff --cached --name-status` remained empty.
+  - No queue item was executed; no Git repair, `git add`, unstage, commit, push, reset, clean, file removal, connector execution, duplicate thread creation, M4 implementation, Electron launch, or pointer input was run by this PM pass.
+- 2026-07-02 16:08:23 +08:00 decision-queue item-to-coverage guard pass:
+  - Strengthened `scripts/check-orchestration.mjs` and `scripts/orchestration-report.mjs` so every daily decision queue item must be used by at least one `coverage guard` row.
+  - Updated the daily decision queue acceptance text so orphan decision items fail explicitly instead of being printed as actionable PM queue entries.
+  - `node --check scripts/check-orchestration.mjs`, `node --check scripts/orchestration-report.mjs`, `npm.cmd run orchestration:check`, `npm.cmd run orchestration:report`, `npm.cmd run orchestration:preflight`, `npm.cmd run lint`, and `npm.cmd run build` passed.
+  - Stale wording scan found no old active-card wording, connector config scan found no accepted approval or enabled connector, and `git diff --cached --name-status` remained empty.
+  - No queue item was executed; no Git repair, `git add`, unstage, commit, push, reset, clean, file removal, connector execution, duplicate thread creation, M4 implementation, Electron launch, or pointer input was run by this PM pass.
+- 2026-07-02 16:11:37 +08:00 role-accountability evidence-path guard pass:
+  - Strengthened `scripts/check-orchestration.mjs` and `scripts/orchestration-report.mjs` so every daily role accountability evidence cell must contain at least one repo path, every referenced path must exist, and every `docs/orchestration/*.md` evidence path must be tracked by `docs/orchestration/index.md`.
+  - Updated the daily role accountability acceptance text so evidence cannot be a stale or untracked free-text pointer.
+  - `node --check scripts/check-orchestration.mjs`, `node --check scripts/orchestration-report.mjs`, `npm.cmd run orchestration:check`, `npm.cmd run orchestration:report`, `npm.cmd run orchestration:preflight`, `npm.cmd run lint`, and `npm.cmd run build` passed.
+  - Stale wording scan found no old active-card wording, connector config scan found no accepted approval or enabled connector, and `git diff --cached --name-status` remained empty.
+  - No role state changed; no Git repair, `git add`, unstage, commit, push, reset, clean, file removal, connector execution, duplicate thread creation, M4 implementation, Electron launch, or pointer input was run by this PM pass.
+- 2026-07-02 16:14:27 +08:00 report decision-coverage visibility pass:
+  - Updated `scripts/orchestration-report.mjs` so `npm.cmd run orchestration:report` prints a `daily decision coverage:` section mapping each open status lane to its queue item.
+  - Updated the daily decision queue acceptance text and `scripts/check-orchestration.mjs` so report coverage visibility is required.
+  - `node --check scripts/orchestration-report.mjs`, `node --check scripts/check-orchestration.mjs`, `npm.cmd run orchestration:report`, `npm.cmd run orchestration:check`, `npm.cmd run orchestration:preflight`, `npm.cmd run lint`, and `npm.cmd run build` passed.
+  - Stale wording scan found no old active-card wording, connector config scan found no accepted approval or enabled connector, and `git diff --cached --name-status` remained empty.
+  - No queue item was executed; no Git repair, `git add`, unstage, commit, push, reset, clean, file removal, connector execution, duplicate thread creation, M4 implementation, Electron launch, or pointer input was run by this PM pass.
+- 2026-07-02 16:58:42 +08:00 decision-coverage stale-lane guard pass:
+  - Strengthened `scripts/check-orchestration.mjs` and `scripts/orchestration-report.mjs` so every daily decision coverage row must resolve to a current `docs/orchestration/status.json` lane in `standby` or `blocked` state and must not point to a supervision-only lane.
+  - Updated the daily decision queue acceptance text so stale, closed, missing, or non-decision coverage rows fail explicitly instead of being printed in the PM callback surface.
+  - `node --check scripts/check-orchestration.mjs`, `node --check scripts/orchestration-report.mjs`, `npm.cmd run orchestration:check`, `npm.cmd run orchestration:report`, `npm.cmd run orchestration:preflight`, `npm.cmd run lint`, and `npm.cmd run build` passed.
+  - Stale wording scan found no old active-card wording, connector config scan found no accepted approval or enabled connector, and `git diff --cached --name-status` remained empty.
+  - No queue item was executed; no Git repair, `git add`, unstage, commit, push, reset, clean, file removal, connector execution, duplicate thread creation, M4 implementation, Electron launch, or pointer input was run by this PM pass.
+- 2026-07-02 17:05:36 +08:00 role-accountability action guard pass:
+  - Strengthened `scripts/check-orchestration.mjs` and `scripts/orchestration-report.mjs` so every parsed daily role accountability row must have a non-empty accountability action, including lane-only rows such as the blocked live-subagents lane.
+  - Updated the daily role accountability acceptance text so each resolved role or lane must carry a concrete action, not just state and evidence.
+  - `node --check scripts/check-orchestration.mjs`, `node --check scripts/orchestration-report.mjs`, `npm.cmd run orchestration:check`, `npm.cmd run orchestration:report`, `npm.cmd run orchestration:preflight`, `npm.cmd run lint`, and `npm.cmd run build` passed.
+  - Stale wording scan found no old active-card wording, connector config scan found no accepted approval or enabled connector, and `git diff --cached --name-status` remained empty.
+  - No role state changed; no Git repair, `git add`, unstage, commit, push, reset, clean, file removal, connector execution, duplicate thread creation, M4 implementation, Electron launch, or pointer input was run by this PM pass.
+- 2026-07-02 17:16:46 +08:00 active-lane singleton guard pass:
+  - Strengthened `scripts/check-orchestration.mjs` and `scripts/orchestration-report.mjs` so `docs/orchestration/status.json` must keep `daily-supervision` as the only active lane.
+  - Updated the daily role accountability acceptance text so implementation, connector, Git, M4, and pointer-smoke lanes cannot become active without a fresh dispatch and matching guard update.
+  - `node --check scripts/check-orchestration.mjs`, `node --check scripts/orchestration-report.mjs`, `npm.cmd run orchestration:check`, `npm.cmd run orchestration:report`, `npm.cmd run orchestration:preflight`, `npm.cmd run lint`, and `npm.cmd run build` passed.
+  - Stale wording scan found no old active-card wording, connector config scan found no accepted approval or enabled connector, and `git diff --cached --name-status` remained empty.
+  - No role state changed; no Git repair, `git add`, unstage, commit, push, reset, clean, file removal, connector execution, duplicate thread creation, M4 implementation, Electron launch, or pointer input was run by this PM pass.
+- 2026-07-02 18:06:34 +08:00 active-lane report visibility pass:
+  - Updated `scripts/orchestration-report.mjs` so `npm.cmd run orchestration:report` prints an `active lane control:` section with the current active lane list and expected active lane.
+  - Updated `scripts/check-orchestration.mjs` and the daily role accountability acceptance text so the report must keep this active-lane control summary visible.
+  - `node --check scripts/check-orchestration.mjs`, `node --check scripts/orchestration-report.mjs`, `npm.cmd run orchestration:check`, `npm.cmd run orchestration:report`, `npm.cmd run orchestration:preflight`, `npm.cmd run lint`, and `npm.cmd run build` passed.
+  - Stale wording scan found no old active-card wording, connector config scan found no accepted approval or enabled connector, and `git diff --cached --name-status` remained empty.
+  - No role state changed; no Git repair, `git add`, unstage, commit, push, reset, clean, file removal, connector execution, duplicate thread creation, M4 implementation, Electron launch, or pointer input was run by this PM pass.
+
+- 2026-07-02 18:11:51 +08:00 non-summarized lane accountability guard pass:
+  - Validated `scripts/check-orchestration.mjs` and `scripts/orchestration-report.mjs` now require every non-summarized `docs/orchestration/status.json` lane to be covered by either its tracked role owner or a lane-specific daily role ledger row.
+  - Confirmed the active `daily-supervision` lane is covered by the lane-specific row in `docs/orchestration/tasks/daily-role-accountability-2026-07-02.md`, while `daily-supervision` remains the only active lane.
+  - `node --check scripts/check-orchestration.mjs`, `node --check scripts/orchestration-report.mjs`, `npm.cmd run orchestration:check`, `npm.cmd run orchestration:report`, `npm.cmd run orchestration:preflight`, `npm.cmd run lint`, and `npm.cmd run build` passed.
+  - Stale wording scan found no old active-card wording, connector config scan found no accepted approval or enabled connector, and `git diff --cached --name-status` remained empty.
+  - No queue item was executed; no Git repair, `git add`, unstage, commit, push, reset, clean, file removal, connector execution, duplicate thread creation, M4 implementation, Electron launch, or pointer input was run by this PM pass.
+- 2026-07-02 18:21:47 +08:00 daily supervision closeout report guard pass:
+  - Updated `scripts/orchestration-report.mjs` so `npm.cmd run orchestration:report` prints a `daily supervision closeout:` section parsed from this session's `incomplete:`, `blockers:`, and `next action:` sections.
+  - Strengthened `scripts/check-orchestration.mjs` so the report script must keep the daily supervision session source, closeout parser, non-empty closeout guard, and printed closeout section.
+  - Updated `docs/orchestration/tasks/daily-role-accountability-2026-07-02.md` acceptance so the report must print both active lane control and daily supervision closeout summaries.
+  - `node --check scripts/orchestration-report.mjs`, `node --check scripts/check-orchestration.mjs`, `npm.cmd run orchestration:report`, `npm.cmd run orchestration:check`, `npm.cmd run orchestration:preflight`, `npm.cmd run lint`, and `npm.cmd run build` passed.
+  - Stale wording scan found no old active-card wording, connector config scan found no accepted approval or enabled connector, and `git diff --cached --name-status` remained empty.
+  - No queue item was executed; no Git repair, `git add`, unstage, commit, push, reset, clean, file removal, connector execution, duplicate thread creation, M4 implementation, Electron launch, or pointer input was run by this PM pass.
+- 2026-07-02 18:27:14 +08:00 daily closeout queue-coverage guard pass:
+  - Added a `session closeout coverage:` table to `docs/orchestration/tasks/daily-decision-queue-2026-07-02.md` so every daily decision queue item has an explicit required evidence phrase in this active supervision session.
+  - Strengthened `scripts/orchestration-report.mjs` so report generation parses the session closeout coverage table, verifies every queue item has closeout coverage, verifies every required phrase appears in this session's closeout sections, and prints `daily supervision closeout coverage:`.
+  - Strengthened `scripts/check-orchestration.mjs` with the same queue-to-session closeout coverage guard and report-script retention checks.
+  - `node --check scripts/orchestration-report.mjs`, `node --check scripts/check-orchestration.mjs`, `npm.cmd run orchestration:report`, `npm.cmd run orchestration:check`, `npm.cmd run orchestration:preflight`, `npm.cmd run lint`, and `npm.cmd run build` passed.
+  - Stale wording scan found no old active-card wording, connector config scan found no accepted approval or enabled connector, and `git diff --cached --name-status` remained empty.
+  - No queue item was executed; no Git repair, `git add`, unstage, commit, push, reset, clean, file removal, connector execution, duplicate thread creation, M4 implementation, Electron launch, or pointer input was run by this PM pass.
+- 2026-07-02 18:30:49 +08:00 strict closeout-section evidence guard pass:
+  - Strengthened `scripts/check-orchestration.mjs` so daily session closeout evidence is parsed from the current `incomplete:`, `blockers:`, and `next action:` sections instead of matching anywhere in the full historical session text.
+  - Updated `docs/orchestration/tasks/daily-decision-queue-2026-07-02.md` acceptance so required closeout evidence phrases must appear in those parsed closeout sections.
+  - `node --check scripts/check-orchestration.mjs`, `node --check scripts/orchestration-report.mjs`, `npm.cmd run orchestration:check`, `npm.cmd run orchestration:report`, `npm.cmd run orchestration:preflight`, `npm.cmd run lint`, and `npm.cmd run build` passed.
+  - Stale wording scan found no old active-card wording, connector config scan found no accepted approval or enabled connector, and `git diff --cached --name-status` remained empty.
+  - No queue item was executed; no Git repair, `git add`, unstage, commit, push, reset, clean, file removal, connector execution, duplicate thread creation, M4 implementation, Electron launch, or pointer input was run by this PM pass.
+- 2026-07-02 18:35:18 +08:00 report coverage-row retention guard pass:
+  - Strengthened `scripts/check-orchestration.mjs` so the report script must retain row-level `daily decision coverage` and `daily supervision closeout coverage` output, not only the section headings.
+  - Updated `docs/orchestration/tasks/daily-decision-queue-2026-07-02.md` and `docs/orchestration/tasks/daily-role-accountability-2026-07-02.md` acceptance so report output must keep both lane-to-queue and queue-to-closeout-evidence mappings visible.
+  - `node --check scripts/check-orchestration.mjs`, `node --check scripts/orchestration-report.mjs`, `npm.cmd run orchestration:check`, `npm.cmd run orchestration:report`, `npm.cmd run orchestration:preflight`, `npm.cmd run lint`, and `npm.cmd run build` passed.
+  - Stale wording scan found no old active-card wording, connector config scan found no accepted approval or enabled connector, and `git diff --cached --name-status` remained empty.
+  - No queue item was executed; no Git repair, `git add`, unstage, commit, push, reset, clean, file removal, connector execution, duplicate thread creation, M4 implementation, Electron launch, or pointer input was run by this PM pass.
+- 2026-07-02 18:42:46 +08:00 connector-safety supervision gate pass:
+  - Added `npm.cmd run orchestration:connector-safety` as a unified gate for the existing connector blocked-state, preload evaluate-only API, and UI status-only checks.
+  - Updated `docs/orchestration/tasks/connector-acceptance-review-v0.1.md` and `docs/orchestration/tasks/daily-decision-queue-2026-07-02.md` so future connector metadata or runtime-surface changes must pass both preflight and connector-safety before any decision can move forward.
+  - `node --check scripts/check-orchestration.mjs`, `npm.cmd run orchestration:connector-safety`, `npm.cmd run orchestration:check`, `npm.cmd run orchestration:report`, `npm.cmd run orchestration:preflight`, `npm.cmd run lint`, and `npm.cmd run build` passed.
+  - Connector-safety confirmed blocked connectors remain non-executable, discovery attempts stay at zero before static unblock, preload exposes only `evaluateConnectorGate`, and UI has no raw command/args/cwd/env passthrough.
+  - No connector was accepted, enabled, executed, or bound; no queue item was executed; no Git repair, `git add`, unstage, commit, push, reset, clean, file removal, duplicate thread creation, M4 implementation, Electron launch, or pointer input was run by this PM pass.
+- 2026-07-02 18:48:31 +08:00 connector-safety evidence retention pass:
+  - Added `npm.cmd run orchestration:connector-safety` to this session's durable evidence list so future daily supervision closeouts cannot omit the connector safety gate.
+  - Strengthened `scripts/check-orchestration.mjs` so the daily supervision session must keep the connector-safety evidence entry.
+  - Follow-up verification continued into the next dispatch correction pass after the user challenged the missing long-worker progress.
+  - No connector was accepted, enabled, executed, or bound; no queue item was executed; no Git repair, `git add`, unstage, commit, push, reset, clean, file removal, duplicate thread creation, M4 implementation, Electron launch, or pointer input was run by this PM pass.
+- 2026-07-02 18:59:51 +08:00 long-worker dispatch correction pass:
+  - Acknowledged the PM drift: the previous work was over-focused on guard hardening while requirements work was not actively held by a long-worker.
+  - Read existing Git long-worker thread `019f20fc-9b77-74f3-aa3d-ba8348cdec1c`; latest callback shows the user later explicitly authorized Git repair/import commit/push and the worker pushed `fa9e08b Import AgentPet workspace` to `origin/main`.
+  - Sent the Git long-worker a new post-push read-only callback request; no further Git write was authorized.
+  - Created active M4 implementation long-worker thread `019f227a-8978-7df1-8b3f-738ccdb01b18` with `gpt-5.4` + `xhigh`, scoped to M4 rename plus compact control-cockpit ranch settings entry.
+  - Updated `docs/orchestration/index.md`, `docs/orchestration/status.json`, `docs/orchestration/tasks/ranch-m4-implementation-v0.2.md`, `docs/orchestration/tasks/daily-decision-queue-2026-07-02.md`, `docs/orchestration/tasks/daily-role-accountability-2026-07-02.md`, and `docs/orchestration/sessions/git-manager-agentpet-2026-07-02.md` so M4 is active rather than standby and Git truth is post-push rather than old empty-repo diagnosis.
+  - Connector execution remains disabled; no connector was accepted, enabled, executed, or bound.
+  - This PM pass did not run `git add`, unstage, commit, push, reset, clean, file removal, Electron pointer input, or direct M4 implementation edits.
+- 2026-07-02 19:11:19 +08:00 M4 long-worker acceptance pass:
+  - Collected M4 long-worker callback from thread `019f227a-8978-7df1-8b3f-738ccdb01b18`: touched files were `package.json`, `README.md`, `src/App.tsx`, and `src/components/NiuMaWorkspace.tsx`.
+  - PM corrected two style-compliance details in `src/components/NiuMaWorkspace.tsx`: header settings panel radius is `8` and label `letterSpacing` is `0`.
+  - PM corrected the control-cockpit header title to `桌面牧场 · 控制舱`, matching `docs/桌面牧场开发计划-v0.2.md` M4 acceptance.
+  - Browser smoke on `http://127.0.0.1:5175/` passed with system Chrome: heading `桌面牧场 · 控制舱` visible, `桌面牧场设置` dialog opens, and prefs write verified as `mode=floating`, `personality=quiet`, `notifyPrefs.system=false`.
+  - `npm.cmd run orchestration:check`, `npm.cmd run orchestration:report`, `npm.cmd run orchestration:preflight`, `npm.cmd run orchestration:connector-safety`, `npm.cmd run lint`, and `npm.cmd run build` passed after the M4 implementation and PM corrections.
+  - Negative checks passed: protected files `src/components/NiuMaAvatar.tsx`, `src/index.css`, `src/lib/agentCore.ts`, `ranch.html`, `electron/main.ts`, and `icon/**` had no diff; connector config still has no `enabledByDefault=true` or `approvalStatus=accepted`.
+  - Updated M4/status/accountability truth so `ranch-m4-implementation` is summarized rather than active.
+  - No connector was accepted, enabled, executed, or bound; no `git add`, unstage, commit, push, reset, clean, file removal, Electron pointer input, or transparent-window pointer smoke was run by this PM pass.
+- 2026-07-02 19:44:42 +08:00 core workstation matrix protection pass:
+  - User explicitly marked the middle 牛马工位矩阵 as the core selling point and not to be changed.
+  - Reverted the UI refresh portions that affected `AgentCard` internals: removed the added status-tag wrapper and task-summary block from the matrix cards.
+  - Added a protected CSS override so the matrix stays `repeat(4, minmax(134px, 1fr))`, card min-height stays `318px`, and the original workstation-card background/spacing remain in force.
+  - Browser DOM smoke on `http://127.0.0.1:5173/` confirmed 8 agent cards, 4 grid columns, first card min-height `318px`, zero `.agent-task-summary`, zero `.agent-card-tags`, no horizontal overflow, settings visible, and no raw connector command text.
+  - `npm.cmd run orchestration:check`, `npm.cmd run orchestration:connector-safety`, `npm.cmd run orchestration:preflight`, `npm.cmd run lint`, and `npm.cmd run build` passed after the matrix protection correction.
+  - Constraint for future long-worker/UI work: do not edit the core workstation matrix, `NiuMaAvatar`, or `AgentCard` card internals unless the user explicitly opens that protected scope.
+- 2026-07-02 22:11:39 +08:00 M5 ranch product-line convergence pass:
+  - Spawned M5 orchestration long-worker `019f22ae-8728-7ca3-bc9e-24fb2195ddf7`, but the worker failed with platform `429 Too Many Requests`; PM closed the failed worker and completed the bounded work locally.
+  - Advanced the product line rather than only adding guards: `src/ranch/RanchApp.tsx`, `src/ranch/components/RanchCanvas.tsx`, `src/ranch/components/StatusBand.tsx`, `src/ranch/hooks/useRanchNotifications.ts`, and `src/ranch/styles/ranch.css` now align the ranch body with v0.3's L1/L2/L3 rule.
+  - Ranch UI convergence details: removed the right-side `SelectedOverlay` detail panel and deleted `src/ranch/components/SelectedOverlay.tsx`; kept 8 animals as L1, one `1500ms` status toast as L2, and 3 hover-only icon actions (`召唤控制舱`, `打开设置`, `切换模式`) as L3.
+  - Browser smoke on `http://127.0.0.1:5173/ranch.html` confirmed 8 `.animal` nodes, 3 `.ranch-action-button` nodes, zero `.selected-overlay`, zero persistent `.notification-toast`, transparent field background (`none`), first glyph font-size `56px`, and no horizontal overflow.
+  - `py -3.11` successfully ran the `ui-ux-pro-max` design-system search; its useful guidance was consistent with Inter, strong hierarchy, minimal decoration, and avoiding noisy gradients, while project v0.3 docs remained the stronger source.
+  - M5 orchestration cards `ranch-window-v0.1`, `ranch-status-script-v0.1`, and `ranch-personality-v0.1` are tracked and summarized; their wording was corrected to reflect the ranch-only UI convergence evidence rather than a docs-only pass.
+  - `npm.cmd run lint` and `npm.cmd run build` passed after the ranch UI convergence. Full orchestration gates continued in the next verification pass.
+  - No connector was accepted, enabled, executed, or bound; no Git repair, `git add`, unstage, commit, push, reset, clean, file removal outside the deleted obsolete ranch component, Electron pointer input, transparent-window pointer smoke, or core workstation matrix edit was run by this PM pass.
+- 2026-07-02 22:28:02 +08:00 protected-matrix follow-up supervision pass:
+  - Reconfirmed the user's hard boundary: the central 牛马工位矩阵 is a protected selling point, so this pass did not edit `src/App.tsx`, `src/components/NiuMaWorkspace.tsx`, `src/index.css`, `AgentCard` internals, `NiuMaAvatar`, `agent-board`, or matrix animation behavior.
+  - Spawned two real `gpt-5.4` + `xhigh` sub-agents instead of pretending the main thread was the only worker: `[长工-监督]` `019f2337-32f1-7ad1-816d-7b9c33bca548` for read-only orchestration accountability, and `[长工-验证]` `019f2337-6c62-7842-9996-1d69a9024784` for read-only pointer-smoke route review.
+  - `[长工-监督]` failed before completion with `stream disconnected before completion: Upstream request failed`; PM treated it as failed evidence, not as a completed callback.
+  - `[长工-验证]` did not return a callback after repeated waits and was closed from `running`; PM continued local non-overlapping verification rather than treating the silent worker as evidence.
+  - `npm.cmd run orchestration:report`, `npm.cmd run orchestration:check`, `npm.cmd run orchestration:preflight`, and `npm.cmd run orchestration:connector-safety` passed; connector execution remained blocked/evaluate-only with Codex draft/pending/enabled=false and Trae/Qoder placeholder/not-requested/enabled=false.
+  - In-app browser smoke on `http://127.0.0.1:5173/ranch.html` reconfirmed 8 `.animal` nodes, 3 `.ranch-action-button` nodes, zero `.selected-overlay`, zero persistent `.notification-toast`, transparent field background (`background-image: none`, transparent color), first glyph font-size `56px`, desktop shell class, and no horizontal overflow.
+  - In-app browser smoke on `http://127.0.0.1:5173/` reconfirmed the protected matrix has 8 `.agent-card` nodes, 4 grid columns, first card min-height `318px`, zero `.agent-task-summary`, zero `.agent-card-tags`, and no horizontal overflow.
+  - No source code, connector config, Git metadata, stage/unstage/commit/push/reset/clean, Electron pointer input, or transparent-window pointer-smoke acceptance was performed by this pass.
+- 2026-07-02 22:36:39 +08:00 ranch desktop hot-zone tightening pass:
+  - Identified a product-line issue in the ranch-only pointer path: `src/ranch/RanchApp.tsx` treated `.ranch-field` as a desktop-mode interactive selector, which could cause empty transparent ranch field space to disable passthrough and conflict with the FR-008.1 outside-hot-zone click-through expectation.
+  - Tightened `DESKTOP_INTERACTIVE_SELECTOR` to `.animal, .ranch-actions, .ranch-action-button`, keeping animals and hover-only entry buttons interactive while no longer making the empty field a hot zone.
+  - Updated `docs/orchestration/tasks/ranch-window-v0.1.md` so the M5 window evidence records the hot-zone selector change without marking direct desktop pointer behavior accepted.
+  - Static verification confirmed `DESKTOP_INTERACTIVE_SELECTOR` no longer includes `.ranch-field`.
+  - `npm.cmd run lint` and `npm.cmd run build` passed after the ranch-only code change.
+  - In-app browser re-smoke was blocked by browser URL policy for the local page; PM did not switch to an alternate browser, raw CDP, or workaround route.
+  - No control-cockpit matrix files were edited; no connector was accepted/enabled/executed; no Git stage/unstage/commit/push/reset/clean, Electron pointer input, or transparent-window pointer-smoke acceptance was performed.
+- 2026-07-02 22:43:20 +08:00 matrix lock + browser reopen supervision pass:
+  - User explicitly reaffirmed that the middle 牛马工位矩阵 is the core selling point and must not be moved or edited; PM treats `src/App.tsx`, `src/components/NiuMaWorkspace.tsx`, `src/index.css`, `src/components/NiuMaAvatar.tsx`, `.agent-board`, `AgentCard`, `NiuMaAvatar`, and matrix layout/keyframes as locked for this pass.
+  - Opened two live `gpt-5.4 xhigh` read-only supervision workers: `[监督]#matrix-guard@2026-07-02` (`019f2345-7e87-7f43-930d-04f35816713f`) for matrix-boundary audit and `[监督]#ranch-smoke-evidence@2026-07-02` (`019f2345-ae3a-78f0-a917-7eb51b3d6dbe`) for ranch evidence review; both were explicitly forbidden from editing files, enabling connectors, or running Git writes.
+  - Confirmed port `5173` was initially not listening, then started Vite with `npx.cmd vite --host 127.0.0.1 --port 5173`; `http://127.0.0.1:5173/` and `http://127.0.0.1:5173/ranch.html` both returned HTTP 200.
+  - In-app browser smoke on `/` confirmed the protected matrix remains present with 8 `.agent-card` nodes, 4 grid columns (`240px 240px 240px 240px`), no horizontal overflow, and no PM layout edits performed.
+  - In-app browser smoke on `/ranch.html` confirmed 8 `.animal` nodes, 3 `.ranch-action-button` nodes, zero `.selected-overlay`, zero persistent `.notification-toast`, transparent field background, first glyph height around `59px`, and no horizontal overflow.
+  - `npm.cmd run orchestration:check`, `npm.cmd run lint`, `npm.cmd run build`, `npm.cmd run orchestration:report`, and `npm.cmd run orchestration:connector-safety` passed.
+  - This pass did not mark transparent Electron pointer smoke accepted, did not enable or execute connectors, and did not run Git stage/unstage/commit/push/reset/clean.
+  - `[监督]#ranch-smoke-evidence@2026-07-02` returned a read-only callback: ranch window/status/personality evidence remains summarized; `src/ranch/RanchApp.tsx` hot-zone selector and `dist/ranch.html` ranch entry are static/build evidence only; transparent Electron pointer smoke, OS notification replay, and personality end-to-end replay remain not fresh-smoked.
+  - `[监督]#matrix-guard@2026-07-02` returned a read-only callback: hard-frozen matrix boundary is `src/components/NiuMaWorkspace.tsx` `board-panel -> .agent-board -> AgentCard -> NiuMaAvatar`, with protected CSS selectors in `src/index.css`; safe lanes are `ranch.html -> src/ranch/ranchMain.tsx -> src/ranch/**`, orchestration docs, and verification scripts, while shared bridge/main-shell edits should remain avoided without a fresh bounded lane.
 
 incomplete:
+- M5 ranch verification cards are summarized and the ranch body now matches v0.3's simple three-level UI direction, but real transparent-window pointer smoke is still not accepted.
 - Transparent ranch window pointer smoke is still not fully automated because Windows capture reports `SetIsBorderRequired failed: 不支持此接口 (0x80004002)`.
-- Git repair standby package exists, but execution is waiting for explicit same-message confirmation before any `git init`, remote write, staging, commit, or push.
+- AgentPet Git repair standby package remains as a historical boundary, while the current post-push Git state needs the Git long-worker callback and `git-staging-review-agentpet-v0.1` before any stage, unstage, log-ignore, commit, or push decision.
 - Connector acceptance review package exists, but connector policy acceptance is waiting for PM/user decision; no execution binding should be dispatched before that.
-- M4 requirements readiness is summarized; M4 implementation package is standby and still requires explicit dispatch before touching locked or rename files.
 - Ranch pointer-smoke verification and manual evidence packages are standby until a manual or alternate transparent-window capture route is available.
 - Daily decision queue is standby and does not authorize any queue item by itself.
 - Daily role accountability ledger is standby and records state/evidence/action without changing role states.
@@ -326,15 +575,17 @@ incomplete:
 blockers:
 - External connector execution remains disabled.
 - Live sub-agent execution remains blocked by the previously recorded service-side `403 DAILY_LIMIT_EXCEEDED` until rechecked.
-- Control-cockpit selling-point files remain locked until M4 or explicit user approval.
+- Control-cockpit central 4x2 grid and protected selling-point files remain locked; M4 header settings entry has been completed and accepted.
+- M5 desktop ranch UI convergence is code/browser verified, but it does not clear the transparent Electron pointer-smoke blocker.
+- AgentPet Git working tree/index state is post-push and has PM docs/script/log drift; no stage, unstage, log-ignore, commit, or push decision has been authorized for this PM pass.
 
 next action:
-- Keep PM and Supervisor active for drift checks.
-- Keep `ranch-m4-implementation-v0.2` standby until PM/user explicitly dispatches implementation.
+- Keep PM and Supervisor active for drift checks and Git post-push callback collection.
+- Preserve accepted M4 evidence from thread `019f227a-8978-7df1-8b3f-738ccdb01b18`; future ranch/control-cockpit work must open a new bounded lane.
+- Keep `ranch-window-v0.1`, `ranch-status-script-v0.1`, and `ranch-personality-v0.1` summarized as M5 evidence cards after ranch UI convergence; future direct desktop replay must open a fresh bounded smoke lane.
 - Keep `ranch-pointer-smoke-v0.2` and `ranch-pointer-smoke-manual-evidence-v0.2` standby until a manual or alternate transparent-window capture route is available.
 - Keep connector-policy and `connector-acceptance-review-v0.1` on standby until PM/user accepts or revises machine gate fields.
-- Keep Git manager and `git-repair-agentpet-v0.1` on standby; Git repair stays on hold until explicit authorization.
-- If PM/user explicitly authorizes M4 implementation, open a fresh bounded implementation lane instead of touching locked control-cockpit files opportunistically.
+- Keep Git manager, `git-repair-agentpet-v0.1`, and `git-staging-review-agentpet-v0.1` on standby for post-push review; no stage, unstage, log-ignore, commit, or push before explicit authorization.
 - Use `daily-decision-queue-2026-07-02` as the next PM callback surface for standby decisions.
 - Keep `daily-role-accountability-2026-07-02` aligned with role states before closing any daily supervision pass.
 
@@ -353,15 +604,27 @@ evidence:
 - `docs/orchestration/tasks/daily-decision-queue-2026-07-02.md`
 - `docs/orchestration/tasks/daily-role-accountability-2026-07-02.md`
 - `docs/orchestration/tasks/git-repair-agentpet-v0.1.md`
+- `docs/orchestration/tasks/git-staging-review-agentpet-v0.1.md`
 - `docs/orchestration/tasks/ranch-m4-requirements-v0.2.md`
 - `docs/orchestration/tasks/ranch-m4-implementation-v0.2.md`
+- `docs/orchestration/tasks/ranch-window-v0.1.md`
+- `docs/orchestration/tasks/ranch-status-script-v0.1.md`
+- `docs/orchestration/tasks/ranch-personality-v0.1.md`
 - `docs/orchestration/tasks/ranch-pointer-smoke-v0.2.md`
 - `docs/orchestration/tasks/ranch-pointer-smoke-manual-evidence-v0.2.md`
+- `src/ranch/RanchApp.tsx`
+- `src/ranch/components/RanchCanvas.tsx`
+- `src/ranch/components/StatusBand.tsx`
+- `src/ranch/hooks/useRanchNotifications.ts`
+- `src/ranch/styles/ranch.css`
 - `scripts/check-orchestration.mjs`
 - `scripts/orchestration-report.mjs`
 - Codex thread `019f20fc-9b77-74f3-aa3d-ba8348cdec1c`
+- Codex thread `019f227a-8978-7df1-8b3f-738ccdb01b18`
 - `npm.cmd run orchestration:report`
 - `npm.cmd run orchestration:preflight`
+- `npm.cmd run orchestration:connector-safety`
 - `npm.cmd run orchestration:check`
 - `npm.cmd run lint`
 - `npm.cmd run build`
+- browser smoke on `http://127.0.0.1:5173/ranch.html`

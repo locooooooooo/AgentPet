@@ -16,12 +16,20 @@ truth sources:
 - Connector config: `docs/orchestration/connectors.json`.
 - Connector schema: `docs/orchestration/connectors.schema.json`.
 - Preflight command: `npm.cmd run orchestration:preflight`.
+- Connector safety command: `npm.cmd run orchestration:connector-safety`.
 
 current decision state:
-- Codex is `draft / pending / enabled=false`; command discovery currently resolves `codex` on PATH.
-- Trae is `placeholder / not-requested / enabled=false`; executable command is not confirmed.
-- Qoder is `placeholder / not-requested / enabled=false`; executable command is not confirmed.
+- Codex is `draft / pending / enabled=false`; `Get-Command` and preflight resolve `codex` on PATH, but that is discovery only and not an accepted connector.
+- Trae is `placeholder / not-requested / enabled=false`; no executable currently resolves, so `command` must stay empty.
+- Qoder is `placeholder / not-requested / enabled=false`; no executable currently resolves, so `command` must stay empty.
 - No connector satisfies `status=ready + approvalStatus=accepted + enabledByDefault=true`.
+
+review matrix:
+| connector | current truth | missing before acceptance | next responsible |
+| --- | --- | --- | --- |
+| Codex | `draft / pending / enabled=false` | Controlled dry-run design; JSON output behavior; auth/quota behavior; timeout/exit-code behavior; proof that no interactive UI appears | PM/user decides whether to authorize the dry-run evidence plan; `[短工]#connector-policy@v0.1` may only edit metadata after that decision |
+| Trae | `placeholder / not-requested / enabled=false` | Exact executable path; exact non-interactive args; preflight evidence; connector-safety evidence; PM decision | PM/user must provide the invocation before placeholder status can change |
+| Qoder | `placeholder / not-requested / enabled=false` | Exact executable path; exact verification surface; preflight evidence; connector-safety evidence; PM decision | PM/user must provide the invocation before placeholder status can change |
 
 acceptance review checklist:
 - Confirm whether Codex should remain `draft / pending` or be revised toward `ready`.
@@ -30,6 +38,7 @@ acceptance review checklist:
 - Confirm cwd policy, env allowlist, timeout, confirmation level, and dangerous-command handling for any connector before approval.
 - Confirm live-subagent quota state before using any connector as an execution resource.
 - Confirm `npm.cmd run orchestration:preflight` passes after any proposed connector metadata change.
+- Confirm `npm.cmd run orchestration:connector-safety` passes after any proposed connector metadata or runtime-surface change.
 
 forbidden scope:
 - Do not edit `src/lib/agentCore.ts`, `electron/**`, `src/**`, or runtime binding code.
@@ -51,7 +60,8 @@ blockers:
 - Live sub-agent execution remains blocked by the recorded `403 DAILY_LIMIT_EXCEEDED` until rechecked.
 
 next action:
-- Wait for PM/user acceptance or revision of connector machine gate fields.
+- Wait for PM/user acceptance or revision of connector machine gate fields after the missing evidence above is explicitly filled in.
+- Keep `docs/orchestration/status.json` and `docs/orchestration/connectors.json` aligned on `draft` vs `placeholder`; do not let PATH discovery be reported as connected.
 - Keep connector-policy and connector-acceptance-review on standby until that decision exists.
 
 summary:

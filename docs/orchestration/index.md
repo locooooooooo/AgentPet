@@ -30,12 +30,33 @@ tracked business cards:
 - task: ⟦tag:v2|task|daily-decision-queue-2026-07-02⟧ -> `docs/orchestration/tasks/daily-decision-queue-2026-07-02.md`
 - task: ⟦tag:v2|task|daily-role-accountability-2026-07-02⟧ -> `docs/orchestration/tasks/daily-role-accountability-2026-07-02.md`
 - task: ⟦tag:v2|task|git-repair-agentpet-v0.1⟧ -> `docs/orchestration/tasks/git-repair-agentpet-v0.1.md`
+- task: ⟦tag:v2|task|git-staging-review-agentpet-v0.1⟧ -> `docs/orchestration/tasks/git-staging-review-agentpet-v0.1.md`
 - task: ⟦tag:v2|task|ranch-m4-requirements-v0.2⟧ -> `docs/orchestration/tasks/ranch-m4-requirements-v0.2.md`
 - task: ⟦tag:v2|task|ranch-m4-implementation-v0.2⟧ -> `docs/orchestration/tasks/ranch-m4-implementation-v0.2.md`
+- task: ⟦tag:v2|task|ranch-window-v0.1⟧ -> `docs/orchestration/tasks/ranch-window-v0.1.md`
+- task: ⟦tag:v2|task|ranch-status-script-v0.1⟧ -> `docs/orchestration/tasks/ranch-status-script-v0.1.md`
+- task: ⟦tag:v2|task|ranch-personality-v0.1⟧ -> `docs/orchestration/tasks/ranch-personality-v0.1.md`
 - task: ⟦tag:v2|task|ranch-pointer-smoke-v0.2⟧ -> `docs/orchestration/tasks/ranch-pointer-smoke-v0.2.md`
 - task: ⟦tag:v2|task|ranch-pointer-smoke-manual-evidence-v0.2⟧ -> `docs/orchestration/tasks/ranch-pointer-smoke-manual-evidence-v0.2.md`
+- task: ⟦tag:v2|task|ranch-real-integration-p0-v0.1⟧ -> `docs/orchestration/tasks/ranch-real-integration-p0-v0.1.md`
+- task: ⟦tag:v2|task|cockpit-refactor-p0-v0.1⟧ -> `docs/orchestration/tasks/cockpit-refactor-p0-v0.1.md`
 - session: ⟦tag:v2|session|ranch-v0.2-2026-07-02⟧ -> `docs/orchestration/sessions/ranch-v0.2-2026-07-02.md`
 - session: ⟦tag:v2|session|daily-supervision-2026-07-02⟧ -> `docs/orchestration/sessions/daily-supervision-2026-07-02.md`
+- session: ⟦tag:v2|session|daily-plan-2026-07-03⟧ -> `docs/orchestration/sessions/daily-plan-2026-07-03.md`
+- session: ⟦tag:v2|session|daily-supervision-2026-07-03⟧ -> `docs/orchestration/sessions/daily-supervision-2026-07-03.md`
+- session: ⟦tag:v2|session|daily-longworker-dispatch-2026-07-03⟧ -> `docs/orchestration/sessions/daily-longworker-dispatch-2026-07-03.md`
+- session: ⟦tag:v2|session|cockpit-statusstrip-2026-07-03⟧ -> `docs/orchestration/sessions/cockpit-statusstrip-2026-07-03.md`
+- session: ⟦tag:v2|session|cockpit-visual-acceptance-2026-07-03⟧ -> `docs/orchestration/sessions/cockpit-visual-acceptance-2026-07-03.md`
+- session: ⟦tag:v2|session|r0-evidence-reconcile-2026-07-03⟧ -> `docs/orchestration/sessions/r0-evidence-reconcile-2026-07-03.md`
+- session: ⟦tag:v2|session|daily-closeout-2026-07-03⟧ -> `docs/orchestration/sessions/daily-closeout-2026-07-03.md`
+- session: ⟦tag:v2|session|ranch-real-integration-p0-progress⟧ -> `docs/orchestration/sessions/ranch-real-integration-p0-progress.md`
+- session: ⟦tag:v2|session|cockpit-refactor-p0-progress⟧ -> `docs/orchestration/sessions/cockpit-refactor-p0-progress.md`
+- session: ⟦tag:v2|session|r0-visual-replay-accepted-2026-07-04⟧ -> `docs/orchestration/sessions/r0-visual-replay-accepted-2026-07-04.md`
+- session: ⟦tag:v2|session|cockpit-corner-assist-2026-07-04⟧ -> `docs/orchestration/sessions/cockpit-corner-assist-2026-07-04.md`
+- session: ⟦tag:v2|session|cockpit-c0-6-accepted-2026-07-04⟧ -> `docs/orchestration/sessions/cockpit-c0-6-accepted-2026-07-04.md`
+- session: ⟦tag:v2|session|r0-notification-icons-accepted-2026-07-04⟧ -> `docs/orchestration/sessions/r0-notification-icons-accepted-2026-07-04.md`
+- session: ⟦tag:v2|session|r0-readme-closeout-2026-07-04⟧ -> `docs/orchestration/sessions/r0-readme-closeout-2026-07-04.md`
+- session: ⟦tag:v2|session|r0-connector-decision-2026-07-04⟧ -> `docs/orchestration/sessions/r0-connector-decision-2026-07-04.md`
 - session: ⟦tag:v2|session|git-manager-agentpet-2026-07-02⟧ -> `docs/orchestration/sessions/git-manager-agentpet-2026-07-02.md`
 - session: ⟦tag:v2|session|main-thread-2026-07-01-runtime-bootstrap⟧ -> `docs/orchestration/sessions/main-thread-2026-07-01-runtime-bootstrap.md`
 - session: ⟦tag:v2|session|runtime-blocked-path-closeout-2026-07-01⟧ -> `docs/orchestration/sessions/runtime-blocked-path-closeout-2026-07-01.md`
@@ -52,7 +73,7 @@ dispatch gate:
 - Supervisor owns drift detection, blocker surfacing, and minimum correction.
 
 current target:
-- 按 LPS 建立角色分工，并持续监督各个角色推进“多 Agent 牛马核心部门”项目；今日督办重点是保持 M3 已收口、Git 管理长工回调已收且 Git repair standby 派工包已落成但修复待授权、connector acceptance review 已落成但 policy 待决不误报 active，M4 需求准入已总结为 standby 实现派工包，透明窗口 pointer smoke 与手工证据包均为 standby，日内决策队列与角色问责台账已落成。
+- 按 LPS 建立角色分工，并持续监督各个角色推进“多 Agent 牛马核心部门”项目；今日督办重点是保持 M3 已收口、Git 管理长工已在用户授权后完成 AgentPet repair/import commit/push 并转入 post-push 只读复核，connector acceptance review 已落成但 policy 待决不误报 active，M4 需求已由长工线程 `019f227a-8978-7df1-8b3f-738ccdb01b18` 完成并通过 PM 验证收口为 summarized，M5 window/status/personality 验证摘要卡已补齐为 summarized，桌面牧场本体已按 v0.3 简洁 3 级层级完成 UI 收敛并通过浏览器 smoke，透明窗口 pointer smoke 与手工证据包仍为 standby，日内决策队列与角色问责台账继续跟踪未决项。
 
 current role split:
 - `[PM]#multi-agent-control@v0.1`: maintain this index, dispatch bounded lanes, collect callbacks, write acceptance.
@@ -64,32 +85,36 @@ current role split:
 - `[短工]#runtime-dispatch-cards@v0.1`: control-card setup for blocked-safe connector runtime implementation lanes.
 - `[短工]#runtime-blocked-path-closeout@v0.1`: close accepted blocked-path lanes and hold before execution binding.
 - `[短工]#codex-evidence-closeout@v0.1`: record Codex evidence result and keep acceptance pending.
-- `[PM]#daily-decision-queue@2026-07-02`: standby PM queue for Git repair, connector acceptance, M4 dispatch, pointer smoke route, and live-subagent quota decisions.
+- `[PM]#daily-decision-queue@2026-07-02`: standby PM queue for Git staging/log decisions, connector acceptance, pointer smoke route, and live-subagent quota decisions; M4 dispatch has completed and is summarized.
 - `[PM]#daily-role-accountability@2026-07-02`: standby ledger mapping each role to state, evidence, and accountability action.
 - `[长工]#ranch-m1-m2-correction@v0.2`: corrected ranch M1/M2 drift; accepted for M3 entry after code/build/browser/Electron prefs evidence.
 - `[长工]#ranch-m3-plan@v0.2`: read-only M3 plan complete; superseded by two active M3 implementation owners.
 - `[监督]#ranch-v0.2-audit@v0.2`: pre-correction audit complete; findings are superseded by the current corrected worktree evidence.
 - `[长工]#m3-main-bridge@v0.2`: summarized M3 owner for main/preload/types/browser fallback.
 - `[长工]#m3-ranch-entry@v0.2`: summarized M3 owner for ranch renderer interactions.
-- `[长工]#git-manager@AgentPet`: standby Git-management owner for `https://github.com/locooooooooo/AgentPet.git`; thread `019f20fc-9b77-74f3-aa3d-ba8348cdec1c` confirmed local `.git` is empty metadata and remote AgentPet is an empty repo, no repair/commit/push/reset without explicit confirmation.
-- `[短工]#git-repair-agentpet@v0.1`: standby Git repair dispatch package; no `git init`, remote add, fetch, staging, commit, or push before explicit same-message authorization.
+- `[长工]#git-manager@AgentPet`: standby Git-management owner for `https://github.com/locooooooooo/AgentPet.git`; thread `019f20fc-9b77-74f3-aa3d-ba8348cdec1c` supplied the historical diagnosis and then, after explicit user authorization, completed `fa9e08b Import AgentPet workspace` pushed to `origin/main`; PM has requested a post-push read-only callback.
+- `[短工]#git-repair-agentpet@v0.1`: standby historical Git repair dispatch package; do not rerun `git init`, remote add, fetch, staging, commit, or push before explicit same-message authorization.
+- `[PM]#git-staging-review-agentpet@v0.1`: standby review package for the currently observed valid Git repo and working-tree/index state; no stage, unstage, commit, push, reset, clean, or file removal before explicit decision.
 - `[PM]#ranch-m4-requirements@v0.2`: summarized docs-only requirements readiness for M4 rename/control-cockpit linkage.
-- `[短工]#ranch-m4-implementation@v0.2`: standby implementation package for M4; no file edit before explicit dispatch.
+- `[长工]#ranch-m4-implementation@v0.2`: summarized M4 implementation long-worker; thread `019f227a-8978-7df1-8b3f-738ccdb01b18` completed rename/header settings scope and PM verified lint/build/orchestration/browser smoke.
+- `[监督]#ranch-window@v0.1`: summarized M5 window evidence for FR-001/005/008/009/011 plus ranch 3-level UI convergence; manual transparent pointer smoke remains delegated to the standby verification packages.
+- `[监督]#ranch-status-script@v0.1`: summarized M5 animal/status/single-toast notification evidence for FR-002/003/004/006 without reopening connector state.
+- `[监督]#ranch-personality@v0.1`: summarized M5 personality and control-cockpit prefs-linkage evidence for FR-007 and notifyPrefs.
 - `[监督]#ranch-pointer-smoke@v0.2`: standby verification package for transparent ranch pointer smoke; no implementation edit.
 - `[监督]#ranch-pointer-smoke-manual-evidence@v0.2`: standby manual evidence package for pointer-smoke callback recording; no pointer input executed yet.
 
 blockers:
 - External connector execution remains disabled; do not bind agentCore or run real Codex/Trae/Qoder connectors until connector policy is accepted.
 - Treat service-side `403 DAILY_LIMIT_EXCEEDED` as a live sub-agent blocker until rechecked; today's Codex app long-worker threads were used only as explicit user-authorized role sessions.
-- Control-cockpit selling-point files remain locked until M4 or explicit user approval.
+- Control-cockpit central 4x2 grid and protected selling-point files remain locked; M4 header settings entry has been completed and accepted.
 - Transparent Electron ranch pointer smoke still needs a manual or alternate-capture route because Windows capture reports `SetIsBorderRequired failed`.
 
 next action:
 - Keep M3 code gates accepted as passed after `lint`, `build`, and `orchestration:check`; rerun transparent-window pointer smoke manually or through a capture route that does not hit `SetIsBorderRequired failed`.
 - Keep connector policy and `connector-acceptance-review-v0.1` on standby until PM/user accepts or revises machine gate fields; do not dispatch connector execution binding.
-- Keep AgentPet Git repair/commit decisions behind explicit user confirmation. The standby repair package is `docs/orchestration/tasks/git-repair-agentpet-v0.1.md`; if authorized, run only `git init -b main` -> `git remote add origin ...` -> `git fetch origin` -> `git status --ignored --short`, then stop for staging review.
-- Do not touch control-cockpit selling-point files before M4.
-- Keep M4 implementation package standby until PM/user explicitly dispatches implementation.
+- Keep AgentPet Git post-push state, log ignore policy, staging, commit, and push decisions behind explicit user confirmation. The historical repair package is `docs/orchestration/tasks/git-repair-agentpet-v0.1.md`; the current Git state review package is `docs/orchestration/tasks/git-staging-review-agentpet-v0.1.md` and remains standby.
+- Preserve the accepted M4 evidence from thread `019f227a-8978-7df1-8b3f-738ccdb01b18`; future ranch work must open a new bounded lane.
+- Keep `ranch-window-v0.1`, `ranch-status-script-v0.1`, and `ranch-personality-v0.1` summarized as M5 evidence cards; do not treat them as fresh active implementation lanes.
 - Keep ranch pointer-smoke verification and `ranch-pointer-smoke-manual-evidence-v0.2` standby until a manual or alternate transparent-window capture route is available.
 - Keep Codex draft/pending/enabled=false and Trae/Qoder placeholder/not-requested/enabled=false until connector machine gate fields change.
 - Use `docs/orchestration/tasks/daily-decision-queue-2026-07-02.md` as the next PM callback surface for standby decisions.

@@ -34,19 +34,30 @@ current state:
 - Draft connector policy is represented in `docs/orchestration/status.json` under `connectors`.
 - Detailed connector policy is represented in `docs/orchestration/connectors.json`.
 - `npm run orchestration:report` reads connector details from `docs/orchestration/connectors.json`.
-- Codex is draft-only; Trae and Qoder remain placeholders until executable commands and non-interactive arguments are confirmed.
+- Codex is draft-only; command discovery resolves `codex` on PATH, but that is readiness evidence only and not a connected agent.
+- Trae and Qoder remain placeholders; `Get-Command` does not currently resolve either executable, so they must stay command-empty and disconnected.
 - Connector cards are visible in the cockpit, but no connector is enabled by default.
 - Current preflight finds `codex` on PATH and leaves Trae/Qoder pending.
 - Codex approval is `pending`; Trae/Qoder approval is `not-requested`.
 
+readiness matrix:
+| connector | truth source | discovery evidence | missing before attach | next responsible |
+| --- | --- | --- | --- | --- |
+| Codex | `draft / pending / enabled=false` | `Get-Command` and `orchestration:preflight` resolve `codex` on PATH | Controlled dry-run design, non-interactive JSON/auth-quota/timeout evidence, no-interactive-UI proof, PM acceptance | `[PM]#connector-acceptance-review@v0.1` decides; `[短工]#connector-policy@v0.1` only updates metadata after that decision |
+| Trae | `placeholder / not-requested / enabled=false` | No executable resolved; `command` intentionally stays empty | Exact executable path, exact non-interactive args, safety evidence, PM acceptance decision | PM/user must supply the invocation; `[短工]#connector-policy@v0.1` keeps placeholder until then |
+| Qoder | `placeholder / not-requested / enabled=false` | No executable resolved; `command` intentionally stays empty | Exact executable path, exact verification surface, safety evidence, PM acceptance decision | PM/user must supply the invocation; `[短工]#connector-policy@v0.1` keeps placeholder until then |
+
 blockers:
 - External sub-agent quota remains blocked by `403 DAILY_LIMIT_EXCEEDED`.
-- Exact external agent executable commands are not yet confirmed.
+- Codex still lacks acceptance-grade non-interactive evidence; command discovery alone is insufficient.
+- Exact Trae/Qoder executable commands are not yet confirmed.
 - PM/user has not accepted connector execution binding.
 
 next action:
+- Keep `docs/orchestration/connectors.json` and `docs/orchestration/status.json` as readiness-only truth; do not treat discovery or placeholders as connected.
 - Wait for PM/user acceptance or revision of machine gate fields before wiring any connector to quick actions.
-- Confirm or replace external executable commands before any implementation.
+- PM/user must authorize a controlled Codex dry-run plan before any Codex status change.
+- PM/user must confirm or replace Trae/Qoder executable commands before any implementation.
 - After acceptance, dispatch a short-worker implementation lane with disjoint write scope.
 
 summary:

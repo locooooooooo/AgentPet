@@ -5,11 +5,11 @@
 
 objective:
 - Keep every role in today's plan tied to a current state, evidence source, and next accountability action.
-- Prevent summarized, standby, and blocked roles from being reported as completed implementation work.
+- Prevent summarized, standby, and blocked roles from being reported as completed implementation work, including summarized M5 verification cards.
 
 dispatch state:
 - Standby accountability ledger.
-- This ledger is a supervision artifact only; it does not authorize Git repair, connector execution, M4 implementation, pointer input, or duplicate worker creation.
+- This ledger is a supervision artifact only; it does not authorize Git repair, connector execution, pointer input, duplicate worker creation, or M4 scope expansion. M4 implementation has been summarized after long-worker delivery and PM verification.
 
 truth sources:
 - Current board: `docs/orchestration/status.json`.
@@ -27,27 +27,43 @@ role ledger:
 | `[短工]#connector-policy@v0.1` | standby | `docs/orchestration/tasks/connector-policy-v0.1.md` | Wait for connector machine-gate acceptance or revision. |
 | `[PM]#connector-acceptance-review@v0.1` | standby | `docs/orchestration/tasks/connector-acceptance-review-v0.1.md` | Keep no accepted/no enabled/no execution until a decision exists. |
 | `[短工]#runtime-dispatch-cards@v0.1` | summarized | `docs/orchestration/tasks/runtime-connector-dispatch-v0.1.md` | Keep execution binding paused. |
+| `[PM]#daily-supervision@2026-07-02` daily-supervision lane | active | `docs/orchestration/sessions/daily-supervision-2026-07-02.md` | Keep PM supervision active while collecting Git callbacks and preserving accepted M4 evidence. |
 | `[PM]#daily-decision-queue@2026-07-02` | standby | `docs/orchestration/tasks/daily-decision-queue-2026-07-02.md` | Use as the next PM callback surface for blocked decisions. |
-| `[长工]#git-manager@AgentPet` | standby | `docs/orchestration/sessions/git-manager-agentpet-2026-07-02.md` | Keep read-only diagnosis; wait for Git repair authorization. |
-| `[短工]#git-repair-agentpet@v0.1` | standby | `docs/orchestration/tasks/git-repair-agentpet-v0.1.md` | Wait for same-message Git repair authorization. |
-| `[PM]#ranch-m4-requirements@v0.2` | summarized | `docs/orchestration/tasks/ranch-m4-requirements-v0.2.md` | Use the M4 implementation package as the next source. |
-| `[短工]#ranch-m4-implementation@v0.2` | standby | `docs/orchestration/tasks/ranch-m4-implementation-v0.2.md` | Wait for explicit M4 implementation dispatch. |
+| `[PM]#daily-role-accountability@2026-07-02` | standby | `docs/orchestration/tasks/daily-role-accountability-2026-07-02.md` | Keep this ledger aligned with every `status.json` role. |
+| `[长工]#ranch-m1-m2-correction@v0.2` | summarized | `docs/orchestration/sessions/ranch-v0.2-2026-07-02.md` | Preserve accepted M1/M2 correction evidence; do not reopen implementation. |
+| `[长工]#ranch-m3-plan@v0.2` | summarized | `docs/orchestration/sessions/ranch-v0.2-2026-07-02.md` | Keep M3 planning summarized and superseded by accepted M3 owners. |
+| `[监督]#ranch-v0.2-audit@v0.2` | summarized | `docs/orchestration/sessions/ranch-v0.2-2026-07-02.md` | Treat pre-correction audit as historical evidence, not a reopened blocker. |
+| `[长工]#m3-main-bridge@v0.2` | summarized | `docs/orchestration/sessions/ranch-v0.2-2026-07-02.md` | Preserve passed main/preload/types/fallback evidence. |
+| `[长工]#m3-ranch-entry@v0.2` | summarized | `docs/orchestration/sessions/ranch-v0.2-2026-07-02.md` | Preserve passed ranch renderer interaction evidence while pointer smoke remains separate. |
+| `[长工]#git-manager@AgentPet` | standby | `docs/orchestration/sessions/git-manager-agentpet-2026-07-02.md` | Collect post-push read-only callback; do not run further Git writes without explicit decision. |
+| `[短工]#git-repair-agentpet@v0.1` | standby | `docs/orchestration/tasks/git-repair-agentpet-v0.1.md` | Preserve as historical repair boundary; do not rerun blindly. |
+| `[PM]#git-staging-review-agentpet@v0.1` | standby | `docs/orchestration/tasks/git-staging-review-agentpet-v0.1.md` | Wait for a decision on the current valid repo and working-tree/index state. |
+| `[PM]#ranch-m4-requirements@v0.2` | summarized | `docs/orchestration/tasks/ranch-m4-requirements-v0.2.md` | Keep requirements readiness linked to the accepted M4 implementation evidence. |
+| `[长工]#ranch-m4-implementation@v0.2` | summarized | `docs/orchestration/tasks/ranch-m4-implementation-v0.2.md` | Preserve thread `019f227a-8978-7df1-8b3f-738ccdb01b18` callback and PM verification evidence. |
+| `[监督]#ranch-window@v0.1` | summarized | `docs/orchestration/tasks/ranch-window-v0.1.md` | Preserve the M5 window + ranch 3-level UI evidence summary and leave direct transparent pointer smoke to the existing standby packages. |
+| `[监督]#ranch-status-script@v0.1` | summarized | `docs/orchestration/tasks/ranch-status-script-v0.1.md` | Preserve the M5 animal/status/single-toast evidence summary without overstating direct OS-toast replay. |
+| `[监督]#ranch-personality@v0.1` | summarized | `docs/orchestration/tasks/ranch-personality-v0.1.md` | Preserve the M5 personality/settings linkage summary and reopen direct replay only through a fresh bounded smoke lane. |
 | `[监督]#ranch-pointer-smoke@v0.2` | standby | `docs/orchestration/tasks/ranch-pointer-smoke-v0.2.md` | Wait for a transparent-window capture route. |
 | `[监督]#ranch-pointer-smoke-manual-evidence@v0.2` | standby | `docs/orchestration/tasks/ranch-pointer-smoke-manual-evidence-v0.2.md` | Fill the evidence table only when a valid route exists. |
 | `[监督]#multi-agent-control@v0.1` live-subagents lane | blocked | `docs/orchestration/status.json` | Recheck `403 DAILY_LIMIT_EXCEEDED` only when a safe route exists. |
 
 acceptance:
 - Every non-summarized open item has an accountability action and evidence source.
+- Every role ledger `current state` matches the corresponding `docs/orchestration/status.json` role status.
+- Every role ledger row resolves to either a tracked `docs/orchestration/status.json` role title or a real `docs/orchestration/status.json` lane responsibility label, each parsed state matches that source, and each row has a non-empty accountability action.
+- Every non-summarized `docs/orchestration/status.json` lane is covered by either its tracked role owner or a lane-specific role ledger row.
+- Every role ledger evidence cell contains at least one repo path, every referenced path exists, and every `docs/orchestration/*.md` evidence path is tracked by `docs/orchestration/index.md`.
 - Completed implementation work is represented as summarized only when its verification already passed.
+- The only active lane in `docs/orchestration/status.json` is `daily-supervision`; no implementation, connector, Git, M4, or pointer-smoke lane is active without a fresh dispatch.
 - Standby roles are not called complete.
 - Blocked lanes retain the exact blocker and do not imply a connector or sub-agent is available.
 - `npm.cmd run orchestration:check` passes.
-- `npm.cmd run orchestration:report` shows this ledger as standby, not active.
+- `npm.cmd run orchestration:report` shows this ledger as standby, not active, and prints the active lane control, daily supervision closeout, daily decision coverage, and daily supervision closeout coverage summaries.
 
 non-goals:
 - Do not run Git repair, staging, commit, push, reset, clean, or file removal.
 - Do not accept, enable, execute, or bind Codex, Trae, Qoder, or any connector.
-- Do not dispatch or implement M4.
+- Do not widen M4 beyond the accepted long-worker delivery scope.
 - Do not launch Electron for pointer smoke or run pointer input.
 - Do not create duplicate long-worker threads.
 
@@ -56,4 +72,5 @@ next action:
 - Use it with the daily decision queue during the next PM callback.
 
 summary:
-- Standby accountability ledger; no role state changed by this ledger.
+- Standby accountability ledger; records accepted M4 long-worker delivery and keeps other blocked/standby roles bounded.
+- Summarized M5 verification cards are also tracked here as evidence-only rows without reopening active implementation lanes.

@@ -2,7 +2,8 @@
   "name": "multi-agent-niuma",
   "private": true,
   "version": "0.1.0",
-  "description": "多 Agent 牛马核心部门桌面版",
+  "description": "桌面牧场 — 多 Agent 状态拟人化看板",
+  "productName": "桌面牧场",
   "type": "module",
   "main": "dist-electron/main.cjs",
   "scripts": {
@@ -10,7 +11,9 @@
     "orchestration:check": "node scripts/check-orchestration.mjs",
     "orchestration:report": "node scripts/orchestration-report.mjs",
     "orchestration:preflight": "node scripts/connector-preflight.mjs",
+    "orchestration:connector-safety": "node scripts/check-connector-gate.mjs && node scripts/check-preload-connector-api.mjs && node scripts/check-ui-connector-status-only.mjs",
     "build": "vite build && esbuild electron/main.ts --bundle --platform=node --format=cjs --packages=external --outfile=dist-electron/main.cjs && esbuild electron/preload.ts --bundle --platform=node --format=cjs --packages=external --outfile=dist-electron/preload.cjs",
+    "package:win": "npm run build && powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/package-win-unpacked.ps1",
     "start": "electron .",
     "lint": "tsc --noEmit"
   },

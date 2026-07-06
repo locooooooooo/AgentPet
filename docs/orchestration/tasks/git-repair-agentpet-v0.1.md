@@ -16,11 +16,16 @@ truth sources:
 - Long-worker thread: `019f20fc-9b77-74f3-aa3d-ba8348cdec1c`.
 - Remote: `https://github.com/locooooooooo/AgentPet.git`.
 
-current preflight:
+historical preflight from Git manager callback:
 - Local `.git` exists as an empty directory and is not valid Git metadata.
 - `git status --short --branch` fails with `fatal: not a git repository`.
 - Remote `locooooooooo/AgentPet` is reachable, empty, and reports default branch `main`.
 - Viewer permission was previously reported as `ADMIN`.
+
+live-state update:
+- A later PM read-only check observed valid local Git metadata, branch `main`, origin `https://github.com/locooooooooo/AgentPet.git`, `d158cad Initial commit`, and a staged index.
+- Do not execute this repair package blindly against the current workspace.
+- Current Git follow-up is tracked by `docs/orchestration/tasks/git-staging-review-agentpet-v0.1.md`.
 
 future write scope:
 - Repair local Git metadata only:

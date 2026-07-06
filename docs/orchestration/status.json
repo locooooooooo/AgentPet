@@ -2,9 +2,29 @@
   "identity": "[PM]#multi-agent-control@v0.1",
   "loopState": "active",
   "dispatchState": "active",
-  "target": "按 LPS 建立角色分工，并持续监督各个角色推进“多 Agent 牛马核心部门”项目；今日督办重点是保持 M3 已收口、Git 管理长工回调已收且 Git repair standby 派工包已落成但修复待授权、connector acceptance review 已落成但 policy 待决不误报 active，M4 需求准入已总结为 standby 实现派工包，透明窗口 pointer smoke 与手工证据包均为 standby，日内决策队列与角色问责台账已落成。",
+  "target": "按 LPS 建立角色分工，并持续监督各个角色推进“多 Agent 牛马核心部门”项目；今日督办重点是保持 M3 已收口、Git 管理长工已在用户授权后完成 AgentPet repair/import commit/push 并转入 post-push 只读复核，connector acceptance review 已落成但 policy 待决不误报 active，M4 需求已由长工线程 `019f227a-8978-7df1-8b3f-738ccdb01b18` 完成并通过 PM 验证收口为 summarized，M5 window/status/personality 验证摘要卡已补齐为 summarized，桌面牧场本体已按 v0.3 简洁 3 级层级完成 UI 收敛并通过浏览器 smoke，透明窗口 pointer smoke 与手工证据包仍为 standby，日内决策队列与角色问责台账继续跟踪未决项。",
   "source": "docs/orchestration/index.md",
-  "blocker": "外部 connector 仍 disabled；live-subagents 仍受 403 DAILY_LIMIT_EXCEEDED 阻塞直到复查；control-cockpit 卖点文件保持锁定；透明 Electron 窗口自动截图仍报 SetIsBorderRequired failed；Git repair/commit/push 和 M4 都需明确确认。",
+  "todayPlan": {
+    "date": "2026-07-03",
+    "session": "docs/orchestration/sessions/daily-plan-2026-07-03.md",
+    "selectedRoute": "Y cockpit refactor P0 accepted · R0-3 connector remains policy-deferred",
+    "progress": "docs/orchestration/sessions/cockpit-refactor-p0-progress.md"
+  },
+  "p0Cards": [
+    {
+      "id": "ranch-real-integration-p0",
+      "status": "in_progress",
+      "task": "docs/orchestration/tasks/ranch-real-integration-p0-v0.1.md",
+      "progress": "docs/orchestration/sessions/ranch-real-integration-p0-progress.md"
+    },
+    {
+      "id": "cockpit-refactor-p0",
+      "status": "accepted",
+      "task": "docs/orchestration/tasks/cockpit-refactor-p0-v0.1.md",
+      "progress": "docs/orchestration/sessions/cockpit-refactor-p0-progress.md"
+    }
+  ],
+  "blocker": "外部 connector 仍 disabled；live-subagents 仍受 403 DAILY_LIMIT_EXCEEDED 阻塞直到复查；control-cockpit 中央 4x2 网格和受保护卖点文件保持锁定；透明 Electron 窗口自动截图仍报 SetIsBorderRequired failed；Git post-push log/staging/commit/push 仍需明确确认。",
   "roles": [
     {
       "id": "pm",
@@ -47,7 +67,7 @@
       "title": "[短工]#connector-policy@v0.1",
       "owner": "短工",
       "status": "standby",
-      "responsibility": "定义真实外部 agent connector 的 command、cwd、env、安全确认和验收策略；当前等待 PM/user 接受或修订。",
+      "responsibility": "Maintain non-executing connector readiness metadata for codex/trae/qoder: command, cwd, env, confirmation, and acceptance gates; discovery or placeholders do not count as connected.",
       "tag": "⟦tag:v2|task|connector-policy-v0.1⟧",
       "evidence": "docs/orchestration/tasks/connector-policy-v0.1.md"
     },
@@ -56,7 +76,7 @@
       "title": "[PM]#connector-acceptance-review@v0.1",
       "owner": "主控",
       "status": "standby",
-      "responsibility": "Connector 接受/拒绝/修订的决策评审包；不接受、不启用、不执行 connector。",
+      "responsibility": "Keep acceptance review evidence explicit: codex is draft discovery-only, trae/qoder are placeholders, and no connector may be accepted, enabled, or executed from this lane.",
       "tag": "⟦tag:v2|task|connector-acceptance-review-v0.1⟧",
       "evidence": "docs/orchestration/tasks/connector-acceptance-review-v0.1.md"
     },
@@ -74,7 +94,7 @@
       "title": "[PM]#daily-decision-queue@2026-07-02",
       "owner": "主控",
       "status": "standby",
-      "responsibility": "汇总今日 Git repair、connector acceptance、M4、pointer smoke、live-subagent quota 的待决条件；不授权、不执行。",
+      "responsibility": "汇总今日 Git repair/staging review、connector acceptance、pointer smoke、live-subagent quota 的待决条件；M4 已完成收口，不再作为待决项。",
       "tag": "⟦tag:v2|task|daily-decision-queue-2026-07-02⟧",
       "evidence": "docs/orchestration/tasks/daily-decision-queue-2026-07-02.md"
     },
@@ -137,7 +157,7 @@
       "title": "[长工]#git-manager@AgentPet",
       "owner": "长工",
       "status": "standby",
-      "responsibility": "只读回调已收：本地 .git 为空元数据，远端 https://github.com/locooooooooo/AgentPet.git 为空仓且 default_branch=main；不修复、不提交、不推送、不清理，等待明确授权。",
+      "responsibility": "历史只读诊断已收；用户授权后长工已完成 AgentPet repair/import commit/push 到 origin/main，当前只允许 post-push 只读复核，不再提交、推送或清理。",
       "tag": "⟦tag:v2|session|git-manager-agentpet-2026-07-02⟧",
       "evidence": "docs/orchestration/sessions/git-manager-agentpet-2026-07-02.md"
     },
@@ -146,27 +166,63 @@
       "title": "[短工]#git-repair-agentpet@v0.1",
       "owner": "短工",
       "status": "standby",
-      "responsibility": "AgentPet Git 元数据最小修复派工包；未获同消息授权前不执行 git init/remote/fetch/stage/commit/push。",
+      "responsibility": "AgentPet Git 元数据最小修复派工包作为历史边界保留；未获同消息授权前不执行 git init/remote/fetch/stage/commit/push。",
       "tag": "⟦tag:v2|task|git-repair-agentpet-v0.1⟧",
       "evidence": "docs/orchestration/tasks/git-repair-agentpet-v0.1.md"
+    },
+    {
+      "id": "git-staging-review-agentpet",
+      "title": "[PM]#git-staging-review-agentpet@v0.1",
+      "owner": "主控",
+      "status": "standby",
+      "responsibility": "记录当前有效 Git repo 与 working-tree/index 状态的只读复查结果；不 stage、不 unstage、不 commit、不 push，等待 PM/user 决策。",
+      "tag": "⟦tag:v2|task|git-staging-review-agentpet-v0.1⟧",
+      "evidence": "docs/orchestration/tasks/git-staging-review-agentpet-v0.1.md"
     },
     {
       "id": "ranch-m4-requirements",
       "title": "[PM]#ranch-m4-requirements@v0.2",
       "owner": "主控",
       "status": "summarized",
-      "responsibility": "M4 rename + 控制舱联动的需求准入、范围冻结和验收拆解；已产出 standby 实现派工包。",
+      "responsibility": "M4 rename + 控制舱联动的需求准入、范围冻结和验收拆解；实现已由长工完成并收口。",
       "tag": "⟦tag:v2|task|ranch-m4-requirements-v0.2⟧",
       "evidence": "docs/orchestration/tasks/ranch-m4-requirements-v0.2.md"
     },
     {
       "id": "ranch-m4-implementation",
-      "title": "[短工]#ranch-m4-implementation@v0.2",
-      "owner": "短工",
-      "status": "standby",
-      "responsibility": "M4 rename + 控制舱联动未来实现包；未获明确派工前不编辑文件。",
+      "title": "[长工]#ranch-m4-implementation@v0.2",
+      "owner": "长工",
+      "status": "summarized",
+      "responsibility": "M4 rename + 控制舱联动实现长工；线程 019f227a-8978-7df1-8b3f-738ccdb01b18 已完成允许范围并通过 PM 验证收口。",
       "tag": "⟦tag:v2|task|ranch-m4-implementation-v0.2⟧",
       "evidence": "docs/orchestration/tasks/ranch-m4-implementation-v0.2.md"
+    },
+    {
+      "id": "ranch-window",
+      "title": "[监督]#ranch-window@v0.1",
+      "owner": "监督",
+      "status": "summarized",
+      "responsibility": "整理 M5 牧场窗口验证证据：FR-001/005/008/009/011 当前代码与会话证据已收口；本轮同步桌面牧场 3 级 UI 收敛，透明窗口 pointer smoke 仍显式留给现有 standby 包。",
+      "tag": "⟦tag:v2|task|ranch-window-v0.1⟧",
+      "evidence": "docs/orchestration/tasks/ranch-window-v0.1.md"
+    },
+    {
+      "id": "ranch-status-script",
+      "title": "[监督]#ranch-status-script@v0.1",
+      "owner": "监督",
+      "status": "summarized",
+      "responsibility": "整理 M5 动物身份、14 状态剧本、牧场通知带与系统通知代码证据；本轮将通知带收敛为 1 条/1500ms，不把直接桌面通知观察写成已重跑结论。",
+      "tag": "⟦tag:v2|task|ranch-status-script-v0.1⟧",
+      "evidence": "docs/orchestration/tasks/ranch-status-script-v0.1.md"
+    },
+    {
+      "id": "ranch-personality",
+      "title": "[监督]#ranch-personality@v0.1",
+      "owner": "监督",
+      "status": "summarized",
+      "responsibility": "整理 M5 personality/chatty-quiet-silent、notifyPrefs 与控制舱设置联动证据；保持 connector 和 pointer smoke 边界，不重开控制舱矩阵。",
+      "tag": "⟦tag:v2|task|ranch-personality-v0.1⟧",
+      "evidence": "docs/orchestration/tasks/ranch-personality-v0.1.md"
     },
     {
       "id": "ranch-pointer-smoke",
@@ -207,21 +263,21 @@
       "title": "外部 connector 策略",
       "role": "[短工]#connector-policy@v0.1",
       "state": "standby",
-      "nextAction": "等待 PM/user 接受或修订 machine gate fields；决策面转入 connector-acceptance-review standby 包，不执行绑定。"
+      "nextAction": "Keep codex draft-only and trae/qoder placeholders; wait for PM/user to supply the missing evidence before any machine gate revision."
     },
     {
       "id": "connector-acceptance-review",
       "title": "Connector acceptance review",
       "role": "[PM]#connector-acceptance-review@v0.1",
       "state": "standby",
-      "nextAction": "等待 PM/user 决定接受、拒绝或修订 connector 机器闸门；保持 no accepted/no enabled/no execution。"
+      "nextAction": "PM/user must decide only after the docs name each connector's missing evidence and owner; keep approvalStatus unchanged, enabled=false, and no execution."
     },
     {
       "id": "daily-supervision",
       "title": "每日计划督办",
       "role": "[PM]#daily-supervision@2026-07-02",
       "state": "active",
-      "nextAction": "保持 M3 summarized；保持 Git 管理 standby 等待修复授权；connector-policy standby；M4 implementation standby；pointer-smoke verification standby 等待可用捕获路线。"
+      "nextAction": "保持 M3 和 M4 summarized；收集 Git manager post-push 只读回调；connector-policy standby；pointer-smoke verification standby 等待可用捕获路线。"
     },
     {
       "id": "codex-evidence-closeout",
@@ -249,7 +305,7 @@
       "title": "Daily standby decision queue",
       "role": "[PM]#daily-decision-queue@2026-07-02",
       "state": "standby",
-      "nextAction": "作为下一次 PM 回调面；等待 Git repair、connector acceptance、M4、pointer smoke 或 live-subagent quota 的明确决策/条件。"
+      "nextAction": "作为下一次 PM 回调面；等待 Git post-push log/staging review、connector acceptance、pointer smoke 或 live-subagent quota 的明确决策/条件；M4 已收口为 summarized。"
     },
     {
       "id": "daily-role-accountability",
@@ -305,28 +361,56 @@
       "title": "AgentPet Git management",
       "role": "[长工]#git-manager@AgentPet",
       "state": "standby",
-      "nextAction": "只读回调已收；修复执行转入 git-repair-agentpet standby 派工包，仍等待明确授权。"
+      "nextAction": "用户授权后的 import commit 已推送到 origin/main；等待长工 post-push 只读回调和后续日志忽略/staging review 决策。"
     },
     {
       "id": "git-repair-agentpet",
       "title": "AgentPet Git repair dispatch",
       "role": "[短工]#git-repair-agentpet@v0.1",
       "state": "standby",
-      "nextAction": "等待 PM/user 同消息明确授权；授权后只运行 git init/remote add/fetch/status 并停止等待 staging review。"
+      "nextAction": "作为历史 repair 边界保留；当前不要盲跑 git init/remote add/fetch/status，先走 staging review 决策。"
+    },
+    {
+      "id": "git-staging-review-agentpet",
+      "title": "AgentPet Git staging review",
+      "role": "[PM]#git-staging-review-agentpet@v0.1",
+      "state": "standby",
+      "nextAction": "等待 PM/user 决定如何处理当前 Git state；未授权前不 stage、unstage、commit、push、reset、clean。"
     },
     {
       "id": "ranch-m4-requirements",
       "title": "M4 requirements readiness",
       "role": "[PM]#ranch-m4-requirements@v0.2",
       "state": "summarized",
-      "nextAction": "需求准入已总结；后续以 M4 implementation standby package 为准。"
+      "nextAction": "需求准入已总结；M4 implementation 长工已完成并收口。"
     },
     {
       "id": "ranch-m4-implementation",
-      "title": "M4 implementation package",
-      "role": "[短工]#ranch-m4-implementation@v0.2",
-      "state": "standby",
-      "nextAction": "等待 PM/user 明确派工；派工前不编辑 rename/control-cockpit 文件。"
+      "title": "M4 implementation long-worker",
+      "role": "[长工]#ranch-m4-implementation@v0.2",
+      "state": "summarized",
+      "nextAction": "线程 019f227a-8978-7df1-8b3f-738ccdb01b18 已交付并经 PM 验证；未来需求另开新 lane。"
+    },
+    {
+      "id": "ranch-window",
+      "title": "M5 ranch window verification summary",
+      "role": "[监督]#ranch-window@v0.1",
+      "state": "summarized",
+      "nextAction": "窗口生命周期、双击/右键、desktop/floating、拖拽吸边、围栏与 3 级 UI 收敛证据已汇总；透明窗口 manual pointer smoke 继续留给现有 standby 包。"
+    },
+    {
+      "id": "ranch-status-script",
+      "title": "M5 ranch status script verification summary",
+      "role": "[监督]#ranch-status-script@v0.1",
+      "state": "summarized",
+      "nextAction": "8 动物、14 状态剧本、单条 status band 与系统通知代码证据已汇总；若要重跑桌面通知观察，另开 bounded smoke lane。"
+    },
+    {
+      "id": "ranch-personality",
+      "title": "M5 ranch personality verification summary",
+      "role": "[监督]#ranch-personality@v0.1",
+      "state": "summarized",
+      "nextAction": "chatty/quiet/silent、notifyPrefs 与控制舱设置联动证据已汇总；未来直连回放需 fresh bounded lane。"
     },
     {
       "id": "ranch-pointer-smoke",
@@ -353,7 +437,13 @@
       "envAllowlist": ["PATH", "HOME", "USERPROFILE", "CODEX_HOME"],
       "confirmation": "required-for-write",
       "timeoutSeconds": 3600,
-      "acceptanceGate": "orchestration:check + lint/build when code changes"
+      "acceptanceGate": "PM accepts controlled dry-run plan; orchestration:preflight + connector-safety pass; orchestration:check + lint/build when code changes",
+      "approvalStatus": "pending",
+      "enabledByDefault": false,
+      "readinessEvidence": "Get-Command resolves codex on PATH; discovery only.",
+      "missingReadiness": "Controlled dry-run design, non-interactive JSON/auth-quota/timeout/no-UI evidence, and PM acceptance.",
+      "nextOwner": "[PM]#connector-acceptance-review@v0.1",
+      "nextAction": "Keep codex draft-only until the missing evidence exists and PM/user explicitly revises the machine gate."
     },
     {
       "id": "trae",
@@ -364,7 +454,13 @@
       "envAllowlist": ["PATH", "HOME", "USERPROFILE"],
       "confirmation": "required",
       "timeoutSeconds": 1800,
-      "acceptanceGate": "PM must confirm executable and non-interactive args"
+      "acceptanceGate": "PM confirms executable path and non-interactive args; orchestration:preflight + connector-safety pass",
+      "approvalStatus": "not-requested",
+      "enabledByDefault": false,
+      "readinessEvidence": "No trae executable resolves via Get-Command; command stays empty.",
+      "missingReadiness": "Exact executable path, exact non-interactive args, safety evidence, and PM acceptance decision.",
+      "nextOwner": "[PM]#connector-acceptance-review@v0.1",
+      "nextAction": "Keep trae as placeholder until PM/user supplies the exact invocation and readiness evidence."
     },
     {
       "id": "qoder",
@@ -375,7 +471,13 @@
       "envAllowlist": ["PATH", "HOME", "USERPROFILE"],
       "confirmation": "required",
       "timeoutSeconds": 1800,
-      "acceptanceGate": "PM must confirm executable and verification surface"
+      "acceptanceGate": "PM confirms executable path and verification surface; orchestration:preflight + connector-safety pass",
+      "approvalStatus": "not-requested",
+      "enabledByDefault": false,
+      "readinessEvidence": "No qoder executable resolves via Get-Command; command stays empty.",
+      "missingReadiness": "Exact executable path, exact verification surface, safety evidence, and PM acceptance decision.",
+      "nextOwner": "[PM]#connector-acceptance-review@v0.1",
+      "nextAction": "Keep qoder as placeholder until PM/user supplies the exact invocation and readiness evidence."
     }
   ]
 }

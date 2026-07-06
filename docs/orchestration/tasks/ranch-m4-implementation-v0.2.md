@@ -1,15 +1,15 @@
 # Ranch M4 Implementation Dispatch Package
 
-[短工]#ranch-m4-implementation@v0.2
+[长工]#ranch-m4-implementation@v0.2
 ⟦tag:v2|task|ranch-m4-implementation-v0.2⟧
 
 objective:
-- Implement Ranch M4 rename + control-cockpit linkage only after PM/user explicitly dispatches implementation.
+- Implement Ranch M4 rename + control-cockpit linkage after the user's explicit demand to stop solo PM work and move requirements through long-workers.
 - Preserve the current M3 ranch interaction baseline and keep connector execution disabled.
 
 dispatch state:
-- Standby. This is a future implementation package, not an active implementation lane.
-- Do not edit files from this package until PM/user explicitly dispatches M4 implementation.
+- Summarized. User challenged the PM to use long-workers and move requirements, so PM dispatched thread `019f227a-8978-7df1-8b3f-738ccdb01b18` with `gpt-5.4` + `xhigh`; the worker completed the declared write scope and PM verified the result.
+- All future M4 or ranch follow-up work requires a new bounded dispatch.
 
 truth sources:
 - Requirements readiness: `docs/orchestration/tasks/ranch-m4-requirements-v0.2.md`.
@@ -20,12 +20,12 @@ truth sources:
 current M4 preflight:
 - Already aligned: `electron/main.ts` has main window title `桌面牧场 · 控制舱`, ranch window title `桌面牧场`, and tray tooltip `桌面牧场`.
 - Already aligned: `ranch.html` has `<title>桌面牧场</title>`.
-- Pending: `package.json` still describes `多 Agent 牛马核心部门桌面版`.
-- Pending: `README.md` still starts with `# 多 Agent 牛马核心部门`.
-- Pending: `src/App.tsx` boot screens still show `多 Agent 牛马核心部门`.
-- Pending: control cockpit has no compact app-header ranch settings entry yet.
+- Completed: `package.json` description/productName now use `桌面牧场` while `name` remains `multi-agent-niuma`.
+- Completed: `README.md` H1 and intro use `桌面牧场` while preserving project code name `multi-agent-niuma`.
+- Completed: `src/App.tsx` boot screens use `桌面牧场 · 控制舱`.
+- Completed: control cockpit header uses `桌面牧场 · 控制舱` and exposes a compact app-header ranch settings entry.
 
-future write scope:
+active write scope:
 - `package.json`: update `description`; add or update `productName` only if the package tooling accepts it without breaking build.
 - `README.md`: update H1 and short introduction to product name `桌面牧场`, keeping project code name `multi-agent-niuma`.
 - `src/App.tsx`: update boot-screen H1 strings only.
@@ -56,13 +56,13 @@ implementation acceptance:
 - Negative review confirms forbidden files and central grid layout were not changed.
 
 blockers:
-- Implementation is not authorized yet.
-- Local Git metadata is still invalid, so future implementation must not rely on Git diff until repair is explicitly authorized and completed.
+- Implementation is accepted for the declared M4 scope; future scope expansion needs a new dispatch.
+- The Git repo is valid at `fa9e08b Import AgentPet workspace`, but the M4 worker must not stage, commit, push, reset, clean, or remove files.
 - Transparent ranch pointer smoke remains partially manual because Windows capture reports `SetIsBorderRequired failed`.
 
 next action:
-- Wait for PM/user explicit M4 implementation dispatch.
-- On dispatch, keep the worker short-scoped and require callback evidence before acceptance.
+- Keep this M4 implementation card summarized.
+- Future ranch or control-cockpit work must open a new bounded lane and re-run the same negative checks.
 
 summary:
-- Standby implementation dispatch package; no implementation started.
+- Summarized M4 implementation long-worker package; thread `019f227a-8978-7df1-8b3f-738ccdb01b18` completed and PM verified lint/build/orchestration/preflight/connector-safety plus browser settings smoke.

@@ -43,19 +43,19 @@ acceptance:
 
 current state:
 - Requirements readiness is summarized.
-- Future implementation dispatch package exists at `docs/orchestration/tasks/ranch-m4-implementation-v0.2.md`.
+- Summarized implementation dispatch package exists at `docs/orchestration/tasks/ranch-m4-implementation-v0.2.md`.
 - M3 code gates were rechecked after the latest supervision pass: `npm.cmd run lint` and `npm.cmd run build` both passed.
-- M4 implementation is not started.
-- Git repair and connector execution remain unauthorized.
+- M4 implementation was completed in long-worker thread `019f227a-8978-7df1-8b3f-738ccdb01b18` and accepted after PM verification.
+- Connector execution remains unauthorized; no further Git write action is authorized by this requirements card.
 
 blockers:
-- M4 implementation requires a separate explicit dispatch before touching locked control-cockpit or rename files.
+- Future M4 scope expansion requires a new bounded dispatch, touched-file review, negative checks, and gates.
 - Transparent ranch pointer smoke remains partially manual because Windows capture reports `SetIsBorderRequired failed`.
 - Connector execution remains disabled and unrelated to M4 requirements readiness.
 
 next action:
-- Keep the future M4 implementation package standby until PM/user explicitly dispatches implementation.
+- Keep the requirements lane summarized and use the M4 implementation package as accepted evidence.
 - Keep this requirements lane summarized unless the M4 scope changes.
 
 summary:
-- Summarized M4 requirements readiness; implementation held behind explicit dispatch.
+- Summarized M4 requirements readiness; implementation completed by long-worker and accepted by PM verification.
