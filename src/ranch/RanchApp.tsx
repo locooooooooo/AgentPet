@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react';
-import type { AgentSnapshot, DesktopApi, RanchPrefs } from '../types';
+import { PanelTopOpen, Repeat2, Settings } from 'lucide-react';
+import type { AgentSnapshot, DesktopApi, RanchInteractiveRegion, RanchPrefs } from '../types';
 import { getDesktopApi } from '../lib/desktopClient';
 import RanchCanvas from './components/RanchCanvas';
 import StatusBand from './components/StatusBand';
@@ -8,7 +9,25 @@ import { useRanchMode } from './hooks/useRanchMode';
 import { useRanchNotifications } from './hooks/useRanchNotifications';
 import { useSelectedAgent } from './hooks/useSelectedAgent';
 
-const DESKTOP_INTERACTIVE_SELECTOR = '.animal, .ranch-field, .selected-overlay';
+const DESKTOP_INTERACTIVE_SELECTOR = '.animal, .ranch-actions, .ranch-action-button';
+
+function readDesktopInteractiveRegions(): RanchInteractiveRegion[] {
+  return Array.from(document.querySelectorAll<HTMLElement>(DESKTOP_INTERACTIVE_SELECTOR))
+    .map((element) => {
+      const rect = element.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) {
+        return null;
+      }
+
+      return {
+        x: Math.round(rect.left),
+        y: Math.round(rect.top),
+        width: Math.round(rect.width),
+        height: Math.round(rect.height)
+      };
+    })
+    .filter((region): region is RanchInteractiveRegion => Boolean(region));
+}
 
 export default function RanchApp() {
   const [api] = useState<DesktopApi>(() => getDesktopApi());
@@ -16,6 +35,7 @@ export default function RanchApp() {
   const [bootPrefs, setBootPrefs] = useState<RanchPrefs | null>(null);
   const [bootError, setBootError] = useState<string | null>(null);
   const cockpitOpenAtRef = useRef(0);
+  const desktopPassthroughRef = useRef<boolean | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -57,6 +77,7 @@ export default function RanchApp() {
     onPrefsChange: setPrefs,
     onError: (message) => console.error(message)
   });
+  const prefsReady = Boolean(prefs);
 
   async function selectAgent(agentId: string) {
     setSelectedAgentId(agentId);
@@ -114,6 +135,45 @@ export default function RanchApp() {
     }
   }
 
+  async function showSettingsMenu(event: ReactMouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    try {
+      await api.ranch.showContextMenu({
+        x: event.clientX,
+        y: event.clientY,
+        agentId: selectedAgentId
+      });
+    } catch (reason) {
+      console.error(reason instanceof Error ? reason.message : 'Desktop Ranch failed to open settings menu.');
+    }
+  }
+
+  async function toggleMode(event: ReactMouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!prefs) {
+      return;
+    }
+
+    try {
+      const nextPrefs = await api.ranch.setPrefs({
+        mode: prefs.mode === 'desktop' ? 'floating' : 'desktop'
+      });
+      setPrefs(nextPrefs);
+    } catch (reason) {
+      console.error(reason instanceof Error ? reason.message : 'Desktop Ranch failed to switch mode.');
+    }
+  }
+
+  function openSelectedCockpit(event: ReactMouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+    void openCockpit(selectedAgentId);
+  }
+
   function handleDoubleClick(event: ReactMouseEvent<HTMLElement>) {
     const target = event.target;
     const agentNode = target instanceof Element ? target.closest<HTMLElement>('.animal[data-agent-id]') : null;
@@ -126,46 +186,63 @@ export default function RanchApp() {
   }
 
   useEffect(() => {
-    if (!prefs) {
+    if (!prefsReady) {
       return;
     }
 
     if (!isDesktop) {
+      void api.ranch.setInteractiveRegions([]);
       void api.ranch.setMousePassthrough(false);
       return;
     }
 
-    let interactive = false;
-    const syncPassthrough = (nextInteractive: boolean) => {
-      if (interactive === nextInteractive) {
+    let disposed = false;
+    const setDesktopPassthrough = (passthrough: boolean) => {
+      if (desktopPassthroughRef.current === passthrough) {
         return;
       }
 
-      interactive = nextInteractive;
-      void api.ranch.setMousePassthrough(!nextInteractive);
+      desktopPassthroughRef.current = passthrough;
+      void api.ranch.setMousePassthrough(passthrough);
     };
+    const publishInteractiveRegions = () => {
+      if (disposed) {
+        return;
+      }
 
-    const handleMouseMove = (event: MouseEvent) => {
-      const target = event.target;
-      syncPassthrough(target instanceof Element && Boolean(target.closest(DESKTOP_INTERACTIVE_SELECTOR)));
+      void api.ranch.setInteractiveRegions(readDesktopInteractiveRegions());
     };
-
-    const handleMouseOut = (event: MouseEvent) => {
-      if (!(event.relatedTarget instanceof Element)) {
-        syncPassthrough(false);
+    const updatePassthroughFromPointer = (event: MouseEvent) => {
+      const target = document.elementFromPoint(event.clientX, event.clientY) ?? event.target;
+      const interactiveNode = target instanceof Element
+        ? target.closest(DESKTOP_INTERACTIVE_SELECTOR)
+        : null;
+      if (interactiveNode) {
+        setDesktopPassthrough(false);
       }
     };
 
-    void api.ranch.setMousePassthrough(true);
-    window.addEventListener('mousemove', handleMouseMove, true);
-    window.addEventListener('mouseout', handleMouseOut, true);
+    publishInteractiveRegions();
+    setDesktopPassthrough(true);
+
+    const regionTimer = window.setInterval(publishInteractiveRegions, 250);
+    window.addEventListener('mousemove', updatePassthroughFromPointer, true);
+    window.addEventListener('pointermove', updatePassthroughFromPointer, true);
+    window.addEventListener('resize', publishInteractiveRegions);
+    window.addEventListener('scroll', publishInteractiveRegions, true);
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove, true);
-      window.removeEventListener('mouseout', handleMouseOut, true);
+      disposed = true;
+      window.clearInterval(regionTimer);
+      window.removeEventListener('mousemove', updatePassthroughFromPointer, true);
+      window.removeEventListener('pointermove', updatePassthroughFromPointer, true);
+      window.removeEventListener('resize', publishInteractiveRegions);
+      window.removeEventListener('scroll', publishInteractiveRegions, true);
+      void api.ranch.setInteractiveRegions([]);
+      desktopPassthroughRef.current = null;
       void api.ranch.setMousePassthrough(false);
     };
-  }, [api, isDesktop, prefs]);
+  }, [api, isDesktop, prefsReady]);
 
   if (bootError) {
     return (
@@ -208,6 +285,35 @@ export default function RanchApp() {
     >
       <StatusBand messages={toasts} />
       <RanchCanvas snapshot={snapshot} selectedAgentId={selectedAgentId} onSelectAgent={selectAgent} />
+      <nav className="ranch-actions is-hover-only" aria-label="桌面牧场入口" data-ranch-no-drag="true">
+        <button
+          type="button"
+          className="ranch-action-button"
+          aria-label="召唤控制舱"
+          title="召唤控制舱"
+          onClick={openSelectedCockpit}
+        >
+          <PanelTopOpen aria-hidden="true" size={15} strokeWidth={2} />
+        </button>
+        <button
+          type="button"
+          className="ranch-action-button"
+          aria-label="打开设置"
+          title="打开设置"
+          onClick={(event) => void showSettingsMenu(event)}
+        >
+          <Settings aria-hidden="true" size={15} strokeWidth={2} />
+        </button>
+        <button
+          type="button"
+          className="ranch-action-button"
+          aria-label="切换模式"
+          title="切换模式"
+          onClick={(event) => void toggleMode(event)}
+        >
+          <Repeat2 aria-hidden="true" size={15} strokeWidth={2} />
+        </button>
+      </nav>
     </main>
   );
 }

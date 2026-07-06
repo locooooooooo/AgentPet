@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import type { AgentSnapshot, AgentSystemMessage, DesktopApi, RanchPrefs } from '../../types';
 import { allowsRanchToast } from '../components/PersonalityGate';
 
-const TOAST_TTL_MS = 3000;
-const MAX_TOASTS = 3;
+const TOAST_TTL_MS = 1500;
+const MAX_TOASTS = 1;
 
 export function useRanchNotifications(
   api: DesktopApi,
@@ -60,7 +60,8 @@ export function useRanchNotifications(
     ) {
       void api.ranch.requestSystemNotify({
         title: latestMessage.title,
-        body: latestMessage.content
+        body: latestMessage.content,
+        agentId: latestMessage.agentId
       });
     }
   }, [api, snapshot]);

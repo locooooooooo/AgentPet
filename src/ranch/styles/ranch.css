@@ -29,9 +29,8 @@
 }
 
 #ranch-root .ranch-shell {
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  gap: 8px;
+  position: relative;
+  display: block;
   width: 100%;
   height: 100%;
   padding: 12px;
@@ -40,40 +39,29 @@
 }
 
 #ranch-root .ranch-shell.is-floating .ranch-field,
-#ranch-root .ranch-shell.is-floating .selected-overlay {
+#ranch-root .ranch-shell.is-floating .ranch-canvas {
   cursor: grab;
 }
 
 #ranch-root .ranch-shell.is-floating.is-dragging .ranch-field,
-#ranch-root .ranch-shell.is-floating.is-dragging .selected-overlay {
+#ranch-root .ranch-shell.is-floating.is-dragging .ranch-canvas {
   cursor: grabbing;
 }
 
 #ranch-root .status-band {
-  position: relative;
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
   z-index: 12;
   display: flex;
+  justify-content: center;
   min-width: 0;
-  min-height: 34px;
-  gap: 6px;
+  width: min(320px, calc(100% - 96px));
   align-items: center;
   overflow: hidden;
   pointer-events: none;
+  transform: translateX(-50%);
   -webkit-app-region: no-drag;
-}
-
-#ranch-root .status-band-empty {
-  display: inline-grid;
-  min-height: 28px;
-  place-items: center;
-  padding: 0 10px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: rgba(255, 255, 255, 0.42);
-  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
-  font-size: 10px;
-  font-weight: 800;
-  background: rgba(8, 8, 8, 0.42);
 }
 
 #ranch-root .notification-toast {
@@ -81,13 +69,13 @@
   grid-template-columns: 8px minmax(0, 1fr);
   gap: 8px;
   align-items: start;
-  width: min(220px, 32vw);
+  width: 100%;
   min-height: 34px;
   padding: 7px 9px;
-  border: 1px solid rgba(255, 255, 255, 0.11);
-  border-radius: 8px;
-  background: rgba(8, 8, 8, 0.82);
-  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.34);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.6);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.26);
   animation: ranch-toast-in 180ms ease-in-out both;
 }
 
@@ -142,9 +130,7 @@
 
 #ranch-root .ranch-canvas {
   position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 188px;
-  gap: 10px;
+  display: block;
   width: 100%;
   height: 100%;
   min-height: 0;
@@ -152,44 +138,63 @@
 
 #ranch-root .ranch-field {
   position: relative;
+  width: 100%;
+  height: 100%;
   min-width: 0;
   min-height: 0;
   padding: 10px;
-  border-radius: 14px;
-  background:
-    linear-gradient(180deg, rgba(17, 17, 17, 0.58), rgba(8, 8, 8, 0.42)),
-    radial-gradient(circle at 16% 20%, rgba(0, 214, 143, 0.16), transparent 32%),
-    radial-gradient(circle at 72% 34%, rgba(77, 163, 255, 0.13), transparent 34%),
-    radial-gradient(circle at 76% 80%, rgba(255, 122, 26, 0.12), transparent 30%);
-  box-shadow: inset 0 0 0 1px var(--border), 0 18px 44px rgba(0, 0, 0, 0.32);
+  border-radius: 12px;
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--border);
   transition: box-shadow 180ms ease-in-out, transform 180ms ease-in-out;
 }
 
 #ranch-root .ranch-fence {
   position: absolute;
-  inset: 5px;
+  inset: 6px;
   z-index: 4;
-  border: 8px double rgba(255, 255, 255, 0.16);
-  border-radius: 13px;
-  box-shadow:
-    inset 0 0 0 1px rgba(0, 214, 143, 0.22),
-    0 0 18px rgba(0, 214, 143, 0.13);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.05);
   pointer-events: none;
   transition: box-shadow 180ms ease-in-out;
 }
 
-#ranch-root .ranch-fence::before,
-#ranch-root .ranch-fence::after {
-  content: "";
+#ranch-root .ranch-corner {
   position: absolute;
+  z-index: 7;
   width: 10px;
   height: 10px;
   border-radius: 50%;
   background: color-mix(in srgb, var(--green) 64%, white 12%);
-  box-shadow:
-    calc(100vw - 64px) 0 0 rgba(77, 163, 255, 0.54),
-    0 calc(100vh - 60px) 0 rgba(255, 122, 26, 0.48),
-    calc(100vw - 64px) calc(100vh - 60px) 0 rgba(255, 77, 95, 0.46);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease-in-out;
+}
+
+#ranch-root .corner-nw {
+  left: 11px;
+  top: 11px;
+}
+
+#ranch-root .corner-ne {
+  right: 11px;
+  top: 11px;
+}
+
+#ranch-root .corner-se {
+  right: 11px;
+  bottom: 11px;
+}
+
+#ranch-root .corner-sw {
+  left: 11px;
+  bottom: 11px;
+}
+
+#ranch-root .ranch-shell:hover .ranch-corner,
+#ranch-root .ranch-shell:focus-within .ranch-corner {
+  opacity: 0.72;
 }
 
 #ranch-root .ranch-ground {
@@ -199,11 +204,7 @@
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 10px;
-  background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(180deg, rgba(22, 44, 32, 0.78), rgba(17, 24, 19, 0.84));
-  background-size: 42px 42px, 42px 42px, auto;
+  background: transparent;
 }
 
 #ranch-root .ranch-zone {
@@ -212,10 +213,10 @@
   min-width: 76px;
   min-height: 42px;
   place-items: center;
-  border: 1px dashed rgba(255, 255, 255, 0.09);
+  border: 1px dashed rgba(255, 255, 255, 0.06);
   border-radius: 10px;
-  color: rgba(255, 255, 255, 0.34);
-  font-size: 11px;
+  color: transparent;
+  font-size: 0;
   font-weight: 800;
   pointer-events: none;
 }
@@ -225,7 +226,7 @@
   bottom: 10%;
   width: 38%;
   height: 35%;
-  background: rgba(77, 163, 255, 0.06);
+  background: transparent;
 }
 
 #ranch-root .zone-rest {
@@ -233,7 +234,7 @@
   top: 10%;
   width: 28%;
   height: 30%;
-  background: rgba(0, 214, 143, 0.06);
+  background: transparent;
 }
 
 #ranch-root .zone-water {
@@ -241,7 +242,7 @@
   top: 9%;
   width: 28%;
   height: 30%;
-  background: rgba(77, 163, 255, 0.08);
+  background: transparent;
 }
 
 #ranch-root .zone-plaza {
@@ -249,7 +250,7 @@
   top: 31%;
   width: 22%;
   height: 28%;
-  background: rgba(255, 255, 255, 0.035);
+  background: transparent;
 }
 
 #ranch-root .zone-release {
@@ -257,7 +258,7 @@
   bottom: 10%;
   width: 30%;
   height: 32%;
-  background: rgba(255, 122, 26, 0.06);
+  background: transparent;
 }
 
 #ranch-root .animal {
@@ -266,8 +267,8 @@
   top: var(--animal-y);
   z-index: 5;
   display: grid;
-  width: 74px;
-  height: 82px;
+  width: 92px;
+  height: 98px;
   padding: 0;
   border: 0;
   color: var(--text);
@@ -290,15 +291,13 @@
 #ranch-root .animal-ring {
   position: relative;
   display: grid;
-  width: 48px;
-  height: 48px;
+  width: 66px;
+  height: 66px;
   place-self: center;
   place-items: center;
   border: 1px solid color-mix(in srgb, var(--agent-accent) 70%, white 10%);
   border-radius: 50%;
-  background:
-    radial-gradient(circle at 50% 44%, rgba(255, 255, 255, 0.12), transparent 52%),
-    var(--panel-soft);
+  background: var(--panel-soft);
   box-shadow:
     0 0 0 4px color-mix(in srgb, var(--agent-accent) 26%, transparent),
     0 0 18px color-mix(in srgb, var(--agent-accent) 30%, transparent);
@@ -312,7 +311,7 @@
 
 #ranch-root .animal-glyph {
   display: block;
-  font-size: 31px;
+  font-size: 56px;
   line-height: 1;
   filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.45));
 }
@@ -465,25 +464,7 @@
     0 0 24px rgba(0, 214, 143, 0.34);
 }
 
-#ranch-root .selected-overlay {
-  display: grid;
-  grid-template-columns: 46px minmax(0, 1fr);
-  gap: 10px;
-  min-width: 0;
-  height: 100%;
-  padding: 12px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background:
-    linear-gradient(180deg, rgba(17, 17, 17, 0.88), rgba(8, 8, 8, 0.74)),
-    radial-gradient(circle at 22% 12%, color-mix(in srgb, var(--agent-accent) 20%, transparent), transparent 46%);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.025);
-  -webkit-app-region: no-drag;
-  transition: box-shadow 180ms ease-in-out, transform 180ms ease-in-out;
-}
-
-#ranch-root .ranch-shell.is-floating.is-dragging .ranch-field,
-#ranch-root .ranch-shell.is-floating.is-dragging .selected-overlay {
+#ranch-root .ranch-shell.is-floating.is-dragging .ranch-field {
   transform: translateY(-1px);
 }
 
@@ -511,61 +492,44 @@
     0 16px 28px rgba(77, 163, 255, 0.18);
 }
 
-#ranch-root .selected-avatar {
+#ranch-root .ranch-actions {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  z-index: 14;
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease-in-out;
+  -webkit-app-region: no-drag;
+}
+
+#ranch-root .ranch-shell:hover .ranch-actions,
+#ranch-root .ranch-shell:focus-within .ranch-actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#ranch-root .ranch-action-button {
   display: grid;
-  width: 46px;
-  height: 46px;
+  width: 24px;
+  height: 24px;
   place-items: center;
-  border: 1px solid color-mix(in srgb, var(--agent-accent) 70%, white 10%);
-  border-radius: 50%;
-  font-size: 30px;
-  background: rgba(255, 255, 255, 0.05);
-  box-shadow: 0 0 18px color-mix(in srgb, var(--agent-accent) 34%, transparent);
-}
-
-#ranch-root .selected-copy {
-  display: grid;
-  align-content: start;
-  min-width: 0;
-  gap: 4px;
-}
-
-#ranch-root .selected-kicker {
-  overflow: hidden;
-  color: var(--green);
-  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
-  font-size: 10px;
-  font-weight: 800;
-  text-overflow: ellipsis;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-#ranch-root .selected-copy strong {
-  overflow: hidden;
-  font-size: 18px;
-  line-height: 1.15;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-#ranch-root .selected-copy span:not(.selected-kicker) {
-  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 6px;
   color: var(--muted);
-  font-size: 12px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  background: rgba(0, 0, 0, 0.44);
+  cursor: pointer;
+  transition: border-color 160ms ease-in-out, color 160ms ease-in-out, background 160ms ease-in-out;
 }
 
-#ranch-root .selected-copy p {
-  display: -webkit-box;
-  margin: 8px 0 0;
-  overflow: hidden;
-  color: #e7e7e7;
-  font-size: 12px;
-  line-height: 1.45;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 4;
+#ranch-root .ranch-action-button:hover,
+#ranch-root .ranch-action-button:focus-visible {
+  border-color: color-mix(in srgb, var(--green) 48%, white 8%);
+  color: var(--green);
+  background: rgba(0, 0, 0, 0.62);
+  outline: none;
 }
 
 #ranch-root .ranch-boot-card {
@@ -707,34 +671,17 @@
 }
 
 @media (max-width: 620px) {
-  #ranch-root .ranch-canvas {
-    grid-template-columns: 1fr;
-    grid-template-rows: minmax(0, 1fr) auto;
-  }
-
-  #ranch-root .selected-overlay {
-    grid-template-columns: 38px minmax(0, 1fr);
-    height: auto;
-    padding: 8px;
-  }
-
-  #ranch-root .selected-avatar {
-    width: 38px;
-    height: 38px;
-    font-size: 25px;
-  }
-
   #ranch-root .animal {
-    width: 62px;
-    height: 72px;
+    width: 78px;
+    height: 84px;
   }
 
   #ranch-root .animal-ring {
-    width: 42px;
-    height: 42px;
+    width: 58px;
+    height: 58px;
   }
 
   #ranch-root .animal-glyph {
-    font-size: 27px;
+    font-size: 48px;
   }
 }

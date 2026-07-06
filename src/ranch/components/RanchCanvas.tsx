@@ -3,7 +3,6 @@ import { AGENT_ANIMALS, getAgentDef } from '../data/agentAnimals';
 import { RANCH_ZONES } from '../data/ranchLayout';
 import { pickAnimalAction } from '../data/statusActions';
 import Animal from './Animal';
-import SelectedOverlay from './SelectedOverlay';
 
 interface RanchCanvasProps {
   snapshot: AgentSnapshot;
@@ -20,18 +19,20 @@ export default function RanchCanvas({ snapshot, selectedAgentId, onSelectAgent }
     })
     .filter(Boolean);
 
-  const selectedItem = visibleAgents.find((item) => item?.agent.id === selectedAgentId) ?? visibleAgents[0] ?? null;
-
   return (
     <section className="ranch-canvas" aria-label="桌面牧场动物区">
       <div className="ranch-field">
         <div className="ranch-fence" aria-hidden="true" />
         <div className="ranch-ground">
           {RANCH_ZONES.map((zone) => (
-            <span key={zone.id} className={`ranch-zone ${zone.className}`}>
+            <span key={zone.id} className={`ranch-zone ${zone.className}`} aria-hidden="true">
               {zone.label}
             </span>
           ))}
+          <span className="ranch-corner corner-nw" aria-hidden="true" />
+          <span className="ranch-corner corner-ne" aria-hidden="true" />
+          <span className="ranch-corner corner-se" aria-hidden="true" />
+          <span className="ranch-corner corner-sw" aria-hidden="true" />
           {visibleAgents.map((item, index) => {
             if (!item) {
               return null;
@@ -51,15 +52,6 @@ export default function RanchCanvas({ snapshot, selectedAgentId, onSelectAgent }
           })}
         </div>
       </div>
-
-      {selectedItem ? (
-        <SelectedOverlay
-          agent={selectedItem.agent}
-          agentDef={selectedItem.def}
-          runtime={selectedItem.runtime}
-          action={pickAnimalAction(selectedItem.agent, selectedItem.runtime, selectedAgentId.length)}
-        />
-      ) : null}
     </section>
   );
 }
