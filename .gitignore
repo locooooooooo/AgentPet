@@ -1,5 +1,17 @@
 node_modules
 dist
 dist-electron
+release
+release-dir
 user-data
 npm-debug.log*
+
+# Dev runtime logs
+.devserver.log
+.devserver.err.log
+.electron.log
+.electron.err.log
+debug.log
+
+# Temporary visual-acceptance screenshots
+tmp-*.png
