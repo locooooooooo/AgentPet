@@ -408,7 +408,7 @@
       "title": "AgentPet Git staging review",
       "role": "[PM]#git-staging-review-agentpet@v0.1",
       "state": "standby",
-      "nextAction": "等待 PM/user 决定如何处理当前 Git state；未授权前不 stage、unstage、commit、push、reset、clean。"
+      "nextAction": "Git log ignore 决策已落档(2026-07-07 ① 推 main 即可);lane 维持 standby 等待 PM/user 决定是否处理当前 Git state;未授权前不 stage、unstage、commit、push、reset、clean。"
     },
     {
       "id": "ranch-m4-requirements",

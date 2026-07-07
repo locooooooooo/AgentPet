@@ -56,6 +56,12 @@ blockers:
 next action:
 - Wait for PM/user decision on whether to review the current Git state, unstage, stage, commit, push, or leave it untouched.
 - If review is requested, run read-only review commands first and report exact staged/unstaged/untracked state before any write decision.
+- **2026-07-07 PM + 用户拍板**:
+  - Git log ignore decision = **① 推 main 即可**(不引 pre-commit / pre-push hook)
+  - 依据:`e095764` `.gitignore` 已拦截 dev runtime 日志 + `release-dir/` + 验收截图;hook 维护成本 > 收益
+  - backup:每周 manual 巡检 `git status --ignored --short`
+  - 后续:`git-repair-agentpet@v0.1` 仍 standby,等用户同消息授权才执行 `git init` / `remote add` / `fetch` / `stage` / `commit` / `push`
+  - 状态:lane `git-staging-review-agentpet` 维持 `standby`(本轮仅落档决策,不重跑 Git 操作)
 
 summary:
 - Standby Git state review package; no Git write action authorized or executed.
