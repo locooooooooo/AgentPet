@@ -72,7 +72,7 @@ dispatch state: active
 
 **当前状态**：任务卡 + 派工包 + 进度卡 + 控制面同步已落档；长工 thread `mvs_237b464ebc78403d953b9ab93b398ab8` 已启动并交付 H0-1 三套设计稿；用户已选择 C 华丽；H0-2/H0-3/H0-4 已完成，dev 已启动到 `http://127.0.0.1:5173/` 供用户查看。
 
-**PM 默认执行序**：已完成启动长工 thread → H0-1 设计稿 → 用户拍板 C → H0-2/H0-3 实施 → H0-4 验收；commit/push 等待用户授权。
+**PM 默认执行序**：已完成启动长工 thread → H0-1 设计稿 → 用户拍板 C → H0-2/H0-3 实施 → H0-4 验收；用户已授权 commit/push，PM commit `18451ba` 已推送到 origin/main。
 
 ---
 
@@ -93,7 +93,7 @@ dispatch state: active
 **2026-07-07 PM 执行记录**：
 - 已同步 `docs/orchestration/status.json` 与 `docs/orchestration/index.md` blocker wording。
 - 已删除过期 Git post-push blocker。
-- P0-3 清理仍等待用户完成当前游戏预览后执行，因为清理 `release-dir/win-unpacked.tmp` 需要停止 Electron。
+- P0-3 清理已执行：`release-dir/win-unpacked.tmp` 已删除，`release-dir` 当前不包含该目录。
 
 ### P0-2 · 拍 R0-3 connector enablement 决策 · 决策点（不写代码）
 
@@ -126,6 +126,11 @@ dispatch state: active
 **验收**：
 - `ls E:\多agent牛马\release-dir` 输出不包含 `win-unpacked.tmp/`。
 - git status 工作区无新增 diff（该路径已在 `e095764` `.gitignore` 拦截范围内）。
+
+**2026-07-07 PM 执行记录**：
+- 先停止 Electron；第一次删除仍被 `default_app.asar` 文件锁阻塞。
+- Restart Manager 查到锁源为 MiniMax Code daemon PID 9424；仅停止该 daemon 后删除成功。
+- `Get-ChildItem E:\多agent牛马\release-dir` 输出不包含 `win-unpacked.tmp`。
 
 ---
 
@@ -328,20 +333,20 @@ Fri 7-11        ▸ 本周 closeout + 5 commit 推 main
 
 - 本文档存在且可被 `docs/orchestration/index.md` 引用。
 - 4 个决策点（A/B/C/D）有用户拍板结果记录。
-- P0-1 / P0-2 / P0-3 / P1-1 / P1-2 五件事每件都对应 1 个 commit + push 到 origin/main。
+- P0-0 / P0-1 / P0-3 / P1-2 / P1-4 的当日 PM 收口结果已随 commit `18451ba` 推送到 origin/main；P0-3 清理后的事实同步由后续 PM cleanup-record commit 追认。
 - `npm.cmd run orchestration:check` pass（54+ 张卡一致）。
 - 工作区 clean。
 
 ## 十、next action
 
-- 等待用户拍 A/B/C/D 四个决策点。
+- 7-7 当日 5 件 PM 收口已执行；后续仍保留 P0-2 / P1-1 / P1-3 等未纳入本轮 5 件的决策点。
 - 拍板后按 PM 默认执行序开干，预计 3~4h 跑完 P0 三件套 + P1-1 派工 + P1-2 调查。
 - 每日傍晚写 `daily-supervision-2026-07-XX.md` 跟踪本周推进。
 - 7-11 周五做 weekly-closeout，把本周 W27 闭环。
 
 ## 十一、summary
 
-- 本周 P0 **四件套**（P0-0 全新首页 UI 设计 + P0-1 blocker 同步 / P0-2 R0-3 决策 / P0-3 release-dir 清理）继续按序推进；P0-0 已提前 accepted，剩余动作仅为用户视觉确认与显式授权后的 commit/push。
+- 本轮已完成 7-7 当日 5 件 PM 收口：P0-0 首页 accepted 并 commit/push、P0-1 blocker 同步、P0-3 release-dir 清理、P1-2 pointer smoke 调查、P1-4 connector decision 文档化；P0-2 / P1-1 / P1-3 仍作为后续决策点保留。
 - 本周 P1 候选 4 件，建议至少开 P1-1（ranch-m5 v0.2 需求准入 short-worker）+ P1-2（pointer smoke blocker 调查），P1-3/P1-4 看用户时间。
 - 本周 P2 4 件不强推，作为下次开盘候选池。
 - 横切 3 件（卖点保护 / live-subagent quota / 长工幂等）作为契约持续 backlog。

@@ -86,7 +86,7 @@ dispatch gate:
 - Supervisor owns drift detection, blocker surfacing, and minimum correction.
 
 current target:
-- 按 LPS 建立角色分工，并持续监督各个角色推进“多 Agent 牛马核心部门”项目；2026-07-07 P0 homepage-ui-p0（全新首页 / landing / 启动页 UI）已按用户拍板 C 华丽完成 H0-1/H0-2/H0-3/H0-4，证据卡 `homepage-ui-p0-c0-6-style-2026-07-07.md` 已归档，本地 dev 已启动在 `http://127.0.0.1:5173/` 供用户查看；2026-07-06 baseline = 闭环 5 commit (e095764 / 3e91d4c / 3aa30f7 / 42e3f7f / 9612151) + 桌面牧场 v0.3 视觉 smoke + 7-3 旧 release 残留 4/6 回收；ranch-m4 v0.2 summarized 无需重派、R0-3 connector 仍 deferred、transparent ranch pointer smoke blocker 仍 standby、`release-dir/win-unpacked.tmp` 嵌套文件锁顺延次日清理；后续 7-7~7-13 W27 路线见 weekly-requirements-2026-07-07.md。
+- 按 LPS 建立角色分工，并持续监督各个角色推进“多 Agent 牛马核心部门”项目；2026-07-07 P0 homepage-ui-p0（全新首页 / landing / 启动页 UI）已按用户拍板 C 华丽完成 H0-1/H0-2/H0-3/H0-4，证据卡 `homepage-ui-p0-c0-6-style-2026-07-07.md` 已归档并随 PM commit `18451ba` 推送；P0-1 blocker 同步、P0-3 `release-dir/win-unpacked.tmp` 清理、P1-2 pointer smoke 捕获路线调查、P1-4 connector decision 文档化均已完成；ranch-m4 v0.2 summarized 无需重派、R0-3 connector 仍 deferred、transparent ranch pointer smoke 完整输入验收仍 standby；后续 7-7~7-13 W27 路线见 weekly-requirements-2026-07-07.md。
 
 current role split:
 - `[PM]#multi-agent-control@v0.1`: maintain this index, dispatch bounded lanes, collect callbacks, write acceptance.
