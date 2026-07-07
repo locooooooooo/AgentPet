@@ -46,6 +46,10 @@ role ledger:
 | `[监督]#ranch-pointer-smoke@v0.2` | standby | `docs/orchestration/tasks/ranch-pointer-smoke-v0.2.md` | Wait for a transparent-window capture route. |
 | `[监督]#ranch-pointer-smoke-manual-evidence@v0.2` | standby | `docs/orchestration/tasks/ranch-pointer-smoke-manual-evidence-v0.2.md` | Fill the evidence table only when a valid route exists. |
 | `[监督]#multi-agent-control@v0.1` live-subagents lane | blocked | `docs/orchestration/status.json` | Recheck `403 DAILY_LIMIT_EXCEEDED` only when a safe route exists. |
+| `[长工]#homepage-ui-design@v0.1` | standby | `docs/orchestration/tasks/homepage-ui-p0-v0.1.md` | Wait for PM to start a long-worker mavis session and assign a thread id; deliver H0-1 design drafts + user acceptance + H0-2 implementation + H0-3 visual polish + H0-4 protected-file zero-byte audit. |
+| `[长工]#homepage-ui-design@v0.1` homepage-ui-design lane | standby | `docs/orchestration/status.json` | Open the long-worker dispatch only after PM assigns a thread id; keep §〇·quarter selling-point files untouched. |
+| `[PM]#weekly-requirements@2026-07-07` | active | `docs/orchestration/sessions/weekly-requirements-2026-07-07.md` | Maintain W27 (2026-07-07~2026-07-13) weekly-requirements card; align排期 with status.json p0Cards; close W27 lane on 2026-07-11. |
+| `[PM]#weekly-requirements@2026-07-07` weekly-requirements lane | active | `docs/orchestration/status.json` | Keep weekly-requirements session card loop/dispatch state aligned with this role; refresh排期 after each daily supervision pass. |
 
 acceptance:
 - Every non-summarized open item has an accountability action and evidence source.
@@ -54,7 +58,7 @@ acceptance:
 - Every non-summarized `docs/orchestration/status.json` lane is covered by either its tracked role owner or a lane-specific role ledger row.
 - Every role ledger evidence cell contains at least one repo path, every referenced path exists, and every `docs/orchestration/*.md` evidence path is tracked by `docs/orchestration/index.md`.
 - Completed implementation work is represented as summarized only when its verification already passed.
-- The only active lane in `docs/orchestration/status.json` is `daily-supervision`; no implementation, connector, Git, M4, or pointer-smoke lane is active without a fresh dispatch.
+- The only active lanes in `docs/orchestration/status.json` are `daily-supervision` and `weekly-requirements`; no implementation, connector, Git, M4, homepage-ui-design, or pointer-smoke lane is active without a fresh dispatch.
 - Standby roles are not called complete.
 - Blocked lanes retain the exact blocker and do not imply a connector or sub-agent is available.
 - `npm.cmd run orchestration:check` passes.
@@ -74,3 +78,4 @@ next action:
 summary:
 - Standby accountability ledger; records accepted M4 long-worker delivery and keeps other blocked/standby roles bounded.
 - Summarized M5 verification cards are also tracked here as evidence-only rows without reopening active implementation lanes.
+- 2026-07-07 adds W27 weekly-requirements lane (active) and homepage-ui-design long-worker lane (standby, thread pending).

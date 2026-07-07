@@ -40,6 +40,8 @@ tracked business cards:
 - task: ⟦tag:v2|task|ranch-pointer-smoke-manual-evidence-v0.2⟧ -> `docs/orchestration/tasks/ranch-pointer-smoke-manual-evidence-v0.2.md`
 - task: ⟦tag:v2|task|ranch-real-integration-p0-v0.1⟧ -> `docs/orchestration/tasks/ranch-real-integration-p0-v0.1.md`
 - task: ⟦tag:v2|task|cockpit-refactor-p0-v0.1⟧ -> `docs/orchestration/tasks/cockpit-refactor-p0-v0.1.md`
+- task: ⟦tag:v2|task|homepage-ui-p0-v0.1⟧ -> `docs/orchestration/tasks/homepage-ui-p0-v0.1.md`
+- task: ⟦tag:v2|task|homepage-ui-p0-dispatch-v0.1⟧ -> `docs/orchestration/tasks/homepage-ui-p0-dispatch-v0.1.md`
 - session: ⟦tag:v2|session|ranch-v0.2-2026-07-02⟧ -> `docs/orchestration/sessions/ranch-v0.2-2026-07-02.md`
 - session: ⟦tag:v2|session|daily-supervision-2026-07-02⟧ -> `docs/orchestration/sessions/daily-supervision-2026-07-02.md`
 - session: ⟦tag:v2|session|daily-plan-2026-07-03⟧ -> `docs/orchestration/sessions/daily-plan-2026-07-03.md`
@@ -64,6 +66,8 @@ tracked business cards:
 - session: ⟦tag:v2|session|daily-closeout-2026-07-06⟧ -> `docs/orchestration/sessions/daily-closeout-2026-07-06.md`
 - session: ⟦tag:v2|session|daily-supervision-2026-07-06⟧ -> `docs/orchestration/sessions/daily-supervision-2026-07-06.md`
 - session: ⟦tag:v2|session|ranch-smoke-desktop-exe-2026-07-06⟧ -> `docs/orchestration/sessions/ranch-smoke-desktop-exe-2026-07-06.md`
+- session: ⟦tag:v2|session|weekly-requirements-2026-07-07⟧ -> `docs/orchestration/sessions/weekly-requirements-2026-07-07.md`
+- session: ⟦tag:v2|session|homepage-ui-p0-progress⟧ -> `docs/orchestration/sessions/homepage-ui-p0-progress.md`
 
 recently closed cards:
 - accepted blocked-path lanes: ⟦tag:v2|task|connector-types-v0.1⟧, ⟦tag:v2|task|connector-main-gate-v0.1⟧, ⟦tag:v2|task|connector-preload-api-v0.1⟧, ⟦tag:v2|task|connector-ui-binding-v0.1⟧
@@ -76,7 +80,7 @@ dispatch gate:
 - Supervisor owns drift detection, blocker surfacing, and minimum correction.
 
 current target:
-- 按 LPS 建立角色分工，并持续监督各个角色推进“多 Agent 牛马核心部门”项目；2026-07-06 主控在 root session 闭环 4 commit (e095764 gitignore / 3e91d4c ranch v0.3 修订 B 路径 / 3aa30f7 控制舱 P0 C0-1~C0-6 + 真实打通 R0-1/2/4/5 / 42e3f7f orchestration 控制面 v3.0) 并 push 到 origin/main、`npm run package:win` 产出 桌面牧场.exe 235.7MB、桌面牧场.exe smoke 验证 v0.3 视觉 (控制舱 8 卡 + StatusStrip + 任务卡分级 + 角部小三角 + ranch 本体透明 B 路径) 全部通过、7-3 旧 release 残留 4/6 回收成功；ranch-m4 v0.2 早已 summarized 无需重派、R0-3 connector 仍 deferred、transparent ranch pointer smoke blocker 仍 standby、`release-dir/win-unpacked.tmp` 嵌套文件锁顺延次日清理。
+- 按 LPS 建立角色分工，并持续监督各个角色推进“多 Agent 牛马核心部门”项目；2026-07-07 主控在 root session 新增 P0 homepage-ui-p0（全新首页 / landing / 启动页 UI 设计，长工 thread 待 PM 启动 mavis session 后分配 thread id），落档 3 张新卡（任务卡 homepage-ui-p0-v0.1.md / 长工派工包 homepage-ui-p0-dispatch-v0.1.md / 进度卡 homepage-ui-p0-progress.md）并同步 status.json / index.md / weekly-requirements-2026-07-07.md 共 6 文件 + push 到 origin/main；2026-07-06 baseline = 闭环 5 commit (e095764 / 3e91d4c / 3aa30f7 / 42e3f7f / 9612151) + 桌面牧场 v0.3 视觉 smoke + 7-3 旧 release 残留 4/6 回收；ranch-m4 v0.2 summarized 无需重派、R0-3 connector 仍 deferred、transparent ranch pointer smoke blocker 仍 standby、`release-dir/win-unpacked.tmp` 嵌套文件锁顺延次日清理；后续 7-7~7-13 W27 路线见 weekly-requirements-2026-07-07.md。
 
 current role split:
 - `[PM]#multi-agent-control@v0.1`: maintain this index, dispatch bounded lanes, collect callbacks, write acceptance.
@@ -105,6 +109,8 @@ current role split:
 - `[监督]#ranch-personality@v0.1`: summarized M5 personality and control-cockpit prefs-linkage evidence for FR-007 and notifyPrefs.
 - `[监督]#ranch-pointer-smoke@v0.2`: standby verification package for transparent ranch pointer smoke; no implementation edit.
 - `[监督]#ranch-pointer-smoke-manual-evidence@v0.2`: standby manual evidence package for pointer-smoke callback recording; no pointer input executed yet.
+- `[长工]#homepage-ui-design@v0.1`: standby long-worker owner for the new HomePage / landing / 启动页 P0 lane; thread id is `TBD - PM will start mavis session new general --title "homepage-ui-design"` and write the assigned thread id back into the dispatch package; H0-1 design drafts + user acceptance + H0-2 implementation + H0-3 visual polish + H0-4 protected-file zero-byte audit are the declared scope; no edit to `NiuMaAvatar.tsx` / `index.css` / `agentCore.ts` / central 4x2 control-cockpit grid.
+- `[PM]#weekly-requirements@2026-07-07`: active W27 (2026-07-07~2026-07-13) weekly-requirements planner; maintains the weekly-requirements session card aligned with `status.json` p0Cards / roles / lanes; refreshes排期 after each daily supervision pass; closes the W27 lane on 2026-07-11 with a weekly-closeout session card.
 
 blockers:
 - External connector execution remains disabled; do not bind agentCore or run real Codex/Trae/Qoder connectors until connector policy is accepted.

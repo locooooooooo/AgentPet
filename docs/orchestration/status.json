@@ -2,7 +2,7 @@
   "identity": "[PM]#multi-agent-control@v0.1",
   "loopState": "active",
   "dispatchState": "active",
-  "target": "按 LPS 建立角色分工，并持续监督各个角色推进“多 Agent 牛马核心部门”项目；2026-07-06 主控在 root session 闭环 4 commit (e095764 gitignore / 3e91d4c ranch v0.3 修订 B 路径 / 3aa30f7 控制舱 P0 C0-1~C0-6 + 真实打通 R0-1/2/4/5 / 42e3f7f orchestration 控制面 v3.0) 并 push 到 origin/main、`npm run package:win` 产出 桌面牧场.exe 235.7MB、桌面牧场.exe smoke 验证 v0.3 视觉 (控制舱 8 卡 + StatusStrip + 任务卡分级 + 角部小三角 + ranch 本体透明 B 路径) 全部通过、7-3 旧 release 残留 4/6 回收成功；ranch-m4 v0.2 早已 summarized 无需重派、R0-3 connector 仍 deferred、transparent ranch pointer smoke blocker 仍 standby、`release-dir/win-unpacked.tmp` 嵌套文件锁顺延次日清理。",
+  "target": "按 LPS 建立角色分工，并持续监督各个角色推进“多 Agent 牛马核心部门”项目；2026-07-07 主控在 root session 新增 P0 homepage-ui-p0（全新首页 / landing / 启动页 UI 设计，长工 thread 待 PM 启动 mavis session 后分配 thread id），落档 3 张新卡（任务卡 homepage-ui-p0-v0.1.md / 长工派工包 homepage-ui-p0-dispatch-v0.1.md / 进度卡 homepage-ui-p0-progress.md）并同步 status.json / index.md / weekly-requirements-2026-07-07.md 共 6 文件 + push 到 origin/main；2026-07-06 baseline = 闭环 5 commit (e095764 / 3e91d4c / 3aa30f7 / 42e3f7f / 9612151) + 桌面牧场 v0.3 视觉 smoke + 7-3 旧 release 残留 4/6 回收；ranch-m4 v0.2 summarized 无需重派、R0-3 connector 仍 deferred、transparent ranch pointer smoke blocker 仍 standby、`release-dir/win-unpacked.tmp` 嵌套文件锁顺延次日清理；后续 7-7~7-13 W27 路线见 weekly-requirements-2026-07-07.md。",
   "source": "docs/orchestration/index.md",
   "todayPlan": {
     "date": "2026-07-06",
@@ -11,6 +11,12 @@
     "progress": "docs/orchestration/sessions/daily-closeout-2026-07-06.md"
   },
   "p0Cards": [
+    {
+      "id": "homepage-ui-p0",
+      "status": "in_progress",
+      "task": "docs/orchestration/tasks/homepage-ui-p0-v0.1.md",
+      "progress": "docs/orchestration/sessions/homepage-ui-p0-progress.md"
+    },
     {
       "id": "ranch-real-integration-p0",
       "status": "in_progress",
@@ -241,6 +247,24 @@
       "responsibility": "透明 Electron 牧场 pointer-smoke 手工证据记录包；等待手工或替代捕获路线，不执行输入、不改实现。",
       "tag": "⟦tag:v2|task|ranch-pointer-smoke-manual-evidence-v0.2⟧",
       "evidence": "docs/orchestration/tasks/ranch-pointer-smoke-manual-evidence-v0.2.md"
+    },
+    {
+      "id": "homepage-ui-design",
+      "title": "[长工]#homepage-ui-design@v0.1",
+      "owner": "长工",
+      "status": "standby",
+      "responsibility": "全新 HomePage 组件 + 路由 + 视觉打磨；3 套设计稿（轻量/中等/华丽）出稿 + 用户拍板；不动 §〇·quarter 卖点文件。",
+      "tag": "⟦tag:v2|task|homepage-ui-p0-v0.1⟧",
+      "evidence": "docs/orchestration/tasks/homepage-ui-p0-v0.1.md"
+    },
+    {
+      "id": "weekly-requirements",
+      "title": "[PM]#weekly-requirements@2026-07-07",
+      "owner": "主控",
+      "status": "active",
+      "responsibility": "Maintain W27 (2026-07-07~2026-07-13) weekly requirements; consolidate P0/P1/P2 candidates; keep排期 / 决策点 / acceptance aligned with the PM board; refresh after each daily supervision pass.",
+      "tag": "⟦tag:v2|session|weekly-requirements-2026-07-07⟧",
+      "evidence": "docs/orchestration/sessions/weekly-requirements-2026-07-07.md"
     }
   ],
   "lanes": [
@@ -425,6 +449,20 @@
       "role": "[监督]#ranch-pointer-smoke-manual-evidence@v0.2",
       "state": "standby",
       "nextAction": "等待可观察透明 Electron 窗口的手工或替代捕获路线；未观察前保持 pending evidence。"
+    },
+    {
+      "id": "homepage-ui-design",
+      "title": "Homepage UI P0 long-worker",
+      "role": "[长工]#homepage-ui-design@v0.1",
+      "state": "standby",
+      "nextAction": "PM 启动 mavis session new general --title 'homepage-ui-design' 后分配 thread id，写回 dispatch 包的 next action 段、本卡 nextAction 字段、status.json roles[homepage-ui-design] evidence 字段；H0-1 出 3 套设计稿 + 用户拍板 + H0-2 实施 + H0-3 视觉打磨 + H0-4 卖点 0 字节验收。"
+    },
+    {
+      "id": "weekly-requirements",
+      "title": "W27 weekly requirements planning",
+      "role": "[PM]#weekly-requirements@2026-07-07",
+      "state": "active",
+      "nextAction": "Keep weekly-requirements-2026-07-07.md aligned with status.json p0Cards / roles / lanes; add new P0/P1 candidates as they surface; refresh排期 after each PM supervision pass; close the W27 lane on 2026-07-11 with weekly-closeout session card."
     }
   ],
   "connectors": [

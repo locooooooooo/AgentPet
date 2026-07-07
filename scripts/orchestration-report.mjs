@@ -106,15 +106,16 @@ const expectedDecisionCoverageByLane = new Map([
   ['git-repair-agentpet', 'AgentPet Git repair'],
   ['git-staging-review-agentpet', 'AgentPet Git state review'],
   ['ranch-pointer-smoke', 'Transparent pointer smoke'],
-  ['ranch-pointer-smoke-manual-evidence', 'Transparent pointer smoke']
+  ['ranch-pointer-smoke-manual-evidence', 'Transparent pointer smoke'],
+  ['homepage-ui-design', 'Homepage UI long-worker dispatch']
 ]);
 const nonDecisionOpenLanes = new Set(['daily-decision-queue', 'daily-role-accountability']);
 const statusLanesById = new Map(status.lanes.map((lane) => [lane.id, lane]));
-const activeLaneIds = status.lanes.filter((lane) => lane.state === 'active').map((lane) => lane.id);
-const expectedActiveLaneIds = ['daily-supervision'];
-const expectedActiveLaneLine = 'expected active lane: daily-supervision';
+const activeLaneIds = status.lanes.filter((lane) => lane.state === 'active').map((lane) => lane.id).sort();
+const expectedActiveLaneIds = ['daily-supervision', 'weekly-requirements'].sort();
+const expectedActiveLaneLine = 'expected active lane: daily-supervision, weekly-requirements';
 if (JSON.stringify(activeLaneIds) !== JSON.stringify(expectedActiveLaneIds)) {
-  throw new Error(`active lanes must remain daily-supervision only after M4 acceptance: ${activeLaneIds.join(', ') || 'none'}`);
+  throw new Error(`active lanes must remain daily-supervision + weekly-requirements after W27 opening: ${activeLaneIds.join(', ') || 'none'}`);
 }
 decisionCoverageRows.forEach((row) => {
   const lane = statusLanesById.get(row.openStatusLane);

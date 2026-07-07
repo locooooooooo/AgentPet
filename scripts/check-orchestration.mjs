@@ -413,7 +413,7 @@ requireText('daily role accountability task card', dailyRoleAccountabilityTask, 
   'Every role ledger row resolves to either a tracked `docs/orchestration/status.json` role title or a real `docs/orchestration/status.json` lane responsibility label, each parsed state matches that source, and each row has a non-empty accountability action.',
   'Every non-summarized `docs/orchestration/status.json` lane is covered by either its tracked role owner or a lane-specific role ledger row.',
   'Every role ledger evidence cell contains at least one repo path, every referenced path exists, and every `docs/orchestration/*.md` evidence path is tracked by `docs/orchestration/index.md`.',
-  'The only active lane in `docs/orchestration/status.json` is `daily-supervision`; no implementation, connector, Git, M4, or pointer-smoke lane is active without a fresh dispatch.',
+  'The only active lanes in `docs/orchestration/status.json` are `daily-supervision` and `weekly-requirements`; no implementation, connector, Git, M4, homepage-ui-design, or pointer-smoke lane is active without a fresh dispatch.',
   'Standby roles are not called complete.',
   'Blocked lanes retain the exact blocker and do not imply a connector or sub-agent is available.',
   '`npm.cmd run orchestration:report` shows this ledger as standby, not active, and prints the active lane control, daily supervision closeout, daily decision coverage, and daily supervision closeout coverage summaries.',
@@ -657,7 +657,7 @@ requireText('orchestration report script', reportScript, [
   'daily role accountability report evidence path missing',
   'daily role accountability report evidence markdown is not tracked',
   'daily role accountability report action is empty',
-  'active lanes must remain daily-supervision only after M4 acceptance',
+  'active lanes must remain daily-supervision + weekly-requirements after W27 opening',
   'commandState',
   'loop state:',
   'dispatch state:',
@@ -667,7 +667,7 @@ requireText('orchestration report script', reportScript, [
   'evidence:',
   'action:',
   'active lane control:',
-  'expected active lane: daily-supervision',
+  'expected active lane: daily-supervision, weekly-requirements',
   'daily supervision closeout:',
   'daily decision queue:',
   'first action:',
@@ -956,10 +956,10 @@ if (statusJson) {
         errors.push(`status.json lanes[${index}] has invalid state: ${lane.state}`);
       }
     });
-    const activeLaneIds = statusJson.lanes.filter((lane) => lane.state === 'active').map((lane) => lane.id);
-    const expectedActiveLaneIds = ['daily-supervision'];
+    const activeLaneIds = statusJson.lanes.filter((lane) => lane.state === 'active').map((lane) => lane.id).sort();
+    const expectedActiveLaneIds = ['daily-supervision', 'weekly-requirements'].sort();
     if (JSON.stringify(activeLaneIds) !== JSON.stringify(expectedActiveLaneIds)) {
-      errors.push(`status.json active lanes must remain daily-supervision only after M4 acceptance: ${activeLaneIds.join(', ') || 'none'}`);
+      errors.push(`status.json active lanes must remain daily-supervision + weekly-requirements after W27 opening: ${activeLaneIds.join(', ') || 'none'}`);
     }
   }
 
@@ -1029,7 +1029,8 @@ if (statusJson) {
     ['git-repair-agentpet', 'AgentPet Git repair'],
     ['git-staging-review-agentpet', 'AgentPet Git state review'],
     ['ranch-pointer-smoke', 'Transparent pointer smoke'],
-    ['ranch-pointer-smoke-manual-evidence', 'Transparent pointer smoke']
+    ['ranch-pointer-smoke-manual-evidence', 'Transparent pointer smoke'],
+    ['homepage-ui-design', 'Homepage UI long-worker dispatch']
   ]);
   const nonDecisionOpenLanes = new Set(['daily-decision-queue', 'daily-role-accountability']);
   const statusLanesById = new Map((statusJson.lanes ?? []).map((lane) => [lane.id, lane]));
