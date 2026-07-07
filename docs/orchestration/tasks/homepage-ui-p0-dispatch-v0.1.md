@@ -9,14 +9,14 @@ objective:
 - 输出 3 套设计稿（轻量 / 中等 / 华丽），由用户在 P0 验收前拍板。
 
 dispatch state:
-- Standby long-worker dispatch package.
-- Long-worker thread id：`TBD - PM 启动 mavis session 后分配`
-- 启动方式：PM 在 root session 跑 `mavis session new general --title "homepage-ui-design"` 后，把 thread id 写回本卡 `## next action` 段，并 commit 跟进。
+- accepted; H0-1 design drafts accepted as C gorgeous, H0-2/H0-3 implemented, H0-4 protected-file audit passed.
+- Long-worker thread id：`mvs_237b464ebc78403d953b9ab93b398ab8`
+- 启动方式：PM 已在 root session 跑 `mavis session new general --from root --title "homepage-ui-design" --workspace "E:\多agent牛马"`，初始 prompt 限定长工先做 H0-1 三套设计稿，不写代码、不碰 forbidden scope、不跑 Git。
 - 模型建议：`gpt-5.4` + `xhigh`（参考 ranch-m4 long-worker 配置）
 
 truth sources:
 - 任务卡：`docs/orchestration/tasks/homepage-ui-p0-v0.1.md`
-- 进度卡：`docs/orchestration/sessions/homepage-ui-p0-progress.md`（待长工首次回报后填充）
+- 进度卡：`docs/orchestration/sessions/homepage-ui-p0-progress.md`（accepted）
 - 产品真源：`docs/桌面牧场需求-v0.3.md` + `docs/桌面牧场需求-v0.3-修订说明-2026-07-03.md`
 - 工程真源：`docs/桌面牧场工程需求-v0.2.md`
 - 开发计划：`docs/桌面牧场开发计划-v0.2.md`
@@ -89,26 +89,21 @@ implementation acceptance:
 - H0-4 卖点 0 字节 evidence 卡归档
 
 blockers:
-- **长工 thread 尚未启动**；PM 启动 mavis session 后分配 thread id，写入本卡 + status.json + 进度卡
-- 用户对"全屏大卡片华丽展示"具体风格尚未拍板（H0-1 设计稿出来后拍）
+- H0-4 完成前，受保护卖点文件必须保持禁区验收通过
 - 关键指标数据源（snapshot.lastEvent）当前可能为 undefined，需 graceful degradation 处理
 - 桌面牧场 ranch-m5（M5 implementation）尚未派工，本 P0 独立推进，但首页"8 动物概览卡片"复用 ranch 数据时需确认 ranch snapshot 稳定
 
 next action:
-- **PM** 启动长工 mavis session：`mavis session new general --title "homepage-ui-design"`
-- PM 把分配的 thread id 写回本卡 `## next action` 段、status.json roles/lanes、进度卡
-- 长工读本卡 + 任务卡 + 全部真源
-- 长工 H0-1 出 3 套设计稿（轻量 / 中等 / 华丽）归档 `homepage-ui-p0-design-2026-07-XX.md`
-- 用户拍板后写 `homepage-ui-p0-design-accepted-2026-07-XX.md`
-- H0-2 / H0-3 实施（写代码 + 视觉打磨）
-- H0-4 卖点 0 字节确认 + evidence 卡
-- 长工 callback → PM 收口 → 1 commit + push 到 origin/main
-- `status.json` p0Card 状态 `in_progress` → `accepted`
-- `index.md` 加入 accepted 任务清单
-- `weekly-requirements-2026-07-07.md` 标记本 P0 闭环
+- **长工** `mvs_237b464ebc78403d953b9ab93b398ab8` 读本卡 + 任务卡 + 全部真源。
+- **长工** H0-1 已出 3 套设计稿（轻量 / 中等 / 华丽）并归档 `homepage-ui-p0-design-2026-07-07.md`，配套预览 `homepage-ui-p0-design-2026-07-07.html`。
+- **PM** 已按用户回复 `c` 写入 `homepage-ui-p0-design-accepted-2026-07-07.md`。
+- H0-2 / H0-3 已实施（写代码 + 视觉打磨，按 C · 华丽）
+- H0-4 卖点 0 字节确认已归档：`docs/orchestration/sessions/homepage-ui-p0-c0-6-style-2026-07-07.md`
+- PM 已本地启动 `npm.cmd run dev`，用户可在 `http://127.0.0.1:5173/` 查看。
+- commit/push 由用户授权后另行处理。
 
 summary:
-- Standby long-worker dispatch package; long-worker thread 待 PM 启动后分配。
+- Long-worker thread `mvs_237b464ebc78403d953b9ab93b398ab8` 已启动并交付 H0-1 三套设计稿；用户已拍板 C · 华丽；H0-2/H0-3/H0-4 已完成并本地启动验证。
 - 写 scope 包含 src/homepage/** 全新增量 + App.tsx / NiuMaWorkspace.tsx 跳转按钮 + README + docs 视觉规范。
 - forbidden scope 严格保护 §〇·quarter 卖点文件（NiuMaAvatar / index.css / agentCore.ts / 中央 4×2 grid）。
 - 预计长工实施 6.5~9.5h（1.5 个工作日）+ 用户拍板设计稿 0.5h。

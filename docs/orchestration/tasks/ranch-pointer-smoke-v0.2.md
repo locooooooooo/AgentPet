@@ -33,7 +33,7 @@ verification route:
 3. Run `npm.cmd run orchestration:check`.
 4. Launch Electron with `npm.cmd run dev`.
 5. Confirm both windows exist: `桌面牧场` and `桌面牧场 · 控制舱`.
-6. Use a manual desktop check or alternate capture route that can see transparent windows.
+6. Use a manual desktop check or the Windows MCP Snapshot route recorded in `docs/orchestration/sessions/ranch-pointer-smoke-investigation-2026-07-07.md`; the route must see transparent windows and avoid `SetIsBorderRequired failed`.
 7. Verify desktop mode click-through outside animal hot zones.
 8. Verify animal double-click summons/focuses the control cockpit.
 9. Verify animal right-click opens the ranch context menu.
@@ -51,11 +51,12 @@ acceptance:
 
 blockers:
 - Prior Windows capture route failed with `SetIsBorderRequired failed: 不支持此接口 (0x80004002)`.
-- Computer-use input requires a fresh screenshot state before click/right-click/drag input.
+- 2026-07-07 investigation found Windows MCP Snapshot can see the transparent ranch window without emitting that error, but it has not yet run click-through, double-click, right-click, drag, or dock persistence.
+- Computer-use or Windows MCP input requires a fresh screenshot state before click/right-click/drag input, and should not interrupt the user's active preview.
 
 next action:
-- Run this package only when a manual or alternate transparent-window capture route is available.
-- Keep it standby until that route is available.
+- Run this package only when the user preview can be interrupted or a manual observer records the pointer steps.
+- Keep it standby until full pointer input evidence can be collected.
 
 summary:
 - Standby pointer-smoke verification package; no implementation started.

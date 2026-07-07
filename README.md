@@ -11,6 +11,7 @@
 
 ## 当前范围
 
+- 启动首页：App 第一屏进入 HomePage，展示桌面牧场品牌头、8 个 agent 概览、控制舱入口和关键指标。
 - Electron 桌面壳：窗口、托盘、隐藏到托盘、退出菜单。
 - React 控制舱：8 个 agent 工位、牛马状态、交互按钮、任务队列和日志终端。
 - 桌面牧场：640×360 圈养 widget，8 只动物在桌面右下角活物感（[桌面牧场需求 v0.3](docs/桌面牧场需求-v0.3.md)）。
@@ -28,10 +29,23 @@ npm start
 
 `npm run dev` 会启动 Vite renderer 和 Electron 窗口。`npm run build` 会生成 `dist/` 与 `dist-electron/`。
 
+## 启动流程
+
+```text
+npm run dev
+  -> HomePage 首页（品牌头 / 8 动物概览 / 关键指标）
+  -> 进控制舱
+  -> 桌面牧场 · 控制舱（8 工位矩阵 / 派活 / 队列 / 日志）
+  -> 返回首页
+```
+
+首页是 `homepage-ui-p0` 的 C · 华丽方案落地结果；控制舱中央 4×2 牛马工位和 `NiuMaAvatar` 动效仍按卖点保护契约保持独立。
+
 ## P0 路线图（2026-07-03 拍板）
 
 | 优先级 | 主题 | 任务卡 |
 |---|---|---|
+| **P0** | 全新首页 / landing / 启动页（C · 华丽，已 accepted）| [homepage-ui-p0](docs/orchestration/tasks/homepage-ui-p0-v0.1.md) |
 | **P0** | 真实打通（IPC 接 spawn + exitCode + 状态映射）| [ranch-real-integration-p0](docs/orchestration/tasks/ranch-real-integration-p0-v0.1.md) |
 | **P0** | 主页面优化（控制舱重构 v3.0 收口 + 4 根因解决）| [cockpit-refactor-p0](docs/orchestration/tasks/cockpit-refactor-p0-v0.1.md) |
 | P1 | 控制台 UI 清理（桌面牧场 v0.3 偏离文档对齐）| [桌面牧场需求 v0.3 修订说明](docs/桌面牧场需求-v0.3-修订说明-2026-07-03.md) |

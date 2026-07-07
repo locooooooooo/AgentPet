@@ -46,8 +46,8 @@ role ledger:
 | `[监督]#ranch-pointer-smoke@v0.2` | standby | `docs/orchestration/tasks/ranch-pointer-smoke-v0.2.md` | Wait for a transparent-window capture route. |
 | `[监督]#ranch-pointer-smoke-manual-evidence@v0.2` | standby | `docs/orchestration/tasks/ranch-pointer-smoke-manual-evidence-v0.2.md` | Fill the evidence table only when a valid route exists. |
 | `[监督]#multi-agent-control@v0.1` live-subagents lane | blocked | `docs/orchestration/status.json` | Recheck `403 DAILY_LIMIT_EXCEEDED` only when a safe route exists. |
-| `[长工]#homepage-ui-design@v0.1` | standby | `docs/orchestration/tasks/homepage-ui-p0-v0.1.md` | Wait for PM to start a long-worker mavis session and assign a thread id; deliver H0-1 design drafts + user acceptance + H0-2 implementation + H0-3 visual polish + H0-4 protected-file zero-byte audit. |
-| `[长工]#homepage-ui-design@v0.1` homepage-ui-design lane | standby | `docs/orchestration/status.json` | Open the long-worker dispatch only after PM assigns a thread id; keep §〇·quarter selling-point files untouched. |
+| `[长工]#homepage-ui-design@v0.1` | summarized | `docs/orchestration/tasks/homepage-ui-p0-dispatch-v0.1.md` | Thread `mvs_237b464ebc78403d953b9ab93b398ab8` delivered H0-1; C implementation and H0-4 audit are accepted. |
+| `[长工]#homepage-ui-design@v0.1` homepage-ui-design lane | summarized | `docs/orchestration/sessions/homepage-ui-p0-c0-6-style-2026-07-07.md` | C · 华丽 HomePage is verified; do not create a duplicate thread and keep §〇·quarter selling-point files untouched. |
 | `[PM]#weekly-requirements@2026-07-07` | active | `docs/orchestration/sessions/weekly-requirements-2026-07-07.md` | Maintain W27 (2026-07-07~2026-07-13) weekly-requirements card; align排期 with status.json p0Cards; close W27 lane on 2026-07-11. |
 | `[PM]#weekly-requirements@2026-07-07` weekly-requirements lane | active | `docs/orchestration/status.json` | Keep weekly-requirements session card loop/dispatch state aligned with this role; refresh排期 after each daily supervision pass. |
 
@@ -69,7 +69,7 @@ non-goals:
 - Do not accept, enable, execute, or bind Codex, Trae, Qoder, or any connector.
 - Do not widen M4 beyond the accepted long-worker delivery scope.
 - Do not launch Electron for pointer smoke or run pointer input.
-- Do not create duplicate long-worker threads.
+- Do not create duplicate long-worker threads; homepage-ui-design is already assigned to `mvs_237b464ebc78403d953b9ab93b398ab8`.
 
 next action:
 - Keep this ledger aligned with `docs/orchestration/status.json` whenever a role state changes.
@@ -78,4 +78,4 @@ next action:
 summary:
 - Standby accountability ledger; records accepted M4 long-worker delivery and keeps other blocked/standby roles bounded.
 - Summarized M5 verification cards are also tracked here as evidence-only rows without reopening active implementation lanes.
-- 2026-07-07 adds W27 weekly-requirements lane (active) and homepage-ui-design long-worker lane (standby, thread pending).
+- 2026-07-07 adds W27 weekly-requirements lane (active) and homepage-ui-design long-worker lane (summarized; H0-1/H0-2/H0-3/H0-4 accepted, commit/push not run).

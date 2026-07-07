@@ -68,9 +68,15 @@ tracked business cards:
 - session: ⟦tag:v2|session|ranch-smoke-desktop-exe-2026-07-06⟧ -> `docs/orchestration/sessions/ranch-smoke-desktop-exe-2026-07-06.md`
 - session: ⟦tag:v2|session|weekly-requirements-2026-07-07⟧ -> `docs/orchestration/sessions/weekly-requirements-2026-07-07.md`
 - session: ⟦tag:v2|session|homepage-ui-p0-progress⟧ -> `docs/orchestration/sessions/homepage-ui-p0-progress.md`
+- session: ⟦tag:v2|session|homepage-ui-p0-design-2026-07-07⟧ -> `docs/orchestration/sessions/homepage-ui-p0-design-2026-07-07.md`
+- session: ⟦tag:v2|session|homepage-ui-p0-design-accepted-2026-07-07⟧ -> `docs/orchestration/sessions/homepage-ui-p0-design-accepted-2026-07-07.md`
+- session: ⟦tag:v2|session|homepage-ui-p0-c0-6-style-2026-07-07⟧ -> `docs/orchestration/sessions/homepage-ui-p0-c0-6-style-2026-07-07.md`
+- session: ⟦tag:v2|session|ranch-pointer-smoke-investigation-2026-07-07⟧ -> `docs/orchestration/sessions/ranch-pointer-smoke-investigation-2026-07-07.md`
+- session: ⟦tag:v2|session|connector-decision-2026-07-07⟧ -> `docs/orchestration/sessions/connector-decision-2026-07-07.md`
 
 recently closed cards:
 - accepted blocked-path lanes: ⟦tag:v2|task|connector-types-v0.1⟧, ⟦tag:v2|task|connector-main-gate-v0.1⟧, ⟦tag:v2|task|connector-preload-api-v0.1⟧, ⟦tag:v2|task|connector-ui-binding-v0.1⟧
+- accepted homepage lane: ⟦tag:v2|task|homepage-ui-p0-v0.1⟧ with evidence ⟦tag:v2|session|homepage-ui-p0-c0-6-style-2026-07-07⟧
 - insufficient Codex acceptance evidence: ⟦tag:v2|task|codex-execution-evidence-v0.1⟧
 
 dispatch gate:
@@ -80,7 +86,7 @@ dispatch gate:
 - Supervisor owns drift detection, blocker surfacing, and minimum correction.
 
 current target:
-- 按 LPS 建立角色分工，并持续监督各个角色推进“多 Agent 牛马核心部门”项目；2026-07-07 主控在 root session 新增 P0 homepage-ui-p0（全新首页 / landing / 启动页 UI 设计，长工 thread 待 PM 启动 mavis session 后分配 thread id），落档 3 张新卡（任务卡 homepage-ui-p0-v0.1.md / 长工派工包 homepage-ui-p0-dispatch-v0.1.md / 进度卡 homepage-ui-p0-progress.md）并同步 status.json / index.md / weekly-requirements-2026-07-07.md 共 6 文件 + push 到 origin/main；2026-07-06 baseline = 闭环 5 commit (e095764 / 3e91d4c / 3aa30f7 / 42e3f7f / 9612151) + 桌面牧场 v0.3 视觉 smoke + 7-3 旧 release 残留 4/6 回收；ranch-m4 v0.2 summarized 无需重派、R0-3 connector 仍 deferred、transparent ranch pointer smoke blocker 仍 standby、`release-dir/win-unpacked.tmp` 嵌套文件锁顺延次日清理；后续 7-7~7-13 W27 路线见 weekly-requirements-2026-07-07.md。
+- 按 LPS 建立角色分工，并持续监督各个角色推进“多 Agent 牛马核心部门”项目；2026-07-07 P0 homepage-ui-p0（全新首页 / landing / 启动页 UI）已按用户拍板 C 华丽完成 H0-1/H0-2/H0-3/H0-4，证据卡 `homepage-ui-p0-c0-6-style-2026-07-07.md` 已归档，本地 dev 已启动在 `http://127.0.0.1:5173/` 供用户查看；2026-07-06 baseline = 闭环 5 commit (e095764 / 3e91d4c / 3aa30f7 / 42e3f7f / 9612151) + 桌面牧场 v0.3 视觉 smoke + 7-3 旧 release 残留 4/6 回收；ranch-m4 v0.2 summarized 无需重派、R0-3 connector 仍 deferred、transparent ranch pointer smoke blocker 仍 standby、`release-dir/win-unpacked.tmp` 嵌套文件锁顺延次日清理；后续 7-7~7-13 W27 路线见 weekly-requirements-2026-07-07.md。
 
 current role split:
 - `[PM]#multi-agent-control@v0.1`: maintain this index, dispatch bounded lanes, collect callbacks, write acceptance.
@@ -109,19 +115,19 @@ current role split:
 - `[监督]#ranch-personality@v0.1`: summarized M5 personality and control-cockpit prefs-linkage evidence for FR-007 and notifyPrefs.
 - `[监督]#ranch-pointer-smoke@v0.2`: standby verification package for transparent ranch pointer smoke; no implementation edit.
 - `[监督]#ranch-pointer-smoke-manual-evidence@v0.2`: standby manual evidence package for pointer-smoke callback recording; no pointer input executed yet.
-- `[长工]#homepage-ui-design@v0.1`: standby long-worker owner for the new HomePage / landing / 启动页 P0 lane; thread id is `TBD - PM will start mavis session new general --title "homepage-ui-design"` and write the assigned thread id back into the dispatch package; H0-1 design drafts + user acceptance + H0-2 implementation + H0-3 visual polish + H0-4 protected-file zero-byte audit are the declared scope; no edit to `NiuMaAvatar.tsx` / `index.css` / `agentCore.ts` / central 4x2 control-cockpit grid.
+- `[长工]#homepage-ui-design@v0.1`: summarized HomePage / landing / 启动页 P0 lane; H0-1 design drafts accepted as C · 华丽, H0-2/H0-3 implemented, H0-4 protected-file audit passed in `homepage-ui-p0-c0-6-style-2026-07-07.md`; no edit to `NiuMaAvatar.tsx` / `index.css` / `agentCore.ts` / central 4x2 control-cockpit grid.
 - `[PM]#weekly-requirements@2026-07-07`: active W27 (2026-07-07~2026-07-13) weekly-requirements planner; maintains the weekly-requirements session card aligned with `status.json` p0Cards / roles / lanes; refreshes排期 after each daily supervision pass; closes the W27 lane on 2026-07-11 with a weekly-closeout session card.
 
 blockers:
-- External connector execution remains disabled; do not bind agentCore or run real Codex/Trae/Qoder connectors until connector policy is accepted.
-- Treat service-side `403 DAILY_LIMIT_EXCEEDED` as a live sub-agent blocker until rechecked; today's Codex app long-worker threads were used only as explicit user-authorized role sessions.
+- External connector execution remains disabled; Codex is draft/pending/discovery-only, Trae/Qoder are intentionally command-empty placeholders, and no Codex/Trae/Qoder connector may be accepted, enabled, or executed until connector policy is accepted.
+- Treat service-side `403 DAILY_LIMIT_EXCEEDED` as a live sub-agent blocker until a quota recheck path is available; today's Codex app long-worker threads were used only as explicit user-authorized role sessions.
 - Control-cockpit central 4x2 grid and protected selling-point files remain locked; M4 header settings entry has been completed and accepted.
-- Transparent Electron ranch pointer smoke still needs a manual or alternate-capture route because Windows capture reports `SetIsBorderRequired failed`.
+- Transparent Electron ranch pointer smoke has an identified Windows MCP Snapshot capture route that sees the transparent window without `SetIsBorderRequired failed`; full click-through / double-click / right-click / drag / dock evidence is still pending.
 
 next action:
-- Keep M3 code gates accepted as passed after `lint`, `build`, and `orchestration:check`; rerun transparent-window pointer smoke manually or through a capture route that does not hit `SetIsBorderRequired failed`.
-- Keep connector policy and `connector-acceptance-review-v0.1` on standby until PM/user accepts or revises machine gate fields; do not dispatch connector execution binding.
-- Keep AgentPet Git post-push state, log ignore policy, staging, commit, and push decisions behind explicit user confirmation. The historical repair package is `docs/orchestration/tasks/git-repair-agentpet-v0.1.md`; the current Git state review package is `docs/orchestration/tasks/git-staging-review-agentpet-v0.1.md` and remains standby.
+- Keep M3 code gates accepted as passed after `lint`, `build`, and `orchestration:check`; use the identified Windows MCP Snapshot route only as capture evidence until full transparent-window pointer input is observed.
+- Keep connector policy and `connector-acceptance-review-v0.1` on standby until PM/user accepts or revises machine gate fields; do not dispatch connector execution binding and do not add schema-breaking connector fields.
+- Keep AgentPet Git log ignore / staging decisions behind explicit user confirmation. The historical repair package is `docs/orchestration/tasks/git-repair-agentpet-v0.1.md`; the current Git state review package is `docs/orchestration/tasks/git-staging-review-agentpet-v0.1.md` and remains standby.
 - Preserve the accepted M4 evidence from thread `019f227a-8978-7df1-8b3f-738ccdb01b18`; future ranch work must open a new bounded lane.
 - Keep `ranch-window-v0.1`, `ranch-status-script-v0.1`, and `ranch-personality-v0.1` summarized as M5 evidence cards; do not treat them as fresh active implementation lanes.
 - Keep ranch pointer-smoke verification and `ranch-pointer-smoke-manual-evidence-v0.2` standby until a manual or alternate transparent-window capture route is available.

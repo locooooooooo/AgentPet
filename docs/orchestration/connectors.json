@@ -30,7 +30,7 @@
       "approvalStatus": "pending",
       "acceptedBy": "",
       "acceptedAt": "",
-      "approvalEvidence": "Get-Command and preflight resolve codex on PATH only; missing controlled dry-run design, non-interactive JSON/auth-quota/timeout evidence, and no-UI proof.",
+      "approvalEvidence": "Get-Command and preflight resolve codex on PATH only; this is discovery evidence, not execution readiness. Missing controlled dry-run design, non-interactive JSON/auth-quota/timeout evidence, and no-UI proof.",
       "enabledByDefault": false
     },
     {
@@ -48,7 +48,7 @@
       "approvalStatus": "not-requested",
       "acceptedBy": "",
       "acceptedAt": "",
-      "approvalEvidence": "Get-Command does not resolve a trae executable; command must stay empty until PM/user supplies the exact non-interactive invocation.",
+      "approvalEvidence": "Get-Command does not resolve a trae executable; executable is intentionally absent in current scope and command must stay empty until PM/user supplies the exact non-interactive invocation.",
       "enabledByDefault": false
     },
     {
@@ -66,7 +66,7 @@
       "approvalStatus": "not-requested",
       "acceptedBy": "",
       "acceptedAt": "",
-      "approvalEvidence": "Get-Command does not resolve a qoder executable; command must stay empty until PM/user supplies the exact invocation and verification surface.",
+      "approvalEvidence": "Get-Command does not resolve a qoder executable; executable is intentionally absent in current scope and command must stay empty until PM/user supplies the exact invocation and verification surface.",
       "enabledByDefault": false
     }
   ]

@@ -24,7 +24,7 @@ dispatch state: active
 
 7-6 闭环 5 commit（`fa9e08b` / `e095764` / `3e91d4c` / `3aa30f7` / `42e3f7f` / `9612151`），全部 push 到 `https://github.com/locooooooooo/AgentPet.git`；桌面牧场 v0.3 视觉 smoke 通过；控制舱 P0 C0-1~C0-6 accepted；R0-1/2/4/5 accepted、R0-3 connector enablement 决策 deferred；ranch-m4 v0.2 summarized；3 张 M5 verification 卡（window/status-script/personality）summarized 但**仅有 evidence summary，缺真实实施 v0.2**。
 
-**当前 stale 段**：`status.json` 第 27 行 `blocker` 字段含 5 条，但 #5（Git post-push 需明确确认）已过期（push 7-6 完成），#1 #2 #4 措辞与今日事实需刷新，#3 保留。`index.md` 第 109~113 行 `blockers` 段也需同步。
+**当前 stale 段**：2026-07-07 PM sync 已将 `status.json` + `index.md` blocker wording 对齐到当日事实：Git post-push 过期项删除；connector 改为 Codex draft/pending/discovery-only、Trae/Qoder command-empty placeholders；live-subagents 改为等待 quota 复查路径；pointer smoke 改为 Windows MCP Snapshot 捕获路线已识别但完整指针输入证据未跑。
 
 **当前可立即用的产物**：`E:\多agent牛马\release\desktop-ranch-win-unpacked\桌面牧场.exe`（235.7 MB，7-6 编译产物，v0.3 视觉验收 OK）。
 
@@ -34,7 +34,7 @@ dispatch state: active
 
 > **2026-07-07 11:07 增补 P0-0**：用户拍"将首页的 UI 设计提到 P0 上，单独开分工去做"（scope = 全新首页 / landing / 启动页；worker = 长工），本节追加 P0-0 段；本卡 P0 候选由 3 件升至 4 件。
 
-### P0-0 · 全新首页 UI 设计 P0 · 6.5~9.5h（长工）· in_progress
+### P0-0 · 全新首页 UI 设计 P0 · 6.5~9.5h（长工）· accepted
 
 **问题**：7-6 闭环后，App 启动直接进控制舱；没有专门的"首页" / landing / 启动页。用户希望开 P0 全屏大卡片华丽展示风格首页 + 独立长工通道。
 
@@ -49,8 +49,8 @@ dispatch state: active
 - 改 `README.md`（加首页占位说明 + 启动流程图）
 - 改 `docs/桌面牧场需求-v0.3.md` §〇·quinary（加首页视觉规范段）
 - H0-1 出 3 套设计稿（轻量 / 中等 / 华丽）→ 用户拍板
-- H0-2 / H0-3 实施 + 视觉打磨
-- H0-4 卖点文件 0 字节变动确认
+- H0-2 / H0-3 实施 + 视觉打磨（已完成）
+- H0-4 卖点文件 0 字节变动确认（已完成，证据见 `docs/orchestration/sessions/homepage-ui-p0-c0-6-style-2026-07-07.md`）
 
 **禁止**（§〇·quarter 卖点保护）：
 - ❌ 不改 `NiuMaAvatar.tsx` / `index.css` 中央 8 卡样式 / `agentCore.ts` / `NiuMaWorkspace` 中央 4×2 grid
@@ -70,9 +70,9 @@ dispatch state: active
 - 3 套设计稿 + 用户拍板 evidence
 - PM 收口 1 commit + push
 
-**当前状态**：任务卡 + 派工包 + 进度卡 + 控制面同步已落档；长工 thread 待 PM 启动 mavis session 后分配 thread id 并写回派工包 / status.json / 进度卡。
+**当前状态**：任务卡 + 派工包 + 进度卡 + 控制面同步已落档；长工 thread `mvs_237b464ebc78403d953b9ab93b398ab8` 已启动并交付 H0-1 三套设计稿；用户已选择 C 华丽；H0-2/H0-3/H0-4 已完成，dev 已启动到 `http://127.0.0.1:5173/` 供用户查看。
 
-**PM 默认执行序**：今日内启动长工 thread → 长工 H0-1 出设计稿 → 用户拍板 → H0-2/H0-3 实施 → H0-4 验收 → PM 收口 commit。
+**PM 默认执行序**：已完成启动长工 thread → H0-1 设计稿 → 用户拍板 C → H0-2/H0-3 实施 → H0-4 验收；commit/push 等待用户授权。
 
 ---
 
@@ -81,7 +81,7 @@ dispatch state: active
 **问题**：7-6 closeout 时主控只改了 `todayPlan` + `target`，漏改 `blocker`，导致 control-plane 状态面对外仍报"Git post-push 需明确确认"等过期项。
 
 **改动**：
-- `docs/orchestration/status.json` 第 27 行 `blocker` 字段：删 #5（已过期），刷 #1（外部 connector 措辞，按 R0-3 决策结果更新）、#2（live-subagents 403 改为"待 quota 复查路径"）、#4（`SetIsBorderRequired failed` 改为"transparent pointer smoke blocker，已知 Electron `webContents.capturePage()` 可绕过，待 P1-2 实施"），保留 #3。
+- `docs/orchestration/status.json` 第 27 行 `blocker` 字段：删 #5（已过期），刷 #1（外部 connector 措辞，按 R0-3 决策结果更新）、#2（live-subagents 403 改为"待 quota 复查路径"）、#4（`SetIsBorderRequired failed` 改为"transparent pointer smoke blocker，Windows MCP Snapshot 捕获路线已识别，完整指针输入验收仍待执行"），保留 #3。
 - `docs/orchestration/index.md` 第 109~113 行 `blockers` 段同步对齐。
 - commit + push 到 origin/main（commit message：`chore(orchestration): 同步 blocker 字段至 7-7 事实`）。
 
@@ -89,6 +89,11 @@ dispatch state: active
 - `npm.cmd run orchestration:check` pass。
 - `npm.cmd run orchestration:report` 输出新 blocker 段与 status.json / index.md 三处一致。
 - 1 个 commit + push 成功。
+
+**2026-07-07 PM 执行记录**：
+- 已同步 `docs/orchestration/status.json` 与 `docs/orchestration/index.md` blocker wording。
+- 已删除过期 Git post-push blocker。
+- P0-3 清理仍等待用户完成当前游戏预览后执行，因为清理 `release-dir/win-unpacked.tmp` 需要停止 Electron。
 
 ### P0-2 · 拍 R0-3 connector enablement 决策 · 决策点（不写代码）
 
@@ -164,6 +169,12 @@ dispatch state: active
 - 至少 1 个 evidence row 从 `pending` → `pass`。
 - 1 个 commit + push。
 
+**2026-07-07 调查记录**：
+- 未新增脚本，先用现有 Windows MCP 桌面能力调查捕获路线。
+- Windows MCP `Snapshot` 已观察到透明 `桌面牧场` 窗口和 `桌面牧场 · 控制舱`，没有触发 `SetIsBorderRequired failed`。
+- 新证据卡：`docs/orchestration/sessions/ranch-pointer-smoke-investigation-2026-07-07.md`。
+- 完整 click-through / double-click / right-click / floating drag / edge dock 指针验收未跑；当前用户正在看游戏，不中断预览。
+
 ### P1-3 · Git post-push log ignore 决策 · 0.5h
 
 **问题**：`git-manager-agentpet-2026-07-02.md` + `git-staging-review-agentpet-v0.1.md` 挂着；7-6 e095764 `.gitignore` 已拦截 dev runtime 日志 + release-dir + 验收截图，**剩下 log / staging 决策**需要你拍：
@@ -185,7 +196,7 @@ dispatch state: active
 
 **改动**：
 - 写 `docs/orchestration/sessions/connector-decision-2026-07-07.md`：把 codex / trae / qoder 三个 connector 的当前状态、缺失证据、决策建议、未来实施 lane 一次性写清。
-- 改 `status.json` connectors 段：trae/qoder 加 `"permanently_placeholder": true` 字段，codex 维持 `draft/pending/enabled=false` 直至 P0-2 拍板。
+- 改 `status.json` connectors 段：在现有字段内写清 trae/qoder 是当前范围内 intentionally command-empty placeholders；`connectors.schema.json` 禁止 `additionalProperties`，所以本轮不加 `"permanently_placeholder": true` 字段，codex 维持 `draft/pending/enabled=false` 直至 P0-2 拍板。
 - 改 `connector-policy-v0.1.md` §blockers + `connector-acceptance-review-v0.1.md` §blockers 措辞：trae/qoder 从 "missing executable path" 升格为 "executable intentionally absent in current scope"。
 
 **验收**：
@@ -193,6 +204,11 @@ dispatch state: active
 - `status.json` connectors 段措辞对齐。
 - `npm.cmd run orchestration:check` + `orchestration:preflight` + `orchestration:connector-safety` 三件套 pass。
 - 1 个 commit + push。
+
+**2026-07-07 PM 执行记录**：
+- 已新增 `docs/orchestration/sessions/connector-decision-2026-07-07.md`。
+- 已确认 schema 不允许临时新增 `permanently_placeholder` 字段；本轮仅更新 `status.json`、任务卡 wording 和 `docs/orchestration/connectors.json` 的 `approvalEvidence` 文案，不改 connector status/command/approval/enabled 机器闸门字段。
+- Codex 保持 `draft/pending/enabled=false`；Trae/Qoder 保持 `placeholder/not-requested/enabled=false/command=""`。
 
 ---
 
@@ -220,7 +236,7 @@ dispatch state: active
 ## 五、排期建议（5 个工作日）
 
 ```
-Mon 7-7 (今天)  ▸ P0-0 启动 homepage-ui long-worker thread（PM 跑 mavis session new）
+Mon 7-7 (今天)  ▸ P0-0 启动 homepage-ui long-worker thread（已分配 `mvs_237b464ebc78403d953b9ab93b398ab8`）
                 ▸ P0-1 同步 blocker（0.2h）
                 ▸ P0-3 顺手清 release-dir 嵌套（0.2h）
                 ▸ P0-2 拍 R0-3 决策（不写代码）
@@ -232,15 +248,15 @@ Tue 7-8         ▸ P0-0 长工 H0-1 出 3 套设计稿（1~2h）
                 ▸ P1-1 ranch-m5 v0.2 需求准入验收 → 派 long-worker 实施（如有）
                 ▸ P1-4 connector decision 文档化（2h）
                 ▸ P1-3 Git log ignore 决策
-                ▸ 用户拍板首页设计稿 → 长工 H0-2 / H0-3 实施
+                ▸ 用户拍板首页设计稿 → H0-2 / H0-3 / H0-4 已提前完成
 
-Wed 7-9         ▸ P0-0 长工 H0-2 HomePage 组件 + 路由（3~4h）
+Wed 7-9         ▸ P0-0 已 accepted；保留给用户视觉确认 / commit 授权
                 ▸ ranch-m5 long-worker 实施 day 1（4h）
 
-Thu 7-10        ▸ P0-0 长工 H0-3 视觉打磨（2~3h）+ H0-4 卖点 0 字节验收（0.5h）
+Thu 7-10        ▸ P0-0 无需继续实施；如用户反馈再开 bounded polish lane
                 ▸ ranch-m5 long-worker 实施 day 2（4h）
 
-Fri 7-11        ▸ P0-0 PM 收口 1 commit + push + p0Card 状态 in_progress → accepted
+Fri 7-11        ▸ P0-0 commit/push only after explicit user authorization
                 ▸ 本周 closeout + 5 commit 推 main
                 ▸ 桌面牧场 v0.3.1 smoke + 截图归档
                 ▸ PM board 同步到 7-11
@@ -325,9 +341,9 @@ Fri 7-11        ▸ 本周 closeout + 5 commit 推 main
 
 ## 十一、summary
 
-- 本周 P0 **四件套**（P0-0 全新首页 UI 设计 + P0-1 blocker 同步 / P0-2 R0-3 决策 / P0-3 release-dir 清理）应该按序在今天~周五清掉。P0-0 是大投入长工 6.5~9.5h，按周一启动 thread、周二拍板设计稿、周三~周四实施、周五收口的节奏走。
+- 本周 P0 **四件套**（P0-0 全新首页 UI 设计 + P0-1 blocker 同步 / P0-2 R0-3 决策 / P0-3 release-dir 清理）继续按序推进；P0-0 已提前 accepted，剩余动作仅为用户视觉确认与显式授权后的 commit/push。
 - 本周 P1 候选 4 件，建议至少开 P1-1（ranch-m5 v0.2 需求准入 short-worker）+ P1-2（pointer smoke blocker 调查），P1-3/P1-4 看用户时间。
 - 本周 P2 4 件不强推，作为下次开盘候选池。
 - 横切 3 件（卖点保护 / live-subagent quota / 长工幂等）作为契约持续 backlog。
 - 4 个决策点等用户拍板；PM 默认执行序：A=U2, B=②, C=short-worker, D=今天就开。
-- **2026-07-07 11:07 增补**：用户新增 P0-0（首页 UI 设计 + 长工）拍板；本周 P0 由 3 件升至 4 件；长工 thread 待 PM 启动 mavis session 后分配。
+- **2026-07-07 11:07 增补**：用户新增 P0-0（首页 UI 设计 + 长工）拍板；本周 P0 由 3 件升至 4 件；长工 thread `mvs_237b464ebc78403d953b9ab93b398ab8` 已启动并交付 H0-1 设计稿，用户已选择 C 华丽，H0-2/H0-3/H0-4 已完成并本地启动验证。

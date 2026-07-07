@@ -6,6 +6,7 @@ import {
   Coffee,
   Eraser,
   Flame,
+  Home,
   PauseCircle,
   Play,
   RefreshCcw,
@@ -41,6 +42,7 @@ interface NiuMaWorkspaceProps {
   api: DesktopApi;
   snapshot: AgentSnapshot;
   onSnapshot: (snapshot: AgentSnapshot) => void;
+  onReturnHome?: () => void;
 }
 
 type SummaryTone = 'neutral' | 'positive' | 'info' | 'warning' | 'danger';
@@ -92,7 +94,7 @@ const cockpitTaskCards = [
   }
 ] as const;
 
-export default function NiuMaWorkspace({ api, snapshot, onSnapshot }: NiuMaWorkspaceProps) {
+export default function NiuMaWorkspace({ api, snapshot, onSnapshot, onReturnHome }: NiuMaWorkspaceProps) {
   const [selectedAgentId, setSelectedAgentId] = useState(snapshot.agents[0]?.id ?? '');
   const [connectorGateResults, setConnectorGateResults] = useState<Record<string, ConnectorGateResult>>({});
   const [ranchPrefs, setRanchPrefs] = useState<RanchPrefs | null>(null);
@@ -262,6 +264,13 @@ export default function NiuMaWorkspace({ api, snapshot, onSnapshot }: NiuMaWorks
         </div>
 
         <div className="header-actions">
+          {onReturnHome ? (
+            <button type="button" className="safe-status" onClick={onReturnHome}>
+              <Home size={14} />
+              <span>返回首页</span>
+            </button>
+          ) : null}
+
           <StatusStrip
             connectors={CONNECTOR_POLICY.connectors}
             gateResults={connectorGateResults}

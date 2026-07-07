@@ -33,7 +33,6 @@ decision queue:
 | Connector acceptance | `[PM]#connector-acceptance-review@v0.1` | PM/user accepts, rejects, or revises connector machine gate fields | Update connector metadata only if the decision explicitly says so, then rerun `npm.cmd run orchestration:preflight` and `npm.cmd run orchestration:connector-safety` | No connector decision exists |
 | Transparent pointer smoke | `[监督]#ranch-pointer-smoke-manual-evidence@v0.2` | Manual observer or alternate transparent-window capture route is available | Run parent pointer-smoke route and fill evidence table | Capture route is unavailable |
 | Live sub-agent quota | `[监督]#multi-agent-control@v0.1` | Service-side `403 DAILY_LIMIT_EXCEEDED` can be rechecked without treating connectors as available | Recheck quota state and record exact result | Recheck route is unavailable |
-| Homepage UI long-worker dispatch | `[长工]#homepage-ui-design@v0.1` | PM starts a long-worker `mavis session new general --title "homepage-ui-design"` and writes the assigned thread id back into the dispatch package | Long-worker reads dispatch package, runs H0-1 (3 design drafts), waits for user acceptance, then H0-2 / H0-3 / H0-4 | PM has not yet assigned a thread id |
 
 coverage guard:
 | open status lane | queue coverage |
@@ -46,7 +45,6 @@ coverage guard:
 | git-staging-review-agentpet | AgentPet Git state review |
 | ranch-pointer-smoke | Transparent pointer smoke |
 | ranch-pointer-smoke-manual-evidence | Transparent pointer smoke |
-| homepage-ui-design | Homepage UI long-worker dispatch |
 
 session closeout coverage:
 | queue item | required closeout evidence |
@@ -56,11 +54,10 @@ session closeout coverage:
 | Connector acceptance | `Connector acceptance review package exists` |
 | Transparent pointer smoke | `Ranch pointer-smoke verification and manual evidence packages are standby` |
 | Live sub-agent quota | `403 DAILY_LIMIT_EXCEEDED` |
-| Homepage UI long-worker dispatch | `Homepage UI long-worker dispatch package exists` |
 
 - `daily-decision-queue` and `daily-role-accountability` are supervision artifacts; they remain standby but are not decision-bearing queue items.
 - Summarized M5 ranch verification cards (`ranch-window-v0.1`, `ranch-status-script-v0.1`, `ranch-personality-v0.1`) plus the ranch 3-level UI convergence evidence feed existing ranch follow-up items and do not create new decision-bearing lanes.
-- `ranch-window-v0.1` is the current residual-risk summary for the existing transparent pointer-smoke queue item, but it does not change that queue row's blocked-until condition.
+- `ranch-window-v0.1` is the current residual-risk summary for the existing transparent pointer-smoke queue item; 2026-07-07 adds a Windows MCP Snapshot capture route, but full pointer input evidence is still pending.
 - Any new `standby` or `blocked` lane in `docs/orchestration/status.json` must be added to this guard or explicitly exempted in `scripts/check-orchestration.mjs`.
 
 non-goals:
@@ -69,7 +66,7 @@ non-goals:
 - Do not widen the accepted M4 long-worker delivery beyond its declared write scope or edit locked M4/control-cockpit files from this standby queue.
 - Do not run Electron pointer input or mark pointer smoke accepted.
 - Do not create duplicate long-worker threads.
-- Do not start the `homepage-ui-design` long-worker without first recording the assigned thread id in `docs/orchestration/tasks/homepage-ui-p0-dispatch-v0.1.md` `## next action`, `docs/orchestration/status.json` roles / lanes evidence fields, and the progress card.
+- Do not create another `homepage-ui-design` long-worker; thread `mvs_237b464ebc78403d953b9ab93b398ab8` has delivered H0-1 and user selected C gorgeous.
 - Do not edit `NiuMaAvatar.tsx` / `index.css` central 8-card styles / `agentCore.ts` / `NiuMaWorkspace.tsx` central 4x2 grid from the homepage-ui-design lane; those remain under §〇·quarter selling-point protection.
 
 acceptance:

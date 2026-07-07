@@ -569,7 +569,7 @@ incomplete:
 - AgentPet Git repair standby package remains as a historical boundary, while the current post-push Git state needs the Git long-worker callback and `git-staging-review-agentpet-v0.1` before any stage, unstage, log-ignore, commit, or push decision.
 - Connector acceptance review package exists, but connector policy acceptance is waiting for PM/user decision; no execution binding should be dispatched before that.
 - Ranch pointer-smoke verification and manual evidence packages are standby until a manual or alternate transparent-window capture route is available.
-- Homepage UI long-worker dispatch package exists, but the homepage-ui-design long-worker thread id is TBD - PM must start a `mavis session new general --title "homepage-ui-design"` to allocate the thread before H0-1 design drafts can begin.
+- Homepage UI long-worker dispatch package exists, thread `mvs_237b464ebc78403d953b9ab93b398ab8` has delivered H0-1 design drafts, user selected C gorgeous, and H0-2/H0-3/H0-4 are accepted with evidence `docs/orchestration/sessions/homepage-ui-p0-c0-6-style-2026-07-07.md`; commit/push not run.
 - Daily decision queue is standby and does not authorize any queue item by itself.
 - Daily role accountability ledger is standby and records state/evidence/action without changing role states.
 

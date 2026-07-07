@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="homepage-ui-p0 H0-1 三套首页设计稿可视化预览">
+    <title>Homepage UI P0 · 三套设计稿预览</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #080808;
+        --panel: rgba(17, 17, 17, 0.88);
+        --panel-soft: rgba(255, 255, 255, 0.045);
+        --border: rgba(255, 255, 255, 0.1);
+        --text: #f5f5f5;
+        --muted: #9898a6;
+        --green: #00d68f;
+        --blue: #4da3ff;
+        --orange: #ff7a1a;
+        --red: #ff4d5f;
+        --violet: #a78bfa;
+        --radius: 8px;
+        font-family: Inter, "Microsoft YaHei", "PingFang SC", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+      }
+
+      button,
+      a {
+        font: inherit;
+      }
+
+      .page {
+        max-width: 1520px;
+        margin-inline: auto;
+        padding: 32px;
+      }
+
+      .masthead {
+        display: grid;
+        gap: 12px;
+        padding-block: 8px 28px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .eyebrow {
+        margin: 0;
+        color: var(--green);
+        font-size: 13px;
+        letter-spacing: 0;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        font-size: 34px;
+        line-height: 1.12;
+        letter-spacing: 0;
+      }
+
+      .lede {
+        max-width: 920px;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .decision-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-block-start: 16px;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        min-height: 34px;
+        padding: 7px 11px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: var(--panel-soft);
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .pill strong {
+        color: var(--text);
+        font-weight: 650;
+      }
+
+      .preview-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+        margin-block-start: 28px;
+      }
+
+      .preview {
+        min-width: 0;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: #101010;
+        overflow: hidden;
+      }
+
+      .preview-header {
+        display: grid;
+        gap: 8px;
+        padding: 18px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .preview-header h2 {
+        font-size: 20px;
+        letter-spacing: 0;
+      }
+
+      .preview-header p {
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.6;
+      }
+
+      .stage {
+        display: grid;
+        gap: 14px;
+        min-height: 680px;
+        padding: 18px;
+      }
+
+      .stage h3 {
+        font-size: 18px;
+        letter-spacing: 0;
+      }
+
+      .stage small {
+        color: var(--muted);
+      }
+
+      .action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 38px;
+        padding-inline: 14px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.06);
+        text-decoration: none;
+      }
+
+      .animal-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .animal {
+        display: grid;
+        justify-items: center;
+        align-content: center;
+        min-height: 88px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.025);
+      }
+
+      .animal .emoji {
+        display: grid;
+        place-items: center;
+        width: 56px;
+        aspect-ratio: 1;
+        border: 4px solid currentColor;
+        border-radius: 999px;
+        font-size: 30px;
+      }
+
+      .animal span:last-child {
+        margin-block-start: 8px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .metric-row,
+      .metric-grid {
+        display: grid;
+        gap: 8px;
+      }
+
+      .metric-row {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .metric-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .metric {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.035);
+      }
+
+      .metric b {
+        display: block;
+        font-size: 20px;
+        line-height: 1.1;
+      }
+
+      .metric span {
+        display: block;
+        margin-block-start: 6px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .mini-footer {
+        display: flex;
+        justify-content: center;
+        gap: 18px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .light .stage {
+        align-content: start;
+        background: #080808;
+      }
+
+      .light .brand {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        min-height: 58px;
+      }
+
+      .light .brand strong {
+        font-size: 18px;
+      }
+
+      .light .summary-line {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        color: var(--muted);
+      }
+
+      .medium .stage {
+        background:
+          linear-gradient(180deg, rgba(77, 163, 255, 0.08), transparent 42%),
+          #0b0b0c;
+      }
+
+      .medium .brand,
+      .medium .entry {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.06);
+        backdrop-filter: blur(12px);
+      }
+
+      .medium .brand {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px;
+      }
+
+      .medium .entry {
+        display: grid;
+        gap: 8px;
+        padding: 16px;
+      }
+
+      .medium .animal {
+        min-height: 112px;
+        background: rgba(255, 255, 255, 0.055);
+      }
+
+      .medium .animal .emoji {
+        width: 72px;
+        border-width: 6px;
+        font-size: 38px;
+      }
+
+      .gorgeous .stage {
+        position: relative;
+        align-content: start;
+        background:
+          radial-gradient(circle at 26% 14%, rgba(0, 214, 143, 0.18), transparent 28%),
+          radial-gradient(circle at 80% 10%, rgba(255, 122, 26, 0.16), transparent 30%),
+          linear-gradient(145deg, #090909, #101217 54%, #0b0b0b);
+      }
+
+      .gorgeous .brand {
+        display: grid;
+        gap: 10px;
+        min-height: 132px;
+        padding: 22px;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.42);
+      }
+
+      .gorgeous .brand h3 {
+        font-size: 28px;
+      }
+
+      .gorgeous .entry {
+        display: grid;
+        gap: 10px;
+        padding: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: var(--radius);
+        background: rgba(8, 8, 8, 0.72);
+      }
+
+      .gorgeous .animal {
+        min-height: 132px;
+        background: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 14px 38px rgba(0, 0, 0, 0.28);
+        transition: transform 180ms ease, border-color 180ms ease;
+      }
+
+      .gorgeous .animal:hover {
+        transform: translateY(-3px);
+        border-color: currentColor;
+      }
+
+      .gorgeous .animal .emoji {
+        width: 88px;
+        border-width: 8px;
+        font-size: 46px;
+        box-shadow: 0 0 22px currentColor;
+      }
+
+      .gorgeous .metric b {
+        font-size: 32px;
+      }
+
+      .accent-green {
+        color: var(--green);
+      }
+
+      .accent-blue {
+        color: var(--blue);
+      }
+
+      .accent-orange {
+        color: var(--orange);
+      }
+
+      .accent-red {
+        color: var(--red);
+      }
+
+      .accent-violet {
+        color: var(--violet);
+      }
+
+      .decision {
+        margin-block-start: 24px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+      }
+
+      .decision table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .decision th,
+      .decision td {
+        padding: 12px;
+        border-bottom: 1px solid var(--border);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      .decision th {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .decision tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .callout {
+        margin-block-start: 18px;
+        padding: 14px;
+        border: 1px solid rgba(0, 214, 143, 0.32);
+        border-radius: var(--radius);
+        background: rgba(0, 214, 143, 0.08);
+        color: #dffbf1;
+        line-height: 1.65;
+      }
+
+      footer {
+        margin-block-start: 28px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      @media (max-width: 1180px) {
+        .preview-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .stage {
+          min-height: auto;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .page {
+          padding: 18px;
+        }
+
+        h1 {
+          font-size: 28px;
+        }
+
+        .animal-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .metric-row,
+        .metric-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .decision {
+          overflow-x: auto;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          scroll-behavior: auto !important;
+          transition-duration: 0.01ms !important;
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header class="masthead">
+        <p class="eyebrow">H0-1 Design Preview · docs-only artifact</p>
+        <h1>Homepage UI P0 · 三套首页设计稿预览</h1>
+        <p class="lede">
+          这页用于把 `homepage-ui-p0-design-2026-07-07.md` 的 A/B/C 三套方案做成离线可视化对照，方便用户在 H0-2 实施前拍板。
+        </p>
+        <div class="decision-bar" aria-label="关键拍板点">
+          <span class="pill"><strong>A 轻量</strong>：最快进控制舱，装饰最少</span>
+          <span class="pill"><strong>B 中等</strong>：默认推荐，平衡信息密度和质感</span>
+          <span class="pill"><strong>C 华丽</strong>：主推方向，全屏大卡片华丽展示</span>
+        </div>
+      </header>
+
+      <main>
+        <section class="preview-grid" aria-label="三套方案预览">
+          <article class="preview light">
+            <div class="preview-header">
+              <h2>A · 轻量</h2>
+              <p>工程师桌面入口，少装饰、少停留、快速进入控制舱。适合 1366×768 和高频工作流。</p>
+            </div>
+            <div class="stage">
+              <div class="brand">
+                <strong>🐄 桌面牧场</strong>
+                <small>8 头牛马，随时待命</small>
+              </div>
+              <div class="animal-grid" aria-label="轻量 8 动物">
+                <div class="animal accent-green"><span class="emoji">🐂</span><span>Codex</span></div>
+                <div class="animal accent-blue"><span class="emoji">🦓</span><span>Trae</span></div>
+                <div class="animal accent-orange"><span class="emoji">🦉</span><span>Qoder</span></div>
+                <div class="animal accent-violet"><span class="emoji">🦚</span><span>MiniMax</span></div>
+                <div class="animal accent-blue"><span class="emoji">🦥</span><span>WorkBuddy</span></div>
+                <div class="animal accent-red"><span class="emoji">🦨</span><span>OpenClaw</span></div>
+                <div class="animal accent-green"><span class="emoji">🐢</span><span>OpenCode</span></div>
+                <div class="animal accent-orange"><span class="emoji">🦊</span><span>Hermes</span></div>
+              </div>
+              <div class="summary-line">
+                <span>正在拉磨 2 头 · 活跃 Lanes 1 · Gate 3 blocked</span>
+                <a class="action" href="#decision">› 进控制舱</a>
+              </div>
+              <div class="mini-footer">
+                <span>设置</span>
+                <span>文档</span>
+                <span>关于</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="preview medium">
+            <div class="preview-header">
+              <h2>B · 中等</h2>
+              <p>默认推荐方案。玻璃拟态、状态条、指标卡和 4×2 动物网格都保留，视觉不过载。</p>
+            </div>
+            <div class="stage">
+              <div class="brand">
+                <div>
+                  <h3>🐄 桌面牧场</h3>
+                  <small>8 头牛马，1 个控制舱，随时待命</small>
+                </div>
+                <a class="action" href="#decision">桌面牧场设置</a>
+              </div>
+              <div class="entry">
+                <h3>控制舱</h3>
+                <small>深色高对比 · 左轨追踪调度 · 右轨可操作任务面板</small>
+                <a class="action" href="#decision">进入控制舱 →</a>
+              </div>
+              <div class="animal-grid" aria-label="中等 8 动物">
+                <div class="animal accent-green"><span class="emoji">🐂</span><span>拉磨中 · 42%</span></div>
+                <div class="animal accent-blue"><span class="emoji">🦓</span><span>待命 · 100%</span></div>
+                <div class="animal accent-orange"><span class="emoji">🦉</span><span>验收 · 71%</span></div>
+                <div class="animal accent-violet"><span class="emoji">🦚</span><span>写稿 · 64%</span></div>
+                <div class="animal accent-blue"><span class="emoji">🦥</span><span>慢工 · 33%</span></div>
+                <div class="animal accent-red"><span class="emoji">🦨</span><span>阻塞 · 12%</span></div>
+                <div class="animal accent-green"><span class="emoji">🐢</span><span>收口 · 89%</span></div>
+                <div class="animal accent-orange"><span class="emoji">🦊</span><span>派活 · 56%</span></div>
+              </div>
+              <div class="metric-row">
+                <div class="metric"><b>8</b><span>动物在线</span></div>
+                <div class="metric"><b>1</b><span>活跃 Lane</span></div>
+                <div class="metric"><b>3</b><span>Gate blocked</span></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="preview gorgeous">
+            <div class="preview-header">
+              <h2>C · 华丽</h2>
+              <p>用户偏好方向。全屏大卡片、accent glow、玻璃拟态、强品牌首屏，适合对外门面和截图展示。</p>
+            </div>
+            <div class="stage">
+              <div class="brand">
+                <h3>🐄 桌面牧场</h3>
+                <p>把活的 AI Agent 关进牧场，调度、监督、验收都从这里开始。</p>
+                <div class="decision-bar">
+                  <span class="pill">8 头在线</span>
+                  <span class="pill">H0-1 ready</span>
+                </div>
+              </div>
+              <div class="entry">
+                <h3>控制舱入口</h3>
+                <small>当前 P0：homepage-ui-p0 · 等待用户拍板后进入 H0-2</small>
+                <a class="action" href="#decision">进入控制舱 →</a>
+              </div>
+              <div class="animal-grid" aria-label="华丽 8 动物">
+                <div class="animal accent-green"><span class="emoji">🐂</span><span>codex · 拉磨中</span></div>
+                <div class="animal accent-blue"><span class="emoji">🦓</span><span>trae · 待派活</span></div>
+                <div class="animal accent-orange"><span class="emoji">🦉</span><span>qoder · 审核中</span></div>
+                <div class="animal accent-violet"><span class="emoji">🦚</span><span>minimax · 出稿</span></div>
+                <div class="animal accent-blue"><span class="emoji">🦥</span><span>workbuddy · standby</span></div>
+                <div class="animal accent-red"><span class="emoji">🦨</span><span>openclaw · blocked</span></div>
+                <div class="animal accent-green"><span class="emoji">🐢</span><span>opencode · 收口</span></div>
+                <div class="animal accent-orange"><span class="emoji">🦊</span><span>hermes · 派发</span></div>
+              </div>
+              <div class="metric-grid">
+                <div class="metric accent-green"><b>8</b><span>在线动物</span></div>
+                <div class="metric accent-blue"><b>58</b><span>编排卡一致</span></div>
+                <div class="metric accent-orange"><b>1</b><span>P0 进行中</span></div>
+                <div class="metric accent-red"><b>3</b><span>外部 gate 未开</span></div>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <section id="decision" class="decision" aria-label="拍板表">
+          <table>
+            <thead>
+              <tr>
+                <th>拍板项</th>
+                <th>A 轻量</th>
+                <th>B 中等</th>
+                <th>C 华丽</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>建议用途</td>
+                <td>高频工作入口</td>
+                <td>默认产品首页</td>
+                <td>对外门面与截图展示</td>
+              </tr>
+              <tr>
+                <td>实施风险</td>
+                <td>最低</td>
+                <td>中低</td>
+                <td>中等，需要重点验 1366×768</td>
+              </tr>
+              <tr>
+                <td>PM 建议</td>
+                <td>作为回退方案保留</td>
+                <td>稳妥默认</td>
+                <td>主推，因为最贴近用户原话</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <div class="callout">
+          当前 H0-1 可以进入用户拍板：选 A / B / C，或指定“以 C 为主但收敛某些元素”。拍板后再写 `homepage-ui-p0-design-accepted-2026-07-07.md` 并进入 H0-2。
+        </div>
+      </main>
+
+      <footer>
+        Source: docs/orchestration/sessions/homepage-ui-p0-design-2026-07-07.md · Generated as docs-only H0-1 preview.
+      </footer>
+    </div>
+  </body>
+</html>

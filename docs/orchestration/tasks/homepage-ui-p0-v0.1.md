@@ -8,7 +8,7 @@
 > **创建日期**：2026-07-07
 > **创建人**：Mavis（root session `mvs_5bb811db0b244b80a142de9d522cc90a`）
 > **优先级**：**P0**（2026-07-07 用户拍板提升）
-> **状态**：in_progress（长工 thread 待 PM 启动）
+> **状态**：accepted（C · 华丽已实现并本地启动验证）
 > **派工包**：`docs/orchestration/tasks/homepage-ui-p0-dispatch-v0.1.md`
 > **进度卡**：`docs/orchestration/sessions/homepage-ui-p0-progress.md`
 > **周计划**：`docs/orchestration/sessions/weekly-requirements-2026-07-07.md`
@@ -219,7 +219,7 @@ git diff src/components/NiuMaWorkspace.tsx                # 仅"返回首页"按
 
 ---
 
-> **本任务卡状态**：in_progress（长工 thread 待 PM 启动）
-> **触发实施**：用户拍"开 P0-H0-1"或类似指令；PM 启动长工 mavis session 后提供 thread id 写入派工包
+> **本任务卡状态**：accepted（H0-1/H0-2/H0-3/H0-4 已完成；证据见 `docs/orchestration/sessions/homepage-ui-p0-c0-6-style-2026-07-07.md`）
+> **触发实施**：用户已拍 `c`，C · 华丽方案已落地；后续 commit/push 需用户另行授权
 > **配套 task card**：`docs/orchestration/tasks/cockpit-refactor-p0-v0.1.md`（已 accepted，本卡不冲突）
 > **配套 task card**：`docs/orchestration/tasks/ranch-real-integration-p0-v0.1.md`（in_progress，R0-3 deferred，本卡独立）

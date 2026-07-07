@@ -2,7 +2,7 @@
   "identity": "[PM]#multi-agent-control@v0.1",
   "loopState": "active",
   "dispatchState": "active",
-  "target": "按 LPS 建立角色分工，并持续监督各个角色推进“多 Agent 牛马核心部门”项目；2026-07-07 主控在 root session 新增 P0 homepage-ui-p0（全新首页 / landing / 启动页 UI 设计，长工 thread 待 PM 启动 mavis session 后分配 thread id），落档 3 张新卡（任务卡 homepage-ui-p0-v0.1.md / 长工派工包 homepage-ui-p0-dispatch-v0.1.md / 进度卡 homepage-ui-p0-progress.md）并同步 status.json / index.md / weekly-requirements-2026-07-07.md 共 6 文件 + push 到 origin/main；2026-07-06 baseline = 闭环 5 commit (e095764 / 3e91d4c / 3aa30f7 / 42e3f7f / 9612151) + 桌面牧场 v0.3 视觉 smoke + 7-3 旧 release 残留 4/6 回收；ranch-m4 v0.2 summarized 无需重派、R0-3 connector 仍 deferred、transparent ranch pointer smoke blocker 仍 standby、`release-dir/win-unpacked.tmp` 嵌套文件锁顺延次日清理；后续 7-7~7-13 W27 路线见 weekly-requirements-2026-07-07.md。",
+  "target": "按 LPS 建立角色分工，并持续监督各个角色推进“多 Agent 牛马核心部门”项目；2026-07-07 P0 homepage-ui-p0（全新首页 / landing / 启动页 UI）已按用户拍板 C 华丽完成 H0-1/H0-2/H0-3/H0-4，证据卡 `homepage-ui-p0-c0-6-style-2026-07-07.md` 已归档，本地 dev 已启动在 `http://127.0.0.1:5173/` 供用户查看；2026-07-06 baseline = 闭环 5 commit (e095764 / 3e91d4c / 3aa30f7 / 42e3f7f / 9612151) + 桌面牧场 v0.3 视觉 smoke + 7-3 旧 release 残留 4/6 回收；ranch-m4 v0.2 summarized 无需重派、R0-3 connector 仍 deferred、transparent ranch pointer smoke blocker 仍 standby、`release-dir/win-unpacked.tmp` 嵌套文件锁顺延次日清理；后续 7-7~7-13 W27 路线见 weekly-requirements-2026-07-07.md。",
   "source": "docs/orchestration/index.md",
   "todayPlan": {
     "date": "2026-07-06",
@@ -13,7 +13,7 @@
   "p0Cards": [
     {
       "id": "homepage-ui-p0",
-      "status": "in_progress",
+      "status": "accepted",
       "task": "docs/orchestration/tasks/homepage-ui-p0-v0.1.md",
       "progress": "docs/orchestration/sessions/homepage-ui-p0-progress.md"
     },
@@ -30,7 +30,7 @@
       "progress": "docs/orchestration/sessions/cockpit-refactor-p0-progress.md"
     }
   ],
-  "blocker": "外部 connector 仍 disabled；live-subagents 仍受 403 DAILY_LIMIT_EXCEEDED 阻塞直到复查；control-cockpit 中央 4x2 网格和受保护卖点文件保持锁定；透明 Electron 窗口自动截图仍报 SetIsBorderRequired failed；Git post-push log/staging/commit/push 仍需明确确认。",
+  "blocker": "外部 connector 仍 disabled；Codex 仅 draft/pending/discovery-only，Trae/Qoder 在当前范围内刻意保持 placeholder/command-empty，不作为可执行资源；live-subagents 仍受 403 DAILY_LIMIT_EXCEEDED 阻塞直到 quota 复查路径可用；control-cockpit 中央 4x2 网格和受保护卖点文件保持锁定；透明 Electron 窗口 capture 路线已用 Windows MCP Snapshot 观察到可见窗口且未触发 SetIsBorderRequired failed，但完整 pointer smoke（click-through / double-click / right-click / drag / dock）仍未执行。",
   "roles": [
     {
       "id": "pm",
@@ -82,7 +82,7 @@
       "title": "[PM]#connector-acceptance-review@v0.1",
       "owner": "主控",
       "status": "standby",
-      "responsibility": "Keep acceptance review evidence explicit: codex is draft discovery-only, trae/qoder are placeholders, and no connector may be accepted, enabled, or executed from this lane.",
+      "responsibility": "Keep acceptance review evidence explicit: codex is draft discovery-only, trae/qoder are intentionally command-empty placeholders, and no connector may be accepted, enabled, or executed from this lane.",
       "tag": "⟦tag:v2|task|connector-acceptance-review-v0.1⟧",
       "evidence": "docs/orchestration/tasks/connector-acceptance-review-v0.1.md"
     },
@@ -235,7 +235,7 @@
       "title": "[监督]#ranch-pointer-smoke@v0.2",
       "owner": "监督",
       "status": "standby",
-      "responsibility": "透明 Electron 牧场 pointer-smoke 验证包；等待手工或替代捕获路线，不改实现。",
+      "responsibility": "透明 Electron 牧场 pointer-smoke 验证包；Windows MCP Snapshot 捕获路线已识别，完整指针输入验收仍待执行，不改实现。",
       "tag": "⟦tag:v2|task|ranch-pointer-smoke-v0.2⟧",
       "evidence": "docs/orchestration/tasks/ranch-pointer-smoke-v0.2.md"
     },
@@ -244,7 +244,7 @@
       "title": "[监督]#ranch-pointer-smoke-manual-evidence@v0.2",
       "owner": "监督",
       "status": "standby",
-      "responsibility": "透明 Electron 牧场 pointer-smoke 手工证据记录包；等待手工或替代捕获路线，不执行输入、不改实现。",
+      "responsibility": "透明 Electron 牧场 pointer-smoke 手工证据记录包；替代捕获路线已识别，但未执行 click/right-click/drag 输入、不改实现。",
       "tag": "⟦tag:v2|task|ranch-pointer-smoke-manual-evidence-v0.2⟧",
       "evidence": "docs/orchestration/tasks/ranch-pointer-smoke-manual-evidence-v0.2.md"
     },
@@ -252,10 +252,10 @@
       "id": "homepage-ui-design",
       "title": "[长工]#homepage-ui-design@v0.1",
       "owner": "长工",
-      "status": "standby",
-      "responsibility": "全新 HomePage 组件 + 路由 + 视觉打磨；3 套设计稿（轻量/中等/华丽）出稿 + 用户拍板；不动 §〇·quarter 卖点文件。",
-      "tag": "⟦tag:v2|task|homepage-ui-p0-v0.1⟧",
-      "evidence": "docs/orchestration/tasks/homepage-ui-p0-v0.1.md"
+      "status": "summarized",
+      "responsibility": "全新 HomePage 组件 + 路由 + 视觉打磨已按 C 华丽完成；H0-4 证据已归档；不动 §〇·quarter 卖点文件。",
+      "tag": "⟦tag:v2|task|homepage-ui-p0-dispatch-v0.1⟧",
+      "evidence": "docs/orchestration/tasks/homepage-ui-p0-dispatch-v0.1.md"
     },
     {
       "id": "weekly-requirements",
@@ -287,21 +287,21 @@
       "title": "外部 connector 策略",
       "role": "[短工]#connector-policy@v0.1",
       "state": "standby",
-      "nextAction": "Keep codex draft-only and trae/qoder placeholders; wait for PM/user to supply the missing evidence before any machine gate revision."
+      "nextAction": "Keep codex draft-only and keep trae/qoder intentionally command-empty placeholders; wait for PM/user to supply acceptance-grade evidence before any machine gate revision."
     },
     {
       "id": "connector-acceptance-review",
       "title": "Connector acceptance review",
       "role": "[PM]#connector-acceptance-review@v0.1",
       "state": "standby",
-      "nextAction": "PM/user must decide only after the docs name each connector's missing evidence and owner; keep approvalStatus unchanged, enabled=false, and no execution."
+      "nextAction": "PM/user must decide only after the docs name each connector's missing evidence and owner; keep approvalStatus unchanged, enabled=false, command-empty placeholders unchanged, and no execution."
     },
     {
       "id": "daily-supervision",
       "title": "每日计划督办",
       "role": "[PM]#daily-supervision@2026-07-02",
       "state": "active",
-      "nextAction": "保持 M3 和 M4 summarized；收集 Git manager post-push 只读回调；connector-policy standby；pointer-smoke verification standby 等待可用捕获路线。"
+      "nextAction": "保持 M3 和 M4 summarized；connector-policy standby；pointer-smoke alternate capture route 已识别但完整输入验收仍待执行。"
     },
     {
       "id": "codex-evidence-closeout",
@@ -329,7 +329,7 @@
       "title": "Daily standby decision queue",
       "role": "[PM]#daily-decision-queue@2026-07-02",
       "state": "standby",
-      "nextAction": "作为下一次 PM 回调面；等待 Git post-push log/staging review、connector acceptance、pointer smoke 或 live-subagent quota 的明确决策/条件；M4 已收口为 summarized。"
+      "nextAction": "作为下一次 PM 回调面；等待 Git log ignore/staging review、connector acceptance、pointer smoke 或 live-subagent quota 的明确决策/条件；M4 已收口为 summarized。"
     },
     {
       "id": "daily-role-accountability",
@@ -441,21 +441,21 @@
       "title": "Transparent ranch pointer smoke",
       "role": "[监督]#ranch-pointer-smoke@v0.2",
       "state": "standby",
-      "nextAction": "等待手工或替代透明窗口捕获路线；验证前不改实现，执行时同步填写 manual evidence 包。"
+      "nextAction": "Windows MCP Snapshot 已可观察透明 Electron 窗口且未触发 SetIsBorderRequired failed；等待完整 pointer input 验收窗口，执行时同步填写 manual evidence 包。"
     },
     {
       "id": "ranch-pointer-smoke-manual-evidence",
       "title": "Transparent ranch pointer smoke manual evidence",
       "role": "[监督]#ranch-pointer-smoke-manual-evidence@v0.2",
       "state": "standby",
-      "nextAction": "等待可观察透明 Electron 窗口的手工或替代捕获路线；未观察前保持 pending evidence。"
+      "nextAction": "替代捕获路线已识别；完整 click-through / double-click / right-click / drag / dock 证据未跑前保持 pending evidence。"
     },
     {
       "id": "homepage-ui-design",
       "title": "Homepage UI P0 long-worker",
       "role": "[长工]#homepage-ui-design@v0.1",
-      "state": "standby",
-      "nextAction": "PM 启动 mavis session new general --title 'homepage-ui-design' 后分配 thread id，写回 dispatch 包的 next action 段、本卡 nextAction 字段、status.json roles[homepage-ui-design] evidence 字段；H0-1 出 3 套设计稿 + 用户拍板 + H0-2 实施 + H0-3 视觉打磨 + H0-4 卖点 0 字节验收。"
+      "state": "summarized",
+      "nextAction": "H0-1/H0-2/H0-3/H0-4 已完成并通过 lint/build/orchestration gates、截图、CDP smoke、protected-file audit；等待用户视觉确认后再决定是否 stage/commit/push。"
     },
     {
       "id": "weekly-requirements",
@@ -495,10 +495,10 @@
       "acceptanceGate": "PM confirms executable path and non-interactive args; orchestration:preflight + connector-safety pass",
       "approvalStatus": "not-requested",
       "enabledByDefault": false,
-      "readinessEvidence": "No trae executable resolves via Get-Command; command stays empty.",
-      "missingReadiness": "Exact executable path, exact non-interactive args, safety evidence, and PM acceptance decision.",
+      "readinessEvidence": "No trae executable resolves via Get-Command; command intentionally stays empty in current scope.",
+      "missingReadiness": "Executable intentionally absent in current scope; changing this would require exact executable path, non-interactive args, safety evidence, and PM acceptance.",
       "nextOwner": "[PM]#connector-acceptance-review@v0.1",
-      "nextAction": "Keep trae as placeholder until PM/user supplies the exact invocation and readiness evidence."
+      "nextAction": "Keep trae as placeholder/command-empty; do not enable or execute from this lane."
     },
     {
       "id": "qoder",
@@ -512,10 +512,10 @@
       "acceptanceGate": "PM confirms executable path and verification surface; orchestration:preflight + connector-safety pass",
       "approvalStatus": "not-requested",
       "enabledByDefault": false,
-      "readinessEvidence": "No qoder executable resolves via Get-Command; command stays empty.",
-      "missingReadiness": "Exact executable path, exact verification surface, safety evidence, and PM acceptance decision.",
+      "readinessEvidence": "No qoder executable resolves via Get-Command; command intentionally stays empty in current scope.",
+      "missingReadiness": "Executable intentionally absent in current scope; changing this would require exact executable path, verification surface, safety evidence, and PM acceptance.",
       "nextOwner": "[PM]#connector-acceptance-review@v0.1",
-      "nextAction": "Keep qoder as placeholder until PM/user supplies the exact invocation and readiness evidence."
+      "nextAction": "Keep qoder as placeholder/command-empty; do not enable or execute from this lane."
     }
   ]
 }

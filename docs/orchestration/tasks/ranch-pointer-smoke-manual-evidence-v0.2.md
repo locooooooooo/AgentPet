@@ -21,6 +21,7 @@ manual evidence route:
 - Record the route used: human desktop observation, local screen recording that can capture the transparent Electron window, phone camera recording, or another route that explicitly avoids the previous `SetIsBorderRequired failed` failure.
 - Record whether the route can see the transparent `桌面牧场` Electron window and the `桌面牧场 · 控制舱` window at the same time.
 - Record the exact command session used to launch and stop Electron, including any failure output.
+- 2026-07-07 route candidate: Windows MCP Snapshot observed both Electron windows and did not emit `SetIsBorderRequired failed`; full pointer input rows remain pending until they are directly observed.
 
 evidence table template:
 | check | expected result | result | evidence | blocker if incomplete |
@@ -58,12 +59,12 @@ acceptance:
 - Callback confirms no implementation files, connector config, or Git metadata were changed.
 
 blockers:
-- No manual observer or alternate transparent-window capture route is available in the current PM thread.
-- Prior Windows capture route failed with `SetIsBorderRequired failed: 不支持此接口 (0x80004002)`.
+- Alternate transparent-window capture exists via Windows MCP Snapshot, but full pointer input evidence has not been run in the current PM thread.
+- Prior Windows capture route failed with `SetIsBorderRequired failed: 不支持此接口 (0x80004002)`; use the 2026-07-07 Snapshot route or a manual recording route instead.
 
 next action:
-- Keep this package standby until a manual observer or alternate transparent-window capture route is available.
-- When available, run the parent `ranch-pointer-smoke-v0.2` route and fill this evidence table before acceptance.
+- Keep this package standby until the full click-through / double-click / right-click / floating drag / edge-dock evidence can be collected without interrupting user review.
+- Then run the parent `ranch-pointer-smoke-v0.2` route and fill this evidence table before acceptance.
 
 summary:
 - Standby manual evidence package; no pointer smoke executed.
