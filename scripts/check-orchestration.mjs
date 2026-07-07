@@ -735,7 +735,7 @@ if (statusJson) {
   const allowedP0Statuses = new Set(['pending', 'in_progress', 'summarized', 'accepted', 'blocked']);
   const requiredP0Cards = new Map([
     ['ranch-real-integration-p0', {
-      status: 'in_progress',
+      status: 'accepted',
       task: 'docs/orchestration/tasks/ranch-real-integration-p0-v0.1.md',
       progress: 'docs/orchestration/sessions/ranch-real-integration-p0-progress.md'
     }],
@@ -1030,7 +1030,8 @@ if (statusJson) {
     ['git-staging-review-agentpet', 'AgentPet Git state review'],
     ['ranch-pointer-smoke', 'Transparent pointer smoke'],
     ['ranch-pointer-smoke-manual-evidence', 'Transparent pointer smoke'],
-    ['homepage-ui-design', 'Homepage UI long-worker dispatch']
+    ['homepage-ui-design', 'Homepage UI long-worker dispatch'],
+    ['ranch-real-integration-r0-3-dryrun', 'R0-3 Codex dry-run authorization']
   ]);
   const nonDecisionOpenLanes = new Set(['daily-decision-queue', 'daily-role-accountability']);
   const statusLanesById = new Map((statusJson.lanes ?? []).map((lane) => [lane.id, lane]));

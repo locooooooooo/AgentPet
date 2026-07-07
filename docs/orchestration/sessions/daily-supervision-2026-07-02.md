@@ -572,6 +572,7 @@ incomplete:
 - Homepage UI long-worker dispatch package exists, thread `mvs_237b464ebc78403d953b9ab93b398ab8` has delivered H0-1 design drafts, user selected C gorgeous, and H0-2/H0-3/H0-4 are accepted with evidence `docs/orchestration/sessions/homepage-ui-p0-c0-6-style-2026-07-07.md`; PM commit `18451ba` has been pushed to `origin/main`.
 - Daily decision queue is standby and does not authorize any queue item by itself.
 - Daily role accountability ledger is standby and records state/evidence/action without changing role states.
+- R0-3 Codex controlled dry-run lane is standby: P0 ranch-real-integration-p0 accepted after user decision ② on 2026-07-07; R0-3 evidence-collection lane opened at `docs/orchestration/tasks/ranch-real-integration-r0-3-dryrun-v0.1.md`; Codex machine-gate fields (approvalStatus / enabledByDefault / command) remain untouched; trae/qoder remain placeholder; dry-run execution still awaits explicit PM/user authorization.
 
 blockers:
 - External connector execution remains disabled.

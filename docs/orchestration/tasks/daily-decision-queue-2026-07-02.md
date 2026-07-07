@@ -33,6 +33,7 @@ decision queue:
 | Connector acceptance | `[PM]#connector-acceptance-review@v0.1` | PM/user accepts, rejects, or revises connector machine gate fields | Update connector metadata only if the decision explicitly says so, then rerun `npm.cmd run orchestration:preflight` and `npm.cmd run orchestration:connector-safety` | No connector decision exists |
 | Transparent pointer smoke | `[监督]#ranch-pointer-smoke-manual-evidence@v0.2` | Manual observer or alternate transparent-window capture route is available | Run parent pointer-smoke route and fill evidence table | Capture route is unavailable |
 | Live sub-agent quota | `[监督]#multi-agent-control@v0.1` | Service-side `403 DAILY_LIMIT_EXCEEDED` can be rechecked without treating connectors as available | Recheck quota state and record exact result | Recheck route is unavailable |
+| R0-3 Codex dry-run authorization | `[PM]#ranch-real-integration-r0-3-dryrun@v0.1` | PM/user authorizes the controlled dry-run execution window | Run a single `codex --output-format json --quiet "<prompt>"` in an isolated cwd, exit 0, archive evidence to `docs/orchestration/sessions/codex-dryrun-2026-07-XX.{json,png,md}`; Codex machine-gate fields remain untouched | Authorization is absent |
 
 coverage guard:
 | open status lane | queue coverage |
@@ -45,6 +46,7 @@ coverage guard:
 | git-staging-review-agentpet | AgentPet Git state review |
 | ranch-pointer-smoke | Transparent pointer smoke |
 | ranch-pointer-smoke-manual-evidence | Transparent pointer smoke |
+| ranch-real-integration-r0-3-dryrun | R0-3 Codex dry-run authorization |
 
 session closeout coverage:
 | queue item | required closeout evidence |
@@ -54,6 +56,7 @@ session closeout coverage:
 | Connector acceptance | `Connector acceptance review package exists` |
 | Transparent pointer smoke | `Ranch pointer-smoke verification and manual evidence packages are standby` |
 | Live sub-agent quota | `403 DAILY_LIMIT_EXCEEDED` |
+| R0-3 Codex dry-run authorization | `R0-3 Codex controlled dry-run lane is standby` |
 
 - `daily-decision-queue` and `daily-role-accountability` are supervision artifacts; they remain standby but are not decision-bearing queue items.
 - Summarized M5 ranch verification cards (`ranch-window-v0.1`, `ranch-status-script-v0.1`, `ranch-personality-v0.1`) plus the ranch 3-level UI convergence evidence feed existing ranch follow-up items and do not create new decision-bearing lanes.

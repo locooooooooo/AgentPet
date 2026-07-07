@@ -13,6 +13,7 @@ dispatch state: active
 > **关联看板**：`docs/orchestration/index.md` + `docs/orchestration/status.json`（含 7-6 closeout 后的状态面）
 > **关联任务卡**：
 > - `docs/orchestration/tasks/ranch-real-integration-p0-v0.1.md`（R0-3 deferred，本周必须拍）
+> - `docs/orchestration/tasks/ranch-real-integration-r0-3-dryrun-v0.1.md`（R0-3 分支② controlled dry-run standby，未执行）
 > - `docs/orchestration/tasks/ranch-window-v0.1.md` + `ranch-status-script-v0.1.md` + `ranch-personality-v0.1.md`（M5 verification only，待派 v0.2 实施）
 > - `docs/orchestration/tasks/ranch-pointer-smoke-v0.2.md` + `ranch-pointer-smoke-manual-evidence-v0.2.md`（透明 pointer blocker）
 > - `docs/orchestration/tasks/connector-policy-v0.1.md` + `connector-acceptance-review-v0.1.md`（外部 connector 决策）
@@ -109,9 +110,16 @@ dispatch state: active
 
 **PM 默认建议**：**分支 ②**（最稳，不动 machine-gate 也能闭环 P0 卡；trae/qoder 缺可执行文件是 hard-blocker，强行 enabled 是给自己挖坑）。
 
+**2026-07-07 PM 执行记录（分支 ② standby 落地）**：
+- 已新增并登记 `docs/orchestration/tasks/ranch-real-integration-r0-3-dryrun-v0.1.md`，作为 Codex controlled dry-run evidence lane。
+- 本轮仅创建 standby task card；未执行 `codex --output-format json --quiet "<prompt>"`。
+- Codex 仍保持 `draft / pending / enabled=false`；Trae/Qoder 仍保持 `placeholder / not-requested / enabled=false / command=""`。
+- `docs/orchestration/connectors.json` machine-gate 字段不属于本轮改动范围：不改 `approvalStatus`、`enabledByDefault`、`command`。
+
 **验收**：
 - 用户拍板 ①/②/③。
 - 按拍板结果更新 `ranch-real-integration-p0-v0.1.md` R0-3 段、session card（`r0-connector-decision-2026-07-04.md` 同模板续写 `r0-connector-decision-2026-07-07.md`）、status.json p0Cards 状态、connectors.json。
+- 若拍板结果为 ②，本轮只允许注册 standby dry-run task card 和引用说明，不改 `connectors.json` machine-gate。
 - 跑 `orchestration:preflight` + `orchestration:connector-safety` 通过。
 - commit + push。
 

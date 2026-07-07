@@ -19,7 +19,7 @@
     },
     {
       "id": "ranch-real-integration-p0",
-      "status": "in_progress",
+      "status": "accepted",
       "task": "docs/orchestration/tasks/ranch-real-integration-p0-v0.1.md",
       "progress": "docs/orchestration/sessions/ranch-real-integration-p0-progress.md"
     },
@@ -265,6 +265,15 @@
       "responsibility": "Maintain W27 (2026-07-07~2026-07-13) weekly requirements; consolidate P0/P1/P2 candidates; keep排期 / 决策点 / acceptance aligned with the PM board; refresh after each daily supervision pass.",
       "tag": "⟦tag:v2|session|weekly-requirements-2026-07-07⟧",
       "evidence": "docs/orchestration/sessions/weekly-requirements-2026-07-07.md"
+    },
+    {
+      "id": "ranch-real-integration-r0-3-dryrun",
+      "title": "[PM]#ranch-real-integration-r0-3-dryrun@v0.1",
+      "owner": "主控",
+      "status": "standby",
+      "responsibility": "R0-3 Codex controlled dry-run evidence collection lane;Codex approvalStatus/enabledByDefault/command 维持原值;trae/qoder 维持 placeholder;在 standby 阶段不主动启动 dry-run,等用户二次确认时机;evidence 归档至 docs/orchestration/sessions/codex-dryrun-2026-07-XX.{json,png,md}。",
+      "tag": "⟦tag:v2|task|ranch-real-integration-r0-3-dryrun-v0.1⟧",
+      "evidence": "docs/orchestration/tasks/ranch-real-integration-r0-3-dryrun-v0.1.md"
     }
   ],
   "lanes": [
@@ -463,6 +472,13 @@
       "role": "[PM]#weekly-requirements@2026-07-07",
       "state": "active",
       "nextAction": "Keep weekly-requirements-2026-07-07.md aligned with status.json p0Cards / roles / lanes; add new P0/P1 candidates as they surface; refresh排期 after each PM supervision pass; close the W27 lane on 2026-07-11 with weekly-closeout session card."
+    },
+    {
+      "id": "ranch-real-integration-r0-3-dryrun",
+      "title": "R0-3 Codex controlled dry-run lane",
+      "role": "[PM]#ranch-real-integration-r0-3-dryrun@v0.1",
+      "state": "standby",
+      "nextAction": "Standby; Codex approvalStatus/enabledByDefault/command remain unchanged; wait for user to authorize the controlled dry-run execution window before any codex invocation."
     }
   ],
   "connectors": [

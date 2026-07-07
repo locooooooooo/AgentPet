@@ -130,6 +130,12 @@
 - no-go/deferred: `docs/orchestration/sessions/r0-connector-decision-2026-07-04.md`
 - Do not set connector `approvalStatus` to `accepted` or `enabledByDefault` to `true` until PM/user explicitly accepts the connector machine gate.
 
+**分支② standby 状态（2026-07-07）**：
+- Controlled dry-run evidence lane is registered at `docs/orchestration/tasks/ranch-real-integration-r0-3-dryrun-v0.1.md`.
+- Codex remains `draft / pending / enabled=false`; Trae/Qoder remain `placeholder / command-empty`.
+- No dry-run command has been executed from this branch; wait for user second confirmation of timing before collecting evidence.
+- Do not change connector `approvalStatus`, `enabledByDefault`, or `command` from this standby lane.
+
 ### R0-4 系统通知 icon 接通（8 张 PNG 复活）（**1h**）
 
 **改动**：
