@@ -1,4 +1,4 @@
-import type { AgentSystemMessage } from '../types';
+import type { AgentSystemMessage, NiuMaStatus } from '../types';
 
 export type HomeMetricTone = 'green' | 'blue' | 'orange' | 'red' | 'violet';
 export type HomeMetricIcon = 'activity' | 'shield' | 'plug' | 'bell';
@@ -10,6 +10,7 @@ export interface HomePageAgent {
   codename: string;
   avatar: string;
   accent: string;
+  status: NiuMaStatus;
   statusName: string;
   expression: string;
   quote: string;

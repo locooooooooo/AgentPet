@@ -7,6 +7,7 @@ objective:
 - Consolidate today's remaining standby and blocked decisions into one PM-facing queue.
 - Keep every role's next action executable without silently starting Git repair, staging review writes, connector execution, or pointer input; M4 implementation has been completed and summarized outside this standby queue.
 - Keep summarized M5 ranch verification cards and the ranch-only UI convergence pass as evidence inputs to existing ranch follow-up items instead of reopening new decision-bearing lanes.
+- Keep protected cockpit / selling-point source drift visible as a PM disposition item before any accept, format-only repair, rollback, or bounded implementation lane.
 
 dispatch state:
 - Standby decision queue.
@@ -34,6 +35,7 @@ decision queue:
 | Transparent pointer smoke | `[监督]#ranch-pointer-smoke-manual-evidence@v0.2` | Manual observer or alternate transparent-window capture route is available | Run parent pointer-smoke route and fill evidence table | Capture route is unavailable |
 | Live sub-agent quota | `[监督]#multi-agent-control@v0.1` | Service-side `403 DAILY_LIMIT_EXCEEDED` can be rechecked without treating connectors as available | Recheck quota state and record exact result | Recheck route is unavailable |
 | R0-3 Codex dry-run authorization | `[PM]#ranch-real-integration-r0-3-dryrun@v0.1` | PM/user authorizes the controlled dry-run execution window | Run a single `codex --output-format json --quiet "<prompt>"` in an isolated cwd, exit 0, archive evidence to `docs/orchestration/sessions/codex-dryrun-2026-07-XX.{json,png,md}`; Codex machine-gate fields remain untouched | Authorization is absent |
+| Protected cockpit source drift | `[PM]#protected-cockpit-source-drift@v0.1` | PM/user decides whether to accept, format-only repair, revert, or route the protected cockpit/selling-point source diffs into a fresh bounded lane | Run read-only diff review first; only after explicit disposition may apply a bounded source fix or rollback, then rerun `npm.cmd run lint`, `npm.cmd run build`, `git diff --check`, and orchestration gates | Disposition is absent |
 
 coverage guard:
 | open status lane | queue coverage |
@@ -47,6 +49,7 @@ coverage guard:
 | ranch-pointer-smoke | Transparent pointer smoke |
 | ranch-pointer-smoke-manual-evidence | Transparent pointer smoke |
 | ranch-real-integration-r0-3-dryrun | R0-3 Codex dry-run authorization |
+| protected-cockpit-source-drift | Protected cockpit source drift |
 
 session closeout coverage:
 | queue item | required closeout evidence |
@@ -57,6 +60,7 @@ session closeout coverage:
 | Transparent pointer smoke | `Ranch pointer-smoke verification and manual evidence packages are standby` |
 | Live sub-agent quota | `403 DAILY_LIMIT_EXCEEDED` |
 | R0-3 Codex dry-run authorization | `R0-3 Codex controlled dry-run lane is standby` |
+| Protected cockpit source drift | `Protected cockpit source drift is pending PM disposition` |
 
 - `daily-decision-queue` and `daily-role-accountability` are supervision artifacts; they remain standby but are not decision-bearing queue items.
 - Summarized M5 ranch verification cards (`ranch-window-v0.1`, `ranch-status-script-v0.1`, `ranch-personality-v0.1`) plus the ranch 3-level UI convergence evidence feed existing ranch follow-up items and do not create new decision-bearing lanes.

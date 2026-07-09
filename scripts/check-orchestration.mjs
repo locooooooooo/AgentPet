@@ -1031,7 +1031,8 @@ if (statusJson) {
     ['ranch-pointer-smoke', 'Transparent pointer smoke'],
     ['ranch-pointer-smoke-manual-evidence', 'Transparent pointer smoke'],
     ['homepage-ui-design', 'Homepage UI long-worker dispatch'],
-    ['ranch-real-integration-r0-3-dryrun', 'R0-3 Codex dry-run authorization']
+    ['ranch-real-integration-r0-3-dryrun', 'R0-3 Codex dry-run authorization'],
+    ['protected-cockpit-source-drift', 'Protected cockpit source drift']
   ]);
   const nonDecisionOpenLanes = new Set(['daily-decision-queue', 'daily-role-accountability']);
   const statusLanesById = new Map((statusJson.lanes ?? []).map((lane) => [lane.id, lane]));

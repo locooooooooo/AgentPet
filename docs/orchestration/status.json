@@ -274,6 +274,15 @@
       "responsibility": "R0-3 Codex controlled dry-run evidence collection lane;Codex approvalStatus/enabledByDefault/command 维持原值;trae/qoder 维持 placeholder;在 standby 阶段不主动启动 dry-run,等用户二次确认时机;evidence 归档至 docs/orchestration/sessions/codex-dryrun-2026-07-XX.{json,png,md}。",
       "tag": "⟦tag:v2|task|ranch-real-integration-r0-3-dryrun-v0.1⟧",
       "evidence": "docs/orchestration/tasks/ranch-real-integration-r0-3-dryrun-v0.1.md"
+    },
+    {
+      "id": "protected-cockpit-source-drift",
+      "title": "[PM]#protected-cockpit-source-drift@v0.1",
+      "owner": "主控",
+      "status": "standby",
+      "responsibility": "Protected cockpit / selling-point source drift disposition lane; keeps current diffs visible without accepting, formatting, reverting, or editing protected source files before explicit PM/user disposition.",
+      "tag": "⟦tag:v2|task|protected-cockpit-source-drift-v0.1⟧",
+      "evidence": "docs/orchestration/tasks/protected-cockpit-source-drift-v0.1.md"
     }
   ],
   "lanes": [
@@ -479,6 +488,13 @@
       "role": "[PM]#ranch-real-integration-r0-3-dryrun@v0.1",
       "state": "standby",
       "nextAction": "Standby; Codex approvalStatus/enabledByDefault/command remain unchanged; wait for user to authorize the controlled dry-run execution window before any codex invocation."
+    },
+    {
+      "id": "protected-cockpit-source-drift",
+      "title": "Protected cockpit source drift disposition",
+      "role": "[PM]#protected-cockpit-source-drift@v0.1",
+      "state": "standby",
+      "nextAction": "Standby; request PM/user disposition before accepting, formatting, reverting, or routing current protected cockpit/selling-point source diffs into a bounded lane."
     }
   ],
   "connectors": [

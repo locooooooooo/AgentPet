@@ -18,6 +18,7 @@ export function useHomePageData(snapshot: AgentSnapshot): HomePageData {
         codename: agent.codename,
         avatar: agent.avatar,
         accent: agent.accent,
+        status: runtime?.status ?? 'idle',
         statusName: meta?.name ?? '待命',
         expression: meta?.expression ?? '(-_-)',
         quote: runtime?.quote ?? '暂无状态台词',

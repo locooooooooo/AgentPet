@@ -27,9 +27,6 @@ export default function StatusStrip({
           <Activity size={14} />
           <span>connector · {gateSummary.label}</span>
         </div>
-        <div className="status-strip-item">
-          <span>tasks: {runningTaskCount}/{totalTaskCount}</span>
-        </div>
         <div className="status-strip-item grow">
           <span>last event: {lastEventLabel}</span>
         </div>

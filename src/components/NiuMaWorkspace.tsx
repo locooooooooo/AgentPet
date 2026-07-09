@@ -125,6 +125,14 @@ export default function NiuMaWorkspace({ api, snapshot, onSnapshot, onReturnHome
   }).length;
   const latestMessage = snapshot.messages[0];
 
+  // 左侧折叠状态
+  const [rolesExpanded, setRolesExpanded] = useState(false);
+  const [lanesExpanded, setLanesExpanded] = useState(false);
+
+  // 侧边栏整体收起/展开状态
+  const [leftRailOpen, setLeftRailOpen] = useState(true);
+  const [rightRailOpen, setRightRailOpen] = useState(true);
+
   useEffect(() => {
     // Connector gate display is status-only, not executable; do not add run/start actions here.
     let mounted = true;
@@ -243,22 +251,22 @@ export default function NiuMaWorkspace({ api, snapshot, onSnapshot, onReturnHome
 
           <div className="header-kpis">
             <SummaryTile
+              label="在线牛马"
+              value={`${snapshot.agents.length}`}
+              detail="核心部门已就位"
+              tone="info"
+            />
+            <SummaryTile
               label="正在拉磨"
               value={`${runningCount}`}
-              detail={`${snapshot.agents.length} 头牛马在线`}
-              tone="positive"
+              detail="疯狂运转中"
+              tone={runningCount > 0 ? 'positive' : 'neutral'}
             />
             <SummaryTile
-              label="活跃 Lanes"
-              value={`${activeLaneCount}`}
-              detail={`${blockedLaneCount} 阻塞 / ${standbyLaneCount} 待命`}
-              tone={blockedLaneCount > 0 ? 'warning' : 'info'}
-            />
-            <SummaryTile
-              label="状态管道 Gate"
-              value={gateHeadline}
-              detail={`${acceptedConnectorCount} 已打通 / ${CONNECTOR_POLICY.connectors.length} 总数`}
-              tone={gateBlockedCount > 0 ? 'danger' : gatePendingCount > 0 ? 'warning' : 'positive'}
+              label="管道阻塞"
+              value={`${gateBlockedCount}`}
+              detail="需要人工决策"
+              tone={gateBlockedCount > 0 ? 'danger' : 'positive'}
             />
           </div>
         </div>
@@ -362,117 +370,119 @@ export default function NiuMaWorkspace({ api, snapshot, onSnapshot, onReturnHome
         </div>
       </header>
 
-      <main className="workspace-grid cockpit-grid">
-        <aside className="left-rail">
-          <section className="cockpit-panel rail-summary-panel" aria-label="调度总览">
-            <PanelHeading
-              kicker="Dispatch State"
-              title="调度总览"
-              meta={ORCHESTRATION_STATUS.identity}
-            />
-
-            <div className="dispatch-grid">
-              <SummaryTile
-                label="监督身份"
-                value={ORCHESTRATION_STATUS.loopState}
-                detail={ORCHESTRATION_STATUS.identity}
-                tone={getToneForState(ORCHESTRATION_STATUS.loopState)}
+      <main className={`workspace-grid cockpit-grid ${!leftRailOpen ? 'left-collapsed' : ''} ${!rightRailOpen ? 'right-collapsed' : ''}`}>
+        <aside className={`left-rail ${leftRailOpen ? 'is-open' : 'is-collapsed'}`}>
+          <button 
+            type="button" 
+            className="rail-toggle-btn left-toggle"
+            onClick={() => setLeftRailOpen(!leftRailOpen)}
+            title={leftRailOpen ? "收起左面板" : "展开左面板"}
+          >
+            {leftRailOpen ? '◀' : '▶'}
+          </button>
+          
+          <div className="rail-content">
+            <section className="cockpit-panel rail-summary-panel" aria-label="调度总览">
+              <PanelHeading
+                kicker="Dispatch State"
+                title="调度总览"
               />
-              <SummaryTile
-                label="派工状态"
-                value={ORCHESTRATION_STATUS.dispatchState}
-                detail={ORCHESTRATION_STATUS.source}
-                tone={getToneForState(ORCHESTRATION_STATUS.dispatchState)}
+
+              <div className="dispatch-grid">
+                <SummaryTile
+                  label="监督身份"
+                  value={ORCHESTRATION_STATUS.loopState}
+                  tone={getToneForState(ORCHESTRATION_STATUS.loopState)}
+                />
+                <SummaryTile
+                  label="派工状态"
+                  value={ORCHESTRATION_STATUS.dispatchState}
+                  tone={getToneForState(ORCHESTRATION_STATUS.dispatchState)}
+                />
+                <SummaryTile
+                  label="今日阻塞"
+                  value={`${blockedLaneCount}`}
+                  tone={blockedLaneCount > 0 ? 'danger' : 'neutral'}
+                />
+                <SummaryTile
+                  label="最新消息"
+                  value={latestMessage ? latestMessage.type : 'idle'}
+                  tone={latestMessage ? getToneForMessage(latestMessage.type) : 'neutral'}
+                />
+              </div>
+
+              <div className="supervision-note emphasis">
+                <ShieldAlert size={14} />
+                <span>{ORCHESTRATION_STATUS.blocker}</span>
+              </div>
+            </section>
+
+            <section className="cockpit-panel orchestration-panel" aria-label="LPS 角色与 lanes">
+              <PanelHeading
+                kicker={ORCHESTRATION_STATUS.source}
+                title="角色分工与监督"
+                meta={`${ORCHESTRATION_STATUS.roles.length} 角色 / ${ORCHESTRATION_STATUS.lanes.length} Lanes`}
               />
-              <SummaryTile
-                label="今日阻塞"
-                value={`${blockedLaneCount}`}
-                detail="需要 PM/用户 决策"
-                tone={blockedLaneCount > 0 ? 'danger' : 'neutral'}
-              />
-              <SummaryTile
-                label="最新消息"
-                value={latestMessage ? latestMessage.type : 'idle'}
-                detail={latestMessage ? latestMessage.title : '暂无系统消息'}
-                tone={latestMessage ? getToneForMessage(latestMessage.type) : 'neutral'}
-              />
-            </div>
+              <p>{ORCHESTRATION_STATUS.target}</p>
 
-            <div className="supervision-note emphasis">
-              <ShieldAlert size={15} />
-              <span>{ORCHESTRATION_STATUS.blocker}</span>
-            </div>
-          </section>
-
-          <section className="cockpit-panel orchestration-panel" aria-label="LPS 角色与 lanes">
-            <PanelHeading
-              kicker={ORCHESTRATION_STATUS.source}
-              title="角色分工与监督"
-              meta={`${ORCHESTRATION_STATUS.roles.length} 角色 / ${ORCHESTRATION_STATUS.lanes.length} Lanes`}
-            />
-            <p>{ORCHESTRATION_STATUS.target}</p>
-
-            <div className="orchestration-task-cards" aria-label="P0 task cards">
-              {cockpitTaskCards.map((card) => {
-                const active = card.id === ACTIVE_COCKPIT_TASK_CARD_ID;
-
-                return (
-                  <article
-                    key={card.id}
-                    className={`orchestration-task-card ${active ? 'task-card-active' : 'task-card-dimmed'}`}
-                    aria-current={active ? 'step' : undefined}
+              <div className="orchestration-columns">
+                <div className="rail-group">
+                  <button 
+                    type="button" 
+                    className="rail-group-head-btn"
+                    onClick={() => setRolesExpanded(!rolesExpanded)}
                   >
-                    <div className="orchestration-task-card-top">
-                      <span>{card.step}</span>
-                      <strong>{card.status}</strong>
+                    <div className="rail-group-head">
+                      <Workflow size={14} />
+                      <span>角色工位 ({ORCHESTRATION_STATUS.roles.length})</span>
                     </div>
-                    <h3>{card.title}</h3>
-                    <p>{card.detail}</p>
-                  </article>
-                );
-              })}
-            </div>
-
-            <div className="orchestration-columns">
-              <div className="rail-group">
-                <div className="rail-group-head">
-                  <Workflow size={14} />
-                  <span>角色工位</span>
+                    <ChevronUp size={14} className={`accordion-chevron ${rolesExpanded ? 'is-open' : ''}`} />
+                  </button>
+                  {rolesExpanded ? (
+                    <div className="role-grid">
+                      {ORCHESTRATION_STATUS.roles.map((role) => (
+                        <article key={role.id} className={`role-card ${role.status}`}>
+                          <div>
+                            <strong>{role.title}</strong>
+                            <span>{role.owner}</span>
+                          </div>
+                          <p>{role.responsibility}</p>
+                          <code>{role.tag}</code>
+                        </article>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
-                <div className="role-grid">
-                  {ORCHESTRATION_STATUS.roles.map((role) => (
-                    <article key={role.id} className={`role-card ${role.status}`}>
-                      <div>
-                        <strong>{role.title}</strong>
-                        <span>{role.owner}</span>
-                      </div>
-                      <p>{role.responsibility}</p>
-                      <code>{role.tag}</code>
-                    </article>
-                  ))}
+
+                <div className="rail-group">
+                  <button 
+                    type="button" 
+                    className="rail-group-head-btn"
+                    onClick={() => setLanesExpanded(!lanesExpanded)}
+                  >
+                    <div className="rail-group-head">
+                      <Activity size={14} />
+                      <span>推进 Lanes ({ORCHESTRATION_STATUS.lanes.length})</span>
+                    </div>
+                    <ChevronUp size={14} className={`accordion-chevron ${lanesExpanded ? 'is-open' : ''}`} />
+                  </button>
+                  {lanesExpanded ? (
+                    <div className="lane-strip lane-stack">
+                      {ORCHESTRATION_STATUS.lanes.map((lane) => (
+                        <div key={lane.id} className={`lane-chip ${lane.state}`}>
+                          <div className="lane-copy">
+                            <span>{lane.title}</span>
+                            <small>{lane.nextAction}</small>
+                          </div>
+                          <strong>{lane.state}</strong>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
               </div>
-
-              <div className="rail-group">
-                <div className="rail-group-head">
-                  <Activity size={14} />
-                  <span>推进 Lanes</span>
-                </div>
-                <div className="lane-strip lane-stack">
-                  {ORCHESTRATION_STATUS.lanes.map((lane) => (
-                    <div key={lane.id} className={`lane-chip ${lane.state}`}>
-                      <div className="lane-copy">
-                        <span>{lane.title}</span>
-                        <small>{lane.nextAction}</small>
-                      </div>
-                      <strong>{lane.state}</strong>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </section>
-
+            </section>
+          </div>
         </aside>
 
         <section className="center-stage">
@@ -485,7 +495,6 @@ export default function NiuMaWorkspace({ api, snapshot, onSnapshot, onReturnHome
               />
               <div className="board-meta">
                 <span>{runningCount} 头正在拉磨</span>
-                <span>{completedCount} 个历史功绩</span>
               </div>
             </div>
 
@@ -507,16 +516,28 @@ export default function NiuMaWorkspace({ api, snapshot, onSnapshot, onReturnHome
         </section>
 
         {selectedAgent && runtime ? (
-          <AgentDetailPanel
-            key={selectedAgent.id}
-            api={api}
-            agent={selectedAgent}
-            runtime={runtime}
-            snapshot={snapshot}
-            onSnapshot={onSnapshot}
-            onRunTask={runTask}
-            onCycle={(event) => cycleState(selectedAgent, event)}
-          />
+          <aside className={`right-rail ${rightRailOpen ? 'is-open' : 'is-collapsed'}`}>
+            <button 
+              type="button" 
+              className="rail-toggle-btn right-toggle"
+              onClick={() => setRightRailOpen(!rightRailOpen)}
+              title={rightRailOpen ? "收起右面板" : "展开右面板"}
+            >
+              {rightRailOpen ? '▶' : '◀'}
+            </button>
+            <div className="rail-content">
+              <AgentDetailPanel
+                key={selectedAgent.id}
+                api={api}
+                agent={selectedAgent}
+                runtime={runtime}
+                snapshot={snapshot}
+                onSnapshot={onSnapshot}
+                onRunTask={runTask}
+                onCycle={(event) => cycleState(selectedAgent, event)}
+              />
+            </div>
+          </aside>
         ) : null}
       </main>
 
@@ -594,14 +615,6 @@ export default function NiuMaWorkspace({ api, snapshot, onSnapshot, onReturnHome
           <strong>{runningCount} 头</strong>
         </div>
         <div className="dock-item">
-          <span>历史功绩</span>
-          <strong>{completedCount} 个</strong>
-        </div>
-        <div className="dock-item">
-          <span>活跃 Lanes</span>
-          <strong>{activeLaneCount} 个</strong>
-        </div>
-        <div className="dock-item">
           <span>管道阻塞</span>
           <strong>{gateBlockedCount} 个</strong>
         </div>
@@ -644,14 +657,14 @@ function SummaryTile({
 }: {
   label: string;
   value: string;
-  detail: string;
+  detail?: string;
   tone?: SummaryTone;
 }) {
   return (
     <article className={`summary-tile ${tone}`}>
       <span>{label}</span>
       <strong>{value}</strong>
-      <small>{detail}</small>
+      {detail ? <small>{detail}</small> : null}
     </article>
   );
 }
@@ -697,7 +710,7 @@ function AgentCard({ agent, runtime, selected, onSelect, onRun, onAction, onCycl
 
   return (
     <article
-      className={`agent-card ${selected ? 'is-selected' : ''}`}
+      className={`agent-card ${selected ? 'is-selected' : 'is-dimmed'}`}
       style={{ '--agent-accent': agent.accent } as CSSProperties}
     >
       <button type="button" className="agent-card-hit" onClick={onSelect}>
@@ -765,9 +778,6 @@ function AgentDetailPanel({ api, agent, runtime, snapshot, onSnapshot, onRunTask
   const quickTasks = useMemo(() => getQuickTasks(agent.id), [agent.id]);
   const openTask = agent.tasks.find((task) => task.id === openTaskId) ?? agent.tasks[0];
   const recentMessage = snapshot.messages[0];
-  const runningTasks = agent.tasks.filter((task) => task.status === 'running').length;
-  const localTasks = agent.tasks.filter((task) => task.runner === 'local').length;
-  const simulatedTasks = agent.tasks.filter((task) => task.runner === 'simulated').length;
 
   async function submitTask(event: React.FormEvent) {
     event.preventDefault();
@@ -810,35 +820,37 @@ function AgentDetailPanel({ api, agent, runtime, snapshot, onSnapshot, onRunTask
           showBubble
           onClick={onCycle}
         />
-        <div>
+        <div className="detail-identity-info">
           <div className="detail-name">
             <h2>{agent.name}</h2>
             <span>{meta.name}</span>
           </div>
-          <p>{agent.description}</p>
+          <p className="detail-desc">{agent.description}</p>
         </div>
       </div>
 
       <div className="quote-box">
-        <Bell size={16} />
+        <Bell size={14} />
         <span>{runtime.quote}</span>
       </div>
 
-      <div className="detail-metrics">
-        <Metric label="模型" value={agent.modelName} />
-        <Metric label="端点" value={agent.endpoint} mono />
-        <Metric
-          label="脑门发热度 / 剩余电量"
-          value={`${runtime.stress}% / ${runtime.energy}%`}
-          detail={`温度 ${Math.round(runtime.temperature)}°C`}
-        />
-        <Metric
-          label="任务负载"
-          value={`${agent.tasks.length} 个任务`}
-          detail={`${runningTasks} 正在拉磨 · ${localTasks} 本地 · ${simulatedTasks} 模拟`}
-        />
-        <Metric label="最近交互" value={formatDateTime(runtime.lastInteractionAt)} />
-        <Metric label="已打开任务" value={openTask?.name ?? '未打开任务'} detail={openTask?.status ?? 'idle'} />
+      <div className="detail-metrics-compact">
+        <div className="metric-item-row">
+          <span className="metric-label">模型:</span>
+          <span className="metric-value">{agent.modelName}</span>
+        </div>
+        <div className="metric-item-row">
+          <span className="metric-label">端点:</span>
+          <span className="metric-value mono">{agent.endpoint}</span>
+        </div>
+        <div className="metric-item-row">
+          <span className="metric-label">状态:</span>
+          <span className="metric-value">{runtime.stress}% 压力 / {runtime.energy}% 电量 ({Math.round(runtime.temperature)}°C)</span>
+        </div>
+        <div className="metric-item-row">
+          <span className="metric-label">交互:</span>
+          <span className="metric-value">{formatDateTime(runtime.lastInteractionAt)}</span>
+        </div>
       </div>
 
       <div className="detail-tabs" role="tablist" aria-label="右侧详情面板">
@@ -923,6 +935,23 @@ function AgentDetailPanel({ api, agent, runtime, snapshot, onSnapshot, onRunTask
                 立即派活
               </button>
             </form>
+
+            <div className="tab-extra-metrics">
+              <div className="extra-metric-item">
+                <span>当前任务负载</span>
+                <strong>{agent.tasks.length} 个任务</strong>
+              </div>
+              <div className="extra-metric-item">
+                <span>拉磨状态</span>
+                <strong>{agent.tasks.filter((task) => task.status === 'running').length} 正在拉磨 · {agent.tasks.filter((task) => task.runner === 'local').length} 本地 · {agent.tasks.filter((task) => task.runner === 'simulated').length} 模拟</strong>
+              </div>
+              {openTask ? (
+                <div className="extra-metric-item">
+                  <span>已打开任务</span>
+                  <strong>{openTask.name} ({openTask.status})</strong>
+                </div>
+              ) : null}
+            </div>
           </section>
         ) : null}
 

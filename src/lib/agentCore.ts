@@ -161,7 +161,7 @@ export const STATE_METAS: Record<NiuMaStatus, StateMeta> = {
 const AGENT_SEEDS: AIAgent[] = [
   {
     id: 'codex',
-    slot: '1号舍',
+    slot: '1号位',
     name: 'Codex',
     codename: '批发排障',
     badge: 'RANCH-v2.5',
@@ -175,7 +175,7 @@ const AGENT_SEEDS: AIAgent[] = [
   },
   {
     id: 'trae',
-    slot: '2号舍',
+    slot: '2号位',
     name: 'Trae',
     codename: '带薪拉屎',
     badge: 'IDE',
@@ -189,7 +189,7 @@ const AGENT_SEEDS: AIAgent[] = [
   },
   {
     id: 'qoder',
-    slot: '3号舍',
+    slot: '3号位',
     name: 'Qoder',
     codename: '佛祖保佑',
     badge: 'QA',
@@ -203,7 +203,7 @@ const AGENT_SEEDS: AIAgent[] = [
   },
   {
     id: 'minimax',
-    slot: '4号舍',
+    slot: '4号位',
     name: 'MiniMax',
     codename: '废话周会',
     badge: 'UI',
@@ -217,7 +217,7 @@ const AGENT_SEEDS: AIAgent[] = [
   },
   {
     id: 'workbuddy',
-    slot: '5号舍',
+    slot: '5号位',
     name: 'WorkBuddy',
     codename: '打水摸鱼',
     badge: 'OPS',
@@ -231,7 +231,7 @@ const AGENT_SEEDS: AIAgent[] = [
   },
   {
     id: 'openclaw',
-    slot: '6号舍',
+    slot: '6号位',
     name: 'OpenClaw',
     codename: '生产救火',
     badge: 'BUG',
@@ -245,7 +245,7 @@ const AGENT_SEEDS: AIAgent[] = [
   },
   {
     id: 'openccode',
-    slot: '7号舍',
+    slot: '7号位',
     name: 'OpenCCode',
     codename: '佛系发版',
     badge: 'CLOUD',
@@ -259,7 +259,7 @@ const AGENT_SEEDS: AIAgent[] = [
   },
   {
     id: 'hermes',
-    slot: '8号舍',
+    slot: '8号位',
     name: 'Hermes',
     codename: '热舞躺平',
     badge: 'NET',
