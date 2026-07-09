@@ -51,7 +51,8 @@ role ledger:
 | `[PM]#protected-cockpit-source-drift@v0.1` | standby | `docs/orchestration/tasks/protected-cockpit-source-drift-v0.1.md` | Hold protected cockpit / selling-point source drift for PM disposition before accepting, formatting, reverting, or routing source edits. |
 | `[长工]#homepage-ui-design@v0.1` homepage-ui-design lane | summarized | `docs/orchestration/sessions/homepage-ui-p0-c0-6-style-2026-07-07.md` | C · 华丽 HomePage is verified; do not create a duplicate thread and keep §〇·quarter selling-point files untouched. |
 | `[PM]#weekly-requirements@2026-07-07` | active | `docs/orchestration/sessions/weekly-requirements-2026-07-07.md` | Maintain W27 (2026-07-07~2026-07-13) weekly-requirements card; align排期 with status.json p0Cards; close W27 lane on 2026-07-11. |
-| `[PM]#weekly-requirements@2026-07-07` weekly-requirements lane | active | `docs/orchestration/status.json` | Keep weekly-requirements session card loop/dispatch state aligned with this role; refresh排期 after each daily supervision pass. |
+    | `[PM]#weekly-requirements@2026-07-07` weekly-requirements lane | active | `docs/orchestration/status.json` | Keep weekly-requirements session card loop/dispatch state aligned with this role; refresh排期 after each daily supervision pass. |
+    | `[PM]#daily-plan@2026-07-09` | active | `docs/orchestration/sessions/daily-plan-2026-07-09.md` | Acknowledge W27 cleanup commit `9ae95ab`; capture 4 P1 decisions (B/C/D/E); dispatch ranch-m5 v0.2 short-worker; run pointer smoke blocker investigation; close the day with a 17:20 PM-direct commit before W27 weekly closeout on 2026-07-11. |
 
 acceptance:
 - Every non-summarized open item has an accountability action and evidence source.

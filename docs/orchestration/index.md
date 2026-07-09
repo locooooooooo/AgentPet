@@ -47,6 +47,7 @@ tracked business cards:
 - session: ⟦tag:v2|session|ranch-v0.2-2026-07-02⟧ -> `docs/orchestration/sessions/ranch-v0.2-2026-07-02.md`
 - session: ⟦tag:v2|session|daily-supervision-2026-07-02⟧ -> `docs/orchestration/sessions/daily-supervision-2026-07-02.md`
 - session: ⟦tag:v2|session|daily-plan-2026-07-03⟧ -> `docs/orchestration/sessions/daily-plan-2026-07-03.md`
+- session: ⟦tag:v2|session|daily-plan-2026-07-09⟧ -> `docs/orchestration/sessions/daily-plan-2026-07-09.md`
 - session: ⟦tag:v2|session|daily-supervision-2026-07-03⟧ -> `docs/orchestration/sessions/daily-supervision-2026-07-03.md`
 - session: ⟦tag:v2|session|daily-longworker-dispatch-2026-07-03⟧ -> `docs/orchestration/sessions/daily-longworker-dispatch-2026-07-03.md`
 - session: ⟦tag:v2|session|cockpit-statusstrip-2026-07-03⟧ -> `docs/orchestration/sessions/cockpit-statusstrip-2026-07-03.md`
@@ -88,7 +89,7 @@ dispatch gate:
 - Supervisor owns drift detection, blocker surfacing, and minimum correction.
 
 current target:
-- 按 LPS 建立角色分工，并持续监督各个角色推进“多 Agent 牛马核心部门”项目；2026-07-07 P0 homepage-ui-p0（全新首页 / landing / 启动页 UI）已按用户拍板 C 华丽完成 H0-1/H0-2/H0-3/H0-4，证据卡 `homepage-ui-p0-c0-6-style-2026-07-07.md` 已归档并随 PM commit `18451ba` 推送；P0-1 blocker 同步、P0-3 `release-dir/win-unpacked.tmp` 清理、P1-2 pointer smoke 捕获路线调查、P1-4 connector decision 文档化均已完成；ranch-m4 v0.2 summarized 无需重派、R0-3 connector 仍 deferred、transparent ranch pointer smoke 完整输入验收仍 standby；后续 7-7~7-13 W27 路线见 weekly-requirements-2026-07-07.md。
+- 按 LPS 建立角色分工，并持续监督各个角色推进“多 Agent 牛马核心部门”项目；2026-07-07 P0 homepage-ui-p0（全新首页 / landing / 启动页 UI）已按用户拍板 C 华丽完成 H0-1/H0-2/H0-3/H0-4，证据卡 `homepage-ui-p0-c0-6-style-2026-07-07.md` 已归档并随 PM commit `18451ba` 推送；P0-1 blocker 同步、P0-3 `release-dir/win-unpacked.tmp` 清理、P1-2 pointer smoke 捕获路线调查、P1-4 connector decision 文档化均已完成；ranch-m4 v0.2 summarized 无需重派、R0-3 connector 仍 deferred、transparent ranch pointer smoke 完整输入验收仍 standby；2026-07-09 用户拍 A3 一刀 commit 路线，PM commit `9ae95ab` 一次性收口 25 文件 / 7 类来源（含 §〇·quarter 受保护源 + 11 行 trailing whitespace 红点接受），PM-direct daily-plan `daily-plan-2026-07-09.md` 已就绪 + 4 件 P1 决策点 B/C/D/E 等用户拍板；后续 7-9 13:00~17:30 按 PM 默认执行序 P1-1 短工 + P1-2 调查 + P0-2 决策落档 + P1-5 立档 + 17:20 commit 收口。
 
 current role split:
 - `[PM]#multi-agent-control@v0.1`: maintain this index, dispatch bounded lanes, collect callbacks, write acceptance.
@@ -120,7 +121,8 @@ current role split:
 - `[长工]#homepage-ui-design@v0.1`: summarized HomePage / landing / 启动页 P0 lane; H0-1 design drafts accepted as C · 华丽, H0-2/H0-3 implemented, H0-4 protected-file audit passed in `homepage-ui-p0-c0-6-style-2026-07-07.md`; no edit to `NiuMaAvatar.tsx` / `index.css` / `agentCore.ts` / central 4x2 control-cockpit grid.
 - `[PM]#ranch-real-integration-r0-3-dryrun@v0.1`: standby R0-3 Codex controlled dry-run evidence collection lane; P0 ranch-real-integration-p0 整体 accepted(2026-07-07 拍板 ②),R0-3 段已转交本 lane;Codex approvalStatus/enabledByDefault/command 维持原值,trae/qoder 维持 placeholder;不主动启动 dry-run,等用户二次确认时机。
 - `[PM]#protected-cockpit-source-drift@v0.1`: standby PM disposition lane for protected cockpit / selling-point source drift; current protected diffs stay visible without accept, format-only repair, revert, or bounded implementation routing until explicit PM/user decision.
-- `[PM]#weekly-requirements@2026-07-07`: active W27 (2026-07-07~2026-07-13) weekly-requirements planner; maintains the weekly-requirements session card aligned with `status.json` p0Cards / roles / lanes; refreshes排期 after each daily supervision pass; closes the W27 lane on 2026-07-11 with a weekly-closeout session card.
+  - `[PM]#weekly-requirements@2026-07-07`: active W27 (2026-07-07~2026-07-13) weekly-requirements planner; maintains the weekly-requirements session card aligned with `status.json` p0Cards / roles / lanes; refreshes排期 after each daily supervision pass; closes the W27 lane on 2026-07-11 with a weekly-closeout session card.
+  - `[PM]#daily-plan@2026-07-09`: active 2026-07-09 (Thu) daily plan; acknowledges W27 cleanup commit `9ae95ab`, holds 4 P1 decisions (B/C/D/E), dispatches ranch-m5 v0.2 short-worker, runs pointer smoke blocker investigation, and closes the day with a 17:20 PM-direct commit before W27 weekly closeout on 2026-07-11.
 
 blockers:
 - External connector execution remains disabled; Codex is draft/pending/discovery-only, Trae/Qoder are intentionally command-empty placeholders, and no Codex/Trae/Qoder connector may be accepted, enabled, or executed until connector policy is accepted.

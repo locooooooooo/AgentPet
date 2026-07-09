@@ -360,3 +360,18 @@ Fri 7-11        ▸ 本周 closeout + 5 commit 推 main
 - 横切 3 件（卖点保护 / live-subagent quota / 长工幂等）作为契约持续 backlog。
 - 4 个决策点等用户拍板；PM 默认执行序：A=U2, B=②, C=short-worker, D=今天就开。
 - **2026-07-07 11:07 增补**：用户新增 P0-0（首页 UI 设计 + 长工）拍板；本周 P0 由 3 件升至 4 件；长工 thread `mvs_237b464ebc78403d953b9ab93b398ab8` 已启动并交付 H0-1 设计稿，用户已选择 C 华丽，H0-2/H0-3/H0-4 已完成并本地启动验证。
+
+## 十二、7-9(Thu)当日补记
+
+**已落 commit**:9ae95ab chore(orchestration): 7-9 PM-direct W27 cleanup + 7-8 cockpit 改动整收(26 files / +5169 −307;origin/main 已推)
+
+**已写当日 plan**:docs/orchestration/sessions/daily-plan-2026-07-09.md(主计划),4 件 P1 等用户拍板
+- **P1-1** 派 ranch-m5 v0.2 短工(1.5h) ‖ **P1-2** pointer smoke blocker 调查(1h) ‖ **P0-2** R0-3 connector 决策落档(20min 不写代码) ‖ **P1-5** 7-8 控制舱 UI 检讨方案立项(1h)
+
+**PM 默认执行序**:B=②(deferred + new dry-run lane)/ C=short-worker(ranch-m5 v0.2 准入)/ D=今天就开(CDP capturePage 调查)/ E=E1(cockpit-ui-redesign-v3.1 task card 立档)
+
+**距离 7-11 周五 closeout 还有 1.5 个工作日**(7-9 13:00 后 + 7-10 全天 + 7-11 上午),时间盒充分
+
+**每日傍晚 daily-supervision 续写 11:19 / 11:29 / 11:50 三段已落**,docs/orchestration/sessions/daily-supervision-2026-07-02.md 同步到位
+
+- **2026-07-09 11:29 增补**:用户拍 A3 路线,commit 9ae95ab 一次性收口 workspace;weekly-requirements 不动,由 docs/orchestration/sessions/daily-plan-2026-07-09.md 续写当日 P1 候选与 4 决策点;距离 7-11 W27 closeout 还有 1.5 个工作日,本日 4h 内 P1-1 / P1-2 / P0-2 / P1-5 全可派;新增长工 §〇·quarter 保护文件 4 个(NiuMaWorkspace / StatusStrip / index.css / agentCore)改动 + 11 行 trailing whitespace 红点已接受但不 format-only repair,留待 W28 P1-5 立档后处理。

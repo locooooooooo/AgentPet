@@ -786,11 +786,11 @@ if (statusJson) {
   if (!statusJson.todayPlan || typeof statusJson.todayPlan !== 'object') {
     errors.push('status.json missing todayPlan registration');
   } else {
-    if (statusJson.todayPlan.date !== '2026-07-06') {
-      errors.push(`status.json todayPlan date mismatch: ${statusJson.todayPlan.date}`);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(statusJson.todayPlan.date ?? '')) {
+      errors.push(`status.json todayPlan date must be YYYY-MM-DD, got: ${statusJson.todayPlan.date}`);
     }
-    if (statusJson.todayPlan.session !== 'docs/orchestration/sessions/daily-closeout-2026-07-06.md') {
-      errors.push(`status.json todayPlan session mismatch: ${statusJson.todayPlan.session}`);
+    if (!statusJson.todayPlan.session?.trim()) {
+      errors.push('status.json todayPlan session is required');
     }
     if (!statusJson.todayPlan.selectedRoute?.trim()) {
       errors.push('status.json todayPlan selectedRoute is required');

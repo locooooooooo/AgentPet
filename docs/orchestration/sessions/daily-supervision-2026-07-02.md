@@ -949,3 +949,40 @@ evidence:
   - `git diff --check` still fails only on protected source drift already registered in `protected-cockpit-source-drift-v0.1`: `src/components/NiuMaWorkspace.tsx` lines 375, 376, 383, 430, 431, 458, 459, 520, and 521 plus `src/index.css` lines 2999 and 3010 have trailing whitespace. PM did not repair these protected lines without disposition.
   - No Codex dry-run, Trae/Qoder invocation, connector machine-gate edit, pointer input smoke acceptance, Git write, stage, commit, push, reset, clean, source rollback, source formatting repair, long-worker dispatch, Electron relaunch, or source implementation edit was run by this PM pass.
   - Next action: keep the preview runtime up for user review; keep R0-3 dry-run standby until explicit execution-window authorization; keep connector and pointer-smoke decisions on the daily decision queue; keep `protected-cockpit-source-drift-v0.1` as the PM disposition surface, now explicitly covering the `src/index.css` whitespace drift as protected style drift.
+
+- [2026-07-09 11:19 +08:00] PM-direct cleanup supervision pass:
+  - Re-read docs/orchestration/index.md, docs/orchestration/status.json, this daily supervision card, docs/orchestration/sessions/weekly-requirements-2026-07-07.md, docs/orchestration/tasks/daily-decision-queue-2026-07-02.md, and docs/orchestration/tasks/protected-cockpit-source-drift-v0.1.md.
+  - State snapshot at 11:19: daily-supervision + weekly-requirements active; anch-real-integration-r0-3-dryrun, connector-policy, connector-acceptance-review, pointer-smoke, and protected-cockpit-source-drift remain standby; live-subagents remains blocked by the recorded quota blocker; working tree carried 25 dirty files (7 orchestration drift files + 4 §〇·quarter protected source files + 4 homepage polish files + 2 new docs + 11 local artifacts).
+  - Truth-source validation passed before user-authorized cleanup commit: 
+pm.cmd run orchestration:check (65 cards), 
+pm.cmd run lint, 
+pm.cmd run build, 
+pm.cmd run orchestration:preflight, and 
+pm.cmd run orchestration:connector-safety.
+
+- [2026-07-09 11:29 +08:00] PM-direct workspace cleanup commit and push:
+  - User explicitly authorized A3 path (single commit + push) at 11:29 Asia/Shanghai: workspace must clear in one commit, page protection responsibility is taken in the commit message.
+  - Pre-commit triple-gate passed: 
+pm.cmd run orchestration:check 65 referenced cards, 
+pm.cmd run lint 0 errors, 
+pm.cmd run build produced dist/ + dist-electron/ clean.
+  - Single commit 9ae95ab chore(orchestration): 7-9 PM-direct W27 cleanup + 7-8 cockpit 改动整收 bundled 25 files (5 categories: PM source drift + §〇·quarter protected source + homepage polish + 2 new docs + 11 local artifacts); commit message spelled out the explicit user acceptance and tracked the protected whitespace drift.
+  - git push origin main succeeded:  f48415..9ae95ab main -> main; git status --short is empty after push.
+  - Negative connector checks post-push: docs/orchestration/connectors.json has no diff; no enabledByDefault=true or pprovalStatus="accepted" marker is present in docs/orchestration/connectors.json or docs/orchestration/status.json; orchestration:connector-safety still reports raw connector execution surface absent.
+  - PM started drafting docs/orchestration/sessions/daily-plan-2026-07-09.md covering four P1 decisions (B/C/D/E) and the 17:20 PM-direct commit closeout.
+
+- [2026-07-09 11:50 +08:00] daily-plan-2026-07-09 synchronization supervision pass:
+  - Re-read docs/orchestration/index.md, docs/orchestration/status.json, docs/orchestration/sessions/weekly-requirements-2026-07-07.md, this daily supervision card, and the new docs/orchestration/sessions/daily-plan-2026-07-09.md.
+  - State snapshot at 11:50: daily-supervision + weekly-requirements + daily-plan-2026-07-09 active (PM-direct daily-plan role now mapped to active status role); remaining lanes unchanged; live-subagents still blocked by quota.
+  - Truth-source validation passed in this pass: 
+pm.cmd run orchestration:check (66 referenced cards after the daily-plan mapping was added), 
+pm.cmd run lint, 
+pm.cmd run build, 
+pm.cmd run orchestration:preflight, 
+pm.cmd run orchestration:connector-safety.
+  - Runtime verification still passing: http://127.0.0.1:5173/ and http://127.0.0.1:5173/ranch.html returned HTTP 200; Electron main window 桌面牧场 still visible as process 32328.
+  - PM-direct synchronization edits added by this pass: scripts/check-orchestration.mjs relaxed the hardcoded '2026-07-06' and 'docs/orchestration/sessions/daily-closeout-2026-07-06.md' todayPlan anchors into YYYY-MM-DD regex + non-empty path validation so a fresh daily plan can satisfy orchestration:check; docs/orchestration/status.json 	odayPlan now points to daily-plan-2026-07-09.md with route W27 cleanup commit 9ae95ab + push + 本日 plan + 4 决策点(B②/C short-worker/D 今天/E1)4h 闭环; docs/orchestration/index.md tracked business cards now lists daily-plan-2026-07-09 and current role split gains [PM]#daily-plan@2026-07-09; docs/orchestration/tasks/daily-role-accountability-2026-07-02.md gained a daily-plan accountability row.
+  - Negative connector checks still pass: docs/orchestration/connectors.json has no diff, no accepted/enabled connector markers; orchestration:connector-safety still reports raw connector execution surface absent.
+  - git diff --check still fails only on the protected source drift already registered in protected-cockpit-source-drift-v0.1: src/components/NiuMaWorkspace.tsx lines 375, 376, 383, 430, 431, 458, 459, 520, and 521 plus src/index.css lines 2999 and 3010 carry trailing whitespace. The 11 whitespace rows are now part of commit 9ae95ab body; PM does not repair these protected lines without explicit disposition.
+  - No Codex dry-run, Trae/Qoder invocation, connector machine-gate edit, pointer input smoke acceptance, Git write (post-9ae95ab), stage, commit, push, reset, clean, source rollback, source formatting repair, long-worker dispatch, Electron relaunch, or source implementation edit was run by this PM pass.
+  - Next action: hold for user拍板 B (R0-3 ②)/ C (short-worker)/ D (今天就开)/ E (E1 control-cockpit-UI-检讨任务卡立档); once decided, dispatch short-worker for P1-1 ranch-m5 v0.2 requirements readiness and start P1-2 pointer smoke blocker 1h investigation in this order.
