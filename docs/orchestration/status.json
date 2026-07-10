@@ -294,6 +294,15 @@
       "evidence": "docs/orchestration/sessions/weekly-requirements-2026-07-14.md"
     },
     {
+      "id": "m5-longworker-dispatch",
+      "title": "[PM]#m5-longworker-dispatch@v0.1",
+      "owner": "主控",
+      "status": "standby",
+      "responsibility": "M5 long-worker dispatch package (ranch-window-v0.2 优先); 2026-07-10 16:21 administrator selected option ② 串行 1 张 ranch-window-v0.2 first; W27 不启动任何 long-worker,等 W28 激活; 实际 thread 由管理员手动开.",
+      "tag": "⟦tag:v2|task|m5-longworker-dispatch-v0.1⟧",
+      "evidence": "docs/orchestration/tasks/m5-longworker-dispatch-v0.1.md"
+    },
+    {
       "id": "ranch-real-integration-r0-3-dryrun",
       "title": "[PM]#ranch-real-integration-r0-3-dryrun@v0.1",
       "owner": "主控",

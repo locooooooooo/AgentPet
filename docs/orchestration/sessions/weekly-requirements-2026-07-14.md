@@ -29,7 +29,7 @@ dispatch state: standby
 
 | 优先级 | 候选 | 当前边界 | 激活前置 |
 | --- | --- | --- | --- |
-| P0-1 | M5 v0.2 串行实施,首卡 `ranch-window-v0.2` | 仅路线已选;未派 long-worker,未改 source | 新 bounded dispatch 明确文件 fence、验收和回滚面 |
+| P0-1 | M5 v0.2 串行实施,首卡 `ranch-window-v0.2` | 仅路线已选;未派 long-worker,未改 source | 派工包 docs-only 已落档(`docs/orchestration/tasks/m5-longworker-dispatch-v0.1.md`);W28 激活时按派工包"thread 启动描述"手动开 long-worker |
 | P0-2 | R0-3 Codex controlled dry-run | 仍 standby;不改 `approvalStatus` / `enabledByDefault` / `command` | W28 明确执行窗口、隔离 cwd 和 evidence 路径后再二次确认 |
 | P0-3 | Transparent ranch full pointer input evidence | capturePage 仅证明可见渲染;完整 pointer input 未 accepted | 明确 observer/automation route,保持 implementation 与 evidence 分离 |
 
