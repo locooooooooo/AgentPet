@@ -22,6 +22,12 @@ manual evidence route:
 - Record whether the route can see the transparent `桌面牧场` Electron window and the `桌面牧场 · 控制舱` window at the same time.
 - Record the exact command session used to launch and stop Electron, including any failure output.
 - 2026-07-07 route candidate: Windows MCP Snapshot observed both Electron windows and did not emit `SetIsBorderRequired failed`; full pointer input rows remain pending until they are directly observed.
+- 2026-07-09 route candidate: Electron `webContents.capturePage()` captured `http://127.0.0.1:5173/ranch.html` to `docs/orchestration/sessions/ranch-pointer-capture-2026-07-09.{json,png}` and did not emit `SetIsBorderRequired failed`; full pointer input rows remain pending until they are directly observed.
+
+capture-route evidence:
+| check | expected result | result | evidence | blocker if incomplete |
+| --- | --- | --- | --- | --- |
+| capture route | Electron `webContents.capturePage()` captures ranch renderer without `SetIsBorderRequired failed` | pass | `docs/orchestration/sessions/ranch-pointer-capture-2026-07-09.json`, `docs/orchestration/sessions/ranch-pointer-capture-2026-07-09.png`, `docs/orchestration/sessions/ranch-pointer-capture-2026-07-09.md` |  |
 
 evidence table template:
 | check | expected result | result | evidence | blocker if incomplete |

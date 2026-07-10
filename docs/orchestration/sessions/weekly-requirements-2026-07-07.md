@@ -297,7 +297,9 @@ Fri 7-11        ▸ 本周 closeout + 5 commit 推 main
 
 ---
 
-## 六、本周决策待办（**等用户拍板，4 项**）
+## 六、本周决策待办（**历史态；7-9 已更新**）
+
+> 2026-07-09 20:00 更新：本节保留 7-7 当时的计划态作为来源记录；B/C/D/E 已由用户授权按 PM 默认路线执行，当前不再等待这组拍板。
 
 | # | 决策点 | 候选 | PM 默认建议 |
 |---|---|---|---|
@@ -306,7 +308,7 @@ Fri 7-11        ▸ 本周 closeout + 5 commit 推 main
 | **C** | ranch-m5 派工粒度 | **short-worker 写 v0.2 需求准入** / 直接 long-worker 实施 / 暂不派 | **short-worker 写 v0.2 需求准入**（先看清要求再拍 long-worker，长工投入大别盲上）|
 | **D** | pointer smoke blocker 处理 | **今天就开 1h 调查** / 排到下周二 / 不解，承认接受现状 | **今天就开 1h 调查**（低垂果实，大概率半天能闭环）|
 
-> **等你拍 A/B/C/D**，本日内回我即开干。
+> **历史提示**：7-7 当时等待 A/B/C/D；7-9 已由 `daily-plan-2026-07-09.md` 更新为 B②/C short-worker/D 今天/E1 已执行到边界内结果。
 > **PM 默认执行序**：A=U2, B=②, C=short-worker, D=今天就开。
 > 一次回我"**A=U2, B=②, C=short-worker, D=今天就开**"即按此跑完 5 件事（3 件 P0 + P1-1 派工 + P1-2 调查），预计 3~4h。
 
@@ -358,15 +360,15 @@ Fri 7-11        ▸ 本周 closeout + 5 commit 推 main
 - 本周 P1 候选 4 件，建议至少开 P1-1（ranch-m5 v0.2 需求准入 short-worker）+ P1-2（pointer smoke blocker 调查），P1-3/P1-4 看用户时间。
 - 本周 P2 4 件不强推，作为下次开盘候选池。
 - 横切 3 件（卖点保护 / live-subagent quota / 长工幂等）作为契约持续 backlog。
-- 4 个决策点等用户拍板；PM 默认执行序：A=U2, B=②, C=short-worker, D=今天就开。
+- 7-7 历史态曾等待 4 个决策点；7-9 已按 PM 默认执行序完成 B②/C short-worker/D 今天/E1 的 docs-only 准入、capture 调查和 task intake。
 - **2026-07-07 11:07 增补**：用户新增 P0-0（首页 UI 设计 + 长工）拍板；本周 P0 由 3 件升至 4 件；长工 thread `mvs_237b464ebc78403d953b9ab93b398ab8` 已启动并交付 H0-1 设计稿，用户已选择 C 华丽，H0-2/H0-3/H0-4 已完成并本地启动验证。
 
 ## 十二、7-9(Thu)当日补记
 
 **已落 commit**:9ae95ab chore(orchestration): 7-9 PM-direct W27 cleanup + 7-8 cockpit 改动整收(26 files / +5169 −307;origin/main 已推)
 
-**已写当日 plan**:docs/orchestration/sessions/daily-plan-2026-07-09.md(主计划),4 件 P1 等用户拍板
-- **P1-1** 派 ranch-m5 v0.2 短工(1.5h) ‖ **P1-2** pointer smoke blocker 调查(1h) ‖ **P0-2** R0-3 connector 决策落档(20min 不写代码) ‖ **P1-5** 7-8 控制舱 UI 检讨方案立项(1h)
+**已写当日 plan**:docs/orchestration/sessions/daily-plan-2026-07-09.md(主计划),4 件 P1 已按用户授权拍板执行到边界内结果
+- **P1-1** 派 ranch-m5 v0.2 短工(1.5h) ‖ **P1-2** pointer smoke blocker 调查(1h) ‖ **P0-2** R0-3 connector 决策落档(20min 不写代码) ‖ **P1-5** 7-8 控制舱 UI 诊断方案立项(1h)
 
 **PM 默认执行序**:B=②(deferred + new dry-run lane)/ C=short-worker(ranch-m5 v0.2 准入)/ D=今天就开(CDP capturePage 调查)/ E=E1(cockpit-ui-redesign-v3.1 task card 立档)
 
@@ -375,3 +377,15 @@ Fri 7-11        ▸ 本周 closeout + 5 commit 推 main
 **每日傍晚 daily-supervision 续写 11:19 / 11:29 / 11:50 三段已落**,docs/orchestration/sessions/daily-supervision-2026-07-02.md 同步到位
 
 - **2026-07-09 11:29 增补**:用户拍 A3 路线,commit 9ae95ab 一次性收口 workspace;weekly-requirements 不动,由 docs/orchestration/sessions/daily-plan-2026-07-09.md 续写当日 P1 候选与 4 决策点;距离 7-11 W27 closeout 还有 1.5 个工作日,本日 4h 内 P1-1 / P1-2 / P0-2 / P1-5 全可派;新增长工 §〇·quarter 保护文件 4 个(NiuMaWorkspace / StatusStrip / index.css / agentCore)改动 + 11 行 trailing whitespace 红点已接受但不 format-only repair,留待 W28 P1-5 立档后处理。
+
+- **2026-07-09 20:00 增补**:用户授权按 PM 默认路线执行 B②/C short-worker/D 今天/E1。本轮已创建 `ranch-m5-requirements-v0.2.md` 主卡 + 5 子卡,已用 `scripts/ranch-pointer-capture.mjs` 归档 `ranch-pointer-capture-2026-07-09.{json,png,md}`,已创建 `cockpit-ui-redesign-v3.1-v0.1.md`;未执行 Codex dry-run,未改 connector machine-gate,未派 M5 long-worker,未做控制舱 source implementation,未执行 git stage/commit/push。
+
+## 十三、7-10(周五)管理员拍板与 W27 closeout 准备
+
+- P1-1 trailing whitespace 选择 ④:路由到 W28 bounded lane;W27 不修 protected source。
+- P1-2 M5 选择 ②:W28 串行优先 `ranch-window-v0.2`;W27 不派 long-worker、不启动 implementation。
+- P1-3 live-subagents quota 选择 ②:推到 W28;W27 不主动复查 `403 DAILY_LIMIT_EXCEEDED`。
+- P1-4 R0-3 dry-run 选择 ②:推到 W28;W27 不执行 Codex,不改 connector machine gate。
+- W28 standby placeholder: `docs/orchestration/sessions/weekly-requirements-2026-07-14.md`。
+- W27 closeout template: `docs/orchestration/sessions/weekly-closeout-2026-07-11.md`。
+- 2026-07-11 (周六) 16:00 +08:00 前完成 W27 final closeout;模板存在不等同于提前收口。

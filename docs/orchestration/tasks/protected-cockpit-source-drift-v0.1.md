@@ -16,6 +16,8 @@ objective:
 
 current state:
 - Standby only.
+- 2026-07-10 administrator disposition selected option ④: route the registered trailing-whitespace drift to a W28 bounded lane.
+- This disposition is routing only. No protected source edit, format-only repair, acceptance, or rollback is performed in W27.
 - A supervision pass observed current diffs in protected/shared source surfaces including `src/components/NiuMaWorkspace.tsx`, `src/components/StatusStrip.tsx`, `src/index.css`, and `src/lib/agentCore.ts`.
 - `git diff --check` currently reports trailing whitespace in `src/components/NiuMaWorkspace.tsx`; that remains an explicit red point rather than an authorized formatting fix.
 
@@ -34,7 +36,7 @@ acceptance:
 - `docs/orchestration/status.json` keeps this role/lane `standby`.
 - `docs/orchestration/tasks/daily-decision-queue-2026-07-02.md` contains the PM decision queue row and coverage row for this lane.
 - `docs/orchestration/tasks/daily-role-accountability-2026-07-02.md` contains the role accountability row for this lane.
-- `docs/orchestration/sessions/daily-supervision-2026-07-02.md` closeout states: Protected cockpit source drift is pending PM disposition.
+- `docs/orchestration/sessions/daily-supervision-2026-07-02.md` records the W28 bounded-lane routing and preserves the no-source-edit boundary.
 - No `src/**`, `electron/**`, `package.json`, Git stage/commit/push/reset/clean, connector machine-gate field, or external connector command is changed by this card.
 
 non-goals:
@@ -46,8 +48,8 @@ non-goals:
 - Do not reopen summarized homepage-ui-design, ranch-m4, ranch-window, ranch-status-script, ranch-personality, cockpit-refactor-p0, or pointer-smoke lanes from this card.
 
 next action:
-- Wait for PM/user disposition: accept current diffs, authorize format-only repair, authorize rollback, or route the source drift into a fresh bounded lane.
-- Keep this lane visible in daily decision queue and role accountability until disposition is recorded.
+- Keep this lane standby through W27 closeout.
+- In W28, open a fresh bounded lane naming the exact whitespace rows and verification surface before any source edit.
 
 summary:
-- Standby protected source drift disposition card; no source edit, connector execution, or Git write is authorized.
+- Administrator selected W28 bounded routing; no source edit, connector execution, or Git write is authorized by this disposition.

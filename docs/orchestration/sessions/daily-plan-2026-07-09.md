@@ -4,8 +4,8 @@
 
 ⟦tag:v2|session|daily-plan-2026-07-09⟧
 
-loop state: active
-dispatch state: active
+loop state: summarized
+dispatch state: summarized
 
 > **计划日期**:2026-07-09(周四)
 > **计划人**:Mavis(root session `mvs_5bb811db0b244b80a142de9d522cc90a`)
@@ -30,7 +30,7 @@ dispatch state: active
 - 真源 drift(7 个 PM 监督产物)
 - §〇·quarter 受保护源改动 4 个(用户显式授权接受,trailing whitespace 11 行红点已登记 `protected-cockpit-source-drift-v0.1.md`)
 - 首页 polish(HomePage + 3 子项)
-- 2 个新 doc(`protected-cockpit-source-drift-v0.1.md` + `docs/控制舱UI检讨与改造方案-2026-07-08.md`)
+- 2 个新 doc(`protected-cockpit-source-drift-v0.1.md` + `docs/控制舱UI诊断与改造方案-2026-07-08.md`)
 - 11 个本地临时产物(animal-emotions* / build-animals* / .tmp-* / .pyserver.log)
 
 **当前可立即用的产物**:`E:\多agent牛马\release\desktop-ranch-win-unpacked\桌面牧场.exe`(7-6 编译产物,v0.3 视觉验收 OK);dev `http://127.0.0.1:5173/` 仍可达;Electron 桌面牧场进程 32328 仍可见。
@@ -46,15 +46,15 @@ dispatch state: active
 | 11:30 ~ 11:50 | W27 cleanup commit 9ae95ab + push | 20min | ✅ 完成 |
 | 11:50 ~ 12:30 | 写本 plan + status.json todayPlan 同步 + index.md tracked cards 登记 | 40min | ✅ 进行 |
 | 12:30 ~ 13:30 | 午休 / 监听 | - | - |
-| 13:30 ~ 15:00 | **P1-1 派 ranch-m5 v0.2 短工**(5 张子卡需求准入) | 1.5h | 排队 |
-| 15:00 ~ 16:00 | **P1-2 pointer smoke blocker 调查**(Electron `webContents.capturePage()` CDP 路线) | 1h | 排队 |
-| 16:00 ~ 16:20 | P0-2 / B R0-3 决策落档(不写代码,只标 ©/②/③ + 更新 task + 更新 status.json) | 20min | 排队 |
-| 16:20 ~ 17:20 | **P1-5 候选**:7-8 控制舱 UI 检讨方案 doc 立项(归档成 `cockpit-ui-redesign-v3.1-v0.1.md` task card + E 选项) | 1h | 排队 |
-| 17:20 ~ 17:50 | 跑三件套 + 写 daily-supervision 续写 + 当日 commit + push | 30min | 排队 |
+| 13:30 ~ 15:00 | **P1-1 派 ranch-m5 v0.2 短工**(5 张子卡需求准入) | 1.5h | ✅ 准入卡已落档 |
+| 15:00 ~ 16:00 | **P1-2 pointer smoke blocker 调查**(Electron `webContents.capturePage()` CDP 路线) | 1h | ✅ capture route 已通过 |
+| 16:00 ~ 16:20 | P0-2 / B R0-3 决策落档(不写代码,只标 ② + 更新 task/status wording) | 20min | ✅ B② 已落档 |
+| 16:20 ~ 17:20 | **P1-5 候选**:7-8 控制舱 UI 诊断方案 doc 立项(归档成 `cockpit-ui-redesign-v3.1-v0.1.md` task card + E1) | 1h | ✅ task card 已落档 |
+| 17:20 ~ 17:50 | 跑三件套 + 写 daily-supervision 续写；commit/push 需单独授权 | 30min | 进行 |
 | 17:50 ~ 18:30 | 当日 closeout 等式 | - | 监空 |
 
 > **总可用工时**:约 4.5~5 小时有效开发时间(去掉午饭 1h 与傍晚 30min 收口)。
-> **本卡不写代码。** 1 个 commit + push 全部归口,7-10 / 7-11 留给 W27 closeout。
+> **本卡不改产品代码。** 本轮产出为 orchestration docs + capture 调查脚本 + 证据归档；git commit/push 需另行授权。
 
 ---
 
@@ -105,7 +105,10 @@ dispatch state: active
 - 5 子卡各自 objective 1 行 + scope 文件路径清单 + FR 编号
 - 跨子卡共享禁止清单在主卡统一写明,子卡引用主卡
 
-**PM 拟好 prompt**(待用户授权"开 P1-1"即派):详见 transcript 7-9 11:14 段 prompt。
+**2026-07-09 19:xx 执行结果**:
+- 用户授权 PM 默认路线后,已创建 `ranch-m5-requirements-v0.2.md` 主卡 + 5 张子卡。
+- 本轮仅做 docs-only 需求准入,没有启动 long-worker,没有修改 `src/**` / `electron/**` / `package.json` / `icon/**`。
+- 后续 M5 实施仍需 PM/user 另行拍 long-worker implementation lane。
 
 ---
 
@@ -127,7 +130,11 @@ dispatch state: active
 - `SetIsBorderRequired failed` 不再出现
 - 至少 1 个 evidence row pending → pass
 
-**本日目标**:跑完调查路线 1,出 `scripts/ranch-pointer-capture.mjs` 原型 + 留 7-10 实施收口。
+**2026-07-09 19:51 执行结果**:
+- 已新增 `scripts/ranch-pointer-capture.mjs`。
+- 已运行 `node scripts/ranch-pointer-capture.mjs`,输出 `docs/orchestration/sessions/ranch-pointer-capture-2026-07-09.json` 与 `.png`。
+- 证据:route=`electron-webContents-capturePage`,target=`http://127.0.0.1:5173/ranch.html`,640×360 PNG 139609 bytes,8 animals,3 action buttons,未出现 `SetIsBorderRequired failed`。
+- 未执行 click-through / double-click / right-click / floating drag / edge dock pointer input,所以 pointer smoke 完整验收仍 pending。
 
 ---
 
@@ -143,22 +150,25 @@ dispatch state: active
 
 ---
 
-### P1-5 · 7-8 控制舱 UI 检讨方案立项 · 1h · ⭐ ⭐
+### P1-5 · 7-8 控制舱 UI 诊断方案立项 · 1h · ⭐ ⭐
 
-**问题**:`docs/控制舱UI检讨与改造方案-2026-07-08.md` 已 commit 进 history(commit 9ae95ab),但未立项成 task card,等于"业务面只有方案没有 lane"。
+**问题**:`docs/控制舱UI诊断与改造方案-2026-07-08.md` 已 commit 进 history(commit 9ae95ab),但未立项成 task card,等于"业务面只有方案没有 lane"。
 
 **改动**:
 - 写 `docs/orchestration/tasks/cockpit-ui-redesign-v3.1-v0.1.md`(新 task card)
 - 登记到 `index.md` tracked business cards + `status.json` 角色与 lane
 - 在 weekly-requirements-2026-07-07.md §二 P1 列表追加 P1-5(改 cockpit UI 视觉规范)
-- commit + push(本日 17:20 ~ 17:50 收口 commit 一并推)
+- 本轮仅立项 task card;commit/push 需另行授权
 
 **scope 选项**(留 W28 P0 候选,本卡仅立项):
 - §〇·quarter 保护下的视觉降噪增量
 - 拟物化推进(状态条 / 卡片材质 / 阴影)
 - 8 卡样式小修订(仅限于不破坏动效 + 不破坏 hover 状态)
 
-**PM 默认建议**:本日 16:20 段立项 task card(60min 卡完成时间),具体 scope 推到 W28 拍板。
+**2026-07-09 19:xx 执行结果**:
+- 已创建 `docs/orchestration/tasks/cockpit-ui-redesign-v3.1-v0.1.md`。
+- 已引用实际存在的诊断文档 `docs/控制舱UI诊断与改造方案-2026-07-08.md`。
+- 本轮仅立项为 W28 候选,没有修改控制舱 source,具体 scope 推到 W28 拍板。
 
 ---
 
@@ -206,8 +216,8 @@ Thu 7-9 (今天)
   13:30 ▸ P1-1 派 ranch-m5 v0.2 短工(1.5h)
   15:00 ▸ P1-2 pointer smoke blocker 调查路线 1(1h)
   16:00 ▸ P0-2 R0-3 决策落档(20min,不写代码)
-  16:20 ▸ P1-5 控制舱 UI 检讨方案立项(1h)
-  17:20 ▸ 跑三件套 + daily-supervision 续写 + commit + push
+  16:20 ▸ P1-5 控制舱 UI 诊断方案立项(1h)
+  17:20 ▸ 跑三件套 + daily-supervision 续写;commit/push 待单独授权
   17:50 ▸ 写 weekly-closeout 草稿(0.2h)
 
 Fri 7-10
@@ -222,26 +232,24 @@ Sat 7-11 (周六,周 closeout)
 
 ---
 
-## 七、本日决策点(等你拍,3 件)
+## 七、本日决策点(已拍板)
 
 | # | 决策点 | 候选 | PM 默认建议 |
 |---|---|---|---|
 | **A** | 9ae95ab 后 working tree 处理方式 | ✅ done(已 commit) | - |
-| **B** | P0-2 R0-3 connector 决策 | ① 接受 / ② 维持 deferred + 新开 dry-run lane / ③ 全 deferred | **②**(trae/qoder 缺可执行文件 hard-block;不应 enabled) |
-| **C** | P1-1 ranch-m5 派工粒度 | short-worker 写 v0.2 准入 / 直接 long-worker 实施 / 暂不派 | **short-worker**(先看清要求再派 long-worker) |
-| **D** | P1-2 pointer smoke blocker | 今天就开 1h 调查 / 排下周二 / 不解 | **今天就开**(低垂果实,半天能闭环) |
-| **新增 E** | 7-8 控制舱 UI 检讨方案 doc | E1 归档成 task card + commit / E2 不归档作为下次排期输入 / E3 跳过 | **E1**(本日 16:20 段 1h 立项) |
+| **B** | P0-2 R0-3 connector 决策 | ① 接受 / ② 维持 deferred + 新开 dry-run lane / ③ 全 deferred | ✅ **②** 已拍板;dry-run lane standby,执行窗口仍需二次确认 |
+| **C** | P1-1 ranch-m5 派工粒度 | short-worker 写 v0.2 准入 / 直接 long-worker 实施 / 暂不派 | ✅ **short-worker** 已拍板;仅需求准入,不实施 |
+| **D** | P1-2 pointer smoke blocker | 今天就开 1h 调查 / 排下周二 / 不解 | ✅ **今天就开** 已拍板;capturePage 路线已跑通 |
+| **新增 E** | 7-8 控制舱 UI 诊断方案 doc | E1 归档成 task card / E2 不归档作为下次排期输入 / E3 跳过 | ✅ **E1** 已拍板;task card 已立档 |
 
-> **等你拍**:B / C / D / E 四项;A 已决。
-> **PM 默认执行序**:B=②, C=short-worker, D=今天就开, E=E1。
-> 一次回我 **"B② C short D 今天 E1"** 即按此跑完,预计 4h。
+> **执行边界**:本轮不执行 Codex dry-run、不改 connector machine-gate、不派 M5 long-worker、不做 control-cockpit source implementation、不做 git stage/commit/push。
 
 ---
 
 ## 八、orchestration 登记
 
 - 本卡路径:`docs/orchestration/sessions/daily-plan-2026-07-09.md`
-- 引用本卡的文档(待用户拍板 + 17:20 段 commit 同步):
+- 引用本卡的文档(本轮已同步到控制面;commit/push 需另行授权):
   - `docs/orchestration/index.md`(`tracked business cards` 段加本 session)
   - `docs/orchestration/status.json`(`todayPlan.date` 改 2026-07-09 + `todayPlan.session` 指向本卡)
   - `docs/orchestration/sessions/weekly-requirements-2026-07-07.md`(§二 P1 列表追加 P1-5)
@@ -264,19 +272,20 @@ Sat 7-11 (周六,周 closeout)
 ## 十、acceptance
 
 - 本文档存在且可被 `docs/orchestration/index.md` 引用
-- workspace clean(`git status --short` 空)
-- 最近 commit `9ae95ab` 已推 origin/main
+- 本轮新增/修改文件全部可由 `git status --short` 查到;不要求 workspace clean,因为未获本轮 commit/push 授权
+- 最近已推 commit 仍为当前 HEAD 基线;本轮不新建 commit
 - 4 个决策点(B/C/D/E)有用户拍板结果记录
-- 17:20 段 commit 收口当日 4 件进度 + 立项 task card
+- 当日 4 件进度 + 立项 task card + capture evidence 已落档
 - `npm.cmd run orchestration:check` pass(66+ 张卡一致)
 - `npm.cmd run lint` + `npm.cmd run build` pass
 - `npm.cmd run orchestration:preflight` + `orchestration:connector-safety` pass
 
 ## 十一、next action
 
-- 等用户拍 B/C/D/E 决策点
-- 13:30 起按 PM 默认执行序开干 P1-1(短工 ranch-m5 v0.2 准入)
-- 17:20 段三件套 + commit 收口 + push
+- B/C/D/E 已按用户授权拍板并执行到 docs-only 准入 / capture 调查 / task intake。
+- 等 PM/user 另行拍 M5 long-worker implementation 是否启动。
+- 等用户二次确认 R0-3 Codex controlled dry-run 执行窗口。
+- 17:20 段三件套 + daily-supervision 续写;git commit/push 需另行授权。
 - 17:50 段写 weekly-closeout 草稿(7-11 final 基础)
 - 续写 `daily-supervision-2026-07-02.md` [2026-07-09 11:30+] 各时间锚点
 - 7-10 周五继续 P1-1 短工验收 + P1-2 实施 + 7-10 PM closeout
@@ -284,7 +293,8 @@ Sat 7-11 (周六,周 closeout)
 
 ## 十二、summary
 
-- 7-9 当日 6 件 PM 收口:`9ae95ab` W27 cleanup commit(20min)+ 本 daily-plan + `index.md`/`status.json` 同步 + 11:30 段 weekly-requirements §十二 增补 + 13:30 起 P1-1 短工 + P1-2 调查 + P0-2 决策落档 + P1-5 立项 + 17:20 commit 收口。
-- 4 个决策点等用户拍;PM 默认执行序:B=②, C=short-worker, D=今天就开, E=E1。
+- 7-9 当日 PM 收口:`9ae95ab` W27 cleanup commit(20min)+ 本 daily-plan + `index.md`/`status.json` 同步 + 11:30 段 weekly-requirements §十二 增补 + 用户授权后的 P1-1 M5 v0.2 准入卡 + P1-2 capturePage 调查 + P0-2 B② 决策落档 + P1-5 立项;本轮不做 git commit/push。
+- 4 个决策点已按用户授权采用 PM 默认执行序:B=②, C=short-worker, D=今天就开, E=E1。
+- R0-3 仍不执行 dry-run;M5 仍未派 long-worker;pointer smoke 仅 capture route 通过,完整 pointer input pending;cockpit UI redesign 仅立项 W28 候选。
 - 距离 7-11 周五 closeout 还有 1.5 个工作日,留余充分。
-- daily-supervision 末段 18:56;7-9 当日新 supervision pass 全程 + 17:20 commit 收口段会续写进 `daily-supervision-2026-07-02.md` 第 [2026-07-09 11:xx] 锚点。
+- daily-supervision 会续写 2026-07-09 19:xx PM-direct 执行段,记录校验、边界和未完成项。

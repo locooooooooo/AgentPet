@@ -43,16 +43,20 @@ role ledger:
 | `[监督]#ranch-window@v0.1` | summarized | `docs/orchestration/tasks/ranch-window-v0.1.md` | Preserve the M5 window + ranch 3-level UI evidence summary and leave direct transparent pointer smoke to the existing standby packages. |
 | `[监督]#ranch-status-script@v0.1` | summarized | `docs/orchestration/tasks/ranch-status-script-v0.1.md` | Preserve the M5 animal/status/single-toast evidence summary without overstating direct OS-toast replay. |
 | `[监督]#ranch-personality@v0.1` | summarized | `docs/orchestration/tasks/ranch-personality-v0.1.md` | Preserve the M5 personality/settings linkage summary and reopen direct replay only through a fresh bounded smoke lane. |
+| `[短工]#ranch-m5-requirements@v0.2` | standby | `docs/orchestration/tasks/ranch-m5-requirements-v0.2.md` | Preserve the selected W28 serial route with `ranch-window-v0.2` first; do not dispatch implementation in W27. |
 | `[监督]#ranch-pointer-smoke@v0.2` | standby | `docs/orchestration/tasks/ranch-pointer-smoke-v0.2.md` | Wait for a transparent-window capture route. |
-| `[监督]#ranch-pointer-smoke-manual-evidence@v0.2` | standby | `docs/orchestration/tasks/ranch-pointer-smoke-manual-evidence-v0.2.md` | Fill the evidence table only when a valid route exists. |
+| `[监督]#ranch-pointer-smoke-manual-evidence@v0.2` | standby | `docs/orchestration/tasks/ranch-pointer-smoke-manual-evidence-v0.2.md` | Keep full click-through, double-click, right-click, drag, and dock rows pending until directly observed. |
 | `[监督]#multi-agent-control@v0.1` live-subagents lane | blocked | `docs/orchestration/status.json` | Recheck `403 DAILY_LIMIT_EXCEEDED` only when a safe route exists. |
 | `[长工]#homepage-ui-design@v0.1` | summarized | `docs/orchestration/tasks/homepage-ui-p0-dispatch-v0.1.md` | Thread `mvs_237b464ebc78403d953b9ab93b398ab8` delivered H0-1; C implementation and H0-4 audit are accepted. |
-| `[PM]#ranch-real-integration-r0-3-dryrun@v0.1` | standby | `docs/orchestration/tasks/ranch-real-integration-r0-3-dryrun-v0.1.md` | Hold R0-3 controlled dry-run standby until user authorizes execution window; do not touch Codex machine-gate fields; trae/qoder remain placeholder. |
-| `[PM]#protected-cockpit-source-drift@v0.1` | standby | `docs/orchestration/tasks/protected-cockpit-source-drift-v0.1.md` | Hold protected cockpit / selling-point source drift for PM disposition before accepting, formatting, reverting, or routing source edits. |
+| `[PM]#cockpit-ui-redesign-v3.1@v0.1` | standby | `docs/orchestration/tasks/cockpit-ui-redesign-v3.1-v0.1.md` | Keep the 2026-07-08 control-cockpit UI diagnosis as a W28 candidate; no source implementation in this pass. |
+| `[PM]#ranch-real-integration-r0-3-dryrun@v0.1` | standby | `docs/orchestration/tasks/ranch-real-integration-r0-3-dryrun-v0.1.md` | Administrator moved the execution window to W28; do not invoke Codex or touch machine-gate fields in W27. |
+| `[PM]#protected-cockpit-source-drift@v0.1` | standby | `docs/orchestration/tasks/protected-cockpit-source-drift-v0.1.md` | Administrator selected option ④; preserve the W28 bounded-lane route without editing protected source in W27. |
 | `[长工]#homepage-ui-design@v0.1` homepage-ui-design lane | summarized | `docs/orchestration/sessions/homepage-ui-p0-c0-6-style-2026-07-07.md` | C · 华丽 HomePage is verified; do not create a duplicate thread and keep §〇·quarter selling-point files untouched. |
 | `[PM]#weekly-requirements@2026-07-07` | active | `docs/orchestration/sessions/weekly-requirements-2026-07-07.md` | Maintain W27 (2026-07-07~2026-07-13) weekly-requirements card; align排期 with status.json p0Cards; close W27 lane on 2026-07-11. |
     | `[PM]#weekly-requirements@2026-07-07` weekly-requirements lane | active | `docs/orchestration/status.json` | Keep weekly-requirements session card loop/dispatch state aligned with this role; refresh排期 after each daily supervision pass. |
-    | `[PM]#daily-plan@2026-07-09` | active | `docs/orchestration/sessions/daily-plan-2026-07-09.md` | Acknowledge W27 cleanup commit `9ae95ab`; capture 4 P1 decisions (B/C/D/E); dispatch ranch-m5 v0.2 short-worker; run pointer smoke blocker investigation; close the day with a 17:20 PM-direct commit before W27 weekly closeout on 2026-07-11. |
+| `[PM]#weekly-requirements@2026-07-14` | standby | `docs/orchestration/sessions/weekly-requirements-2026-07-14.md` | Preserve W28 as a placeholder until the 2026-07-11 W27 closeout; no implementation or dry-run authorization. |
+| `[PM]#daily-plan@2026-07-09` | summarized | `docs/orchestration/sessions/daily-plan-2026-07-09.md` | Retain B②/C short-worker/D 今天/E1 as summarized historical evidence. |
+| `[PM]#daily-plan@2026-07-10` | active | `docs/orchestration/sessions/daily-plan-2026-07-10.md` | Record administrator decisions, prepare W28/W27 closeout, and finish the authorized docs/script commit-push. |
 
 acceptance:
 - Every non-summarized open item has an accountability action and evidence source.

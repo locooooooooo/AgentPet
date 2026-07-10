@@ -33,7 +33,7 @@ verification route:
 3. Run `npm.cmd run orchestration:check`.
 4. Launch Electron with `npm.cmd run dev`.
 5. Confirm both windows exist: `桌面牧场` and `桌面牧场 · 控制舱`.
-6. Use a manual desktop check or the Windows MCP Snapshot route recorded in `docs/orchestration/sessions/ranch-pointer-smoke-investigation-2026-07-07.md`; the route must see transparent windows and avoid `SetIsBorderRequired failed`.
+6. Use a manual desktop check, the Windows MCP Snapshot route recorded in `docs/orchestration/sessions/ranch-pointer-smoke-investigation-2026-07-07.md`, or the Electron capturePage route recorded in `docs/orchestration/sessions/ranch-pointer-capture-2026-07-09.md`; the route must see the transparent ranch renderer and avoid `SetIsBorderRequired failed`.
 7. Verify desktop mode click-through outside animal hot zones.
 8. Verify animal double-click summons/focuses the control cockpit.
 9. Verify animal right-click opens the ranch context menu.
@@ -52,6 +52,7 @@ acceptance:
 blockers:
 - Prior Windows capture route failed with `SetIsBorderRequired failed: 不支持此接口 (0x80004002)`.
 - 2026-07-07 investigation found Windows MCP Snapshot can see the transparent ranch window without emitting that error, but it has not yet run click-through, double-click, right-click, drag, or dock persistence.
+- 2026-07-09 investigation found Electron `webContents.capturePage()` can capture `ranch.html` into JSON/PNG evidence without emitting that error; it still did not run click-through, double-click, right-click, drag, or dock persistence.
 - Computer-use or Windows MCP input requires a fresh screenshot state before click/right-click/drag input, and should not interrupt the user's active preview.
 
 next action:

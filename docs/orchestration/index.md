@@ -36,18 +36,26 @@ tracked business cards:
 - task: ⟦tag:v2|task|ranch-window-v0.1⟧ -> `docs/orchestration/tasks/ranch-window-v0.1.md`
 - task: ⟦tag:v2|task|ranch-status-script-v0.1⟧ -> `docs/orchestration/tasks/ranch-status-script-v0.1.md`
 - task: ⟦tag:v2|task|ranch-personality-v0.1⟧ -> `docs/orchestration/tasks/ranch-personality-v0.1.md`
+- task: ⟦tag:v2|task|ranch-m5-requirements-v0.2⟧ -> `docs/orchestration/tasks/ranch-m5-requirements-v0.2.md`
+- task: ⟦tag:v2|task|ranch-window-v0.2⟧ -> `docs/orchestration/tasks/ranch-window-v0.2.md`
+- task: ⟦tag:v2|task|ranch-status-script-v0.2⟧ -> `docs/orchestration/tasks/ranch-status-script-v0.2.md`
+- task: ⟦tag:v2|task|ranch-personality-v0.2⟧ -> `docs/orchestration/tasks/ranch-personality-v0.2.md`
+- task: ⟦tag:v2|task|ranch-fence-pointer-v0.2⟧ -> `docs/orchestration/tasks/ranch-fence-pointer-v0.2.md`
+- task: ⟦tag:v2|task|ranch-system-notify-v0.2⟧ -> `docs/orchestration/tasks/ranch-system-notify-v0.2.md`
 - task: ⟦tag:v2|task|ranch-pointer-smoke-v0.2⟧ -> `docs/orchestration/tasks/ranch-pointer-smoke-v0.2.md`
 - task: ⟦tag:v2|task|ranch-pointer-smoke-manual-evidence-v0.2⟧ -> `docs/orchestration/tasks/ranch-pointer-smoke-manual-evidence-v0.2.md`
 - task: ⟦tag:v2|task|ranch-real-integration-p0-v0.1⟧ -> `docs/orchestration/tasks/ranch-real-integration-p0-v0.1.md`
 - task: ⟦tag:v2|task|ranch-real-integration-r0-3-dryrun-v0.1⟧ -> `docs/orchestration/tasks/ranch-real-integration-r0-3-dryrun-v0.1.md`
 - task: ⟦tag:v2|task|protected-cockpit-source-drift-v0.1⟧ -> `docs/orchestration/tasks/protected-cockpit-source-drift-v0.1.md`
 - task: ⟦tag:v2|task|cockpit-refactor-p0-v0.1⟧ -> `docs/orchestration/tasks/cockpit-refactor-p0-v0.1.md`
+- task: ⟦tag:v2|task|cockpit-ui-redesign-v3.1-v0.1⟧ -> `docs/orchestration/tasks/cockpit-ui-redesign-v3.1-v0.1.md`
 - task: ⟦tag:v2|task|homepage-ui-p0-v0.1⟧ -> `docs/orchestration/tasks/homepage-ui-p0-v0.1.md`
 - task: ⟦tag:v2|task|homepage-ui-p0-dispatch-v0.1⟧ -> `docs/orchestration/tasks/homepage-ui-p0-dispatch-v0.1.md`
 - session: ⟦tag:v2|session|ranch-v0.2-2026-07-02⟧ -> `docs/orchestration/sessions/ranch-v0.2-2026-07-02.md`
 - session: ⟦tag:v2|session|daily-supervision-2026-07-02⟧ -> `docs/orchestration/sessions/daily-supervision-2026-07-02.md`
 - session: ⟦tag:v2|session|daily-plan-2026-07-03⟧ -> `docs/orchestration/sessions/daily-plan-2026-07-03.md`
 - session: ⟦tag:v2|session|daily-plan-2026-07-09⟧ -> `docs/orchestration/sessions/daily-plan-2026-07-09.md`
+- session: ⟦tag:v2|session|daily-plan-2026-07-10⟧ -> `docs/orchestration/sessions/daily-plan-2026-07-10.md`
 - session: ⟦tag:v2|session|daily-supervision-2026-07-03⟧ -> `docs/orchestration/sessions/daily-supervision-2026-07-03.md`
 - session: ⟦tag:v2|session|daily-longworker-dispatch-2026-07-03⟧ -> `docs/orchestration/sessions/daily-longworker-dispatch-2026-07-03.md`
 - session: ⟦tag:v2|session|cockpit-statusstrip-2026-07-03⟧ -> `docs/orchestration/sessions/cockpit-statusstrip-2026-07-03.md`
@@ -67,15 +75,19 @@ tracked business cards:
 - session: ⟦tag:v2|session|runtime-blocked-path-closeout-2026-07-01⟧ -> `docs/orchestration/sessions/runtime-blocked-path-closeout-2026-07-01.md`
 - session: ⟦tag:v2|session|codex-evidence-closeout-2026-07-01⟧ -> `docs/orchestration/sessions/codex-evidence-closeout-2026-07-01.md`
 - session: ⟦tag:v2|session|daily-closeout-2026-07-06⟧ -> `docs/orchestration/sessions/daily-closeout-2026-07-06.md`
+- session: ⟦tag:v2|session|daily-closeout-2026-07-10⟧ -> `docs/orchestration/sessions/daily-closeout-2026-07-10.md`
 - session: ⟦tag:v2|session|daily-supervision-2026-07-06⟧ -> `docs/orchestration/sessions/daily-supervision-2026-07-06.md`
 - session: ⟦tag:v2|session|ranch-smoke-desktop-exe-2026-07-06⟧ -> `docs/orchestration/sessions/ranch-smoke-desktop-exe-2026-07-06.md`
 - session: ⟦tag:v2|session|weekly-requirements-2026-07-07⟧ -> `docs/orchestration/sessions/weekly-requirements-2026-07-07.md`
+- session: ⟦tag:v2|session|weekly-requirements-2026-07-14⟧ -> `docs/orchestration/sessions/weekly-requirements-2026-07-14.md`
+- session: ⟦tag:v2|session|weekly-closeout-2026-07-11⟧ -> `docs/orchestration/sessions/weekly-closeout-2026-07-11.md`
 - session: ⟦tag:v2|session|homepage-ui-p0-progress⟧ -> `docs/orchestration/sessions/homepage-ui-p0-progress.md`
 - session: ⟦tag:v2|session|homepage-ui-p0-design-2026-07-07⟧ -> `docs/orchestration/sessions/homepage-ui-p0-design-2026-07-07.md`
 - session: ⟦tag:v2|session|homepage-ui-p0-design-accepted-2026-07-07⟧ -> `docs/orchestration/sessions/homepage-ui-p0-design-accepted-2026-07-07.md`
 - session: ⟦tag:v2|session|homepage-ui-p0-c0-6-style-2026-07-07⟧ -> `docs/orchestration/sessions/homepage-ui-p0-c0-6-style-2026-07-07.md`
 - session: ⟦tag:v2|session|ranch-pointer-smoke-investigation-2026-07-07⟧ -> `docs/orchestration/sessions/ranch-pointer-smoke-investigation-2026-07-07.md`
 - session: ⟦tag:v2|session|connector-decision-2026-07-07⟧ -> `docs/orchestration/sessions/connector-decision-2026-07-07.md`
+- session: ⟦tag:v2|session|ranch-pointer-capture-2026-07-09⟧ -> `docs/orchestration/sessions/ranch-pointer-capture-2026-07-09.md`
 
 recently closed cards:
 - accepted blocked-path lanes: ⟦tag:v2|task|connector-types-v0.1⟧, ⟦tag:v2|task|connector-main-gate-v0.1⟧, ⟦tag:v2|task|connector-preload-api-v0.1⟧, ⟦tag:v2|task|connector-ui-binding-v0.1⟧
@@ -89,7 +101,7 @@ dispatch gate:
 - Supervisor owns drift detection, blocker surfacing, and minimum correction.
 
 current target:
-- 按 LPS 建立角色分工，并持续监督各个角色推进“多 Agent 牛马核心部门”项目；2026-07-07 P0 homepage-ui-p0（全新首页 / landing / 启动页 UI）已按用户拍板 C 华丽完成 H0-1/H0-2/H0-3/H0-4，证据卡 `homepage-ui-p0-c0-6-style-2026-07-07.md` 已归档并随 PM commit `18451ba` 推送；P0-1 blocker 同步、P0-3 `release-dir/win-unpacked.tmp` 清理、P1-2 pointer smoke 捕获路线调查、P1-4 connector decision 文档化均已完成；ranch-m4 v0.2 summarized 无需重派、R0-3 connector 仍 deferred、transparent ranch pointer smoke 完整输入验收仍 standby；2026-07-09 用户拍 A3 一刀 commit 路线，PM commit `9ae95ab` 一次性收口 25 文件 / 7 类来源（含 §〇·quarter 受保护源 + 11 行 trailing whitespace 红点接受），PM-direct daily-plan `daily-plan-2026-07-09.md` 已就绪 + 4 件 P1 决策点 B/C/D/E 等用户拍板；后续 7-9 13:00~17:30 按 PM 默认执行序 P1-1 短工 + P1-2 调查 + P0-2 决策落档 + P1-5 立档 + 17:20 commit 收口。
+- 按 LPS 建立角色分工，并持续监督各个角色推进“多 Agent 牛马核心部门”项目；2026-07-10 管理员已拍板四项默认路线：protected trailing whitespace 选择 ④ 路由 W28 bounded lane，M5 选择 ② 串行优先 `ranch-window-v0.2` 但 W27 不启动实施，live-subagents quota 选择 ② 推到 W28，R0-3 dry-run 选择 ② 推到 W28且不执行 Codex；W27 当前只完成 7-9 docs/capture evidence 收口、W28 standby placeholder 和 2026-07-11 closeout 准备，connector machine gate、protected source、完整 pointer input 均保持未触碰。
 
 current role split:
 - `[PM]#multi-agent-control@v0.1`: maintain this index, dispatch bounded lanes, collect callbacks, write acceptance.
@@ -116,19 +128,23 @@ current role split:
 - `[监督]#ranch-window@v0.1`: summarized M5 window evidence for FR-001/005/008/009/011 plus ranch 3-level UI convergence; manual transparent pointer smoke remains delegated to the standby verification packages.
 - `[监督]#ranch-status-script@v0.1`: summarized M5 animal/status/single-toast notification evidence for FR-002/003/004/006 without reopening connector state.
 - `[监督]#ranch-personality@v0.1`: summarized M5 personality and control-cockpit prefs-linkage evidence for FR-007 and notifyPrefs.
+- `[短工]#ranch-m5-requirements@v0.2`: standby docs-only M5 requirements readiness lane; main card plus five child cards are created, but no M5 implementation or long-worker dispatch is authorized.
 - `[监督]#ranch-pointer-smoke@v0.2`: standby verification package for transparent ranch pointer smoke; no implementation edit.
 - `[监督]#ranch-pointer-smoke-manual-evidence@v0.2`: standby manual evidence package for pointer-smoke callback recording; no pointer input executed yet.
 - `[长工]#homepage-ui-design@v0.1`: summarized HomePage / landing / 启动页 P0 lane; H0-1 design drafts accepted as C · 华丽, H0-2/H0-3 implemented, H0-4 protected-file audit passed in `homepage-ui-p0-c0-6-style-2026-07-07.md`; no edit to `NiuMaAvatar.tsx` / `index.css` / `agentCore.ts` / central 4x2 control-cockpit grid.
 - `[PM]#ranch-real-integration-r0-3-dryrun@v0.1`: standby R0-3 Codex controlled dry-run evidence collection lane; P0 ranch-real-integration-p0 整体 accepted(2026-07-07 拍板 ②),R0-3 段已转交本 lane;Codex approvalStatus/enabledByDefault/command 维持原值,trae/qoder 维持 placeholder;不主动启动 dry-run,等用户二次确认时机。
-- `[PM]#protected-cockpit-source-drift@v0.1`: standby PM disposition lane for protected cockpit / selling-point source drift; current protected diffs stay visible without accept, format-only repair, revert, or bounded implementation routing until explicit PM/user decision.
-  - `[PM]#weekly-requirements@2026-07-07`: active W27 (2026-07-07~2026-07-13) weekly-requirements planner; maintains the weekly-requirements session card aligned with `status.json` p0Cards / roles / lanes; refreshes排期 after each daily supervision pass; closes the W27 lane on 2026-07-11 with a weekly-closeout session card.
-  - `[PM]#daily-plan@2026-07-09`: active 2026-07-09 (Thu) daily plan; acknowledges W27 cleanup commit `9ae95ab`, holds 4 P1 decisions (B/C/D/E), dispatches ranch-m5 v0.2 short-worker, runs pointer smoke blocker investigation, and closes the day with a 17:20 PM-direct commit before W27 weekly closeout on 2026-07-11.
+- `[PM]#protected-cockpit-source-drift@v0.1`: standby PM disposition lane;administrator selected W28 bounded routing, with no W27 source edit, format repair, acceptance, or rollback.
+- `[PM]#cockpit-ui-redesign-v3.1@v0.1`: standby task-intake lane for the 2026-07-08 control-cockpit UI diagnosis; W28 candidate only, no source implementation in this pass.
+- `[PM]#weekly-requirements@2026-07-07`: active W27 (2026-07-07~2026-07-13) weekly-requirements planner; closes the W27 lane on 2026-07-11 with a weekly-closeout session card.
+- `[PM]#weekly-requirements@2026-07-14`: standby W28 (2026-07-14~2026-07-20) placeholder;tracks selected routes without authorizing implementation or dry-run.
+- `[PM]#daily-plan@2026-07-09`: summarized 2026-07-09 daily plan;B②/C short-worker/D 今天/E1 evidence is retained as history.
+- `[PM]#daily-plan@2026-07-10`: active 2026-07-10 daily plan;administrator decisions are recorded, W28/closeout preparation is in progress, and authorized docs/script commit-push is the current closeout action.
 
 blockers:
 - External connector execution remains disabled; Codex is draft/pending/discovery-only, Trae/Qoder are intentionally command-empty placeholders, and no Codex/Trae/Qoder connector may be accepted, enabled, or executed until connector policy is accepted.
 - Treat service-side `403 DAILY_LIMIT_EXCEEDED` as a live sub-agent blocker until a quota recheck path is available; today's Codex app long-worker threads were used only as explicit user-authorized role sessions.
 - Control-cockpit central 4x2 grid and protected selling-point files remain locked; M4 header settings entry has been completed and accepted.
-- Transparent Electron ranch pointer smoke has an identified Windows MCP Snapshot capture route that sees the transparent window without `SetIsBorderRequired failed`; full click-through / double-click / right-click / drag / dock evidence is still pending.
+- Transparent Electron ranch pointer smoke now has an additional Electron `webContents.capturePage()` evidence route that captured `ranch.html` without `SetIsBorderRequired failed`; full click-through / double-click / right-click / drag / dock evidence is still pending.
 
 next action:
 - Keep M3 code gates accepted as passed after `lint`, `build`, and `orchestration:check`; use the identified Windows MCP Snapshot route only as capture evidence until full transparent-window pointer input is observed.
@@ -136,7 +152,7 @@ next action:
 - Keep AgentPet Git log ignore / staging decisions behind explicit user confirmation. **2026-07-07 Git log ignore = ① 推 main 即可 已落档**(不引 pre-commit / pre-push hook,backup 为每周 manual 巡检);lane `git-staging-review-agentpet` 仍 standby 等待 PM/user 决定是否处理当前 Git state。The historical repair package is `docs/orchestration/tasks/git-repair-agentpet-v0.1.md`; the current Git state review package is `docs/orchestration/tasks/git-staging-review-agentpet-v0.1.md` and remains standby.
 - Preserve the accepted M4 evidence from thread `019f227a-8978-7df1-8b3f-738ccdb01b18`; future ranch work must open a new bounded lane.
 - Keep `ranch-window-v0.1`, `ranch-status-script-v0.1`, and `ranch-personality-v0.1` summarized as M5 evidence cards; do not treat them as fresh active implementation lanes.
-- Keep ranch pointer-smoke verification and `ranch-pointer-smoke-manual-evidence-v0.2` standby until a manual or alternate transparent-window capture route is available.
+- Keep ranch pointer-smoke verification and `ranch-pointer-smoke-manual-evidence-v0.2` standby for full pointer input; capture-only evidence is archived, but click-through / double-click / right-click / drag / dock are not accepted yet.
 - Keep Codex draft/pending/enabled=false and Trae/Qoder placeholder/not-requested/enabled=false until connector machine gate fields change.
 - Use `docs/orchestration/tasks/daily-decision-queue-2026-07-02.md` as the next PM callback surface for standby decisions.
 - Keep `docs/orchestration/tasks/daily-role-accountability-2026-07-02.md` aligned with role states before closing any daily supervision pass.

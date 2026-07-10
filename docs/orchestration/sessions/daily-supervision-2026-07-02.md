@@ -565,31 +565,31 @@ completed:
 
 incomplete:
 - M5 ranch verification cards are summarized and the ranch body now matches v0.3's simple three-level UI direction, but real transparent-window pointer smoke is still not accepted.
-- Transparent ranch window pointer smoke is still not fully automated because Windows capture reports `SetIsBorderRequired failed: 不支持此接口 (0x80004002)`.
-- AgentPet Git repair standby package remains as a historical boundary, while the current post-push Git state needs the Git long-worker callback and `git-staging-review-agentpet-v0.1` before any stage, unstage, log-ignore, commit, or push decision.
+- Transparent ranch window pointer smoke is still not fully automated; Windows MCP Snapshot and Electron `webContents.capturePage()` now provide capture evidence, but full click-through, double-click, right-click, drag, and dock pointer evidence is still not automated or accepted.
+- AgentPet Git repair standby package remains as a historical boundary; this 2026-07-10 pass has narrow authorization to stage/commit/push only `docs/orchestration/**` and `scripts/ranch-pointer-capture.mjs`, while all other Git state decisions remain behind `git-staging-review-agentpet-v0.1`.
 - Connector acceptance review package exists, but connector policy acceptance is waiting for PM/user decision; no execution binding should be dispatched before that.
-- Ranch pointer-smoke verification and manual evidence packages are standby until a manual or alternate transparent-window capture route is available.
+- Ranch pointer-smoke verification and manual evidence packages are standby; the capture route now exists, but a direct pointer-input observer/automation route is still required before acceptance.
 - Homepage UI long-worker dispatch package exists, thread `mvs_237b464ebc78403d953b9ab93b398ab8` has delivered H0-1 design drafts, user selected C gorgeous, and H0-2/H0-3/H0-4 are accepted with evidence `docs/orchestration/sessions/homepage-ui-p0-c0-6-style-2026-07-07.md`; PM commit `18451ba` has been pushed to `origin/main`.
 - Daily decision queue is standby and does not authorize any queue item by itself.
 - Daily role accountability ledger is standby and records state/evidence/action without changing role states.
-- R0-3 Codex controlled dry-run lane is standby: P0 ranch-real-integration-p0 accepted after user decision ② on 2026-07-07; R0-3 evidence-collection lane opened at `docs/orchestration/tasks/ranch-real-integration-r0-3-dryrun-v0.1.md`; Codex machine-gate fields (approvalStatus / enabledByDefault / command) remain untouched; trae/qoder remain placeholder; dry-run execution still awaits explicit PM/user authorization.
-- Protected cockpit source drift is pending PM disposition: current protected/shared source diffs remain visible as a red point and no accept, format-only repair, revert, or bounded implementation routing is authorized yet.
+- R0-3 Codex controlled dry-run lane is standby: P0 ranch-real-integration-p0 accepted after user decision ② on 2026-07-07; the 2026-07-10 administrator decision moves execution to W28; Codex machine-gate fields (approvalStatus / enabledByDefault / command) remain untouched; trae/qoder remain placeholder; dry-run execution still requires a W28 second execution-window confirmation.
+- Protected cockpit source drift is pending PM disposition activation: administrator selected option ④ to route the registered whitespace drift into a fresh W28 bounded lane; W27 does not accept, format, revert, or edit protected source.
 
 blockers:
 - External connector execution remains disabled.
 - Live sub-agent execution remains blocked by the previously recorded service-side `403 DAILY_LIMIT_EXCEEDED` until rechecked.
 - Control-cockpit central 4x2 grid and protected selling-point files remain locked; M4 header settings entry has been completed and accepted.
 - M5 desktop ranch UI convergence is code/browser verified, but it does not clear the transparent Electron pointer-smoke blocker.
-- AgentPet Git working tree/index state is post-push and has PM docs/script/log drift; no stage, unstage, log-ignore, commit, or push decision has been authorized for this PM pass.
+- AgentPet Git working tree/index state is post-push and has PM docs/script/log drift; this 2026-07-10 pass narrowly authorizes only the declared `docs/orchestration/**` plus `scripts/ranch-pointer-capture.mjs` stage/commit/push, with no reset, clean, force push, or unrelated path inclusion.
 
 next action:
 - Keep PM and Supervisor active for drift checks and Git post-push callback collection.
 - Preserve accepted M4 evidence from thread `019f227a-8978-7df1-8b3f-738ccdb01b18`; future ranch/control-cockpit work must open a new bounded lane.
 - Keep `ranch-window-v0.1`, `ranch-status-script-v0.1`, and `ranch-personality-v0.1` summarized as M5 evidence cards after ranch UI convergence; future direct desktop replay must open a fresh bounded smoke lane.
-- Keep `ranch-pointer-smoke-v0.2` and `ranch-pointer-smoke-manual-evidence-v0.2` standby until a manual or alternate transparent-window capture route is available.
+- Keep `ranch-pointer-smoke-v0.2` and `ranch-pointer-smoke-manual-evidence-v0.2` standby until a manual or alternate transparent-window capture route is available. Capture routes now exist, but the lanes remain standby until full pointer input can be directly observed; capture-only evidence does not clear acceptance.
 - Keep connector-policy and `connector-acceptance-review-v0.1` on standby until PM/user accepts or revises machine gate fields.
-- Keep Git manager, `git-repair-agentpet-v0.1`, and `git-staging-review-agentpet-v0.1` on standby for post-push review; no stage, unstage, log-ignore, commit, or push before explicit authorization.
-- Keep `protected-cockpit-source-drift-v0.1` standby until PM/user decides whether to accept current protected source diffs, authorize format-only repair, authorize rollback, or route the drift into a fresh bounded lane.
+- Keep Git manager, `git-repair-agentpet-v0.1`, and `git-staging-review-agentpet-v0.1` on standby for unrelated Git state; use the current narrow authorization only for the declared docs/script closeout.
+- Keep `protected-cockpit-source-drift-v0.1` standby through W27; open a fresh W28 bounded lane before touching the registered protected whitespace.
 - Use `daily-decision-queue-2026-07-02` as the next PM callback surface for standby decisions.
 - Keep `daily-role-accountability-2026-07-02` aligned with role states before closing any daily supervision pass.
 
@@ -986,3 +986,52 @@ pm.cmd run orchestration:connector-safety.
   - git diff --check still fails only on the protected source drift already registered in protected-cockpit-source-drift-v0.1: src/components/NiuMaWorkspace.tsx lines 375, 376, 383, 430, 431, 458, 459, 520, and 521 plus src/index.css lines 2999 and 3010 carry trailing whitespace. The 11 whitespace rows are now part of commit 9ae95ab body; PM does not repair these protected lines without explicit disposition.
   - No Codex dry-run, Trae/Qoder invocation, connector machine-gate edit, pointer input smoke acceptance, Git write (post-9ae95ab), stage, commit, push, reset, clean, source rollback, source formatting repair, long-worker dispatch, Electron relaunch, or source implementation edit was run by this PM pass.
   - Next action: hold for user拍板 B (R0-3 ②)/ C (short-worker)/ D (今天就开)/ E (E1 control-cockpit-UI-检讨任务卡立档); once decided, dispatch short-worker for P1-1 ranch-m5 v0.2 requirements readiness and start P1-2 pointer smoke blocker 1h investigation in this order.
+
+- [2026-07-09 11:53 +08:00] post-7030ebf supervision recheck:
+  - Re-read the current PM truth sources after the previous 11:50 segment: `docs/orchestration/index.md`, `docs/orchestration/status.json`, this daily supervision card, `docs/orchestration/sessions/daily-plan-2026-07-09.md`, `docs/orchestration/tasks/daily-decision-queue-2026-07-02.md`, and `docs/orchestration/tasks/protected-cockpit-source-drift-v0.1.md`.
+  - State snapshot: `daily-supervision`, `weekly-requirements`, and `daily-plan-2026-07-09` remain active at the role level; connector-policy / connector-acceptance-review / R0-3 dry-run / pointer-smoke / protected-cockpit-source-drift remain standby; live-subagents remains blocked by the recorded quota blocker.
+  - Git/current-state correction: current HEAD is `7030ebf chore(orchestration): 7-9 PM-direct 11:50 真源面同步 + daily-plan 立档`, already at `origin/main`; `git status --short` is empty before this append. This supersedes earlier 11:50 wording that still described post-`9ae95ab` dirty/protected whitespace state as current.
+  - Runtime verification from the latest pass remains: `http://127.0.0.1:5173/` and `http://127.0.0.1:5173/ranch.html` returned HTTP 200; Electron process inventory most recently showed only `D:\GameEditor-PC\node_modules\electron\dist\electron.exe` with visible window `GameEditor PC · 交互式电影编辑器`, so PM does not restate desktop-window runtime as currently passing and does not relaunch without an explicit preview/start request.
+  - Negative connector checks before this append remain: `docs/orchestration/connectors.json` has no diff; no `enabledByDefault=true` or `approvalStatus="accepted"` marker is present in `docs/orchestration/connectors.json` or `docs/orchestration/status.json`; `orchestration:connector-safety` most recently reports raw connector execution surface absent.
+  - Drift inspection: `orchestration:report` still prints active lane control as `daily-supervision, weekly-requirements` while `daily-plan-2026-07-09` is active as a PM role; this is a control-plane wording/coverage drift to monitor, not an execution blocker while `orchestration:check` passes and the daily-plan role remains tracked.
+  - No Codex dry-run, Trae/Qoder invocation, connector machine-gate edit, status connectors edit, pointer input smoke acceptance, git stage, commit, push, reset, clean, source rollback, source formatting repair, long-worker dispatch, Electron relaunch, or source implementation edit was run by this PM recheck.
+  - Next action: keep waiting for user decision on B/C/D/E from `daily-plan-2026-07-09.md`; after explicit拍板, execute only the authorized PM-default order and keep connector / pointer-smoke / protected-source boundaries intact.
+
+- [2026-07-09 11:56 +08:00] loop-mode full-gate supervision pass:
+  - Re-read the PM truth sources for Mode A: `docs/orchestration/index.md`, `docs/orchestration/status.json`, this daily supervision card, `docs/orchestration/sessions/daily-plan-2026-07-09.md`, `docs/orchestration/tasks/daily-decision-queue-2026-07-02.md`, and `docs/orchestration/tasks/protected-cockpit-source-drift-v0.1.md`.
+  - State snapshot: `daily-supervision`, `weekly-requirements`, and `daily-plan-2026-07-09` remain active roles; connector-policy / connector-acceptance-review / R0-3 dry-run / pointer-smoke / protected-cockpit-source-drift stay standby; live-subagents remains blocked by the recorded `403 DAILY_LIMIT_EXCEEDED` quota blocker.
+  - Truth-source validation passed in this pass: `npm.cmd run orchestration:check` (66 referenced cards), `npm.cmd run orchestration:preflight`, `npm.cmd run orchestration:connector-safety`, `npm.cmd run orchestration:report`, `npm.cmd run lint`, and `npm.cmd run build`.
+  - Connector safety state remains negative: Codex is `draft/pending/enabled=false` with `command=codex` discovery only; Trae and Qoder remain `placeholder/not-requested/enabled=false` with pending/empty commands; connector-safety reports raw connector execution surface absent and command/args/cwd/env passthrough absent.
+  - Drift inspection: `orchestration:report` still lists active lane control as `daily-supervision, weekly-requirements` even though `daily-plan-2026-07-09` is an active PM role in `status.json`; keep this as report coverage wording drift, not a blocker while `orchestration:check` passes.
+  - Current git state before any further action: HEAD remains `7030ebf chore(orchestration): 7-9 PM-direct 11:50 真源面同步 + daily-plan 立档`; `git status --short` showed only this daily supervision card modified before this append.
+  - No Codex dry-run, Trae/Qoder invocation, connector machine-gate edit, `status.json` connector edit, pointer input smoke acceptance, git stage, commit, push, reset, clean, source formatting repair, source rollback, long-worker dispatch, Electron relaunch, or source implementation edit was run by this full-gate supervision pass.
+  - Next actions: wait for user拍板 B/C/D/E from `daily-plan-2026-07-09.md`; after explicit decision, execute only the authorized PM-default sequence and keep R0-3 / pointer-smoke / protected-source boundaries intact.
+
+- [2026-07-09 20:03 +08:00] PM-default B/C/D/E execution closeout:
+  - User authorized the PM default route: B② / C short-worker / D 今天 / E1.
+  - B② was recorded as R0-3 deferred + controlled dry-run lane standby. No Codex dry-run was executed; the dry-run execution window still requires a second explicit user confirmation.
+  - C short-worker was completed as docs-only intake: added `docs/orchestration/tasks/ranch-m5-requirements-v0.2.md` plus five child cards (`ranch-window-v0.2`, `ranch-status-script-v0.2`, `ranch-personality-v0.2`, `ranch-fence-pointer-v0.2`, `ranch-system-notify-v0.2`). No M5 long-worker implementation was dispatched.
+  - D investigation produced a repeatable Electron capture route: `scripts/ranch-pointer-capture.mjs` ran successfully and archived `docs/orchestration/sessions/ranch-pointer-capture-2026-07-09.json`, `.png`, and `.md`. Evidence: `webContents.capturePage`, target `http://127.0.0.1:5173/ranch.html`, image 640x360, 139609 bytes, 8 animals, 3 action buttons, no boot/error card, and no `SetIsBorderRequired failed`.
+  - E1 was completed as task intake: added `docs/orchestration/tasks/cockpit-ui-redesign-v3.1-v0.1.md` referencing `docs/控制舱UI诊断与改造方案-2026-07-08.md`. No control-cockpit source implementation was started.
+  - Control-plane sync completed in `docs/orchestration/index.md`, `docs/orchestration/status.json`, `docs/orchestration/sessions/daily-plan-2026-07-09.md`, `docs/orchestration/sessions/weekly-requirements-2026-07-07.md`, `docs/orchestration/tasks/daily-decision-queue-2026-07-02.md`, `docs/orchestration/tasks/daily-role-accountability-2026-07-02.md`, `ranch-pointer-smoke-v0.2.md`, and `ranch-pointer-smoke-manual-evidence-v0.2.md`.
+  - Validation passed before this append: `npm.cmd run orchestration:check` (74 referenced cards), `npm.cmd run orchestration:report`, `npm.cmd run orchestration:preflight`, `npm.cmd run orchestration:connector-safety`, `npm.cmd run lint`, `npm.cmd run build`, and `git diff --check`.
+  - Connector negative checks passed: `docs/orchestration/connectors.json` has no diff; no `enabledByDefault=true` or `approvalStatus="accepted"` marker exists in `docs/orchestration/connectors.json` or `docs/orchestration/status.json`; connector-safety reports raw connector execution surface absent.
+  - Full pointer smoke remains incomplete: click-through, double-click, right-click, floating drag, and edge-dock evidence were not executed or accepted by the capture-only investigation.
+  - No Codex dry-run, Trae/Qoder invocation, connector machine-gate edit, pointer input smoke acceptance, product source implementation, long-worker dispatch, git stage, commit, push, reset, clean, source rollback, or source formatting repair was run by this PM pass.
+  - Next action: keep R0-3 dry-run standby until explicit execution-window authorization; keep M5 implementation pending a future long-worker decision; keep full pointer input smoke pending direct observation; keep cockpit-ui-redesign-v3.1 as a W28 candidate; commit/push remains unrun until separately authorized.
+
+- [2026-07-10 16:04 +08:00] catch-up morning-anchor replacement:
+  - This is the first 2026-07-10 supervision anchor and intentionally uses the actual start time; no synthetic 09:30 checkpoint is claimed.
+  - Re-read `docs/orchestration/index.md`, `docs/orchestration/status.json`, `docs/orchestration/sessions/daily-plan-2026-07-10.md`, `docs/orchestration/sessions/weekly-requirements-2026-07-07.md`, this supervision card, the decision queue, and role accountability ledger.
+  - State before edits: W27 weekly-requirements and daily-supervision remain active; 7-9 daily plan is ready to summarize; 7-9 PM-default docs/capture evidence is still uncommitted at HEAD `7030ebf`.
+  - Administrator decisions accepted for control-plane routing: protected whitespace ④ to W28 bounded lane; M5 ② serial `ranch-window-v0.2` first but no W27 implementation; quota ② to W28; R0-3 dry-run ② to W28 without Codex execution.
+  - Edit boundary for this pass is `docs/orchestration/**` plus `scripts/ranch-pointer-capture.mjs`; protected source, connector machine gate, M5 implementation, pointer input, Codex, Trae, and Qoder remain out of scope.
+  - Next action: create the W28 standby placeholder and W27 closeout template, synchronize index/status/accountability/task dispositions, run the complete gate set, then commit and push only the authorized scope.
+
+- [2026-07-10 16:14 +08:00] W27 closeout under-24h supervision anchor:
+  - Re-read the updated 2026-07-10 control plane after the administrator decision overlay: `docs/orchestration/index.md`, `docs/orchestration/status.json`, `docs/orchestration/sessions/daily-plan-2026-07-10.md`, `docs/orchestration/sessions/weekly-requirements-2026-07-14.md`, `docs/orchestration/sessions/weekly-closeout-2026-07-11.md`, and this supervision card.
+  - State snapshot: `daily-supervision` and W27 `weekly-requirements` remain the only active lanes; `daily-plan-2026-07-10` is active as a PM role; W28 weekly requirements remains standby; `daily-plan-2026-07-09` is summarized.
+  - Drift巡检: the changed/untracked set remains bounded to `docs/orchestration/**` plus `scripts/ranch-pointer-capture.mjs`; there is no diff in `docs/orchestration/connectors.json`, `src/**`, `electron/**`, `package.json`, or `icon/**`.
+  - Boundary check: no Codex dry-run, Trae/Qoder invocation, connector machine-gate edit, pointer input smoke acceptance, protected source edit, M5 implementation, long-worker dispatch, reset, clean, or force push was run.
+  - W27 deadline: 2026-07-11 16:00 +08:00 is now less than 24 hours away; final W27 closeout must use `weekly-closeout-2026-07-11.md` and only after fresh gates.
+  - Next action: run final `orchestration:check`, `orchestration:report`, `orchestration:preflight`, `orchestration:connector-safety`, `lint`, `build`, `git diff --check`, connector negative scans, then commit/push the authorized docs/script set.

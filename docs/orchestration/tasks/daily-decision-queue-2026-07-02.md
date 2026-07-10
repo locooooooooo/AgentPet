@@ -65,6 +65,8 @@ session closeout coverage:
 - `daily-decision-queue` and `daily-role-accountability` are supervision artifacts; they remain standby but are not decision-bearing queue items.
 - Summarized M5 ranch verification cards (`ranch-window-v0.1`, `ranch-status-script-v0.1`, `ranch-personality-v0.1`) plus the ranch 3-level UI convergence evidence feed existing ranch follow-up items and do not create new decision-bearing lanes.
 - `ranch-window-v0.1` is the current residual-risk summary for the existing transparent pointer-smoke queue item; 2026-07-07 adds a Windows MCP Snapshot capture route, but full pointer input evidence is still pending.
+- 2026-07-09 user approved PM default B②/C short-worker/D 今天/E1. B② keeps R0-3 deferred with the controlled dry-run lane on standby; the separate dry-run execution window is still not authorized. D completed capture-route investigation only: Electron `webContents.capturePage()` evidence exists, but full pointer input remains pending.
+- 2026-07-10 administrator decision overlay: protected cockpit source drift selected option ④ and is routed to a W28 bounded lane; M5 selected serial option ② with `ranch-window-v0.2` first but no W27 long-worker dispatch; live-subagent quota recheck selected option ② and moves to W28; R0-3 dry-run selected option ② and moves to W28 without Codex execution. The core queue tables remain unchanged for parser stability and continue to enforce the activation conditions.
 - Any new `standby` or `blocked` lane in `docs/orchestration/status.json` must be added to this guard or explicitly exempted in `scripts/check-orchestration.mjs`.
 
 non-goals:

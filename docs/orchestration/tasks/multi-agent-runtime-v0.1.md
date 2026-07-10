@@ -49,12 +49,12 @@ current state:
 - `npm run orchestration:check`, `npm run lint`, and `npm run build` pass.
 
 blockers:
-- Live sub-agent execution cannot be relied on until quota is restored.
+- Live sub-agent execution cannot be relied on until quota is restored; the 2026-07-10 administrator decision defers the next quota recheck to W28.
 - External agent connector safety policy is drafted but not yet accepted for execution.
 
 next action:
 - Accept or revise connector policy before wiring connectors to quick actions.
-- Keep live sub-agent execution blocked until quota is restored.
+- Keep live sub-agent execution blocked until quota is restored; do not proactively recheck before the W28 window.
 - Use `npm run orchestration:report` at the start of each supervision turn.
 
 summary:

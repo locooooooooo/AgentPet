@@ -1,0 +1,32 @@
+{
+  "generatedAt": "2026-07-09T11:51:43.345Z",
+  "route": "electron-webContents-capturePage",
+  "targetType": "url",
+  "target": "http://127.0.0.1:5173/ranch.html",
+  "outPng": "E:\\多agent牛马\\docs\\orchestration\\sessions\\ranch-pointer-capture-2026-07-09.png",
+  "pngBytes": 139609,
+  "imageSize": {
+    "width": 640,
+    "height": 360
+  },
+  "avoidedSetIsBorderRequired": true,
+  "pointerInputExecuted": false,
+  "evidence": {
+    "href": "http://127.0.0.1:5173/ranch.html",
+    "title": "桌面牧场",
+    "readyState": "complete",
+    "bodyTextSample": "工位区\n休息区\n饮水区\n中央广场\n发布台\n别点我，已经躺平，进入低功耗待机模式。\n🐂\nCodex\n批发排障\n呼噜呼噜... 只要老板看不见，我就是离线状态。\n🦓\nTrae\n带薪拉屎\n别点我，已经躺平，进入低功耗待机模式。\n🦉\nQoder\n佛祖保佑\n摸鱼不算偷，这叫技术沉淀与能耗控制。\n🦚\nMiniMax\n废话周会\n别点我，已经躺平，进入低功耗待机模式。\n🦥\nWorkBuddy\n打水摸鱼\n呼噜呼噜... 只要老板看不见，我就是离线状态。\n🦨\nOpenClaw\n生产救",
+    "animalCount": 8,
+    "actionButtonCount": 3,
+    "hasBootCard": false,
+    "hasErrorCard": false,
+    "shellClassName": "ranch-shell is-desktop",
+    "shellRect": {
+      "width": 640,
+      "height": 360
+    },
+    "fieldBackground": "rgba(0, 0, 0, 0)",
+    "devicePixelRatio": 1
+  },
+  "pass": true
+}

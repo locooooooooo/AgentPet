@@ -17,6 +17,7 @@ objective:
 
 current state:
 - Standby only. No Codex dry-run command has been executed from this task.
+- 2026-07-10 administrator selected route ②: defer the execution window to W28.
 - `docs/orchestration/connectors.json` remains the current machine-gate source of truth.
 - This card is preparation for acceptance-grade input; it is not PM acceptance to enable any connector.
 
@@ -61,5 +62,6 @@ non-goals:
 - Do not modify `src/**`, `electron/**`, `package.json`, `icon/**`, or protected cockpit/ranch UI surfaces.
 
 next action:
-- Wait for user second confirmation of dry-run timing before executing anything.
+- Keep the lane standby through W27 closeout and carry it into W28 planning.
+- Wait for a W28 second confirmation of dry-run timing before executing anything.
 - When activated later, run the Codex JSON dry-run from an isolated cwd, archive evidence, then run `orchestration:check`, `orchestration:preflight`, and `orchestration:connector-safety`.
