@@ -303,6 +303,15 @@
       "evidence": "docs/orchestration/tasks/m5-longworker-dispatch-v0.1.md"
     },
     {
+      "id": "m5-five-day-development",
+      "title": "[PM]#m5-five-day-development@2026-07-14",
+      "owner": "主控",
+      "status": "standby",
+      "responsibility": "Track the 2026-07-14 through 2026-07-18 M5 serial development goal; keep all implementation pending until W27 closeout, W28 activation, and each previous-lane acceptance/commit gate.",
+      "tag": "⟦tag:v2|session|m5-five-day-development-2026-07-14⟧",
+      "evidence": "docs/orchestration/sessions/m5-five-day-development-2026-07-14.md"
+    },
+    {
       "id": "ranch-real-integration-r0-3-dryrun",
       "title": "[PM]#ranch-real-integration-r0-3-dryrun@v0.1",
       "owner": "主控",

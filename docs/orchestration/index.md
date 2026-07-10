@@ -82,6 +82,7 @@ tracked business cards:
 - session: ⟦tag:v2|session|weekly-requirements-2026-07-07⟧ -> `docs/orchestration/sessions/weekly-requirements-2026-07-07.md`
 - session: ⟦tag:v2|session|weekly-requirements-2026-07-14⟧ -> `docs/orchestration/sessions/weekly-requirements-2026-07-14.md`
 - session: ⟦tag:v2|session|weekly-closeout-2026-07-11⟧ -> `docs/orchestration/sessions/weekly-closeout-2026-07-11.md`
+- session: ⟦tag:v2|session|m5-five-day-development-2026-07-14⟧ -> `docs/orchestration/sessions/m5-five-day-development-2026-07-14.md`
 - session: ⟦tag:v2|session|homepage-ui-p0-progress⟧ -> `docs/orchestration/sessions/homepage-ui-p0-progress.md`
 - session: ⟦tag:v2|session|homepage-ui-p0-design-2026-07-07⟧ -> `docs/orchestration/sessions/homepage-ui-p0-design-2026-07-07.md`
 - session: ⟦tag:v2|session|homepage-ui-p0-design-accepted-2026-07-07⟧ -> `docs/orchestration/sessions/homepage-ui-p0-design-accepted-2026-07-07.md`
@@ -131,6 +132,7 @@ current role split:
 - `[监督]#ranch-personality@v0.1`: summarized M5 personality and control-cockpit prefs-linkage evidence for FR-007 and notifyPrefs.
 - `[短工]#ranch-m5-requirements@v0.2`: standby docs-only M5 requirements readiness lane; main card plus five child cards are created, but no M5 implementation or long-worker dispatch is authorized.
 - `[PM]#m5-longworker-dispatch@v0.1`: standby dispatch package for the serial M5 long-worker activation; 2026-07-10 16:21 administrator selected option ② (serial `ranch-window-v0.2` first), no W27 implementation, no Codex / connector / protected-source edit; actual long-worker thread opens manually when W28 activates.
+- `[PM]#m5-five-day-development@2026-07-14`: standby five-day serial control card; tracks W27/W28 admission, five M5 child callbacks, Electron/Windows evidence, independent commits, and strict one-worker-at-a-time gates without starting implementation early.
 - `[监督]#ranch-pointer-smoke@v0.2`: standby verification package for transparent ranch pointer smoke; no implementation edit.
 - `[监督]#ranch-pointer-smoke-manual-evidence@v0.2`: standby manual evidence package for pointer-smoke callback recording; no pointer input executed yet.
 - `[长工]#homepage-ui-design@v0.1`: summarized HomePage / landing / 启动页 P0 lane; H0-1 design drafts accepted as C · 华丽, H0-2/H0-3 implemented, H0-4 protected-file audit passed in `homepage-ui-p0-c0-6-style-2026-07-07.md`; no edit to `NiuMaAvatar.tsx` / `index.css` / `agentCore.ts` / central 4x2 control-cockpit grid.

@@ -58,6 +58,7 @@ role ledger:
 | `[PM]#daily-plan@2026-07-09` | summarized | `docs/orchestration/sessions/daily-plan-2026-07-09.md` | Retain B②/C short-worker/D 今天/E1 as summarized historical evidence. |
 | `[PM]#daily-plan@2026-07-10` | active | `docs/orchestration/sessions/daily-plan-2026-07-10.md` | Record administrator decisions, prepare W28/W27 closeout, and finish the authorized docs/script commit-push. |
 | `[PM]#m5-longworker-dispatch@v0.1` | standby | `docs/orchestration/tasks/m5-longworker-dispatch-v0.1.md` | Maintain the serial M5 long-worker dispatch package; W27 does not start any long-worker; W28 manual activation copies the launch description to open `[长工]#ranch-window@v0.2`. |
+| `[PM]#m5-five-day-development@2026-07-14` | standby | `docs/orchestration/sessions/m5-five-day-development-2026-07-14.md` | Keep the five-day board waiting for W27 closeout and W28 activation; then enforce one product worker, callback, acceptance, commit, and push before each next M5 lane. |
 
 acceptance:
 - Every non-summarized open item has an accountability action and evidence source.
