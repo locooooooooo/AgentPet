@@ -566,21 +566,22 @@ completed:
 incomplete:
 - M5 ranch verification cards are summarized and the ranch body now matches v0.3's simple three-level UI direction, but real transparent-window pointer smoke is still not accepted.
 - Transparent ranch window pointer smoke is still not fully automated; Windows MCP Snapshot and Electron `webContents.capturePage()` now provide capture evidence, but full click-through, double-click, right-click, drag, and dock pointer evidence is still not automated or accepted.
-- AgentPet Git repair standby package remains as a historical boundary; this 2026-07-10 pass has narrow authorization to stage/commit/push only `docs/orchestration/**` and `scripts/ranch-pointer-capture.mjs`, while all other Git state decisions remain behind `git-staging-review-agentpet-v0.1`.
+- AgentPet Git repair standby package remains as a historical boundary; the current W27 closeout pass is limited to declared `docs/orchestration/**` state files, while unrelated Git decisions remain behind `git-staging-review-agentpet-v0.1`.
 - Connector acceptance review package exists, but connector policy acceptance is waiting for PM/user decision; no execution binding should be dispatched before that.
 - Ranch pointer-smoke verification and manual evidence packages are standby; the capture route now exists, but a direct pointer-input observer/automation route is still required before acceptance.
 - Homepage UI long-worker dispatch package exists, thread `mvs_237b464ebc78403d953b9ab93b398ab8` has delivered H0-1 design drafts, user selected C gorgeous, and H0-2/H0-3/H0-4 are accepted with evidence `docs/orchestration/sessions/homepage-ui-p0-c0-6-style-2026-07-07.md`; PM commit `18451ba` has been pushed to `origin/main`.
 - Daily decision queue is standby and does not authorize any queue item by itself.
 - Daily role accountability ledger is standby and records state/evidence/action without changing role states.
 - R0-3 Codex controlled dry-run lane is standby: P0 ranch-real-integration-p0 accepted after user decision ② on 2026-07-07; the 2026-07-10 administrator decision moves execution to W28; Codex machine-gate fields (approvalStatus / enabledByDefault / command) remain untouched; trae/qoder remain placeholder; dry-run execution still requires a W28 second execution-window confirmation.
-- Protected cockpit source drift is pending PM disposition activation: administrator selected option ④ to route the registered whitespace drift into a fresh W28 bounded lane; W27 does not accept, format, revert, or edit protected source.
+- Protected cockpit source drift is pending PM disposition activation: the administrator-selected W28 route is active as planning context, but the source lane remains standby until a fresh bounded authorization exists.
+- W27 is summarized, W28 weekly requirements is active, and the M5 control card is `active_waiting_day1`; all five product callbacks and evidence sets remain pending.
 
 blockers:
 - External connector execution remains disabled.
 - Live sub-agent execution remains blocked by the previously recorded service-side `403 DAILY_LIMIT_EXCEEDED` until rechecked.
 - Control-cockpit central 4x2 grid and protected selling-point files remain locked; M4 header settings entry has been completed and accepted.
 - M5 desktop ranch UI convergence is code/browser verified, but it does not clear the transparent Electron pointer-smoke blocker.
-- AgentPet Git working tree/index state is post-push and has PM docs/script/log drift; this 2026-07-10 pass narrowly authorizes only the declared `docs/orchestration/**` plus `scripts/ranch-pointer-capture.mjs` stage/commit/push, with no reset, clean, force push, or unrelated path inclusion.
+- AgentPet Git working tree/index state is post-push and has PM docs/script/log drift; for the current W27 closeout, that drift is limited to declared `docs/orchestration/**` state files pending PM commit/push, while reset, clean, force push, and unrelated path inclusion remain prohibited.
 
 next action:
 - Keep PM and Supervisor active for drift checks and Git post-push callback collection.
@@ -589,7 +590,8 @@ next action:
 - Keep `ranch-pointer-smoke-v0.2` and `ranch-pointer-smoke-manual-evidence-v0.2` standby until a manual or alternate transparent-window capture route is available. Capture routes now exist, but the lanes remain standby until full pointer input can be directly observed; capture-only evidence does not clear acceptance.
 - Keep connector-policy and `connector-acceptance-review-v0.1` on standby until PM/user accepts or revises machine gate fields.
 - Keep Git manager, `git-repair-agentpet-v0.1`, and `git-staging-review-agentpet-v0.1` on standby for unrelated Git state; use the current narrow authorization only for the declared docs/script closeout.
-- Keep `protected-cockpit-source-drift-v0.1` standby through W27; open a fresh W28 bounded lane before touching the registered protected whitespace.
+- Keep `protected-cockpit-source-drift-v0.1` standby in W28; open a fresh bounded lane before touching the registered protected whitespace.
+- Keep W28 and `m5-five-day-development-2026-07-14` active with custom status `active_waiting_day1`; do not dispatch a product worker before 2026-07-14.
 - Use `daily-decision-queue-2026-07-02` as the next PM callback surface for standby decisions.
 - Keep `daily-role-accountability-2026-07-02` aligned with role states before closing any daily supervision pass.
 
@@ -1066,3 +1068,10 @@ pm.cmd run build pass; git diff --check only on the 11 protected-source whitespa
   - First-principles gate decision: the current time was before `2026-07-11 16:00 +08:00`, so a calendar template could not prove W27 closeout. W27 stays active, W28 and `m5-five-day-development-2026-07-14` stay standby, and `[长工]#ranch-window@v0.2` is not dispatched before the Day 1 gate on 2026-07-14.
   - Boundary check: no product source, protected cockpit source, connector machine gate, pointer evidence, Electron runtime, or M5 implementation was changed or accepted by this pass; no Codex/Trae/Qoder connector was executed.
   - Next action: at or after the actual 16:00 closeout time, complete `weekly-closeout-2026-07-11.md` using current evidence, rerun the full and negative gates, summarize W27, activate W28 only after that evidence passes, synchronize the control plane, then commit and push before any five-day dispatch.
+
+- [2026-07-11 16:04 +08:00] W27 final closeout and W28 activation:
+  - Actual time gate opened at `2026-07-11 16:00:00 +08:00`; no early completion was recorded.
+  - Fresh clean-baseline gates passed before edits: `orchestration:check` with 80 referenced cards, `orchestration:report`, `orchestration:preflight`, `orchestration:connector-safety`, `lint`, and `build`; `HEAD == origin/main == b17c717`, worktree clean.
+  - Applied the atomic transition: W27 weekly role/session summarized; the active `weekly-requirements` lane transferred to W28; W28 weekly role/session active; the 2026-07-10 daily plan summarized; the M5 five-day control card active with `active_waiting_day1`.
+  - `m5-longworker-dispatch-v0.1` and all five M5 implementation cards remain standby. No product worker, R0-3 dry-run, project connector, protected-source edit, or pointer-input acceptance was started.
+  - Next action: run post-edit full gates and negative hash checks, commit/push only the declared closeout files, prove clean `HEAD == origin/main`, then wait for the 2026-07-14 Day 1 gate.

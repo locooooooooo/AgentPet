@@ -4,13 +4,13 @@
 ⟦tag:v2|session|weekly-requirements-2026-07-14⟧
 ⟦tag:v2|session|weekly-requirements-w28⟧
 
-loop state: standby
-dispatch state: standby
+loop state: active
+dispatch state: active
 
 > **计划周期**: 2026-07-14 ~ 2026-07-20 (W28)
-> **当前状态**: standby placeholder
-> **激活条件**: 2026-07-11 (周六) 16:00 W27 closeout 完成后,由 PM 将本卡转为 active。
-> **硬边界**: W27 closeout 前本卡只登记候选与顺序;W28 激活后仅按 `m5-five-day-development-2026-07-14.md` 使用 Codex 内部子 agent 串行实施,不执行项目 Codex/Trae/Qoder connector、不修改 protected source 或 connector machine gate。
+> **当前状态**: active; waiting for the 2026-07-14 Day 1 calendar gate
+> **激活证据**: 2026-07-11 16:00 +08:00 W27 final closeout 已通过 fresh gates，并将 W27 summarized。
+> **硬边界**: 本卡 active 不等于产品实施已启动;仅按 `m5-five-day-development-2026-07-14.md` 使用 Codex 内部子 agent 串行实施,不执行项目 Codex/Trae/Qoder connector、不修改 protected source 或 connector machine gate。
 
 ---
 
@@ -23,7 +23,9 @@ dispatch state: standby
   - live-subagents quota 选择 ②,推到 W28,本周不主动复查。
   - R0-3 controlled dry-run 选择 ②,推到 W28,本周不执行 Codex。
 - W27 已完成的 capture-only evidence、M5 docs-only readiness 和 cockpit v3.1 task intake 作为 W28 输入,不等同于实施验收。
-- 本段在 2026-07-11 closeout 后补最终 commit、遗留项和 W27 acceptance 摘要。
+- 2026-07-11 actual-time closeout 已完成: W27 summarized，W28 active，M5 控制卡为 `active_waiting_day1`；全部五张产品子卡和派工包仍 standby。
+- Pre-edit baseline: `HEAD == origin/main == b17c717`; 80-card orchestration check、report、preflight、connector-safety、lint、build 全绿。
+- W27 遗留项保持分离：M5 serial implementation、direct pointer evidence、R0-3 execution-window confirmation、protected bounded disposition、quota recheck；没有任何一项因 W28 激活被自动接受。
 
 ## 一、W28 P0 候选
 
@@ -61,16 +63,17 @@ dispatch state: standby
 | 2026-07-19 ~ 2026-07-20 | W28 buffer、回归、周 closeout 准备 |
 
 acceptance:
-- 本卡保持 `standby` 直到 W27 closeout。
+- 本卡已在真实 W27 closeout 后切换为 `active`。
 - P0/P1/P2 候选与 2026-07-14 ~ 2026-07-20 排期存在。
-- `docs/orchestration/index.md`, `docs/orchestration/status.json`, and `daily-role-accountability-2026-07-02.md` track this standby role。
-- W27 closeout 前本卡不授权 M5 implementation;W28 激活后 M5 implementation 仅由五日总控和逐卡 bounded dispatch 授权。
+- `docs/orchestration/index.md`, `docs/orchestration/status.json`, and `daily-role-accountability-2026-07-02.md` track this active role。
+- W28 激活不授权提前实施;M5 implementation 仅由五日总控、2026-07-14 日历门和逐卡 bounded dispatch 授权。
 - Codex 内部子 agent 是授权 worker 机制;项目 Codex/Trae/Qoder connector、R0-3 dry-run、connector machine-gate edit 和 protected source edit 仍不授权。
 - `npm.cmd run orchestration:check` passes。
 
 next action:
-- 2026-07-11 16:00 W27 closeout 后补最终上下文。
-- W28 激活时同步五日总控准入状态;M5 按逐卡 bounded dispatch 串行执行,R0-3 dry-run 仍需二次执行确认。
+- 保持 M5 五日总控为 `active_waiting_day1`，在 2026-07-14 前不派产品 worker。
+- 2026-07-14 仅派同一 `[长工]#ranch-window@v0.2` 承接 Day 1/2；后续卡继续受逐卡 callback、acceptance、commit、push 门约束。
+- R0-3 dry-run、protected source、quota recheck 和 pointer evidence 仍需各自 bounded activation。
 
 summary:
-- W28 standby placeholder;M5 已对齐 2026-07-14 ~ 2026-07-18 五日串行 Goal,但 W27 closeout 前不执行。
+- W28 active;M5 已对齐 2026-07-14 ~ 2026-07-18 五日串行 Goal，当前等待 Day 1，不提前执行。

@@ -3,14 +3,14 @@
 [PM]#m5-five-day-development@2026-07-14
 ⟦tag:v2|session|m5-five-day-development-2026-07-14⟧
 
-loop state: standby
-dispatch state: standby
-status: standby_waiting_w27_closeout
+loop state: active
+dispatch state: active
+status: active_waiting_day1
 
 > **开发窗口**: 2026-07-14 ~ 2026-07-18 (W28 五日串行开发)
 > **创建时间**: 2026-07-10 17:50 +08:00
-> **当前准入门**: `docs/orchestration/sessions/weekly-closeout-2026-07-11.md` 必须先有真实 W27 final closeout 证据。
-> **当前结论**: 本卡只完成五日跟踪与验收编排；W27 仍 active，W28 与全部 M5 implementation 卡仍 standby，当前不派 worker、不改产品代码。
+> **当前准入门**: W27 final closeout 已满足；下一道门是 `2026-07-14` Day 1 calendar gate 与派工前 clean baseline。
+> **当前结论**: W27 summarized，W28 active，本卡为 `active_waiting_day1`；全部 M5 implementation 卡与派工包仍 standby，当前不派 worker、不改产品代码。
 
 ## objective
 
@@ -122,23 +122,22 @@ completed:
 - Day 1 allowed-scope risks are identified before dispatch: desktop close/hide semantics and display-work-area recovery for persisted x/y require explicit correction/evidence in `electron/main.ts`.
 
 incomplete:
-- W27 final closeout has not reached its authorized time.
-- W28 is not active.
 - No M5 implementation worker has been dispatched.
 - All five implementation callbacks, desktop evidence sets, and commits are pending.
 
 blockers:
-- Time gate: W27 final closeout is due no later than `2026-07-11 16:00 +08:00` and cannot be pre-recorded on 2026-07-10.
+- Calendar gate: Day 1 does not open before `2026-07-14`; W28 activation alone does not authorize early product work.
 - Existing connector, pointer, protected-source, and live-subagent quota blockers remain separate; none is silently accepted by this plan.
 
 next action:
-- Keep this card in `standby_waiting_w27_closeout` and re-read live truth at the actual W27 closeout time.
-- Do not dispatch `[长工]#ranch-window@v0.2` before W28 activation and the 2026-07-14 Day 1 gate.
+- Keep this card in `active_waiting_day1` and re-read live truth on 2026-07-14 before dispatch.
+- Do not dispatch `[长工]#ranch-window@v0.2` before the 2026-07-14 Day 1 gate and a fresh clean-baseline proof.
 
 evidence:
 - Baseline at creation: `HEAD == origin/main == 1d9d5b0`; worktree clean.
 - 2026-07-11 preflight baseline before its docs commit: `HEAD == origin/main == 5416f4d`; worktree clean; typed ranch bridge and existing renderer/main paths inspected read-only.
-- W27 source remains active; W28 and `m5-longworker-dispatch-v0.1` remain standby.
+- 2026-07-11 actual-time transition baseline: `HEAD == origin/main == b17c717`; fresh 80-card check, report, preflight, connector-safety, lint, and build passed before edits.
+- W27 is summarized and W28 is active; `m5-longworker-dispatch-v0.1` and all five implementation cards remain standby.
 
 summary:
-- Five-day M5 serial development control card created without starting implementation; waiting for the W27 closeout and W28 activation gates.
+- Five-day M5 serial development control is active and waiting for Day 1; no implementation worker has started.

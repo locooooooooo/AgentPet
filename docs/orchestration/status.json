@@ -2,13 +2,13 @@
   "identity": "[PM]#multi-agent-control@v0.1",
   "loopState": "active",
   "dispatchState": "active",
-  "target": "按 LPS 建立角色分工，并持续监督各个角色推进“多 Agent 牛马核心部门”项目；2026-07-10 管理员已拍板四项默认路线：protected trailing whitespace 选择 ④ 路由 W28 bounded lane，M5 选择 ② 串行优先 `ranch-window-v0.2` 但 W27 不启动实施，live-subagents quota 选择 ② 推到 W28，R0-3 dry-run 选择 ② 推到 W28且不执行 Codex；W27 当前只完成 7-9 docs/capture evidence 收口、W28 standby placeholder 和 2026-07-11 closeout 准备，connector machine gate、protected source、完整 pointer input 均保持未触碰。",
+  "target": "W27 已于 2026-07-11 16:00 +08:00 完成真实 closeout 并 summarized；W28 weekly-requirements 与 M5 五日控制卡已激活。当前保持 `active_waiting_day1`，等待 2026-07-14 串行派 `[长工]#ranch-window@v0.2`；五张产品子卡、R0-3 dry-run、protected source、pointer input 和项目 Codex/Trae/Qoder connector 均未提前启动。",
   "source": "docs/orchestration/index.md",
   "todayPlan": {
-    "date": "2026-07-10",
-    "session": "docs/orchestration/sessions/daily-plan-2026-07-10.md",
-    "selectedRoute": "P1-1=④ route to W28 bounded lane;P1-2=② serial ranch-window-v0.2 first without implementation;P1-3=② quota recheck to W28;P1-4=② R0-3 dry-run to W28",
-    "progress": "docs/orchestration/sessions/daily-plan-2026-07-10.md"
+    "date": "2026-07-11",
+    "session": "docs/orchestration/sessions/weekly-closeout-2026-07-11.md",
+    "selectedRoute": "W27 summarized;W28 active;M5 control active_waiting_day1;all product workers remain standby until the 2026-07-14 calendar and dependency gates",
+    "progress": "docs/orchestration/sessions/weekly-closeout-2026-07-11.md"
   },
   "p0Cards": [
     {
@@ -279,8 +279,8 @@
       "id": "weekly-requirements",
       "title": "[PM]#weekly-requirements@2026-07-07",
       "owner": "主控",
-      "status": "active",
-      "responsibility": "Maintain W27 (2026-07-07~2026-07-13) weekly requirements; consolidate P0/P1/P2 candidates; keep排期 / 决策点 / acceptance aligned with the PM board; refresh after each daily supervision pass.",
+      "status": "summarized",
+      "responsibility": "Preserve the accepted W27 requirements and closeout evidence as summarized history; all carry-over work is now governed by W28 bounded gates.",
       "tag": "⟦tag:v2|session|weekly-requirements-2026-07-07⟧",
       "evidence": "docs/orchestration/sessions/weekly-requirements-2026-07-07.md"
     },
@@ -288,8 +288,8 @@
       "id": "weekly-requirements-w28",
       "title": "[PM]#weekly-requirements@2026-07-14",
       "owner": "主控",
-      "status": "standby",
-      "responsibility": "Maintain the W28 standby placeholder and selected routes; do not authorize implementation or dry-run before W27 closeout and a fresh bounded activation.",
+      "status": "active",
+      "responsibility": "Maintain active W28 requirements and the selected serial M5 route; do not dispatch a product worker before the 2026-07-14 Day 1 calendar gate and its bounded task contract.",
       "tag": "⟦tag:v2|session|weekly-requirements-2026-07-14⟧",
       "evidence": "docs/orchestration/sessions/weekly-requirements-2026-07-14.md"
     },
@@ -298,7 +298,7 @@
       "title": "[PM]#m5-longworker-dispatch@v0.1",
       "owner": "主控",
       "status": "standby",
-      "responsibility": "M5 long-worker dispatch package (ranch-window-v0.2 优先);W27 不启动任何 worker;W27 closeout + W28 activation + 2026-07-14 Day 1 后,PM 使用 Codex 内部子 agent 串行派发;项目 Codex/Trae/Qoder connector 保持禁用.",
+      "responsibility": "M5 long-worker dispatch package (ranch-window-v0.2 优先);W27 closeout 与 W28 activation 已满足，但继续等待 2026-07-14 Day 1；届时 PM 使用 Codex 内部子 agent 串行派发，项目 Codex/Trae/Qoder connector 保持禁用.",
       "tag": "⟦tag:v2|task|m5-longworker-dispatch-v0.1⟧",
       "evidence": "docs/orchestration/tasks/m5-longworker-dispatch-v0.1.md"
     },
@@ -306,8 +306,8 @@
       "id": "m5-five-day-development",
       "title": "[PM]#m5-five-day-development@2026-07-14",
       "owner": "主控",
-      "status": "standby",
-      "responsibility": "Track the 2026-07-14 through 2026-07-18 M5 serial development goal; keep all implementation pending until W27 closeout, W28 activation, and each previous-lane acceptance/commit gate.",
+      "status": "active",
+      "responsibility": "Track the active 2026-07-14 through 2026-07-18 M5 serial development goal in `active_waiting_day1`; keep all product workers pending until each calendar, callback, acceptance, commit, and push gate is satisfied.",
       "tag": "⟦tag:v2|session|m5-five-day-development-2026-07-14⟧",
       "evidence": "docs/orchestration/sessions/m5-five-day-development-2026-07-14.md"
     },
@@ -325,7 +325,7 @@
       "title": "[PM]#protected-cockpit-source-drift@v0.1",
       "owner": "主控",
       "status": "standby",
-      "responsibility": "Protected cockpit / selling-point source drift disposition lane; administrator selected option ④ to route the registered whitespace drift into a fresh W28 bounded lane, with no W27 source edit.",
+      "responsibility": "Protected cockpit / selling-point source drift disposition lane; administrator selected option ④, but the W28 source lane remains standby until a fresh bounded authorization exists.",
       "tag": "⟦tag:v2|task|protected-cockpit-source-drift-v0.1⟧",
       "evidence": "docs/orchestration/tasks/protected-cockpit-source-drift-v0.1.md"
     },
@@ -342,8 +342,8 @@
       "id": "daily-plan-2026-07-10",
       "title": "[PM]#daily-plan@2026-07-10",
       "owner": "主控",
-      "status": "active",
-      "responsibility": "Maintain the 2026-07-10 administrator decisions, W28 standby placeholder, W27 closeout preparation, and authorized docs/script commit-push without implementation or connector execution.",
+      "status": "summarized",
+      "responsibility": "Retain the 2026-07-10 administrator decisions, W28 preparation, and docs-only closeout work as summarized history.",
       "tag": "⟦tag:v2|session|daily-plan-2026-07-10⟧",
       "evidence": "docs/orchestration/sessions/daily-plan-2026-07-10.md"
     }
@@ -382,7 +382,7 @@
       "title": "每日计划督办",
       "role": "[PM]#daily-supervision@2026-07-02",
       "state": "active",
-      "nextAction": "保持 M3 和 M4 summarized；connector-policy standby；pointer-smoke alternate capture route 已识别但完整输入验收仍待执行。"
+      "nextAction": "监督 W28 active 与 M5 active_waiting_day1；保持所有产品 worker standby 到 2026-07-14，并继续守住 connector、protected source 和直接 pointer evidence 边界。"
     },
     {
       "id": "codex-evidence-closeout",
@@ -424,7 +424,7 @@
       "title": "实时子 agent 协同",
       "role": "[监督]#multi-agent-control@v0.1",
       "state": "blocked",
-      "nextAction": "2026-07-10 管理员选择 ② 推到 W28；W27 不主动复查 service-side 403 DAILY_LIMIT_EXCEEDED，也不要把外部 connector 当成可用执行资源。"
+      "nextAction": "已进入 W28，但仅在安全 quota recheck route 可用时记录 service-side 403 DAILY_LIMIT_EXCEEDED 精确结果；不要把外部 connector 当成可用执行资源。"
     },
     {
       "id": "ranch-m1-m2-correction",
@@ -540,10 +540,10 @@
     },
     {
       "id": "weekly-requirements",
-      "title": "W27 weekly requirements planning",
-      "role": "[PM]#weekly-requirements@2026-07-07",
+      "title": "W28 weekly requirements planning",
+      "role": "[PM]#weekly-requirements@2026-07-14",
       "state": "active",
-      "nextAction": "Keep weekly-requirements-2026-07-07.md aligned with status.json p0Cards / roles / lanes; add new P0/P1 candidates as they surface; refresh排期 after each PM supervision pass; close the W27 lane on 2026-07-11 with weekly-closeout session card."
+      "nextAction": "Keep W28 active and aligned with the M5 five-day control card; wait for the 2026-07-14 Day 1 gate before dispatching the single authorized ranch-window worker."
     },
     {
       "id": "ranch-real-integration-r0-3-dryrun",
@@ -557,7 +557,7 @@
       "title": "Protected cockpit source drift disposition",
       "role": "[PM]#protected-cockpit-source-drift@v0.1",
       "state": "standby",
-      "nextAction": "2026-07-10 administrator selected option ④; keep standby through W27, then open a fresh W28 bounded lane before any protected whitespace/source edit."
+      "nextAction": "2026-07-10 administrator selected option ④; keep standby in W28 and open a fresh bounded lane before any protected whitespace/source edit."
     }
   ],
   "connectors": [

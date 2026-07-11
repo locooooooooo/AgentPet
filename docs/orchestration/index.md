@@ -103,7 +103,7 @@ dispatch gate:
 - Supervisor owns drift detection, blocker surfacing, and minimum correction.
 
 current target:
-- 按 LPS 建立角色分工，并持续监督各个角色推进“多 Agent 牛马核心部门”项目；2026-07-10 管理员已拍板四项默认路线：protected trailing whitespace 选择 ④ 路由 W28 bounded lane，M5 选择 ② 串行优先 `ranch-window-v0.2` 但 W27 不启动实施，live-subagents quota 选择 ② 推到 W28，R0-3 dry-run 选择 ② 推到 W28且不执行 Codex；W27 当前只完成 7-9 docs/capture evidence 收口、W28 standby placeholder 和 2026-07-11 closeout 准备，connector machine gate、protected source、完整 pointer input 均保持未触碰。
+- W27 已于 2026-07-11 16:00 +08:00 完成真实 closeout 并 summarized；W28 weekly-requirements 与 M5 五日控制卡已激活。当前保持 `active_waiting_day1`，等待 2026-07-14 串行派 `[长工]#ranch-window@v0.2`；五张产品子卡、R0-3 dry-run、protected source、pointer input 和项目 Codex/Trae/Qoder connector 均未提前启动。
 
 current role split:
 - `[PM]#multi-agent-control@v0.1`: maintain this index, dispatch bounded lanes, collect callbacks, write acceptance.
@@ -131,18 +131,18 @@ current role split:
 - `[监督]#ranch-status-script@v0.1`: summarized M5 animal/status/single-toast notification evidence for FR-002/003/004/006 without reopening connector state.
 - `[监督]#ranch-personality@v0.1`: summarized M5 personality and control-cockpit prefs-linkage evidence for FR-007 and notifyPrefs.
 - `[短工]#ranch-m5-requirements@v0.2`: standby docs-only M5 requirements readiness lane; main card plus five child cards are created, but no M5 implementation or long-worker dispatch is authorized.
-- `[PM]#m5-longworker-dispatch@v0.1`: standby dispatch package for the serial M5 long-worker activation; 2026-07-10 16:21 administrator selected option ② (serial `ranch-window-v0.2` first), no W27 implementation and no project connector/protected-source edit; PM dispatches the authorized Codex internal long-worker on 2026-07-14 only after W27 closeout and W28 activation.
-- `[PM]#m5-five-day-development@2026-07-14`: standby five-day serial control card; tracks W27/W28 admission, five M5 child callbacks, Electron/Windows evidence, independent commits, and strict one-worker-at-a-time gates without starting implementation early.
+- `[PM]#m5-longworker-dispatch@v0.1`: standby dispatch package for the serial M5 long-worker activation; W27 closeout and W28 activation are satisfied, but PM still waits until 2026-07-14 before dispatching the authorized Codex internal long-worker.
+- `[PM]#m5-five-day-development@2026-07-14`: active five-day serial control card with custom status `active_waiting_day1`; W27/W28 admission is satisfied, but every product worker remains pending until its calendar/dependency gate.
 - `[监督]#ranch-pointer-smoke@v0.2`: standby verification package for transparent ranch pointer smoke; no implementation edit.
 - `[监督]#ranch-pointer-smoke-manual-evidence@v0.2`: standby manual evidence package for pointer-smoke callback recording; no pointer input executed yet.
 - `[长工]#homepage-ui-design@v0.1`: summarized HomePage / landing / 启动页 P0 lane; H0-1 design drafts accepted as C · 华丽, H0-2/H0-3 implemented, H0-4 protected-file audit passed in `homepage-ui-p0-c0-6-style-2026-07-07.md`; no edit to `NiuMaAvatar.tsx` / `index.css` / `agentCore.ts` / central 4x2 control-cockpit grid.
 - `[PM]#ranch-real-integration-r0-3-dryrun@v0.1`: standby R0-3 Codex controlled dry-run evidence collection lane; P0 ranch-real-integration-p0 整体 accepted(2026-07-07 拍板 ②),R0-3 段已转交本 lane;Codex approvalStatus/enabledByDefault/command 维持原值,trae/qoder 维持 placeholder;不主动启动 dry-run,等用户二次确认时机。
-- `[PM]#protected-cockpit-source-drift@v0.1`: standby PM disposition lane;administrator selected W28 bounded routing, with no W27 source edit, format repair, acceptance, or rollback.
+- `[PM]#protected-cockpit-source-drift@v0.1`: standby PM disposition lane in W28;administrator selected bounded routing, but no source edit, format repair, acceptance, or rollback is authorized yet.
 - `[PM]#cockpit-ui-redesign-v3.1@v0.1`: standby task-intake lane for the 2026-07-08 control-cockpit UI diagnosis; W28 candidate only, no source implementation in this pass.
-- `[PM]#weekly-requirements@2026-07-07`: active W27 (2026-07-07~2026-07-13) weekly-requirements planner; closes the W27 lane on 2026-07-11 with a weekly-closeout session card.
-- `[PM]#weekly-requirements@2026-07-14`: standby W28 (2026-07-14~2026-07-20) placeholder;tracks selected routes without authorizing implementation or dry-run.
+- `[PM]#weekly-requirements@2026-07-07`: summarized W27 (2026-07-07~2026-07-13) weekly-requirements history; final closeout is recorded in `weekly-closeout-2026-07-11.md`.
+- `[PM]#weekly-requirements@2026-07-14`: active W28 (2026-07-14~2026-07-20) planner; tracks selected routes while preserving the 2026-07-14 Day 1 product gate.
 - `[PM]#daily-plan@2026-07-09`: summarized 2026-07-09 daily plan;B②/C short-worker/D 今天/E1 evidence is retained as history.
-- `[PM]#daily-plan@2026-07-10`: active 2026-07-10 daily plan;administrator decisions are recorded, W28/closeout preparation is in progress, and authorized docs/script commit-push is the current closeout action.
+- `[PM]#daily-plan@2026-07-10`: summarized 2026-07-10 daily plan;administrator decisions and W28/closeout preparation are retained as history.
 
 blockers:
 - External connector execution remains disabled; Codex is draft/pending/discovery-only, Trae/Qoder are intentionally command-empty placeholders, and no Codex/Trae/Qoder connector may be accepted, enabled, or executed until connector policy is accepted.
@@ -160,3 +160,5 @@ next action:
 - Keep Codex draft/pending/enabled=false and Trae/Qoder placeholder/not-requested/enabled=false until connector machine gate fields change.
 - Use `docs/orchestration/tasks/daily-decision-queue-2026-07-02.md` as the next PM callback surface for standby decisions.
 - Keep `docs/orchestration/tasks/daily-role-accountability-2026-07-02.md` aligned with role states before closing any daily supervision pass.
+- Keep W28 and the M5 five-day control card active while all product workers remain standby until 2026-07-14.
+- On Day 1, re-read the live truth, prove a clean `HEAD == origin/main` baseline and unchanged negative hashes, then dispatch only the single authorized `[长工]#ranch-window@v0.2`.

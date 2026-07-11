@@ -3,11 +3,11 @@
 [PM]#weekly-closeout@2026-07-11
 ⟦tag:v2|session|weekly-closeout-2026-07-11⟧
 
-loop state: standby
-dispatch state: standby
+loop state: summarized
+dispatch state: summarized
 
 > **截止时间**: 2026-07-11 (周六) 16:00 +08:00
-> **当前状态**: closeout template only
+> **当前状态**: accepted final closeout
 > **来源**: `docs/orchestration/sessions/weekly-requirements-2026-07-07.md`
 > **下一周输入**: `docs/orchestration/sessions/weekly-requirements-2026-07-14.md`
 
@@ -16,13 +16,13 @@ objective:
 - 将未执行的 M5、R0-3、protected drift、quota 和 pointer input 明确路由到 W28,不在 closeout 中偷跑实施。
 
 closeout checklist:
-- [ ] 复核 W27 P0/P1/P2 最终状态。
-- [ ] 记录 2026-07-09 capturePage evidence 和 M5 docs-only readiness。
-- [ ] 记录 2026-07-10 管理员四项默认拍板。
-- [ ] 记录最终 Git commit/push 与远端一致性。
-- [ ] 运行 `orchestration:check`, `orchestration:report`, `orchestration:preflight`, `orchestration:connector-safety`, `lint`, `build`, `git diff --check`。
-- [ ] 确认 `docs/orchestration/connectors.json` machine-gate 无 diff。
-- [ ] 将 W28 role 从 standby 切换到 active,同时收口 W27 weekly role。
+- [x] 复核 W27 P0/P1/P2 最终状态。
+- [x] 记录 2026-07-09 capturePage evidence 和 M5 docs-only readiness。
+- [x] 记录 2026-07-10 管理员四项默认拍板。
+- [x] 记录本 closeout 所在 PM commit/push 的外部 Git 证明方式，不预填递归 commit hash。
+- [x] 运行 `orchestration:check`, `orchestration:report`, `orchestration:preflight`, `orchestration:connector-safety`, `lint`, `build`, `git diff --check`。
+- [x] 确认 `docs/orchestration/connectors.json` machine-gate 无 diff。
+- [x] 将 W28 role 从 standby 切换到 active,同时收口 W27 weekly role。
 
 pre-closeout evidence inventory (prepared 2026-07-11 11:50 +08:00; not final acceptance):
 - W27 pushed commit ledger prepared for final remote recheck: `f4fa3a4`, `18451ba`, `57d0567`, `65da9a9`, `0f48415`, `9ae95ab`, `7030ebf`, `595291f`, `87d3302`, `72540e4`, `1d9d5b0`, `cd34283`, `61b9c5e`.
@@ -68,10 +68,15 @@ negative hash baseline (prepared 2026-07-11 12:07 +08:00; exact-match required a
 - Recompute all values after the closeout edits and again after the final commit. Any mismatch outside declared `docs/orchestration/**` state files blocks W28 activation and must be investigated before staging.
 
 completed:
-- Placeholder created on 2026-07-10。
+- Actual closeout gate opened at `2026-07-11 16:00:00 +08:00`。
+- Fresh pre-edit gates passed: 80 referenced cards, report, preflight, connector-safety, lint, build, and clean Git baseline。
+- W27 role/session summarized; W28 role/session active; 2026-07-10 daily plan summarized; M5 five-day control active with `active_waiting_day1`。
+- `weekly-requirements` lane remains active and is now owned by `[PM]#weekly-requirements@2026-07-14`; `daily-supervision` remains active。
+- M5 dispatch package and all five child cards remain standby; no product worker was dispatched。
 
 incomplete:
-- W27 final evidence, commit list, metrics, and acceptance await the 2026-07-11 closeout pass。
+- Five M5 implementation callbacks, Electron/Windows evidence sets, acceptance cards, and independent commits remain pending for 2026-07-14 through 2026-07-18。
+- R0-3 dry-run, direct pointer evidence, protected-source disposition, and quota recheck remain separately gated W28 work。
 
 blockers:
 - External connector execution remains disabled。
@@ -79,13 +84,16 @@ blockers:
 - Protected source changes remain bounded and unedited。
 
 next action:
-- 2026-07-11 16:00 前执行 final closeout,不得提前把本模板写成 completed。
+- Run post-edit gates and negative hashes, then PM stage only the declared `docs/orchestration/**` closeout files, commit, push, and prove `HEAD == origin/main` with a clean worktree。
+- Keep the Goal active and wait for the 2026-07-14 Day 1 gate; do not dispatch early。
 
 evidence:
+- Actual time: `2026-07-11 16:00:00 +08:00` gate open; edit pass started at `2026-07-11 16:04 +08:00`。
+- Pre-edit baseline: `HEAD == origin/main == b17c717`; worktree clean。
 - `docs/orchestration/sessions/weekly-requirements-2026-07-07.md`
 - `docs/orchestration/sessions/daily-plan-2026-07-10.md`
 - `docs/orchestration/sessions/weekly-requirements-2026-07-14.md`
 - `docs/orchestration/sessions/daily-supervision-2026-07-02.md`
 
 summary:
-- W27 closeout template only;no implementation or connector execution is authorized。
+- W27 final closeout accepted;W28 and M5 control are active, while all implementation and connector execution remain gated。

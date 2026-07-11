@@ -49,16 +49,16 @@ role ledger:
 | `[监督]#multi-agent-control@v0.1` live-subagents lane | blocked | `docs/orchestration/status.json` | Recheck `403 DAILY_LIMIT_EXCEEDED` only when a safe route exists. |
 | `[长工]#homepage-ui-design@v0.1` | summarized | `docs/orchestration/tasks/homepage-ui-p0-dispatch-v0.1.md` | Thread `mvs_237b464ebc78403d953b9ab93b398ab8` delivered H0-1; C implementation and H0-4 audit are accepted. |
 | `[PM]#cockpit-ui-redesign-v3.1@v0.1` | standby | `docs/orchestration/tasks/cockpit-ui-redesign-v3.1-v0.1.md` | Keep the 2026-07-08 control-cockpit UI diagnosis as a W28 candidate; no source implementation in this pass. |
-| `[PM]#ranch-real-integration-r0-3-dryrun@v0.1` | standby | `docs/orchestration/tasks/ranch-real-integration-r0-3-dryrun-v0.1.md` | Administrator moved the execution window to W28; do not invoke Codex or touch machine-gate fields in W27. |
-| `[PM]#protected-cockpit-source-drift@v0.1` | standby | `docs/orchestration/tasks/protected-cockpit-source-drift-v0.1.md` | Administrator selected option ④; preserve the W28 bounded-lane route without editing protected source in W27. |
+| `[PM]#ranch-real-integration-r0-3-dryrun@v0.1` | standby | `docs/orchestration/tasks/ranch-real-integration-r0-3-dryrun-v0.1.md` | Keep the W28 route standby; do not invoke Codex or touch machine-gate fields without a second execution-window confirmation. |
+| `[PM]#protected-cockpit-source-drift@v0.1` | standby | `docs/orchestration/tasks/protected-cockpit-source-drift-v0.1.md` | Preserve the W28 bounded-lane route without editing protected source until a fresh bounded authorization exists. |
 | `[长工]#homepage-ui-design@v0.1` homepage-ui-design lane | summarized | `docs/orchestration/sessions/homepage-ui-p0-c0-6-style-2026-07-07.md` | C · 华丽 HomePage is verified; do not create a duplicate thread and keep §〇·quarter selling-point files untouched. |
-| `[PM]#weekly-requirements@2026-07-07` | active | `docs/orchestration/sessions/weekly-requirements-2026-07-07.md` | Maintain W27 (2026-07-07~2026-07-13) weekly-requirements card; align排期 with status.json p0Cards; close W27 lane on 2026-07-11. |
-    | `[PM]#weekly-requirements@2026-07-07` weekly-requirements lane | active | `docs/orchestration/status.json` | Keep weekly-requirements session card loop/dispatch state aligned with this role; refresh排期 after each daily supervision pass. |
-| `[PM]#weekly-requirements@2026-07-14` | standby | `docs/orchestration/sessions/weekly-requirements-2026-07-14.md` | Preserve W28 as a placeholder until the 2026-07-11 W27 closeout; no implementation or dry-run authorization. |
+| `[PM]#weekly-requirements@2026-07-07` | summarized | `docs/orchestration/sessions/weekly-requirements-2026-07-07.md` | Preserve W27 accepted outcomes and final closeout evidence as history. |
+| `[PM]#weekly-requirements@2026-07-14` weekly-requirements lane | active | `docs/orchestration/status.json` | Own the active weekly lane; keep the M5 Day 1 calendar gate and all bounded carry-over gates explicit. |
+| `[PM]#weekly-requirements@2026-07-14` | active | `docs/orchestration/sessions/weekly-requirements-2026-07-14.md` | Maintain W28 active planning without treating activation as early implementation authorization. |
 | `[PM]#daily-plan@2026-07-09` | summarized | `docs/orchestration/sessions/daily-plan-2026-07-09.md` | Retain B②/C short-worker/D 今天/E1 as summarized historical evidence. |
-| `[PM]#daily-plan@2026-07-10` | active | `docs/orchestration/sessions/daily-plan-2026-07-10.md` | Record administrator decisions, prepare W28/W27 closeout, and finish the authorized docs/script commit-push. |
-| `[PM]#m5-longworker-dispatch@v0.1` | standby | `docs/orchestration/tasks/m5-longworker-dispatch-v0.1.md` | Keep W27 idle; after W27 closeout, W28 activation, and the 2026-07-14 Day 1 gate, PM dispatches the authorized Codex internal `[长工]#ranch-window@v0.2`. |
-| `[PM]#m5-five-day-development@2026-07-14` | standby | `docs/orchestration/sessions/m5-five-day-development-2026-07-14.md` | Keep the five-day board waiting for W27 closeout and W28 activation; then enforce one product worker, callback, acceptance, commit, and push before each next M5 lane. |
+| `[PM]#daily-plan@2026-07-10` | summarized | `docs/orchestration/sessions/daily-plan-2026-07-10.md` | Preserve the administrator decisions and W27/W28 preparation as summarized history. |
+| `[PM]#m5-longworker-dispatch@v0.1` | standby | `docs/orchestration/tasks/m5-longworker-dispatch-v0.1.md` | W27 closeout and W28 activation are satisfied; wait for the 2026-07-14 Day 1 gate before PM dispatches `[长工]#ranch-window@v0.2`. |
+| `[PM]#m5-five-day-development@2026-07-14` | active | `docs/orchestration/sessions/m5-five-day-development-2026-07-14.md` | Keep `active_waiting_day1`; enforce one product worker, callback, acceptance, commit, and push before each next M5 lane. |
 
 acceptance:
 - Every non-summarized open item has an accountability action and evidence source.

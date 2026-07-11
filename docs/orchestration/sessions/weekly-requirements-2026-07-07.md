@@ -4,8 +4,8 @@
 ⟦tag:v2|session|weekly-requirements-2026-07-07⟧
 ⟦tag:v2|session|weekly-requirements-w27⟧
 
-loop state: active
-dispatch state: active
+loop state: summarized
+dispatch state: summarized
 
 > **计划周期**：2026-07-07 ~ 2026-07-13（W27 · 周二起算）
 > **创建人**：Mavis（root session `mvs_5bb811db0b244b80a142de9d522cc90a`）
@@ -389,3 +389,11 @@ Fri 7-11        ▸ 本周 closeout + 5 commit 推 main
 - W28 standby placeholder: `docs/orchestration/sessions/weekly-requirements-2026-07-14.md`。
 - W27 closeout template: `docs/orchestration/sessions/weekly-closeout-2026-07-11.md`。
 - 2026-07-11 (周六) 16:00 +08:00 前完成 W27 final closeout;模板存在不等同于提前收口。
+
+## 十四、2026-07-11 W27 final closeout
+
+- Actual gate opened at `2026-07-11 16:00:00 +08:00`; fresh pre-edit gates passed with 80 referenced cards, connector execution disabled, and a clean `HEAD == origin/main == b17c717` baseline.
+- W27 is summarized. Accepted P0 outcomes, M5 docs-only readiness, capture-only evidence, and the four administrator routes are preserved as history.
+- Carry-over is owned by active W28: M5 serial implementation, direct pointer input evidence, R0-3 execution-window confirmation, protected-source bounded disposition, and live-subagent quota recheck.
+- No M5 product worker, project connector, R0-3 dry-run, protected-source edit, or pointer-input acceptance was started by the closeout.
+- Final closeout truth: `docs/orchestration/sessions/weekly-closeout-2026-07-11.md`.
