@@ -118,6 +118,8 @@ Additional Electron acceptance must cover the relevant success path, failure/dis
 
 completed:
 - Five-day dates, serial lane order, evidence contract, acceptance gates, and protected boundaries are recorded.
+- Day 1 cross-layer preflight confirms the existing preload/types/browser-fallback ranch contract is sufficient; the bounded worker can stay within `src/ranch/**`, `electron/main.ts`, allowed header/settings surfaces, and orchestration evidence files.
+- Day 1 allowed-scope risks are identified before dispatch: desktop close/hide semantics and display-work-area recovery for persisted x/y require explicit correction/evidence in `electron/main.ts`.
 
 incomplete:
 - W27 final closeout has not reached its authorized time.
@@ -135,6 +137,7 @@ next action:
 
 evidence:
 - Baseline at creation: `HEAD == origin/main == 1d9d5b0`; worktree clean.
+- 2026-07-11 preflight baseline before its docs commit: `HEAD == origin/main == 5416f4d`; worktree clean; typed ranch bridge and existing renderer/main paths inspected read-only.
 - W27 source remains active; W28 and `m5-longworker-dispatch-v0.1` remain standby.
 
 summary:

@@ -80,6 +80,16 @@ dispatch state: standby
 
 **行为优先解释**:旧派工表中的 FR-005/FR-008 标签曾互换;验收以工程需求行为定义为准,必须分别证明双击/右键召唤控制舱与 desktop/floating 模式语义,不得只按编号判断。
 
+## 2026-07-11 Day 1 implementation preflight
+
+- Cross-layer contract is already present and typed: `RanchPrefs`, `desktop|floating`, bounds, context menu, passthrough, notifications, and prefs-change IPC exist across `src/types.ts`, `electron/preload.ts`, and `src/lib/desktopClient.ts`. The Day 1/2 worker does not need to edit those blacklisted files.
+- `electron/main.ts` already owns default desktop prefs, JSON persistence, ranch window creation, tray summon, mode application, hot-zone polling, bounds commits, and app-quit destruction. `src/ranch/**` already owns double-click/right-click, mode toggle, drag/dock, interactive-region publication, and renderer listener/timer cleanup.
+- Required allowed-scope correction 1: the current ranch `close` handler hides only in floating mode; in desktop mode it prevents close without hiding. Day 1 must define and prove coherent show/hide/destroy semantics within `electron/main.ts`.
+- Required allowed-scope correction 2: persisted size is clamped, but restored x/y are not clamped to a currently available display work area. Day 1 must keep the ranch recoverable after display topology or DPI/work-area changes without widening the file fence.
+- Required evidence: default desktop launch, tray summon after hide, mode/size/position relaunch restoration, corrupt/missing prefs fallback, and app-quit cleanup of ranch window/hot-zone/listeners. The repo has no targeted automated Electron test suite, so current Electron/Windows screenshots or recording plus persisted prefs evidence are mandatory.
+- Day 2 interactions already have code paths, but existing code is not acceptance: double-click, right-click, desktop passthrough, floating drag, dock/fence persistence, and control-cockpit focus must be directly replayed.
+- Preflight decision: **no bounded correction outside the existing whitelist is currently required**. If implementation later proves otherwise, stop and return a file-specific correction proposal instead of touching preload/types/desktop fallback or protected source.
+
 **自动化 gate**:
 - `npm.cmd run lint` 0 错
 - `npm.cmd run build` 通过
