@@ -24,6 +24,16 @@ closeout checklist:
 - [ ] 确认 `docs/orchestration/connectors.json` machine-gate 无 diff。
 - [ ] 将 W28 role 从 standby 切换到 active,同时收口 W27 weekly role。
 
+pre-closeout evidence inventory (prepared 2026-07-11 11:50 +08:00; not final acceptance):
+- W27 pushed commit ledger prepared for final remote recheck: `f4fa3a4`, `18451ba`, `57d0567`, `65da9a9`, `0f48415`, `9ae95ab`, `7030ebf`, `595291f`, `87d3302`, `72540e4`, `1d9d5b0`, `cd34283`, `61b9c5e`.
+- Current `status.json` P0 cards are all accepted: `homepage-ui-p0`, `ranch-real-integration-p0`, and `cockpit-refactor-p0`.
+- W27 P0 outcomes prepared for final summary: homepage C implementation accepted and pushed; stale blocker wording synchronized; R0-3 branch ② recorded with its dry-run lane still standby; the registered release-dir cleanup outcome is preserved in the weekly evidence.
+- W27 P1 outcomes prepared for final summary: M5 v0.2 main/child requirement cards and the serial dispatch package exist without implementation; Electron `capturePage()` JSON/PNG/MD evidence proves visible ranch rendering only; direct click-through/double-click/right-click/drag/dock evidence remains pending; Git log-ignore decision and connector wording cleanup are recorded without enabling a connector.
+- W27 P2 candidates remain deferred; none is promoted by this inventory.
+- W28 carry-over prepared: M5 serial implementation, direct pointer input, R0-3 dry-run execution window, protected-source bounded disposition, and live-subagent quota recheck. Each remains separately gated after W28 activation.
+- Negative boundary prepared for final recheck: no Codex/Trae/Qoder project connector execution, no connector machine-gate acceptance, no protected-source repair, no M5 product worker, and no browser/capture evidence promoted to OS-input or OS-notification acceptance.
+- Baseline at inventory time: `HEAD == origin/main == 61b9c5e`; worktree clean. The final closeout must replace this with an actual-time post-gate and post-push baseline.
+
 completed:
 - Placeholder created on 2026-07-10。
 
