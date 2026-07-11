@@ -2,13 +2,13 @@
   "identity": "[PM]#multi-agent-control@v0.1",
   "loopState": "active",
   "dispatchState": "active",
-  "target": "W27 已于 2026-07-11 16:00 +08:00 完成真实 closeout 并 summarized；W28 weekly-requirements 与 M5 五日控制卡已激活。当前保持 `active_waiting_day1`，等待 2026-07-14 串行派 `[长工]#ranch-window@v0.2`；五张产品子卡、R0-3 dry-run、protected source、pointer input 和项目 Codex/Trae/Qoder connector 均未提前启动。",
+  "target": "管理员于 2026-07-11 授权将已批准的 M5 五日串行计划提前至今天启动：Day 1 为 `[长工]#ranch-window@v0.2`，Day 2~5 顺延至 2026-07-15。W27 已 summarized、W28 active；R0-3 dry-run、protected source、quota、cockpit redesign、pointer evidence 和项目 Codex/Trae/Qoder connector 继续各自 standby/blocked，不随 M5 提前启动。",
   "source": "docs/orchestration/index.md",
   "todayPlan": {
     "date": "2026-07-11",
-    "session": "docs/orchestration/sessions/weekly-closeout-2026-07-11.md",
-    "selectedRoute": "W27 summarized;W28 active;M5 control active_waiting_day1;all product workers remain standby until the 2026-07-14 calendar and dependency gates",
-    "progress": "docs/orchestration/sessions/weekly-closeout-2026-07-11.md"
+    "session": "docs/orchestration/sessions/m5-five-day-development-2026-07-14.md",
+    "selectedRoute": "Administrator authorized M5 Day 1 today; after fresh gates and PM control-plane push, dispatch only [长工]#ranch-window@v0.2; all other M5 cards remain pending",
+    "progress": "docs/orchestration/sessions/m5-five-day-development-2026-07-14.md"
   },
   "p0Cards": [
     {
@@ -289,7 +289,7 @@
       "title": "[PM]#weekly-requirements@2026-07-14",
       "owner": "主控",
       "status": "active",
-      "responsibility": "Maintain active W28 requirements and the selected serial M5 route; do not dispatch a product worker before the 2026-07-14 Day 1 calendar gate and its bounded task contract.",
+      "responsibility": "Maintain active W28 requirements and the administrator-authorized serial M5 route beginning 2026-07-11; only the bounded ranch-window Day 1 worker may start today.",
       "tag": "⟦tag:v2|session|weekly-requirements-2026-07-14⟧",
       "evidence": "docs/orchestration/sessions/weekly-requirements-2026-07-14.md"
     },
@@ -298,7 +298,7 @@
       "title": "[PM]#m5-longworker-dispatch@v0.1",
       "owner": "主控",
       "status": "standby",
-      "responsibility": "M5 long-worker dispatch package (ranch-window-v0.2 优先);W27 closeout 与 W28 activation 已满足，但继续等待 2026-07-14 Day 1；届时 PM 使用 Codex 内部子 agent 串行派发，项目 Codex/Trae/Qoder connector 保持禁用.",
+      "responsibility": "M5 long-worker dispatch package (ranch-window-v0.2 优先); administrator authorized Day 1 on 2026-07-11. After fresh gates and PM push, dispatch one Codex internal agent serially; project Codex/Trae/Qoder connectors remain disabled.",
       "tag": "⟦tag:v2|task|m5-longworker-dispatch-v0.1⟧",
       "evidence": "docs/orchestration/tasks/m5-longworker-dispatch-v0.1.md"
     },
@@ -307,7 +307,7 @@
       "title": "[PM]#m5-five-day-development@2026-07-14",
       "owner": "主控",
       "status": "active",
-      "responsibility": "Track the active 2026-07-14 through 2026-07-18 M5 serial development goal in `active_waiting_day1`; keep all product workers pending until each calendar, callback, acceptance, commit, and push gate is satisfied.",
+      "responsibility": "Track the active 2026-07-11 through 2026-07-15 M5 serial development goal in `active_ready_day1`; keep all but the bounded ranch-window Day 1 worker pending until each callback, acceptance, commit, and push gate is satisfied.",
       "tag": "⟦tag:v2|session|m5-five-day-development-2026-07-14⟧",
       "evidence": "docs/orchestration/sessions/m5-five-day-development-2026-07-14.md"
     },
@@ -382,7 +382,7 @@
       "title": "每日计划督办",
       "role": "[PM]#daily-supervision@2026-07-02",
       "state": "active",
-      "nextAction": "监督 W28 active 与 M5 active_waiting_day1；保持所有产品 worker standby 到 2026-07-14，并继续守住 connector、protected source 和直接 pointer evidence 边界。"
+      "nextAction": "监督 W28 active 与 M5 active_ready_day1；完成今日门禁和 PM push 后只派 ranch-window Day 1 worker，并继续守住 connector、protected source 和直接 pointer evidence 边界。"
     },
     {
       "id": "codex-evidence-closeout",
@@ -543,7 +543,7 @@
       "title": "W28 weekly requirements planning",
       "role": "[PM]#weekly-requirements@2026-07-14",
       "state": "active",
-      "nextAction": "Keep W28 active and aligned with the M5 five-day control card; wait for the 2026-07-14 Day 1 gate before dispatching the single authorized ranch-window worker."
+      "nextAction": "Keep W28 active and aligned with the M5 five-day control card; today, after fresh gates and PM push, dispatch the single authorized ranch-window worker."
     },
     {
       "id": "ranch-real-integration-r0-3-dryrun",

@@ -103,7 +103,7 @@ dispatch gate:
 - Supervisor owns drift detection, blocker surfacing, and minimum correction.
 
 current target:
-- W27 已于 2026-07-11 16:00 +08:00 完成真实 closeout 并 summarized；W28 weekly-requirements 与 M5 五日控制卡已激活。当前保持 `active_waiting_day1`，等待 2026-07-14 串行派 `[长工]#ranch-window@v0.2`；五张产品子卡、R0-3 dry-run、protected source、pointer input 和项目 Codex/Trae/Qoder connector 均未提前启动。
+- 管理员于 2026-07-11 授权将已批准的 M5 五日串行计划提前至今天启动：Day 1 为 `[长工]#ranch-window@v0.2`，Day 2~5 顺延至 2026-07-15。W27 已 summarized、W28 active；R0-3 dry-run、protected source、quota、cockpit redesign、pointer evidence 和项目 Codex/Trae/Qoder connector 继续各自 standby/blocked，不随 M5 提前启动。
 
 current role split:
 - `[PM]#multi-agent-control@v0.1`: maintain this index, dispatch bounded lanes, collect callbacks, write acceptance.
@@ -131,8 +131,8 @@ current role split:
 - `[监督]#ranch-status-script@v0.1`: summarized M5 animal/status/single-toast notification evidence for FR-002/003/004/006 without reopening connector state.
 - `[监督]#ranch-personality@v0.1`: summarized M5 personality and control-cockpit prefs-linkage evidence for FR-007 and notifyPrefs.
 - `[短工]#ranch-m5-requirements@v0.2`: standby docs-only M5 requirements readiness lane; main card plus five child cards are created, but no M5 implementation or long-worker dispatch is authorized.
-- `[PM]#m5-longworker-dispatch@v0.1`: standby dispatch package for the serial M5 long-worker activation; W27 closeout and W28 activation are satisfied, but PM still waits until 2026-07-14 before dispatching the authorized Codex internal long-worker.
-- `[PM]#m5-five-day-development@2026-07-14`: active five-day serial control card with custom status `active_waiting_day1`; W27/W28 admission is satisfied, but every product worker remains pending until its calendar/dependency gate.
+- `[PM]#m5-longworker-dispatch@v0.1`: standby dispatch package for the serial M5 long-worker activation; administrator authorized Day 1 today, but PM dispatches only after the rebaseline commit/push and fresh clean gate.
+- `[PM]#m5-five-day-development@2026-07-14`: active five-day serial control card with custom status `active_ready_day1`; only the bounded ranch-window Day 1 worker may start after PM gates.
 - `[监督]#ranch-pointer-smoke@v0.2`: standby verification package for transparent ranch pointer smoke; no implementation edit.
 - `[监督]#ranch-pointer-smoke-manual-evidence@v0.2`: standby manual evidence package for pointer-smoke callback recording; no pointer input executed yet.
 - `[长工]#homepage-ui-design@v0.1`: summarized HomePage / landing / 启动页 P0 lane; H0-1 design drafts accepted as C · 华丽, H0-2/H0-3 implemented, H0-4 protected-file audit passed in `homepage-ui-p0-c0-6-style-2026-07-07.md`; no edit to `NiuMaAvatar.tsx` / `index.css` / `agentCore.ts` / central 4x2 control-cockpit grid.
@@ -140,7 +140,7 @@ current role split:
 - `[PM]#protected-cockpit-source-drift@v0.1`: standby PM disposition lane in W28;administrator selected bounded routing, but no source edit, format repair, acceptance, or rollback is authorized yet.
 - `[PM]#cockpit-ui-redesign-v3.1@v0.1`: standby task-intake lane for the 2026-07-08 control-cockpit UI diagnosis; W28 candidate only, no source implementation in this pass.
 - `[PM]#weekly-requirements@2026-07-07`: summarized W27 (2026-07-07~2026-07-13) weekly-requirements history; final closeout is recorded in `weekly-closeout-2026-07-11.md`.
-- `[PM]#weekly-requirements@2026-07-14`: active W28 (2026-07-14~2026-07-20) planner; tracks selected routes while preserving the 2026-07-14 Day 1 product gate.
+- `[PM]#weekly-requirements@2026-07-14`: active W28 planner; tracks the administrator-authorized M5 rolling schedule beginning 2026-07-11 while preserving per-card serial gates.
 - `[PM]#daily-plan@2026-07-09`: summarized 2026-07-09 daily plan;B②/C short-worker/D 今天/E1 evidence is retained as history.
 - `[PM]#daily-plan@2026-07-10`: summarized 2026-07-10 daily plan;administrator decisions and W28/closeout preparation are retained as history.
 
@@ -160,5 +160,5 @@ next action:
 - Keep Codex draft/pending/enabled=false and Trae/Qoder placeholder/not-requested/enabled=false until connector machine gate fields change.
 - Use `docs/orchestration/tasks/daily-decision-queue-2026-07-02.md` as the next PM callback surface for standby decisions.
 - Keep `docs/orchestration/tasks/daily-role-accountability-2026-07-02.md` aligned with role states before closing any daily supervision pass.
-- Keep W28 and the M5 five-day control card active while all product workers remain standby until 2026-07-14.
-- On Day 1, re-read the live truth, prove a clean `HEAD == origin/main` baseline and unchanged negative hashes, then dispatch only the single authorized `[长工]#ranch-window@v0.2`.
+- Commit/push the administrator-authorized 2026-07-11 schedule rebaseline, then prove a clean `HEAD == origin/main` baseline and unchanged negative hashes.
+- After those gates, dispatch only the single authorized `[长工]#ranch-window@v0.2`; keep every other M5 card and all non-M5 standby work pending.

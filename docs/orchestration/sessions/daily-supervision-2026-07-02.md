@@ -1075,3 +1075,9 @@ pm.cmd run build pass; git diff --check only on the 11 protected-source whitespa
   - Applied the atomic transition: W27 weekly role/session summarized; the active `weekly-requirements` lane transferred to W28; W28 weekly role/session active; the 2026-07-10 daily plan summarized; the M5 five-day control card active with `active_waiting_day1`.
   - `m5-longworker-dispatch-v0.1` and all five M5 implementation cards remain standby. No product worker, R0-3 dry-run, project connector, protected-source edit, or pointer-input acceptance was started.
   - Next action: run post-edit full gates and negative hash checks, commit/push only the declared closeout files, prove clean `HEAD == origin/main`, then wait for the 2026-07-14 Day 1 gate.
+
+- [2026-07-11 18:58 +08:00] M5 five-day schedule rebaseline:
+  - Administrator authorized the only acceleration in scope: start M5 Day 1 (`ranch-window-v0.2`) today. The serial schedule is now 2026-07-11 Day 1, 2026-07-12 Day 2 (same worker), 2026-07-13 `ranch-status-script-v0.2`, 2026-07-14 `ranch-personality-v0.2`, and 2026-07-15 `ranch-fence-pointer-v0.2`; `ranch-system-notify-v0.2` remains after the Day 5 acceptance gate.
+  - Rebaseline only changes the M5 control plane. R0-3 dry-run, protected-source work, live-subagent quota, cockpit redesign, direct pointer-evidence lanes, and project Codex/Trae/Qoder connectors remain standby and excluded.
+  - No product worker exists and no product source or connector machine gate has been edited. Before dispatching exactly one `[长工]#ranch-window@v0.2`, PM must commit/push this schedule rebaseline and prove a fresh clean baseline with the full orchestration, lint, build, diff, and protected-hash gates.
+  - Next action: after the fresh baseline passes, dispatch Day 1 only. Do not advance the same worker to Day 2 until its 2026-07-12 follow-up and do not open a second product worker.

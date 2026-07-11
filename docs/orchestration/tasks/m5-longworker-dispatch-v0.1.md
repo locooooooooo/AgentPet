@@ -21,7 +21,7 @@ dispatch state: standby
 ## objective:
 
 - 2026-07-10 管理员拍板 ② 串行派 1 张 M5 long-worker,首张为 `ranch-window-v0.2`(FR-001/005/008/009/011 涵盖最广)
-- 本派工包 docs-only;W28 激活并到达 2026-07-14 Day 1 后,由 PM 将下方启动描述投递给 Codex 内部子 agent
+- 管理员已授权将 Day 1 提前到 2026-07-11;控制面 commit/push 与 fresh clean baseline 后,由 PM 将下方启动描述投递给 Codex 内部子 agent
 - W28 期间串行派工,不得并行(避免抢占 protected/shared surface)
 - W27 不启动任何 long-worker(等 7-11 16:00 W27 closeout 后才激活)
 
@@ -33,7 +33,7 @@ dispatch state: standby
 |---|---|
 | worker type | `[长工]` |
 | 目标 task | `docs/orchestration/tasks/ranch-window-v0.2.md` |
-| 启动窗口 | 2026-07-14 ~ 2026-07-15(Day 1/2,同一 worker) |
+| 启动窗口 | 2026-07-11 ~ 2026-07-12 (Day 1/2,同一 worker) |
 | 预计工时 | 6.5~9.5h |
 | 角色 title | `[长工]#ranch-window@v0.2` |
 | 收口方式 | PM-direct commit + push |
@@ -171,7 +171,7 @@ dispatch state: standby
 - PM-direct commit + push(长工不跑 git stage / commit / push)
 
 **禁止**:
-- ❌ W27 closeout、W28 activation、2026-07-14 Day 1 三道 gate 未同时满足前不得启动本 worker
+- ❌ W27 closeout、W28 activation、2026-07-11 管理员 Day 1 授权、fresh clean baseline 四道 gate 未同时满足前不得启动本 worker
 - ❌ 不跑 Codex / Trae / Qoder / 任何 connector
 - ❌ 不跑 R0-3 dry-run
 - ❌ 不跑 pointer input 实际执行
@@ -185,11 +185,11 @@ dispatch state: standby
 
 | 序 | 子卡 | 启动窗口 | 预计工时 | 备注 |
 |---|---|---|---|---|
-| 1 | `ranch-window-v0.2` | 7-14 ~ 7-15 | 6.5~9.5h | Day 1/2 使用同一 `[长工]`;完成并验收后 PM commit/push |
-| 2 | `ranch-status-script-v0.2` | 7-16 | 4~6h | 前卡 accepted/pushed 后派 `[短工]` |
-| 3 | `ranch-personality-v0.2` | 7-17 | 3~4h | status-script accepted/pushed 后派 `[短工]` |
-| 4 | `ranch-fence-pointer-v0.2` | 7-18 | 3~5h | 必须直接观察 pointer input;capturePage 不算输入证据 |
-| 5 | `ranch-system-notify-v0.2` | 7-18,仅在前卡收口后 | 2~3h | 必须证明真实 Windows notification;browser fallback 不算 |
+| 1 | `ranch-window-v0.2` | 7-11 ~ 7-12 | 6.5~9.5h | Day 1/2 使用同一 `[长工]`;完成并验收后 PM commit/push |
+| 2 | `ranch-status-script-v0.2` | 7-13 | 4~6h | 前卡 accepted/pushed 后派 `[短工]` |
+| 3 | `ranch-personality-v0.2` | 7-14 | 3~4h | status-script accepted/pushed 后派 `[短工]` |
+| 4 | `ranch-fence-pointer-v0.2` | 7-15 | 3~5h | 必须直接观察 pointer input;capturePage 不算输入证据 |
+| 5 | `ranch-system-notify-v0.2` | 7-15,仅在前卡收口后 | 2~3h | 必须证明真实 Windows notification;browser fallback 不算 |
 
 **禁止并行**:5 张子卡都涉及 `src/ranch/**` + `electron/main.ts`,并行会冲突。串行派工,每张收口后再开下一张。
 
@@ -209,8 +209,8 @@ dispatch state: standby
 
 ## next action:
 
-- W27 closeout and W28 activation are complete; keep this package standby until the 2026-07-14 Day 1 gate.
-- On Day 1, PM rechecks the clean baseline and uses the "内部子 agent 启动描述" to dispatch `[长工]#ranch-window@v0.2`.
+- W27 closeout and W28 activation are complete; administrator authorized Day 1 today. Keep this package standby until the schedule-rebaseline commit/push and fresh clean baseline complete.
+- Today, PM rechecks the clean baseline and uses the "内部子 agent 启动描述" to dispatch `[长工]#ranch-window@v0.2`.
 - 长工交付后,PM-direct 跑三件套 + commit/push
 - ranch-window-v0.2 收口后再按串行序列开 ranch-status-script-v0.2
 
@@ -218,4 +218,4 @@ dispatch state: standby
 
 ## summary:
 
-- 2026-07-10 管理员拍板 ② 串行首卡 `ranch-window-v0.2`;派工包已对齐 2026-07-14 ~ 2026-07-18 五日 Goal;W27 已收口、W28 已激活，实际 worker 仍等待 Day 1 后由 PM 使用 Codex 内部子 agent 串行派发。
+- 2026-07-10 管理员拍板 ② 串行首卡 `ranch-window-v0.2`;2026-07-11 管理员授权将五日 Goal 重排为 2026-07-11 ~ 2026-07-15;W27 已收口、W28 已激活，实际 worker 在本次控制面 rebaseline 后由 PM 使用 Codex 内部子 agent 串行派发。

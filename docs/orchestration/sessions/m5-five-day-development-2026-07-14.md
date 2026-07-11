@@ -5,12 +5,12 @@
 
 loop state: active
 dispatch state: active
-status: active_waiting_day1
+status: active_ready_day1
 
-> **开发窗口**: 2026-07-14 ~ 2026-07-18 (W28 五日串行开发)
+> **开发窗口**: 2026-07-11 ~ 2026-07-15 (管理员授权滚动五日串行开发)
 > **创建时间**: 2026-07-10 17:50 +08:00
-> **当前准入门**: W27 final closeout 已满足；下一道门是 `2026-07-14` Day 1 calendar gate 与派工前 clean baseline。
-> **当前结论**: W27 summarized，W28 active，本卡为 `active_waiting_day1`；全部 M5 implementation 卡与派工包仍 standby，当前不派 worker、不改产品代码。
+> **当前准入门**: 管理员已于 2026-07-11 授权提前 Day 1；下一道门是本次控制面 commit/push 后的 fresh clean baseline。
+> **当前结论**: W27 summarized，W28 active，本卡为 `active_ready_day1`；仅 ranch-window Day 1 可在 PM 完成门禁和派工后启动，其余 M5 卡继续 pending。
 
 ## objective
 
@@ -39,12 +39,12 @@ status: active_waiting_day1
 
 | Day | Date | Only allowed product lane | Intended outcome | Start gate | Current state |
 | --- | --- | --- | --- | --- | --- |
-| 1 | 2026-07-14 | `[长工]#ranch-window@v0.2` | FR-001 lifecycle, default desktop mode, size/position/mode persistence | W27 summarized + W28 active + clean baseline | pending_not_started |
-| 2 | 2026-07-15 | same ranch-window worker | Double-click/right-click summon, desktop/floating, drag/dock, fence, Electron evidence | Day 1 callback absorbed; no second worker | pending_not_started |
-| 3 | 2026-07-16 | `[短工]#ranch-status-script@v0.2` | Eight identities, visible status actions, one transient status band | ranch-window accepted, committed, pushed | pending_not_started |
-| 4 | 2026-07-17 | `[短工]#ranch-personality@v0.2` | chatty/quiet/silent and persisted bubble/system/badge preferences | status-script accepted, committed, pushed | pending_not_started |
-| 5A | 2026-07-18 | `[短工]#ranch-fence-pointer@v0.2` | Direct click-through, double-click, right-click, floating drag and dock evidence | personality accepted, committed, pushed | pending_not_started |
-| 5B | 2026-07-18 | `[短工]#ranch-system-notify@v0.2` | Real Windows notification, disable path, icon fallback, shutdown cleanup | fence-pointer accepted, committed, pushed | pending_not_started |
+| 1 | 2026-07-11 | `[长工]#ranch-window@v0.2` | FR-001 lifecycle, default desktop mode, size/position/mode persistence | Administrator authorization + W27 summarized + W28 active + fresh clean baseline | ready_to_dispatch |
+| 2 | 2026-07-12 | same ranch-window worker | Double-click/right-click summon, desktop/floating, drag/dock, fence, Electron evidence | Day 1 callback absorbed; no second worker | pending_not_started |
+| 3 | 2026-07-13 | `[短工]#ranch-status-script@v0.2` | Eight identities, visible status actions, one transient status band | ranch-window accepted, committed, pushed | pending_not_started |
+| 4 | 2026-07-14 | `[短工]#ranch-personality@v0.2` | chatty/quiet/silent and persisted bubble/system/badge preferences | status-script accepted, committed, pushed | pending_not_started |
+| 5A | 2026-07-15 | `[短工]#ranch-fence-pointer@v0.2` | Direct click-through, double-click, right-click, floating drag and dock evidence | personality accepted, committed, pushed | pending_not_started |
+| 5B | 2026-07-15 | `[短工]#ranch-system-notify@v0.2` | Real Windows notification, disable path, icon fallback, shutdown cleanup | fence-pointer accepted, committed, pushed | pending_not_started |
 
 ## serial dispatch invariant
 
@@ -126,18 +126,19 @@ incomplete:
 - All five implementation callbacks, desktop evidence sets, and commits are pending.
 
 blockers:
-- Calendar gate: Day 1 does not open before `2026-07-14`; W28 activation alone does not authorize early product work.
+- Day 1 is authorized today, but no product worker may start until this control-plane rebaseline is committed/pushed and the fresh clean-baseline gate remains green.
 - Existing connector, pointer, protected-source, and live-subagent quota blockers remain separate; none is silently accepted by this plan.
 
 next action:
-- Keep this card in `active_waiting_day1` and re-read live truth on 2026-07-14 before dispatch.
-- Do not dispatch `[长工]#ranch-window@v0.2` before the 2026-07-14 Day 1 gate and a fresh clean-baseline proof.
+- Commit/push the 2026-07-11 schedule authorization, then re-read live truth and dispatch only `[长工]#ranch-window@v0.2`.
+- Do not start Day 2 or any later M5 card until the previous card has its required callback, acceptance, commit, push, and clean-baseline proof.
 
 evidence:
 - Baseline at creation: `HEAD == origin/main == 1d9d5b0`; worktree clean.
 - 2026-07-11 preflight baseline before its docs commit: `HEAD == origin/main == 5416f4d`; worktree clean; typed ranch bridge and existing renderer/main paths inspected read-only.
 - 2026-07-11 actual-time transition baseline: `HEAD == origin/main == b17c717`; fresh 80-card check, report, preflight, connector-safety, lint, and build passed before edits.
+- 2026-07-11 administrator schedule authorization moves Day 1 to today and rolls the serial window through 2026-07-15; product evidence remains pending.
 - W27 is summarized and W28 is active; `m5-longworker-dispatch-v0.1` and all five implementation cards remain standby.
 
 summary:
-- Five-day M5 serial development control is active and waiting for Day 1; no implementation worker has started.
+- Five-day M5 serial development control is active and ready for the administrator-authorized Day 1; no implementation worker has started yet.
