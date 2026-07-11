@@ -39,7 +39,7 @@ acceptance for a future implementation lane:
 - `npm.cmd run lint`, `npm.cmd run build`, and `npm.cmd run orchestration:check` pass.
 
 next action:
-- Keep standby until PM decides whether M5 long-worker implementation should start.
+- Keep standby until `ranch-window-v0.2` is accepted, committed, pushed, and the worktree is clean; on 2026-07-16 PM may dispatch this card as the only `[短工]` product worker.
 
 summary:
 - Requirements-ready child card for M5 animal/status presentation; no implementation started.

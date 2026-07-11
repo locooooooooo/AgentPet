@@ -50,7 +50,8 @@ acceptance:
 
 next action:
 - Keep all five cards standby through W27 closeout.
-- W28 may prepare one bounded long-worker dispatch for `ranch-window-v0.2` first; no parallel child-card implementation is implied.
+- After W27 is summarized and W28 is active, keep all five cards standby until their calendar/dependency gate; on 2026-07-14 PM dispatches only `[长工]#ranch-window@v0.2` through the bounded package.
+- Continue strictly through `ranch-status-script` -> `ranch-personality` -> `ranch-fence-pointer` -> `ranch-system-notify`; every next card waits for callback, PM acceptance, full gates, commit, push, and a clean worktree.
 
 summary:
-- Docs-only M5 v0.2 readiness lane; serial first-card route is selected for W28, but no implementation or connector execution started.
+- Docs-only M5 v0.2 readiness lane; five-day serial route and dependency gates are selected for W28, but no implementation or connector execution started.

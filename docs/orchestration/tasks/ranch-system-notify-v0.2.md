@@ -32,13 +32,14 @@ no-touch boundaries:
 - Do not change connector machine-gate fields.
 
 acceptance for a future implementation lane:
-- System notification displays for a current ranch event when enabled and is suppressed when disabled.
+- A real Electron/Windows system notification displays for a current ranch event when enabled and is suppressed when disabled; browser fallback is not acceptance evidence.
 - Existing agent icon is used when available; missing icon falls back gracefully.
 - Status band and OS notification do not create duplicate persistent UI cards.
+- Window close/application exit removes notification listeners and releases related resources without duplicate callbacks on relaunch.
 - `npm.cmd run lint`, `npm.cmd run build`, `npm.cmd run orchestration:check`, and connector safety gates pass.
 
 next action:
-- Keep standby until PM decides whether M5 long-worker implementation should start.
+- Keep standby until `ranch-fence-pointer-v0.2` is accepted, committed, pushed, and the worktree is clean; only then, on 2026-07-18, PM may dispatch this card as the only `[短工]` product worker.
 
 summary:
 - Requirements-ready child card for system notification behavior; no implementation started.

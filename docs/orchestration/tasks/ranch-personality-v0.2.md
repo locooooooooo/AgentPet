@@ -33,11 +33,12 @@ no-touch boundaries:
 acceptance for a future implementation lane:
 - `chatty` shows normal status messages; `quiet` reduces chatter without breaking critical state; `silent` suppresses non-critical bubble/system notifications.
 - Notify prefs persist across relaunch.
+- `silent` does not stop agent/status refresh, and `quiet` preserves critical notifications.
 - Control-cockpit settings reflect and update the same prefs source as the ranch window.
 - `npm.cmd run lint`, `npm.cmd run build`, and `npm.cmd run orchestration:check` pass.
 
 next action:
-- Keep standby until PM decides whether M5 long-worker implementation should start.
+- Keep standby until `ranch-status-script-v0.2` is accepted, committed, pushed, and the worktree is clean; on 2026-07-17 PM may dispatch this card as the only `[短工]` product worker.
 
 summary:
 - Requirements-ready child card for personality and notification preferences; no source edit authorized here.

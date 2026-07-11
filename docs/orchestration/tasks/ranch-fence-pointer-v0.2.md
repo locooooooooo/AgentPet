@@ -40,8 +40,9 @@ acceptance for a future implementation lane:
 - `npm.cmd run lint`, `npm.cmd run build`, and `npm.cmd run orchestration:check` pass in the same verification pass.
 
 next action:
-- Use `scripts/ranch-pointer-capture.mjs` to verify the Electron `capturePage` route.
-- Keep full pointer input smoke under `ranch-pointer-smoke-v0.2` until direct observation is available.
+- The `capturePage` visibility route is already archived and does not satisfy this card.
+- Keep standby until `ranch-personality-v0.2` is accepted, committed, pushed, and the worktree is clean; on 2026-07-18 PM may dispatch this card as the only `[短工]` product worker.
+- Do not accept or commit this card until click-through, double-click, right-click, floating drag, and dock persistence are directly observed and recorded under the pointer-smoke evidence route.
 
 summary:
 - Requirements-ready child card for fence/pointer integration; capture investigation allowed, pointer acceptance still pending.
