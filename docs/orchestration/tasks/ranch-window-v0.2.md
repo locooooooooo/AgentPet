@@ -41,8 +41,7 @@ acceptance for the Day 1/2 implementation lane:
 - Any skipped pointer behavior remains incomplete and must be routed through `ranch-pointer-smoke-v0.2`.
 
 next action:
-- Keep standby through W27 closeout.
-- Keep standby after W28 activation until 2026-07-14 Day 1 and a clean baseline; PM then dispatches this card as the only active product worker using `m5-longworker-dispatch-v0.1.md`.
+- Keep standby after the completed W27 closeout and W28 activation until 2026-07-14 Day 1 and a fresh clean baseline; PM then dispatches this card as the only active product worker using `m5-longworker-dispatch-v0.1.md`.
 
 summary:
 - Requirements-ready child card for M5 window behavior; no source edit authorized here.

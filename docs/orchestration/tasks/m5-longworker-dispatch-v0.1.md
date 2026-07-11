@@ -209,8 +209,8 @@ dispatch state: standby
 
 ## next action:
 
-- W27 closeout(2026-07-11 16:00)前不动本派工包激活
-- W28 激活后继续等待 2026-07-14 Day 1;PM 按"内部子 agent 启动描述"派 `[长工]#ranch-window@v0.2`
+- W27 closeout and W28 activation are complete; keep this package standby until the 2026-07-14 Day 1 gate.
+- On Day 1, PM rechecks the clean baseline and uses the "内部子 agent 启动描述" to dispatch `[长工]#ranch-window@v0.2`.
 - 长工交付后,PM-direct 跑三件套 + commit/push
 - ranch-window-v0.2 收口后再按串行序列开 ranch-status-script-v0.2
 
@@ -218,4 +218,4 @@ dispatch state: standby
 
 ## summary:
 
-- 2026-07-10 管理员拍板 ② 串行首卡 `ranch-window-v0.2`;派工包已对齐 2026-07-14 ~ 2026-07-18 五日 Goal;实际 worker 由 PM 使用 Codex 内部子 agent 串行派发;W27 不启动任何 long-worker。
+- 2026-07-10 管理员拍板 ② 串行首卡 `ranch-window-v0.2`;派工包已对齐 2026-07-14 ~ 2026-07-18 五日 Goal;W27 已收口、W28 已激活，实际 worker 仍等待 Day 1 后由 PM 使用 Codex 内部子 agent 串行派发。
