@@ -34,6 +34,21 @@ pre-closeout evidence inventory (prepared 2026-07-11 11:50 +08:00; not final acc
 - Negative boundary prepared for final recheck: no Codex/Trae/Qoder project connector execution, no connector machine-gate acceptance, no protected-source repair, no M5 product worker, and no browser/capture evidence promoted to OS-input or OS-notification acceptance.
 - Baseline at inventory time: `HEAD == origin/main == 61b9c5e`; worktree clean. The final closeout must replace this with an actual-time post-gate and post-push baseline.
 
+final state transition matrix (prepared only; apply after the actual 16:00 gate):
+| control item | before closeout | after accepted closeout |
+| --- | --- | --- |
+| `[PM]#weekly-requirements@2026-07-07` role + session | active | summarized |
+| `weekly-requirements` lane id | active,owned by W27 role | remains active,owner changes to `[PM]#weekly-requirements@2026-07-14` |
+| `[PM]#weekly-requirements@2026-07-14` role + session | standby | active |
+| `[PM]#daily-plan@2026-07-10` role + session | active | summarized |
+| `[PM]#m5-five-day-development@2026-07-14` role + session | standby | active tracking with custom status `active_waiting_day1`; no product worker yet |
+| `[PM]#m5-longworker-dispatch@v0.1` and all five M5 child cards | standby | remain standby until their calendar/dependency gates |
+| `status.json.todayPlan` | 2026-07-10 daily plan | 2026-07-11 weekly closeout session/progress |
+| active lane ids enforced by report | `daily-supervision, weekly-requirements` | unchanged; only weekly lane ownership changes |
+
+- `scripts/check-orchestration.mjs` requires each session-backed role's `loop state` and `dispatch state` to match the role status, and each non-shared lane state to match its owner role. Apply the matrix atomically across session cards, `status.json`, index role wording, and daily accountability.
+- `scripts/orchestration-report.mjs` hard-requires active lane ids to remain exactly `daily-supervision, weekly-requirements`; do not add an M5 active lane during closeout.
+
 completed:
 - Placeholder created on 2026-07-10。
 
