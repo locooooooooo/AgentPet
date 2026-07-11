@@ -21,7 +21,7 @@ dispatch state: standby
 ## objective:
 
 - 2026-07-10 管理员拍板 ② 串行派 1 张 M5 long-worker,首张为 `ranch-window-v0.2`(FR-001/005/008/009/011 涵盖最广)
-- 本派工包 docs-only;实际 long-worker thread 由管理员在 W28 激活时手动开(从下方"thread 启动描述"复制)
+- 本派工包 docs-only;W28 激活并到达 2026-07-14 Day 1 后,由 PM 将下方启动描述投递给 Codex 内部子 agent
 - W28 期间串行派工,不得并行(避免抢占 protected/shared surface)
 - W27 不启动任何 long-worker(等 7-11 16:00 W27 closeout 后才激活)
 
@@ -33,7 +33,7 @@ dispatch state: standby
 |---|---|
 | worker type | `[长工]` |
 | 目标 task | `docs/orchestration/tasks/ranch-window-v0.2.md` |
-| 启动窗口 | 2026-07-14 ~ 2026-07-18(W28 P0-1 排期) |
+| 启动窗口 | 2026-07-14 ~ 2026-07-15(Day 1/2,同一 worker) |
 | 预计工时 | 6.5~9.5h |
 | 角色 title | `[长工]#ranch-window@v0.2` |
 | 收口方式 | PM-direct commit + push |
@@ -78,6 +78,8 @@ dispatch state: standby
 | FR-009 | 牧场拖拽吸边(fence) | 录屏 + 截图 ≥ 2 张 |
 | FR-011 | 牧场 3 级 UI 收敛(L1/L2/L3 视觉) | 截图 1920×1080 + 1366×768 各 1 张 |
 
+**行为优先解释**:旧派工表中的 FR-005/FR-008 标签曾互换;验收以工程需求行为定义为准,必须分别证明双击/右键召唤控制舱与 desktop/floating 模式语义,不得只按编号判断。
+
 **自动化 gate**:
 - `npm.cmd run lint` 0 错
 - `npm.cmd run build` 通过
@@ -96,14 +98,14 @@ dispatch state: standby
 
 如果实施过程中发现越界或 quality gate 不通过:
 
-1. **自动回滚到 W28 P0-1 起点**(`595291f` HEAD + 本派工包落档后的 commit)
+1. **自动回滚到实际 W28 P0-1 clean baseline**(以 Day 1 派工前记录的 `HEAD == origin/main` commit 为准)
 2. **回滚命令**:`git revert <long-worker-commit-hash> --no-edit` → 跑 `orchestration:check` + `lint` + `build` → commit → push
 3. **重启条件**:bounded dispatch 描述(本卡)+ acceptance 重新对齐 + PM 重新授权
 4. **不接受**:`git reset --hard` / `git clean -fd` / `git push --force`(任何 destructive 操作都触发上报)
 
 ---
 
-## thread 启动描述(管理员手动开时复制)
+## 内部子 agent 启动描述(PM 派工时投递)
 
 ```markdown
 你是 [长工]#ranch-window@v0.2。目标 task:`docs/orchestration/tasks/ranch-window-v0.2.md`。
@@ -159,7 +161,7 @@ dispatch state: standby
 - PM-direct commit + push(长工不跑 git stage / commit / push)
 
 **禁止**:
-- ❌ 不实际启动 long-worker thread(W28 激活时由管理员手动开本 thread prompt)
+- ❌ W27 closeout、W28 activation、2026-07-14 Day 1 三道 gate 未同时满足前不得启动本 worker
 - ❌ 不跑 Codex / Trae / Qoder / 任何 connector
 - ❌ 不跑 R0-3 dry-run
 - ❌ 不跑 pointer input 实际执行
@@ -169,15 +171,15 @@ dispatch state: standby
 
 ---
 
-## 串行派工序列(W28 P0-1 完成后接续)
+## 五日串行派工序列
 
 | 序 | 子卡 | 启动窗口 | 预计工时 | 备注 |
 |---|---|---|---|---|
-| 1 | `ranch-window-v0.2` | 7-14 ~ 7-18 | 6.5~9.5h | **本派工包**;FR 涵盖最广 |
-| 2 | `ranch-status-script-v0.2` | 7-19 ~ 7-22 | 4~6h | FR-002/003/004/006 status script |
-| 3 | `ranch-personality-v0.2` | 7-23 ~ 7-25 | 3~4h | FR-007 personality |
-| 4 | `ranch-fence-pointer-v0.2` | 7-26 ~ 7-28 | 3~5h | fence + pointer smoke 集成 |
-| 5 | `ranch-system-notify-v0.2` | 7-29 ~ 7-31 | 2~3h | system notification + agent accent icon |
+| 1 | `ranch-window-v0.2` | 7-14 ~ 7-15 | 6.5~9.5h | Day 1/2 使用同一 `[长工]`;完成并验收后 PM commit/push |
+| 2 | `ranch-status-script-v0.2` | 7-16 | 4~6h | 前卡 accepted/pushed 后派 `[短工]` |
+| 3 | `ranch-personality-v0.2` | 7-17 | 3~4h | status-script accepted/pushed 后派 `[短工]` |
+| 4 | `ranch-fence-pointer-v0.2` | 7-18 | 3~5h | 必须直接观察 pointer input;capturePage 不算输入证据 |
+| 5 | `ranch-system-notify-v0.2` | 7-18,仅在前卡收口后 | 2~3h | 必须证明真实 Windows notification;browser fallback 不算 |
 
 **禁止并行**:5 张子卡都涉及 `src/ranch/**` + `electron/main.ts`,并行会冲突。串行派工,每张收口后再开下一张。
 
@@ -187,7 +189,7 @@ dispatch state: standby
 
 - 本卡存在且可被 `docs/orchestration/index.md` 引用
 - 派工参数 / 写 scope / 禁止 scope / acceptance / 回滚面 5 段完整
-- thread 启动描述(上方代码块)可被管理员直接复制开 thread
+- 内部子 agent 启动描述(上方代码块)可由 PM 直接投递
 - 串行派工序列 5 张子卡列清晰
 - W28 weekly-requirements-2026-07-14.md §一 P0-1 激活前置已标注"派工包 docs-only 落档"
 - `npm.cmd run orchestration:check` pass(79+ referenced cards,加本派工包后)
@@ -198,7 +200,7 @@ dispatch state: standby
 ## next action:
 
 - W27 closeout(2026-07-11 16:00)前不动本派工包激活
-- W28 激活时,管理员按"thread 启动描述"手动开 `[长工]#ranch-window@v0.2`
+- W28 激活后继续等待 2026-07-14 Day 1;PM 按"内部子 agent 启动描述"派 `[长工]#ranch-window@v0.2`
 - 长工交付后,PM-direct 跑三件套 + commit/push
 - ranch-window-v0.2 收口后再按串行序列开 ranch-status-script-v0.2
 
@@ -206,4 +208,4 @@ dispatch state: standby
 
 ## summary:
 
-- 2026-07-10 管理员拍板 ② 串行派 1 张 M5 long-worker,首张 `ranch-window-v0.2`;派工包 docs-only 落档;实际 thread 由管理员 W28 激活时手动开;W27 不启动任何 long-worker。
+- 2026-07-10 管理员拍板 ② 串行首卡 `ranch-window-v0.2`;派工包已对齐 2026-07-14 ~ 2026-07-18 五日 Goal;实际 worker 由 PM 使用 Codex 内部子 agent 串行派发;W27 不启动任何 long-worker。

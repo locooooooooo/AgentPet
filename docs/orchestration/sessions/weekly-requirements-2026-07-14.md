@@ -10,7 +10,7 @@ dispatch state: standby
 > **计划周期**: 2026-07-14 ~ 2026-07-20 (W28)
 > **当前状态**: standby placeholder
 > **激活条件**: 2026-07-11 (周六) 16:00 W27 closeout 完成后,由 PM 将本卡转为 active。
-> **硬边界**: 本卡只登记候选与顺序;不启动 M5 实施、不执行 R0-3 dry-run、不修改 protected source 或 connector machine gate。
+> **硬边界**: W27 closeout 前本卡只登记候选与顺序;W28 激活后仅按 `m5-five-day-development-2026-07-14.md` 使用 Codex 内部子 agent 串行实施,不执行项目 Codex/Trae/Qoder connector、不修改 protected source 或 connector machine gate。
 
 ---
 
@@ -29,7 +29,7 @@ dispatch state: standby
 
 | 优先级 | 候选 | 当前边界 | 激活前置 |
 | --- | --- | --- | --- |
-| P0-1 | M5 v0.2 串行实施,首卡 `ranch-window-v0.2` | 仅路线已选;未派 long-worker,未改 source | 派工包 docs-only 已落档(`docs/orchestration/tasks/m5-longworker-dispatch-v0.1.md`);W28 激活时按派工包"thread 启动描述"手动开 long-worker |
+| P0-1 | M5 v0.2 五日串行实施,首卡 `ranch-window-v0.2` | 仅路线已选;未派 long-worker,未改 source | 派工包与五日总控已落档;W27 summarized、W28 active、clean baseline 后,PM 在 2026-07-14 派 Codex 内部 `[长工]#ranch-window@v0.2` |
 | P0-2 | R0-3 Codex controlled dry-run | 仍 standby;不改 `approvalStatus` / `enabledByDefault` / `command` | W28 明确执行窗口、隔离 cwd 和 evidence 路径后再二次确认 |
 | P0-3 | Transparent ranch full pointer input evidence | capturePage 仅证明可见渲染;完整 pointer input 未 accepted | 明确 observer/automation route,保持 implementation 与 evidence 分离 |
 
@@ -40,7 +40,7 @@ dispatch state: standby
 | P1-1 | Protected trailing whitespace bounded lane | 仅处理已登记的 protected whitespace;本周不修、不回退、不扩大 source scope |
 | P1-2 | `cockpit-ui-redesign-v3.1` 范围拍板 | 当前仅 task intake;不得直接修改中央 4x2 grid、8 卡 keyframes、`NiuMaAvatar.tsx` 或关键 `agentCore.ts` |
 | P1-3 | live-subagents `403 DAILY_LIMIT_EXCEEDED` quota 复查 | 本周不主动复查;W28 仅在安全 route 可用时记录精确结果 |
-| P1-4 | M5 后续子卡排队 | `ranch-status-script-v0.2` / `ranch-personality-v0.2` / `ranch-fence-pointer-v0.2` / `ranch-system-notify-v0.2` 均不得与 P0-1 并行抢占 protected/shared surface |
+| P1-4 | M5 后续子卡串行队列 | 按五日总控在前一卡 callback、PM acceptance、full gates、commit、push、clean worktree 后接续;任何时候最多一个产品 worker |
 
 ## 三、W28 P2 候选
 
@@ -53,23 +53,24 @@ dispatch state: standby
 
 | 日期 | 建议动作 |
 | --- | --- |
-| 2026-07-14 (周二) | 激活 W28;复核 W27 closeout;只拍 P0-1 bounded dispatch |
-| 2026-07-15 (周三) | 若 P0-1 获明确派工,只跑 `ranch-window-v0.2` 串行实施与验证 |
-| 2026-07-16 (周四) | 收口 P0-1 evidence;不自动启动其余 M5 子卡 |
-| 2026-07-17 (周五) | 评估 R0-3 dry-run 执行窗口;没有二次确认则继续 standby |
-| 2026-07-18 (周六) | 处理 pointer evidence / protected whitespace / quota 中最多 1 个 bounded lane |
+| 2026-07-14 (周二) | Day 1:PM 派 `[长工]#ranch-window@v0.2`;完成 FR-001 lifecycle、default desktop、size/position/mode persistence |
+| 2026-07-15 (周三) | Day 2:继续同一 ranch-window worker;完成召唤、desktop/floating、drag/dock/fence 与 Electron evidence;验收后 PM commit/push |
+| 2026-07-16 (周四) | Day 3:仅在 ranch-window accepted/pushed 后派 `[短工]#ranch-status-script@v0.2` |
+| 2026-07-17 (周五) | Day 4:仅在 status-script accepted/pushed 后派 `[短工]#ranch-personality@v0.2` |
+| 2026-07-18 (周六) | Day 5:先派 `[短工]#ranch-fence-pointer@v0.2`;直接 pointer evidence accepted/pushed 后才派 `[短工]#ranch-system-notify@v0.2` |
 | 2026-07-19 ~ 2026-07-20 | W28 buffer、回归、周 closeout 准备 |
 
 acceptance:
 - 本卡保持 `standby` 直到 W27 closeout。
 - P0/P1/P2 候选与 2026-07-14 ~ 2026-07-20 排期存在。
 - `docs/orchestration/index.md`, `docs/orchestration/status.json`, and `daily-role-accountability-2026-07-02.md` track this standby role。
-- 本卡不授权 M5 implementation、Codex dry-run、Trae/Qoder、connector machine-gate edit 或 protected source edit。
+- W27 closeout 前本卡不授权 M5 implementation;W28 激活后 M5 implementation 仅由五日总控和逐卡 bounded dispatch 授权。
+- Codex 内部子 agent 是授权 worker 机制;项目 Codex/Trae/Qoder connector、R0-3 dry-run、connector machine-gate edit 和 protected source edit 仍不授权。
 - `npm.cmd run orchestration:check` passes。
 
 next action:
 - 2026-07-11 16:00 W27 closeout 后补最终上下文。
-- W28 激活时只把本卡状态改为 active;任何 implementation / dry-run 仍需独立 bounded dispatch 或二次执行确认。
+- W28 激活时同步五日总控准入状态;M5 按逐卡 bounded dispatch 串行执行,R0-3 dry-run 仍需二次执行确认。
 
 summary:
-- W28 standby placeholder;管理员已选定 M5 串行首卡和三项 deferred 路线,但本周不执行。
+- W28 standby placeholder;M5 已对齐 2026-07-14 ~ 2026-07-18 五日串行 Goal,但 W27 closeout 前不执行。

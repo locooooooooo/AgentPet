@@ -131,7 +131,7 @@ current role split:
 - `[监督]#ranch-status-script@v0.1`: summarized M5 animal/status/single-toast notification evidence for FR-002/003/004/006 without reopening connector state.
 - `[监督]#ranch-personality@v0.1`: summarized M5 personality and control-cockpit prefs-linkage evidence for FR-007 and notifyPrefs.
 - `[短工]#ranch-m5-requirements@v0.2`: standby docs-only M5 requirements readiness lane; main card plus five child cards are created, but no M5 implementation or long-worker dispatch is authorized.
-- `[PM]#m5-longworker-dispatch@v0.1`: standby dispatch package for the serial M5 long-worker activation; 2026-07-10 16:21 administrator selected option ② (serial `ranch-window-v0.2` first), no W27 implementation, no Codex / connector / protected-source edit; actual long-worker thread opens manually when W28 activates.
+- `[PM]#m5-longworker-dispatch@v0.1`: standby dispatch package for the serial M5 long-worker activation; 2026-07-10 16:21 administrator selected option ② (serial `ranch-window-v0.2` first), no W27 implementation and no project connector/protected-source edit; PM dispatches the authorized Codex internal long-worker on 2026-07-14 only after W27 closeout and W28 activation.
 - `[PM]#m5-five-day-development@2026-07-14`: standby five-day serial control card; tracks W27/W28 admission, five M5 child callbacks, Electron/Windows evidence, independent commits, and strict one-worker-at-a-time gates without starting implementation early.
 - `[监督]#ranch-pointer-smoke@v0.2`: standby verification package for transparent ranch pointer smoke; no implementation edit.
 - `[监督]#ranch-pointer-smoke-manual-evidence@v0.2`: standby manual evidence package for pointer-smoke callback recording; no pointer input executed yet.
