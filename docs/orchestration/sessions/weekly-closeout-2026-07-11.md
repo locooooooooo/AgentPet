@@ -49,6 +49,24 @@ final state transition matrix (prepared only; apply after the actual 16:00 gate)
 - `scripts/check-orchestration.mjs` requires each session-backed role's `loop state` and `dispatch state` to match the role status, and each non-shared lane state to match its owner role. Apply the matrix atomically across session cards, `status.json`, index role wording, and daily accountability.
 - `scripts/orchestration-report.mjs` hard-requires active lane ids to remain exactly `daily-supervision, weekly-requirements`; do not add an M5 active lane during closeout.
 
+negative hash baseline (prepared 2026-07-11 12:07 +08:00; exact-match required after closeout):
+| protected surface | baseline hash |
+| --- | --- |
+| `docs/orchestration/connectors.json` Git blob | `5ecd5f057ec183460559b53b734b33028a6a5cc6` |
+| canonical SHA-256 of `docs/orchestration/status.json` `connectors[]` | `e1ee68b95e6af4408038c3dca8ef975b0a2f624cf05db272ad3664e0f8ea68cf` |
+| `electron/preload.ts` Git blob | `7e083f6407d985a51843f3ab5b9a163c86cf5cc7` |
+| `src/types.ts` Git blob | `6d1d6a2ec6d83d4b0184391cd0936b1af10e70c1` |
+| `src/lib/desktopClient.ts` Git blob | `aac4875c26a7bc62f55ed6260193cddaa70dfb8e` |
+| `src/components/NiuMaAvatar.tsx` Git blob | `9475991a867599098a87d6dec8f777e6258531ff` |
+| `src/components/NiuMaWorkspace.tsx` Git blob | `d26cdfd69c02773d235c06f19cd2e92b49579867` |
+| `src/index.css` Git blob | `dcae75746f66d9c3b95b28c147d604ab914ceb79` |
+| `src/lib/agentCore.ts` Git blob | `197a782be276aabecedea5c359f04c41f491fa3b` |
+| `package.json` Git blob | `803d2cbc616f404c76939f064e239d726388eaac` |
+| `icon` tree | `9697a29bc20aa4c97e26415e6d52afb8778ea4ad` |
+
+- This baseline applies to the W27 closeout/state-switch commit only. Future M5 workers remain governed by their own explicit file fences; no future authorization is implied here.
+- Recompute all values after the closeout edits and again after the final commit. Any mismatch outside declared `docs/orchestration/**` state files blocks W28 activation and must be investigated before staging.
+
 completed:
 - Placeholder created on 2026-07-10。
 
