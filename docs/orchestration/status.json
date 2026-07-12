@@ -261,8 +261,8 @@
       "id": "cockpit-ui-redesign-v3-1",
       "title": "[PM]#cockpit-ui-redesign-v3.1@v0.1",
       "owner": "主控",
-      "status": "active",
-      "responsibility": "Run the administrator-authorized 2026-07-12 bounded cockpit visual refinement: improve header, rails, status hierarchy, operator panel and dock containment without touching M5 lifecycle, protected avatar/keyframes, business logic, or connectors.",
+      "status": "summarized",
+      "responsibility": "Accepted and pushed bounded 2026-07-12 cockpit visual refinement as aa4cfa5; future changes require a fresh scope and must preserve M5 lifecycle, protected avatar/keyframes, business logic, and connectors.",
       "tag": "⟦tag:v2|task|cockpit-ui-redesign-v3.1-v0.1⟧",
       "evidence": "docs/orchestration/tasks/cockpit-ui-redesign-v3.1-v0.1.md"
     },

@@ -3,9 +3,9 @@
 [PM]#cockpit-ui-redesign-v3.1@v0.1
 ⟦tag:v2|task|cockpit-ui-redesign-v3.1-v0.1⟧
 
-loop state: active
-dispatch state: active
-status: active_visual_refinement
+loop state: summarized
+dispatch state: summarized
+status: accepted_pushed
 
 date: 2026-07-09
 decision: E=E1 approved by user in PM-direct route.
@@ -43,8 +43,8 @@ acceptance:
 - Browser/Electron screenshots prove 1280x720 and 1440x900 containment; `npm.cmd run orchestration:check`, `lint`, `build`, and `git diff --check` pass.
 
 next action:
-- Dispatch one bounded UI worker using only `NiuMaWorkspace.tsx`, `StatusStrip.tsx`, cockpit-specific `src/index.css` rules, and a dedicated progress/evidence card.
-- Keep the M5 Day 1 correction uncommitted and do not mix it into the visual-lane commit.
+- Visual lane is accepted and pushed as `aa4cfa5`; future refinements require a fresh bounded scope.
+- Keep the M5 Day 1 correction uncommitted and separate from this accepted visual commit.
 
 summary:
-- Active bounded cockpit visual-refinement lane authorized on 2026-07-12; layout hierarchy and containment only, with product behavior and protected surfaces preserved.
+- Bounded cockpit visual-refinement lane accepted and pushed on 2026-07-12; layout hierarchy and containment changed while product behavior and protected surfaces remained preserved.

@@ -1,7 +1,7 @@
 # cockpit-ui-redesign-v3.1 progress - 2026-07-12
 
 worker: `[长工]#cockpit-ui-redesign-v3.1@v0.1`
-status: pm_visual_acceptance_passed_pending_commit
+status: accepted_pushed
 timestamp: 2026-07-12 13:31:24 +08:00
 
 completed:
@@ -43,6 +43,7 @@ evidence:
 - 1440x900 PM screenshot replay: `scrollWidth == clientWidth == 1440`, page height remained 900, compact detail bubble count was 0, right tab body measured approximately 266px, dock bottom was 888px, and corner assist bottom was 830px; central matrix, right CTA, and bottom status remained visible without overlap.
 - The 1440 right tab body had `scrollHeight > clientHeight`, confirming the task form/CTA remains reachable through its own scroll container rather than being clipped.
 - PM accepted the visual lane behaviorally and visually. This acceptance is separate from the still-uncommitted M5 Day 1 `electron/main.ts` correction.
+- Visual implementation was committed as `aa4cfa5` and pushed to `origin/main` after the PM replay.
 - No `@keyframes`, connector machine-gate field, M5 implementation path, or protected source was changed by this worker.
 
 ## Second-round visual correction
