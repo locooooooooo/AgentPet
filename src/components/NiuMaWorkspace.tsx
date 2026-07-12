@@ -243,7 +243,9 @@ export default function NiuMaWorkspace({ api, snapshot, onSnapshot, onReturnHome
       <header className="app-header cockpit-header">
         <div className="header-brand">
           <div className="title-row">
-            <span className="brand-mark">🐄</span>
+            <span className="brand-mark" aria-hidden="true">
+              <Workflow size={16} />
+            </span>
             <h1>桌面牧场 · 控制舱</h1>
             <span className="version-pill">OPS-RANCH v2.6</span>
           </div>
@@ -413,7 +415,13 @@ export default function NiuMaWorkspace({ api, snapshot, onSnapshot, onReturnHome
 
               <div className="supervision-note emphasis">
                 <ShieldAlert size={14} />
-                <span>{ORCHESTRATION_STATUS.blocker}</span>
+                <span
+                  className="supervision-note-copy"
+                  title={ORCHESTRATION_STATUS.blocker}
+                  aria-label={`阻塞摘要：${ORCHESTRATION_STATUS.blocker}`}
+                >
+                  {ORCHESTRATION_STATUS.blocker}
+                </span>
               </div>
             </section>
 
@@ -817,7 +825,6 @@ function AgentDetailPanel({ api, agent, runtime, snapshot, onSnapshot, onRunTask
           runtime={runtime}
           selected
           compact
-          showBubble
           onClick={onCycle}
         />
         <div className="detail-identity-info">
