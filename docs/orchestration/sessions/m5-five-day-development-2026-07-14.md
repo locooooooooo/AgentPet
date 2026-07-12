@@ -5,12 +5,12 @@
 
 loop state: active
 dispatch state: active
-status: blocked_day1_acceptance
+status: day1_correction_required
 
 > **开发窗口**: 2026-07-11 ~ 2026-07-15 (管理员授权滚动五日串行开发)
 > **创建时间**: 2026-07-10 17:50 +08:00
 > **当前准入门**: Day 1 实现回调已吸收；下一道门是 PM 直接复放 close -> hide -> tray summon 与 tray exit -> cleanup，随后 full gates、commit/push 和 clean baseline。
-> **当前结论**: W27 summarized，W28 active，本卡为 `blocked_day1_acceptance`；Day 1 未接受、未提交，Day 2 和其余 M5 卡继续 pending。
+> **当前结论**: W27 summarized，W28 active，本卡为 `day1_correction_required`；direct manual replay proved that ranch close terminated the application, so Day 1 is rejected and Day 2 plus later cards remain pending.
 
 ## objective
 
@@ -39,7 +39,7 @@ status: blocked_day1_acceptance
 
 | Day | Date | Only allowed product lane | Intended outcome | Start gate | Current state |
 | --- | --- | --- | --- | --- | --- |
-| 1 | 2026-07-11 | `[长工]#ranch-window@v0.2` | FR-001 lifecycle, default desktop mode, size/position/mode persistence | Administrator authorization + W27 summarized + W28 active + fresh clean baseline | implementation_complete_pm_acceptance_blocked |
+| 1 | 2026-07-11 | `[长工]#ranch-window@v0.2` | FR-001 lifecycle, default desktop mode, size/position/mode persistence | Administrator authorization + W27 summarized + W28 active + fresh clean baseline | correction_required_close_exits_app |
 | 2 | 2026-07-12 | same ranch-window worker | Double-click/right-click summon, desktop/floating, drag/dock, fence, Electron evidence | Day 1 accepted, committed, pushed; no second worker | pending_blocked_by_day1 |
 | 3 | 2026-07-13 | `[短工]#ranch-status-script@v0.2` | Eight identities, visible status actions, one transient status band | ranch-window accepted, committed, pushed | pending_not_started |
 | 4 | 2026-07-14 | `[短工]#ranch-personality@v0.2` | chatty/quiet/silent and persisted bubble/system/badge preferences | status-script accepted, committed, pushed | pending_not_started |
@@ -128,6 +128,7 @@ incomplete:
 blockers:
 - Windows automation identified the Electron windows but failed to obtain a reliable transparent-window interaction state with `SetIsBorderRequired failed: 不支持此接口 (0x80004002)`; capture/CDP evidence does not prove tray interaction.
 - Day 2 cannot start merely because the calendar reached 2026-07-12; Day 1 still lacks direct close -> hide -> tray summon and tray exit -> cleanup acceptance.
+- 2026-07-12 direct replay produced a failing result: closing the ranch removed verified Electron PID `62196`, so the implementation does not currently provide the required resident close -> hide behavior.
 - Existing connector, pointer, protected-source, and live-subagent quota blockers remain separate; none is silently accepted by this plan.
 
 next action:

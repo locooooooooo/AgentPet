@@ -41,7 +41,7 @@ dispatch state: active
 | 优先级 | 候选 | 当前边界 |
 | --- | --- | --- |
 | P1-1 | Protected trailing whitespace bounded lane | 仅处理已登记的 protected whitespace;本周不修、不回退、不扩大 source scope |
-| P1-2 | `cockpit-ui-redesign-v3.1` 范围拍板 | 当前仅 task intake;不得直接修改中央 4x2 grid、8 卡 keyframes、`NiuMaAvatar.tsx` 或关键 `agentCore.ts` |
+| P1-2 | `cockpit-ui-redesign-v3.1` bounded visual refinement | 2026-07-12 管理员已授权 shell/rail/status/operator/dock 视觉优化；不修改 M5 lifecycle、中央卡片业务结构、8 卡 keyframes、`NiuMaAvatar.tsx`、`agentCore.ts` 或 connector machine gate |
 | P1-3 | live-subagents `403 DAILY_LIMIT_EXCEEDED` quota 复查 | 本周不主动复查;W28 仅在安全 route 可用时记录精确结果 |
 | P1-4 | M5 后续子卡串行队列 | 按五日总控在前一卡 callback、PM acceptance、full gates、commit、push、clean worktree 后接续;任何时候最多一个产品 worker |
 

@@ -2,12 +2,12 @@
   "identity": "[PM]#multi-agent-control@v0.1",
   "loopState": "active",
   "dispatchState": "active",
-  "target": "2026-07-12 M5 Day 1 实现已由唯一 `[长工]#ranch-window@v0.2` 回调，但 PM 无法直接复放透明窗口 close -> hide -> tray summon 与 tray exit -> cleanup；当前为 `blocked_day1_acceptance`，Day 2 和所有后续卡保持 pending。W27 summarized、W28 active；R0-3 dry-run、protected source、quota、cockpit redesign、pointer evidence 和项目 Codex/Trae/Qoder connector 继续各自 standby/blocked。",
+  "target": "2026-07-12 M5 Day 1 direct manual replay confirmed a lifecycle failure: closing `桌面牧场` terminated verified project Electron PID `62196` instead of hiding the window. Current status is `day1_correction_required`; Day 2 and all later cards remain pending. W27 summarized、W28 active；R0-3 dry-run、protected source、quota、cockpit redesign、pointer evidence 和项目 Codex/Trae/Qoder connector 继续各自 standby/blocked。",
   "source": "docs/orchestration/index.md",
   "todayPlan": {
     "date": "2026-07-12",
     "session": "docs/orchestration/sessions/m5-five-day-development-2026-07-14.md",
-    "selectedRoute": "Day 1 implementation callback absorbed but direct tray lifecycle evidence is missing; keep Day 1 unaccepted and uncommitted, and do not start Day 2 or any later M5 card",
+    "selectedRoute": "Day 1 manual replay failed because closing the ranch terminated the project Electron process; run a bounded Day 1 correction, keep the delivery unaccepted and uncommitted, and do not start Day 2",
     "progress": "docs/orchestration/sessions/m5-five-day-development-2026-07-14.md"
   },
   "p0Cards": [
@@ -261,8 +261,8 @@
       "id": "cockpit-ui-redesign-v3-1",
       "title": "[PM]#cockpit-ui-redesign-v3.1@v0.1",
       "owner": "主控",
-      "status": "standby",
-      "responsibility": "Task-intake lane for the 2026-07-08 control-cockpit UI diagnosis; W28 candidate only, no source implementation in this pass.",
+      "status": "active",
+      "responsibility": "Run the administrator-authorized 2026-07-12 bounded cockpit visual refinement: improve header, rails, status hierarchy, operator panel and dock containment without touching M5 lifecycle, protected avatar/keyframes, business logic, or connectors.",
       "tag": "⟦tag:v2|task|cockpit-ui-redesign-v3.1-v0.1⟧",
       "evidence": "docs/orchestration/tasks/cockpit-ui-redesign-v3.1-v0.1.md"
     },
@@ -307,7 +307,7 @@
       "title": "[PM]#m5-five-day-development@2026-07-14",
       "owner": "主控",
       "status": "active",
-      "responsibility": "Track M5 in `blocked_day1_acceptance`; preserve the uncommitted Day 1 delivery and keep Day 2 plus every later product card pending until direct tray evidence, PM acceptance, commit, and push are complete.",
+      "responsibility": "Track M5 in `day1_correction_required`; keep Day 2 and every later card pending until the close/hide lifecycle failure is corrected, directly replayed, accepted, committed, and pushed.",
       "tag": "⟦tag:v2|session|m5-five-day-development-2026-07-14⟧",
       "evidence": "docs/orchestration/sessions/m5-five-day-development-2026-07-14.md"
     },
@@ -382,7 +382,7 @@
       "title": "每日计划督办",
       "role": "[PM]#daily-supervision@2026-07-02",
       "state": "active",
-      "nextAction": "监督 W28 active 与 M5 blocked_day1_acceptance；获取真实 tray lifecycle 证据前不接受 Day 1、不提交、不启动 Day 2，并继续守住 connector、protected source 和 pointer evidence 边界。"
+      "nextAction": "监督 W28 active 与 M5 day1_correction_required；只允许 bounded Day 1 lifecycle correction，不接受、不提交、不启动 Day 2，并继续守住 connector、protected source 和 pointer evidence 边界。"
     },
     {
       "id": "codex-evidence-closeout",

@@ -103,7 +103,7 @@ dispatch gate:
 - Supervisor owns drift detection, blocker surfacing, and minimum correction.
 
 current target:
-- 2026-07-12 M5 Day 1 实现已由唯一 `[长工]#ranch-window@v0.2` 回调，但 PM 无法直接复放透明窗口 close -> hide -> tray summon 与 tray exit -> cleanup；当前为 `blocked_day1_acceptance`，Day 2 和所有后续卡保持 pending。W27 summarized、W28 active；R0-3 dry-run、protected source、quota、cockpit redesign、pointer evidence 和项目 Codex/Trae/Qoder connector 继续各自 standby/blocked。
+- 2026-07-12 M5 Day 1 direct manual replay confirmed a lifecycle failure: closing `桌面牧场` terminated verified project Electron PID `62196` instead of hiding the window. Current status is `day1_correction_required`; Day 2 and all later cards remain pending. W27 summarized、W28 active；R0-3 dry-run、protected source、quota、cockpit redesign、pointer evidence 和项目 Codex/Trae/Qoder connector 继续各自 standby/blocked。
 
 current role split:
 - `[PM]#multi-agent-control@v0.1`: maintain this index, dispatch bounded lanes, collect callbacks, write acceptance.
@@ -132,13 +132,13 @@ current role split:
 - `[监督]#ranch-personality@v0.1`: summarized M5 personality and control-cockpit prefs-linkage evidence for FR-007 and notifyPrefs.
 - `[短工]#ranch-m5-requirements@v0.2`: standby docs-only M5 requirements readiness lane; main card plus five child cards are created, but no M5 implementation or long-worker dispatch is authorized.
 - `[PM]#m5-longworker-dispatch@v0.1`: standby dispatch package; Day 1 worker callback is absorbed, but PM acceptance is blocked on direct tray lifecycle evidence and no Day 2 continuation is authorized.
-- `[PM]#m5-five-day-development@2026-07-14`: active five-day serial control card with custom status `blocked_day1_acceptance`; calendar dates do not override the pending tray lifecycle gate.
+- `[PM]#m5-five-day-development@2026-07-14`: active five-day serial control card with custom status `day1_correction_required`; calendar dates do not override the failed lifecycle gate.
 - `[监督]#ranch-pointer-smoke@v0.2`: standby verification package for transparent ranch pointer smoke; no implementation edit.
 - `[监督]#ranch-pointer-smoke-manual-evidence@v0.2`: standby manual evidence package for pointer-smoke callback recording; no pointer input executed yet.
 - `[长工]#homepage-ui-design@v0.1`: summarized HomePage / landing / 启动页 P0 lane; H0-1 design drafts accepted as C · 华丽, H0-2/H0-3 implemented, H0-4 protected-file audit passed in `homepage-ui-p0-c0-6-style-2026-07-07.md`; no edit to `NiuMaAvatar.tsx` / `index.css` / `agentCore.ts` / central 4x2 control-cockpit grid.
 - `[PM]#ranch-real-integration-r0-3-dryrun@v0.1`: standby R0-3 Codex controlled dry-run evidence collection lane; P0 ranch-real-integration-p0 整体 accepted(2026-07-07 拍板 ②),R0-3 段已转交本 lane;Codex approvalStatus/enabledByDefault/command 维持原值,trae/qoder 维持 placeholder;不主动启动 dry-run,等用户二次确认时机。
 - `[PM]#protected-cockpit-source-drift@v0.1`: standby PM disposition lane in W28;administrator selected bounded routing, but no source edit, format repair, acceptance, or rollback is authorized yet.
-- `[PM]#cockpit-ui-redesign-v3.1@v0.1`: standby task-intake lane for the 2026-07-08 control-cockpit UI diagnosis; W28 candidate only, no source implementation in this pass.
+- `[PM]#cockpit-ui-redesign-v3.1@v0.1`: active bounded visual-refinement lane authorized 2026-07-12; only cockpit shell/rail/status/dock hierarchy and containment may change, while M5 lifecycle, protected animation/avatar, business logic, and connectors remain untouched.
 - `[PM]#weekly-requirements@2026-07-07`: summarized W27 (2026-07-07~2026-07-13) weekly-requirements history; final closeout is recorded in `weekly-closeout-2026-07-11.md`.
 - `[PM]#weekly-requirements@2026-07-14`: active W28 planner; tracks the administrator-authorized M5 rolling schedule beginning 2026-07-11 while preserving per-card serial gates.
 - `[PM]#daily-plan@2026-07-09`: summarized 2026-07-09 daily plan;B②/C short-worker/D 今天/E1 evidence is retained as history.
