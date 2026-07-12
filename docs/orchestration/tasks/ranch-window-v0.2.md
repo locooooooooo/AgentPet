@@ -41,7 +41,7 @@ acceptance for the Day 1/2 implementation lane:
 - Any skipped pointer behavior remains incomplete and must be routed through `ranch-pointer-smoke-v0.2`.
 
 next action:
-- Administrator authorized Day 1 on 2026-07-11; keep standby until the schedule-rebaseline commit/push and a fresh clean baseline, then PM dispatches this card as the only active product worker using `m5-longworker-dispatch-v0.1.md`.
+- Day 1 implementation callback is absorbed but PM acceptance is blocked on direct tray lifecycle evidence. Keep Day 1 uncommitted and Day 2 pending until close -> hide -> tray summon and tray exit -> cleanup are directly observed, full gates pass, and PM commit/push completes.
 
 summary:
 - Requirements-ready child card for M5 window behavior; no source edit authorized here.

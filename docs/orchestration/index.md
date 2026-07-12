@@ -103,7 +103,7 @@ dispatch gate:
 - Supervisor owns drift detection, blocker surfacing, and minimum correction.
 
 current target:
-- 管理员于 2026-07-11 授权将已批准的 M5 五日串行计划提前至今天启动：Day 1 为 `[长工]#ranch-window@v0.2`，Day 2~5 顺延至 2026-07-15。W27 已 summarized、W28 active；R0-3 dry-run、protected source、quota、cockpit redesign、pointer evidence 和项目 Codex/Trae/Qoder connector 继续各自 standby/blocked，不随 M5 提前启动。
+- 2026-07-12 M5 Day 1 实现已由唯一 `[长工]#ranch-window@v0.2` 回调，但 PM 无法直接复放透明窗口 close -> hide -> tray summon 与 tray exit -> cleanup；当前为 `blocked_day1_acceptance`，Day 2 和所有后续卡保持 pending。W27 summarized、W28 active；R0-3 dry-run、protected source、quota、cockpit redesign、pointer evidence 和项目 Codex/Trae/Qoder connector 继续各自 standby/blocked。
 
 current role split:
 - `[PM]#multi-agent-control@v0.1`: maintain this index, dispatch bounded lanes, collect callbacks, write acceptance.
@@ -131,8 +131,8 @@ current role split:
 - `[监督]#ranch-status-script@v0.1`: summarized M5 animal/status/single-toast notification evidence for FR-002/003/004/006 without reopening connector state.
 - `[监督]#ranch-personality@v0.1`: summarized M5 personality and control-cockpit prefs-linkage evidence for FR-007 and notifyPrefs.
 - `[短工]#ranch-m5-requirements@v0.2`: standby docs-only M5 requirements readiness lane; main card plus five child cards are created, but no M5 implementation or long-worker dispatch is authorized.
-- `[PM]#m5-longworker-dispatch@v0.1`: standby dispatch package for the serial M5 long-worker activation; administrator authorized Day 1 today, but PM dispatches only after the rebaseline commit/push and fresh clean gate.
-- `[PM]#m5-five-day-development@2026-07-14`: active five-day serial control card with custom status `active_ready_day1`; only the bounded ranch-window Day 1 worker may start after PM gates.
+- `[PM]#m5-longworker-dispatch@v0.1`: standby dispatch package; Day 1 worker callback is absorbed, but PM acceptance is blocked on direct tray lifecycle evidence and no Day 2 continuation is authorized.
+- `[PM]#m5-five-day-development@2026-07-14`: active five-day serial control card with custom status `blocked_day1_acceptance`; calendar dates do not override the pending tray lifecycle gate.
 - `[监督]#ranch-pointer-smoke@v0.2`: standby verification package for transparent ranch pointer smoke; no implementation edit.
 - `[监督]#ranch-pointer-smoke-manual-evidence@v0.2`: standby manual evidence package for pointer-smoke callback recording; no pointer input executed yet.
 - `[长工]#homepage-ui-design@v0.1`: summarized HomePage / landing / 启动页 P0 lane; H0-1 design drafts accepted as C · 华丽, H0-2/H0-3 implemented, H0-4 protected-file audit passed in `homepage-ui-p0-c0-6-style-2026-07-07.md`; no edit to `NiuMaAvatar.tsx` / `index.css` / `agentCore.ts` / central 4x2 control-cockpit grid.
@@ -160,5 +160,5 @@ next action:
 - Keep Codex draft/pending/enabled=false and Trae/Qoder placeholder/not-requested/enabled=false until connector machine gate fields change.
 - Use `docs/orchestration/tasks/daily-decision-queue-2026-07-02.md` as the next PM callback surface for standby decisions.
 - Keep `docs/orchestration/tasks/daily-role-accountability-2026-07-02.md` aligned with role states before closing any daily supervision pass.
-- Commit/push the administrator-authorized 2026-07-11 schedule rebaseline, then prove a clean `HEAD == origin/main` baseline and unchanged negative hashes.
-- After those gates, dispatch only the single authorized `[长工]#ranch-window@v0.2`; keep every other M5 card and all non-M5 standby work pending.
+- Keep the uncommitted Day 1 delivery bounded to `electron/main.ts` and its two evidence cards; do not stage/commit/push until direct tray lifecycle evidence is accepted.
+- Obtain direct close -> hide -> tray summon and tray exit -> cleanup evidence, rerun full gates, then PM may accept and push Day 1; Day 2 and every later M5 card remain pending meanwhile.

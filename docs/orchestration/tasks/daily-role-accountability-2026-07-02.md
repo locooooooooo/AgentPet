@@ -53,12 +53,12 @@ role ledger:
 | `[PM]#protected-cockpit-source-drift@v0.1` | standby | `docs/orchestration/tasks/protected-cockpit-source-drift-v0.1.md` | Preserve the W28 bounded-lane route without editing protected source until a fresh bounded authorization exists. |
 | `[长工]#homepage-ui-design@v0.1` homepage-ui-design lane | summarized | `docs/orchestration/sessions/homepage-ui-p0-c0-6-style-2026-07-07.md` | C · 华丽 HomePage is verified; do not create a duplicate thread and keep §〇·quarter selling-point files untouched. |
 | `[PM]#weekly-requirements@2026-07-07` | summarized | `docs/orchestration/sessions/weekly-requirements-2026-07-07.md` | Preserve W27 accepted outcomes and final closeout evidence as history. |
-| `[PM]#weekly-requirements@2026-07-14` weekly-requirements lane | active | `docs/orchestration/status.json` | Own the active weekly lane; apply the administrator-authorized M5 Day 1 today while keeping all carry-over gates explicit. |
-| `[PM]#weekly-requirements@2026-07-14` | active | `docs/orchestration/sessions/weekly-requirements-2026-07-14.md` | Maintain W28 planning; only the schedule-rebased ranch-window Day 1 worker may start after PM gates. |
+| `[PM]#weekly-requirements@2026-07-14` weekly-requirements lane | active | `docs/orchestration/status.json` | Own the active weekly lane; keep M5 blocked at Day 1 acceptance and prevent calendar-driven Day 2 dispatch. |
+| `[PM]#weekly-requirements@2026-07-14` | active | `docs/orchestration/sessions/weekly-requirements-2026-07-14.md` | Maintain W28 planning; Day 1 direct tray evidence, acceptance, commit, and push must precede Day 2. |
 | `[PM]#daily-plan@2026-07-09` | summarized | `docs/orchestration/sessions/daily-plan-2026-07-09.md` | Retain B②/C short-worker/D 今天/E1 as summarized historical evidence. |
 | `[PM]#daily-plan@2026-07-10` | summarized | `docs/orchestration/sessions/daily-plan-2026-07-10.md` | Preserve the administrator decisions and W27/W28 preparation as summarized history. |
-| `[PM]#m5-longworker-dispatch@v0.1` | standby | `docs/orchestration/tasks/m5-longworker-dispatch-v0.1.md` | Administrator authorized 2026-07-11 Day 1; PM dispatches `[长工]#ranch-window@v0.2` only after the rebaseline commit/push and fresh clean gate. |
-| `[PM]#m5-five-day-development@2026-07-14` | active | `docs/orchestration/sessions/m5-five-day-development-2026-07-14.md` | Keep `active_ready_day1`; enforce one product worker, callback, acceptance, commit, and push before each next M5 lane. |
+| `[PM]#m5-longworker-dispatch@v0.1` | standby | `docs/orchestration/tasks/m5-longworker-dispatch-v0.1.md` | Day 1 callback is absorbed; do not resume Day 2 until PM direct tray acceptance and push. |
+| `[PM]#m5-five-day-development@2026-07-14` | active | `docs/orchestration/sessions/m5-five-day-development-2026-07-14.md` | Keep `blocked_day1_acceptance`; enforce evidence, acceptance, commit, and push before any next M5 lane. |
 
 acceptance:
 - Every non-summarized open item has an accountability action and evidence source.

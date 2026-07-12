@@ -1081,3 +1081,9 @@ pm.cmd run build pass; git diff --check only on the 11 protected-source whitespa
   - Rebaseline only changes the M5 control plane. R0-3 dry-run, protected-source work, live-subagent quota, cockpit redesign, direct pointer-evidence lanes, and project Codex/Trae/Qoder connectors remain standby and excluded.
   - No product worker exists and no product source or connector machine gate has been edited. Before dispatching exactly one `[长工]#ranch-window@v0.2`, PM must commit/push this schedule rebaseline and prove a fresh clean baseline with the full orchestration, lint, build, diff, and protected-hash gates.
   - Next action: after the fresh baseline passes, dispatch Day 1 only. Do not advance the same worker to Day 2 until its 2026-07-12 follow-up and do not open a second product worker.
+
+- [2026-07-12] M5 Day 1 acceptance blocker truth refresh:
+  - The only `[长工]#ranch-window@v0.2` completed the bounded Day 1 implementation in `electron/main.ts` and returned isolated evidence for invalid-prefs fallback, off-screen recovery, and relaunch persistence. No second product worker exists and Day 2 was not started.
+  - PM full static gates passed after the callback, but direct close -> hide -> tray summon and tray exit -> cleanup remained unaccepted. Windows automation located the Electron windows but returned `SetIsBorderRequired failed: 不支持此接口 (0x80004002)` for the transparent ranch state; PM stopped input instead of using stale coordinates or capture/CDP as tray evidence.
+  - The Day 1 delivery remains uncommitted in `electron/main.ts`, `ranch-window-v0.2-progress.md`, and `ranch-window-v0.2-acceptance-2026-07-11.md`. M5 is now `blocked_day1_acceptance`; reaching the Day 2 calendar date does not satisfy the missing acceptance/commit/push gate.
+  - R0-3 dry-run, project Codex/Trae/Qoder connectors, connector machine gate, protected source, live-subagent quota, cockpit redesign, and separate pointer-evidence lanes remain unchanged and excluded.
