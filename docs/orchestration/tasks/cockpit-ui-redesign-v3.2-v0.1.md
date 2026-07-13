@@ -4,8 +4,8 @@
 ⟦tag:v2|task|cockpit-ui-redesign-v3.2-v0.1⟧
 
 loop state: standby
-dispatch state: ready
-status: requirements_ready
+dispatch state: standby
+status: p0_accepted_pushed
 
 date: 2026-07-13
 source: `docs/控制舱UI体验诊断与v3.2开工方案-2026-07-13.md`
@@ -173,9 +173,9 @@ evidence:
 
 ## next action
 
-- PM 复核本卡后，仅派一个 P0 worker。
-- 未通过 P0 acceptance/commit/push 前，不开 P1/P2。
+- P0 已完成 PM 独立视觉/交互验收并推送；保留本卡为后续增量边界。
+- P1/P2 未获授权，不自动派工；需要新的管理员决定和独立文件围栏。
 
 ## summary
 
-- v3.2 requirements ready；首张实现卡是任务优先与信息去重，不是全页换皮。
+- v3.2 P0 accepted/pushed；任务优先、信息去重、动作收敛与 Corner Assist 条件显示已落地，P1/P2 保持未启动。

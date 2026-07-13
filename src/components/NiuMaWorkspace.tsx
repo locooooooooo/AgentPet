@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState, type CSSProperties, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import {
   Activity,
   Bell,
@@ -379,6 +380,7 @@ export default function NiuMaWorkspace({ api, snapshot, onSnapshot, onReturnHome
             className="rail-toggle-btn left-toggle"
             onClick={() => setLeftRailOpen(!leftRailOpen)}
             title={leftRailOpen ? "收起左面板" : "展开左面板"}
+            aria-label={leftRailOpen ? '收起左面板' : '展开左面板'}
           >
             {leftRailOpen ? '◀' : '▶'}
           </button>
@@ -405,11 +407,6 @@ export default function NiuMaWorkspace({ api, snapshot, onSnapshot, onReturnHome
                   label="今日阻塞"
                   value={`${blockedLaneCount}`}
                   tone={blockedLaneCount > 0 ? 'danger' : 'neutral'}
-                />
-                <SummaryTile
-                  label="最新消息"
-                  value={latestMessage ? latestMessage.type : 'idle'}
-                  tone={latestMessage ? getToneForMessage(latestMessage.type) : 'neutral'}
                 />
               </div>
 
@@ -528,8 +525,14 @@ export default function NiuMaWorkspace({ api, snapshot, onSnapshot, onReturnHome
             <button 
               type="button" 
               className="rail-toggle-btn right-toggle"
-              onClick={() => setRightRailOpen(!rightRailOpen)}
+              onClick={() => {
+                setRightRailOpen(!rightRailOpen);
+                if (!rightRailOpen) {
+                  setCornerPanelOpen(false);
+                }
+              }}
               title={rightRailOpen ? "收起右面板" : "展开右面板"}
+              aria-label={rightRailOpen ? '收起右面板' : '展开右面板'}
             >
               {rightRailOpen ? '▶' : '◀'}
             </button>
@@ -539,7 +542,6 @@ export default function NiuMaWorkspace({ api, snapshot, onSnapshot, onReturnHome
                 api={api}
                 agent={selectedAgent}
                 runtime={runtime}
-                snapshot={snapshot}
                 onSnapshot={onSnapshot}
                 onRunTask={runTask}
                 onCycle={(event) => cycleState(selectedAgent, event)}
@@ -551,7 +553,7 @@ export default function NiuMaWorkspace({ api, snapshot, onSnapshot, onReturnHome
 
       {selectedAgent && runtime && selectedMeta ? (
         <section
-          className={`corner-assist ${cornerPanelOpen ? 'is-open' : ''}`}
+          className={`corner-assist ${rightRailOpen ? 'is-right-rail-open' : 'is-available'} ${cornerPanelOpen ? 'is-open' : ''}`}
           style={{ '--agent-accent': selectedAgent.accent } as CSSProperties}
           aria-label="右下角牛马速览"
         >
@@ -560,7 +562,8 @@ export default function NiuMaWorkspace({ api, snapshot, onSnapshot, onReturnHome
             className="corner-assist-trigger"
             aria-expanded={cornerPanelOpen}
             aria-controls="corner-assist-panel"
-            title="展开牛马速览"
+            aria-label={cornerPanelOpen ? '收起牛马速览' : '展开牛马速览'}
+            title={cornerPanelOpen ? '收起牛马速览' : '展开牛马速览'}
             onClick={() => setCornerPanelOpen((open) => !open)}
           >
             <span className="corner-assist-triangle" aria-hidden="true" />
@@ -614,21 +617,13 @@ export default function NiuMaWorkspace({ api, snapshot, onSnapshot, onReturnHome
       ) : null}
 
       <footer className="dock cockpit-dock">
-        <div className="dock-item">
-          <span>在线牛马</span>
-          <strong>{snapshot.agents.length} 头</strong>
-        </div>
-        <div className="dock-item">
-          <span>正在拉磨</span>
-          <strong>{runningCount} 头</strong>
-        </div>
-        <div className="dock-item">
-          <span>管道阻塞</span>
-          <strong>{gateBlockedCount} 个</strong>
-        </div>
         <div className="dock-item grow">
-          <span>最近更新</span>
+          <span>数据更新时间</span>
           <strong>{formatDateTime(snapshot.updatedAt)}</strong>
+        </div>
+        <div className="dock-item grow" role="status" aria-live="polite">
+          <span>全局反馈</span>
+          <strong>控制舱数据已同步</strong>
         </div>
       </footer>
     </div>
@@ -713,8 +708,51 @@ interface AgentCardProps {
 }
 
 function AgentCard({ agent, runtime, selected, onSelect, onRun, onAction, onCycle }: AgentCardProps) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuStyle, setMenuStyle] = useState<CSSProperties | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const summaryRef = useRef<HTMLElement>(null);
   const meta = STATE_METAS[runtime.status];
   const running = agent.tasks.filter((task) => task.status === 'running').length;
+
+  useEffect(() => {
+    if (!selected) {
+      setMenuOpen(false);
+      setMenuStyle(null);
+    }
+  }, [selected]);
+
+  useLayoutEffect(() => {
+    if (!menuOpen || !selected || !summaryRef.current) {
+      return;
+    }
+
+    const summaryRect = summaryRef.current.getBoundingClientRect();
+    const dockTop = document.querySelector('.cockpit-dock')?.getBoundingClientRect().top ?? window.innerHeight;
+    const menuWidth = Math.min(180, window.innerWidth - 16);
+    const menuHeight = 190;
+    const safeBottom = Math.min(window.innerHeight - 8, dockTop - 8);
+    const top = Math.max(8, Math.min(summaryRect.top - menuHeight - 6, safeBottom - menuHeight));
+    const left = Math.max(8, Math.min(summaryRect.right - menuWidth, window.innerWidth - menuWidth - 8));
+
+    setMenuStyle({ left, top, width: menuWidth });
+  }, [menuOpen, selected]);
+
+  useEffect(() => {
+    if (menuOpen && menuStyle) {
+      menuRef.current?.querySelector('button')?.focus();
+    }
+  }, [menuOpen, menuStyle]);
+
+  function runSecondaryAction(action: NiuMaAction) {
+    onAction(action);
+    setMenuOpen(false);
+  }
+
+  function cycleFromMenu(event: ReactMouseEvent) {
+    onCycle(event);
+    setMenuOpen(false);
+  }
 
   return (
     <article
@@ -730,12 +768,13 @@ function AgentCard({ agent, runtime, selected, onSelect, onRun, onAction, onCycl
           <span className="agent-codename">{agent.codename}</span>
         </div>
 
-        <NiuMaAvatar
-          agent={agent}
-          runtime={runtime}
-          selected={selected}
-          onClick={onCycle}
-        />
+        <div className="agent-card-avatar" aria-hidden="true" inert>
+          <NiuMaAvatar
+            agent={agent}
+            runtime={runtime}
+            selected={selected}
+          />
+        </div>
 
         <div className="expression-line">{meta.expression}</div>
       </button>
@@ -745,23 +784,67 @@ function AgentCard({ agent, runtime, selected, onSelect, onRun, onAction, onCycl
         <Meter label="脑门发热度" value={Math.round(runtime.temperature)} suffix="°C" tone={runtime.temperature > 80 ? 'danger' : 'info'} max={120} />
       </div>
 
-      <div className="card-actions">
-        <button type="button" title="画饼加班" onClick={() => onAction('pie')}>
-          <Flame size={15} />
-        </button>
-        <button type="button" title="给杯咖啡" onClick={() => onAction('coffee')}>
-          <Coffee size={15} />
-        </button>
-        <button type="button" title="强制开工" onClick={() => onAction('whip')}>
-          <Zap size={15} />
-        </button>
-        <button type="button" title="批准摸鱼" onClick={() => onAction('slack')}>
-          <Waves size={15} />
-        </button>
-        <button type="button" title="派活/拉磨" onClick={onRun}>
+      <div className={`card-actions ${selected ? 'is-selected' : 'is-compact'}`}>
+        <button
+          type="button"
+          className="card-primary-action"
+          title={running > 0 ? '继续派活' : '派活/拉磨'}
+          aria-label={`${agent.name}：${running > 0 ? '继续派活' : '派活/拉磨'}`}
+          onClick={onRun}
+        >
           {running > 0 ? <PauseCircle size={15} /> : <Play size={15} />}
+          <span>{running > 0 ? '继续派活' : '派活'}</span>
         </button>
+        {selected ? (
+          <details
+            className="card-more-actions"
+            open={menuOpen}
+            onToggle={(event) => setMenuOpen(event.currentTarget.open)}
+          >
+            <summary
+              ref={summaryRef}
+              title="更多牛马动作"
+              aria-label={`${agent.name}：更多牛马动作`}
+              aria-controls={`agent-more-menu-${agent.id}`}
+            >
+              <SlidersHorizontal size={15} />
+              <span>更多</span>
+            </summary>
+          </details>
+        ) : null}
       </div>
+      {selected && menuOpen && menuStyle ? createPortal(
+        <div
+          ref={menuRef}
+          id={`agent-more-menu-${agent.id}`}
+          className="card-more-menu card-more-menu-portal"
+          style={menuStyle}
+          role="group"
+          aria-label={`${agent.name} 更多牛马动作`}
+        >
+          <button type="button" title="画饼加班" onClick={() => runSecondaryAction('pie')}>
+            <Flame size={15} aria-hidden="true" />
+            <span>画饼加班</span>
+          </button>
+          <button type="button" title="给杯咖啡" onClick={() => runSecondaryAction('coffee')}>
+            <Coffee size={15} aria-hidden="true" />
+            <span>给杯咖啡</span>
+          </button>
+          <button type="button" title="强制开工" onClick={() => runSecondaryAction('whip')}>
+            <Zap size={15} aria-hidden="true" />
+            <span>强制开工</span>
+          </button>
+          <button type="button" title="批准摸鱼" onClick={() => runSecondaryAction('slack')}>
+            <Waves size={15} aria-hidden="true" />
+            <span>批准摸鱼</span>
+          </button>
+          <button type="button" title="切换牛马状态" onClick={cycleFromMenu}>
+            <RefreshCcw size={15} aria-hidden="true" />
+            <span>切换状态</span>
+          </button>
+        </div>,
+        document.body
+      ) : null}
     </article>
   );
 }
@@ -770,13 +853,12 @@ interface AgentDetailPanelProps {
   api: DesktopApi;
   agent: AIAgent;
   runtime: NiuMaRuntimeState;
-  snapshot: AgentSnapshot;
   onSnapshot: (snapshot: AgentSnapshot) => void;
   onRunTask: (agent: AIAgent, taskName?: string, command?: string, runner?: AgentTaskRunner) => Promise<void>;
   onCycle: (event: ReactMouseEvent) => void;
 }
 
-function AgentDetailPanel({ api, agent, runtime, snapshot, onSnapshot, onRunTask, onCycle }: AgentDetailPanelProps) {
+function AgentDetailPanel({ api, agent, runtime, onSnapshot, onRunTask, onCycle }: AgentDetailPanelProps) {
   const [taskName, setTaskName] = useState('');
   const [command, setCommand] = useState('');
   const [runner, setRunner] = useState<AgentTaskRunner>('local');
@@ -785,7 +867,6 @@ function AgentDetailPanel({ api, agent, runtime, snapshot, onSnapshot, onRunTask
   const meta = STATE_METAS[runtime.status];
   const quickTasks = useMemo(() => getQuickTasks(agent.id), [agent.id]);
   const openTask = agent.tasks.find((task) => task.id === openTaskId) ?? agent.tasks[0];
-  const recentMessage = snapshot.messages[0];
 
   async function submitTask(event: React.FormEvent) {
     event.preventDefault();
@@ -809,17 +890,7 @@ function AgentDetailPanel({ api, agent, runtime, snapshot, onSnapshot, onRunTask
       className="detail-panel"
       style={{ '--agent-accent': agent.accent } as CSSProperties}
     >
-      <div className="detail-panel-head">
-        <PanelHeading
-          kicker="Operator Console"
-          title={agent.name}
-          meta={agent.codename}
-          compact
-        />
-        <span className={`stage-status ${runtime.status}`}>{meta.name}</span>
-      </div>
-
-      <div className="detail-identity">
+      <div className="detail-identity detail-identity-compact">
         <NiuMaAvatar
           agent={agent}
           runtime={runtime}
@@ -830,35 +901,46 @@ function AgentDetailPanel({ api, agent, runtime, snapshot, onSnapshot, onRunTask
         <div className="detail-identity-info">
           <div className="detail-name">
             <h2>{agent.name}</h2>
-            <span>{meta.name}</span>
+            <span>{agent.codename}</span>
           </div>
-          <p className="detail-desc">{agent.description}</p>
+          <div className="detail-compact-status">
+            <span className={`stage-status ${runtime.status}`}>{meta.name}</span>
+            <p className="detail-desc">{agent.description}</p>
+          </div>
         </div>
       </div>
 
-      <div className="quote-box">
-        <Bell size={14} />
-        <span>{runtime.quote}</span>
-      </div>
+      <details className="detail-more">
+        <summary title="展开 Agent 状态与连接详情">
+          <span>状态与连接详情</span>
+          <small>{agent.modelName}</small>
+        </summary>
+        <div className="detail-more-content">
+          <div className="quote-box">
+            <Bell size={14} aria-hidden="true" />
+            <span>{runtime.quote}</span>
+          </div>
 
-      <div className="detail-metrics-compact">
-        <div className="metric-item-row">
-          <span className="metric-label">模型:</span>
-          <span className="metric-value">{agent.modelName}</span>
+          <div className="detail-metrics-compact">
+            <div className="metric-item-row">
+              <span className="metric-label">模型:</span>
+              <span className="metric-value">{agent.modelName}</span>
+            </div>
+            <div className="metric-item-row">
+              <span className="metric-label">端点:</span>
+              <span className="metric-value mono" title={agent.endpoint}>{agent.endpoint}</span>
+            </div>
+            <div className="metric-item-row">
+              <span className="metric-label">状态:</span>
+              <span className="metric-value">{runtime.stress}% 压力 / {runtime.energy}% 电量 ({Math.round(runtime.temperature)}°C)</span>
+            </div>
+            <div className="metric-item-row">
+              <span className="metric-label">交互:</span>
+              <span className="metric-value">{formatDateTime(runtime.lastInteractionAt)}</span>
+            </div>
+          </div>
         </div>
-        <div className="metric-item-row">
-          <span className="metric-label">端点:</span>
-          <span className="metric-value mono">{agent.endpoint}</span>
-        </div>
-        <div className="metric-item-row">
-          <span className="metric-label">状态:</span>
-          <span className="metric-value">{runtime.stress}% 压力 / {runtime.energy}% 电量 ({Math.round(runtime.temperature)}°C)</span>
-        </div>
-        <div className="metric-item-row">
-          <span className="metric-label">交互:</span>
-          <span className="metric-value">{formatDateTime(runtime.lastInteractionAt)}</span>
-        </div>
-      </div>
+      </details>
 
       <div className="detail-tabs" role="tablist" aria-label="右侧详情面板">
         {detailTabs.map((tab) => {
@@ -910,38 +992,45 @@ function AgentDetailPanel({ api, agent, runtime, snapshot, onSnapshot, onRunTask
               </div>
             </div>
 
-            <div className="quick-grid">
-              {quickTasks.map((task) => (
-                <button
-                  key={`${task.name}-${task.command}`}
-                  type="button"
-                  onClick={() => {
-                    setTaskName(task.name);
-                    setCommand(task.command);
-                  }}
-                >
-                  <span>{task.name}</span>
-                  <code>{task.command}</code>
-                </button>
-              ))}
-            </div>
-
             <form className="task-form" onSubmit={submitTask}>
               <input
                 value={taskName}
                 onChange={(event) => setTaskName(event.target.value)}
                 placeholder="任务名称，例如：检查桌面 IPC 边界"
+                aria-label="任务名称"
               />
               <input
                 value={command}
                 onChange={(event) => setCommand(event.target.value)}
                 placeholder="命令模板，例如：agent run --mode simulated"
+                aria-label="任务命令"
+                title={command || '输入任务命令'}
               />
               <button type="submit">
                 <Play size={15} />
                 立即派活
               </button>
             </form>
+
+            <div className="quick-task-section">
+              <span className="quick-task-label">快捷填充</span>
+              <div className="quick-grid">
+                {quickTasks.map((task) => (
+                  <button
+                    key={`${task.name}-${task.command}`}
+                    type="button"
+                    title={`${task.name}：${task.command}`}
+                    onClick={() => {
+                      setTaskName(task.name);
+                      setCommand(task.command);
+                    }}
+                  >
+                    <span>{task.name}</span>
+                    <code>{task.command}</code>
+                  </button>
+                ))}
+              </div>
+            </div>
 
             <div className="tab-extra-metrics">
               <div className="extra-metric-item">
@@ -1028,12 +1117,6 @@ function AgentDetailPanel({ api, agent, runtime, snapshot, onSnapshot, onRunTask
         ) : null}
       </div>
 
-      {recentMessage ? (
-        <div className={`system-toast ${recentMessage.type}`}>
-          <RefreshCcw size={14} />
-          <span>{recentMessage.title}：{recentMessage.content}</span>
-        </div>
-      ) : null}
     </aside>
   );
 }
@@ -1128,22 +1211,6 @@ function getToneForState(state: string): SummaryTone {
   }
 
   return 'neutral';
-}
-
-function getToneForMessage(type: AgentSnapshot['messages'][number]['type']): SummaryTone {
-  if (type === 'success') {
-    return 'positive';
-  }
-
-  if (type === 'warning') {
-    return 'warning';
-  }
-
-  if (type === 'error') {
-    return 'danger';
-  }
-
-  return 'info';
 }
 
 function formatDateTime(value: string) {
