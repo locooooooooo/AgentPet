@@ -37,7 +37,7 @@ date: 2026-07-13
 | card | owner | current state | scope |
 | --- | --- | --- | --- |
 | P0-A | `[长工]#realtime-connector-runtime@v0.1` | partial_accepted_blocked_safe_foundation | A1-A5 runtime/fixture/full-gate 通过；production authorizer、真实 reattach 和外部 E2E 未启用 |
-| P0-B | `[长工]#realtime-truth-ui@v0.1` | partial_accepted_renderer_truth_slice | selector + App/Home/Cockpit 接线、fallback 浏览器复核和 fresh/stale/lost SSR fixture 通过；Electron event p95/1920/E2E 待补 |
+| P0-B | `[长工]#realtime-truth-ui@v0.1` | partial_accepted_renderer_truth_slice | selector + App/Home/Cockpit 接线、fallback 1280/1440/1920 浏览器复核和 fresh/stale/lost SSR fixture 通过；Electron event p95/真实 E2E 待补 |
 | P0-C | `[长工]#realtime-requirements-control@v0.1` + PM | standby / authorization_required | Codex controlled dry-run 与 E2E acceptance；当前不得执行 |
 
 主 control lane 保持 `standby_control`：它只协调 A/B 合同和 C 验收。A/B 的 partial accepted 只代表受限切片已被 PM 验收，不代表 Connector runtime 已可执行。
@@ -47,7 +47,7 @@ date: 2026-07-13
 1. C 冻结需求、真值词典、文件围栏和量化门禁。
 2. A 冻结共享 runtime 类型和 IPC 合同，再完成 fixture 可验证实现。
 3. B 在不抢 A 共享文件的前提下完成真值 projection 与 UI；消费已冻结合同。
-4. A/B 各自回调，主控先做静态/fixture/浏览器/Electron 验收；未完成的 Electron p95/1920/E2E 仍保持 partial。
+4. A/B 各自回调，主控先做静态/fixture/浏览器/Electron 验收；1920x1080 浏览器 fallback 已通过，未完成的 Electron p95/真实 E2E 仍保持 partial。
 5. 只有 PM/user 明确给出第二次执行窗口，P0-C 才能调用一次受控 Codex dry-run。
 6. P0-C 全矩阵通过后，PM 才能决定是否把 Codex 从 draft/pending 调整为 accepted/ready；调整 machine-gate 是独立任务，不在本卡自动发生。
 
@@ -116,5 +116,5 @@ evidence:
 
 ## next action
 
-- 收取 A/B 的独立 callback 并按文件围栏检查冲突；补真实 Electron event p95、1920x1080 和 P0-C E2E 后再决定 full acceptance。
+- A/B 的独立 callback、文件围栏、fixture 和 1280/1440/1920 浏览器 fallback 已复核；补真实 Electron event p95 和 P0-C E2E 后再决定 full acceptance。
 - P0-C 保持 standby；等待 A/B 验收与明确第二次执行授权。
