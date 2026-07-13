@@ -370,7 +370,7 @@
       "title": "[长工]#realtime-truth-ui@v0.1",
       "owner": "长工",
       "status": "active",
-      "responsibility": "P0-B selector plus renderer truth slice is PM-verified: configured is distinct from online, simulation/unavailable/source/session/lastSeen/capabilities are explicit, and App/Home/Cockpit consume one projection. Renderer SSR fresh/stale/lost fixture remains incomplete; this role does not own runtime or connector policy.",
+      "responsibility": "P0-B selector plus renderer truth slice is PM-verified: configured is distinct from online, simulation/unavailable/source/session/lastSeen/capabilities are explicit, App/Home/Cockpit consume one projection, and SSR fresh/late/stale/session-lost DOM checks pass. Electron event p95, 1920 viewport and real E2E remain incomplete; this role does not own runtime or connector policy.",
       "tag": "⟦tag:v2|task|realtime-agent-cockpit-p0-b-data-truth-v0.1⟧",
       "evidence": "docs/orchestration/tasks/realtime-agent-cockpit-p0-b-data-truth-v0.1.md"
     },
@@ -379,7 +379,7 @@
       "title": "[长工]#realtime-requirements-control@v0.1",
       "owner": "长工",
       "status": "active",
-      "responsibility": "Docs-only real-time cockpit requirements and acceptance control: record the approximately 55% partial baseline, preserve A/B file fences and quantitative gates, keep P0-C Codex controlled dry-run standby, and record the remaining renderer fixture/trusted-authorizer/real-E2E gaps.",
+      "responsibility": "Docs-only real-time cockpit requirements and acceptance control: record the approximately 60% partial baseline, preserve A/B file fences and quantitative gates, keep P0-C Codex controlled dry-run standby, and record the remaining Electron p95/1920/trusted-authorizer/real-E2E gaps.",
       "tag": "⟦tag:v2|session|realtime-agent-cockpit-progress-2026-07-13⟧",
       "evidence": "docs/orchestration/sessions/realtime-agent-cockpit-progress-2026-07-13.md"
     }

@@ -47,6 +47,8 @@ allowed:
 - `src/homepage/hooks/useHomePageData.ts` 仅同步首页指标的真实语义，避免继续把已配置工位称为在线
 - `src/lib/agentInstanceProjection.ts`
 - `scripts/check-agent-instance-projection.mjs`
+- `scripts/check-realtime-truth-renderer.mjs`
+- `package.json` 仅注册独立的 `realtime:truth-check`；不改既有 Connector safety 命令
 - `src/index.css` 仅 data truth、simulation、degraded/unknown 所需规则
 - `docs/orchestration/sessions/realtime-agent-cockpit-p0-b-progress-2026-07-13.md`
 
@@ -59,7 +61,7 @@ forbidden:
 - `src/ranch/**`
 - `src/components/NiuMaAvatar.tsx`
 - 现有 `@keyframes`、`icon/**`
-- `package.json`、除 `scripts/check-agent-instance-projection.mjs` 外的 `scripts/**`
+- 除两项 realtime truth 验收脚本外的 `scripts/**`
 - `docs/orchestration/connectors.json` machine-gate
 - `docs/orchestration/status.json` `connectors[]`
 
@@ -110,11 +112,11 @@ git diff --check
 ## callback
 
 ```text
-completed: AgentInstance selector、5s/15s freshness、terminal/duplicate/session 因果规则、App runtime snapshot 订阅与 1s tick、首页/控制舱 configured-vs-online/source/session 真值接线；browser fallback 0 online。
-incomplete: 尚未完成独立 SSR/DOM fresh-stale-session-lost fixture；未做真实 Electron Agent session E2E；不宣称完整 P0-B accepted。
+completed: AgentInstance selector、5s/15s freshness、terminal/duplicate/session 因果规则、App runtime snapshot 订阅与 1s tick、首页/控制舱 configured-vs-online/source/session 真值接线；browser fallback 0 online；SSR DOM fresh/late/stale/session-lost/capabilities unknown fixture 通过。
+incomplete: 未做真实 Electron Agent session 事件 p95、1920x1080 视口和 P0-C E2E；不宣称完整 P0-B accepted。
 blockers: 无代码门禁 blocker；真实 session/heartbeat 仍受 P0-C 授权与 production authorizer 缺失约束。
-next action: PM 保留浏览器 fallback 证据，补 renderer state-matrix fixture 后再决定是否把 P0-B 标为 accepted。
-evidence: node scripts/check-agent-instance-projection.mjs；1280x720/1440x900 DOM+边界复核；npm.cmd run lint/build/orchestration:check/report/preflight/connector-safety；git diff --check。
+next action: 保持 partial accepted；后续补真实 Electron runtime event p95 和 1920x1080 视口，再决定 full acceptance。
+evidence: npm.cmd run realtime:truth-check；1280x720/1440x900 DOM+边界复核；npm.cmd run lint/build/orchestration:check/report/preflight/connector-safety；git diff --check。
 ```
 
 必须提供状态矩阵截图/DOM 数值、source/lastSeen 样本、viewport 结果和 git diff 文件清单。不得 stage/commit/push/reset/clean，不得自报 accepted。

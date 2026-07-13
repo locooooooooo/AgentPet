@@ -5,7 +5,7 @@
 
 loop state: active
 dispatch state: active
-status: partial_acceptance_waiting_renderer_fixture
+status: partial_acceptance_waiting_electron_e2e
 control lane: standby_control
 date: 2026-07-13
 
@@ -24,7 +24,7 @@ date: 2026-07-13
 
 ## current truth
 
-- 本地命令执行看板约 75%；真实多 Agent 实时控制舱暂记约 55%：blocked-safe runtime foundation、AgentInstance selector 和 renderer truth 已落地，但没有真实 session E2E、可信授权器或生产重挂证明。
+- 本地命令执行看板约 75%；真实多 Agent 实时控制舱暂记约 60%：blocked-safe runtime foundation、AgentInstance selector、renderer truth 和 SSR DOM state matrix 已落地，但没有真实 Electron session E2E、可信授权器或生产重挂证明。
 - 当前只定义 Codex/Trae/Qoder 三个 Connector，三者全部 blocked/non-executable。
 - Codex 是 draft/pending/discovery-only；Trae/Qoder 是 intentionally command-empty placeholders。
 - 进入本轮前的本机发现快照：codex/openclaw/claude/minimax 可发现；trae/qoder/opencode 未发现。
@@ -37,7 +37,7 @@ date: 2026-07-13
 | card | owner | current state | scope |
 | --- | --- | --- | --- |
 | P0-A | `[长工]#realtime-connector-runtime@v0.1` | partial_accepted_blocked_safe_foundation | A1-A5 runtime/fixture/full-gate 通过；production authorizer、真实 reattach 和外部 E2E 未启用 |
-| P0-B | `[长工]#realtime-truth-ui@v0.1` | partial_accepted_renderer_truth_slice | selector + App/Home/Cockpit 接线与 fallback 浏览器复核通过；renderer fresh/stale/lost SSR fixture 待补 |
+| P0-B | `[长工]#realtime-truth-ui@v0.1` | partial_accepted_renderer_truth_slice | selector + App/Home/Cockpit 接线、fallback 浏览器复核和 fresh/stale/lost SSR fixture 通过；Electron event p95/1920/E2E 待补 |
 | P0-C | `[长工]#realtime-requirements-control@v0.1` + PM | standby / authorization_required | Codex controlled dry-run 与 E2E acceptance；当前不得执行 |
 
 主 control lane 保持 `standby_control`：它只协调 A/B 合同和 C 验收。A/B 的 partial accepted 只代表受限切片已被 PM 验收，不代表 Connector runtime 已可执行。
@@ -47,7 +47,7 @@ date: 2026-07-13
 1. C 冻结需求、真值词典、文件围栏和量化门禁。
 2. A 冻结共享 runtime 类型和 IPC 合同，再完成 fixture 可验证实现。
 3. B 在不抢 A 共享文件的前提下完成真值 projection 与 UI；消费已冻结合同。
-4. A/B 各自回调，主控先做静态/fixture/浏览器/Electron 验收；未完成的 renderer state-matrix 仍保持 partial。
+4. A/B 各自回调，主控先做静态/fixture/浏览器/Electron 验收；未完成的 Electron p95/1920/E2E 仍保持 partial。
 5. 只有 PM/user 明确给出第二次执行窗口，P0-C 才能调用一次受控 Codex dry-run。
 6. P0-C 全矩阵通过后，PM 才能决定是否把 Codex 从 draft/pending 调整为 accepted/ready；调整 machine-gate 是独立任务，不在本卡自动发生。
 
@@ -116,5 +116,5 @@ evidence:
 
 ## next action
 
-- 收取 A/B 的独立 callback 并按文件围栏检查冲突；补 renderer fresh/stale/lost fixture 后再决定 full acceptance。
+- 收取 A/B 的独立 callback 并按文件围栏检查冲突；补真实 Electron event p95、1920x1080 和 P0-C E2E 后再决定 full acceptance。
 - P0-C 保持 standby；等待 A/B 验收与明确第二次执行授权。

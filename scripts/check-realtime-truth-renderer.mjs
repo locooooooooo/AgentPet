@@ -1,0 +1,255 @@
+import assert from 'node:assert/strict';
+import { mkdtemp, rm } from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { build } from 'esbuild';
+
+const temporaryDirectory = await mkdtemp(path.join(os.tmpdir(), 'niuma-renderer-truth-'));
+const outputFile = path.join(temporaryDirectory, 'renderer-truth-fixture.cjs');
+
+const fixtureSource = String.raw`
+import assert from 'node:assert/strict';
+import React from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
+import NiuMaWorkspace from './src/components/NiuMaWorkspace';
+import { createSeedSnapshot } from './src/lib/agentCore';
+import { projectAgentInstances, selectAgentTruthByIdentity } from './src/lib/agentInstanceProjection';
+import { useHomePageData } from './src/homepage/hooks/useHomePageData';
+
+globalThis.window = {
+  addEventListener() {},
+  removeEventListener() {},
+  requestAnimationFrame() { return 0; },
+  cancelAnimationFrame() {},
+  getComputedStyle() { return {}; }
+};
+
+const now = new Date('2026-07-13T08:00:00.000Z');
+const nowIso = now.toISOString();
+const snapshot = createSeedSnapshot();
+snapshot.updatedAt = nowIso;
+const configuredAgents = snapshot.agents.map((agent) => ({ id: agent.id, connectorId: agent.id }));
+const api = {};
+
+function outputStats() {
+  return {
+    receivedBytes: 0,
+    archivedBytes: 0,
+    droppedBytes: 0,
+    outputEvents: 0,
+    truncatedLines: 0,
+    backpressureEvents: 0
+  };
+}
+
+function session(state, lastSeen, capabilities = ['structured-events']) {
+  return {
+    taskId: 'task-codex-1',
+    sessionId: 'session-codex-1',
+    connectorId: 'codex',
+    agentId: 'codex',
+    taskName: 'fixture task',
+    requestedBy: 'test-fixture',
+    source: 'runtime-spawn',
+    capabilities,
+    capabilitySource: capabilities === null ? 'unknown' : 'adapter-declaration',
+    state,
+    startedAt: '2026-07-13T07:59:00.000Z',
+    ...(state === 'session-lost' ? { endedAt: nowIso } : {}),
+    attempt: 1,
+    maxAttempts: 1,
+    retryPolicy: { maxRetries: 0, backoffMs: 250, budgetMs: 0 },
+    output: outputStats(),
+    liveness: {
+      status: lastSeen ? 'fresh' : 'unknown',
+      source: lastSeen ? 'process-event' : 'none',
+      ...(lastSeen ? { lastSeen } : {}),
+      staleAfterMs: 15_000
+    },
+    events: []
+  };
+}
+
+function instance(state, lastSeen, capabilities = ['structured-events']) {
+  return {
+    instanceId: 'codex:codex',
+    agentId: 'codex',
+    connectorId: 'codex',
+    status: state === 'session-lost' ? 'offline' : 'busy',
+    source: state === 'session-lost' ? 'session-lost' : 'connector-runtime',
+    ...(lastSeen ? { lastSeen } : {}),
+    capabilities,
+    capabilitySource: capabilities === null ? 'unknown' : 'adapter-declaration',
+    sessionId: 'session-codex-1',
+    liveness: {
+      status: lastSeen ? 'fresh' : 'unknown',
+      source: lastSeen ? 'process-event' : 'none',
+      ...(lastSeen ? { lastSeen } : {}),
+      staleAfterMs: 15_000
+    }
+  };
+}
+
+function runtimeSnapshot({
+  availability = 'available',
+  mode = 'real',
+  source = 'electron-main',
+  reason,
+  state,
+  lastSeen,
+  capabilities = ['structured-events']
+}) {
+  const hasSession = Boolean(state);
+  return {
+    version: 1,
+    updatedAt: nowIso,
+    runtime: {
+      availability,
+      mode,
+      source,
+      observedAt: nowIso,
+      ...(reason ? { reason } : {})
+    },
+    tasks: hasSession ? [session(state, lastSeen, capabilities)] : [],
+    instances: hasSession ? [instance(state, lastSeen, capabilities)] : []
+  };
+}
+
+function project(runtime) {
+  return projectAgentInstances({ configuredAgents, runtimeSnapshot: runtime, now });
+}
+
+function plain(markup) {
+  return markup
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&quot;/g, '"')
+    .replace(/&#x27;/g, "'")
+    .replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function renderCockpit(agentTruth) {
+  return plain(renderToStaticMarkup(
+    <NiuMaWorkspace
+      api={api}
+      snapshot={snapshot}
+      agentTruth={agentTruth}
+      onSnapshot={() => {}}
+    />
+  ));
+}
+
+function HomeTruthProbe({ agentTruth }) {
+  const data = useHomePageData(snapshot, agentTruth);
+  return (
+    <div>
+      {data.metrics.map((metric) => (
+        <span key={metric.id}>{metric.label}:{metric.value}:{metric.detail}</span>
+      ))}
+    </div>
+  );
+}
+
+function renderHomeTruth(agentTruth) {
+  return plain(renderToStaticMarkup(<HomeTruthProbe agentTruth={agentTruth} />));
+}
+
+function truthFor(projection) {
+  const truth = selectAgentTruthByIdentity(projection, 'codex', 'codex');
+  assert.ok(truth, 'Codex truth must exist');
+  return truth;
+}
+
+const browserProjection = project(runtimeSnapshot({
+  availability: 'unavailable',
+  mode: 'simulated',
+  source: 'browser-fallback',
+  reason: 'Electron Connector runtime is unavailable in browser fallback mode.'
+}));
+assert.equal(browserProjection.summary.configuredCount, 8);
+assert.equal(browserProjection.summary.onlineSessionCount, 0);
+const browserCockpit = renderCockpit(browserProjection);
+const browserHome = renderHomeTruth(browserProjection);
+assert.match(browserCockpit, /真实在线 Session 0/);
+assert.match(browserCockpit, /Agent runtime · simulated/);
+assert.match(browserCockpit, /unavailable · browser-fallback/);
+assert.match(browserCockpit, /本地牧场表现/);
+assert.match(browserCockpit, /应用快照交互/);
+assert.match(browserHome, /已配置工位:8/);
+assert.match(browserHome, /真实在线 Session:0:unavailable · simulated · browser-fallback/);
+
+const freshLastSeen = new Date(now.getTime() - 1_000).toISOString();
+const freshProjection = project(runtimeSnapshot({ state: 'running', lastSeen: freshLastSeen }));
+const freshTruth = truthFor(freshProjection);
+assert.equal(freshProjection.summary.onlineSessionCount, 1);
+assert.equal(freshTruth.presence, 'busy');
+assert.equal(freshTruth.activity, 'busy');
+const freshCockpit = renderCockpit(freshProjection);
+assert.match(freshCockpit, /真实在线 Session 1/);
+assert.match(freshCockpit, /busy \/ busy/);
+assert.match(freshCockpit, /connector-runtime/);
+assert.match(freshCockpit, /session-codex-1/);
+assert.match(freshCockpit, /structured-events · adapter-declaration/);
+assert.match(freshCockpit, /真实 Session 新鲜，且关联任务正在运行/);
+assert.match(renderHomeTruth(freshProjection), /真实在线 Session:1:available · real · electron-main/);
+
+const lateLastSeen = new Date(now.getTime() - 5_001).toISOString();
+const lateProjection = project(runtimeSnapshot({ state: 'running', lastSeen: lateLastSeen }));
+assert.equal(lateProjection.summary.onlineSessionCount, 0);
+assert.equal(truthFor(lateProjection).presence, 'degraded');
+assert.match(renderCockpit(lateProjection), /心跳超过 5 秒，Session 已降级/);
+
+const staleLastSeen = new Date(now.getTime() - 15_000).toISOString();
+const staleProjection = project(runtimeSnapshot({ state: 'running', lastSeen: staleLastSeen }));
+assert.equal(staleProjection.summary.onlineSessionCount, 0);
+assert.equal(truthFor(staleProjection).presence, 'offline');
+assert.match(renderCockpit(staleProjection), /心跳达到 15 秒，Session 已离线/);
+
+const lostProjection = project(runtimeSnapshot({
+  state: 'session-lost',
+  lastSeen: freshLastSeen
+}));
+const lostTruth = truthFor(lostProjection);
+assert.equal(lostProjection.summary.onlineSessionCount, 0);
+assert.equal(lostTruth.presence, 'offline');
+assert.equal(lostTruth.activity, 'terminal');
+const lostCockpit = renderCockpit(lostProjection);
+assert.match(lostCockpit, /offline \/ terminal/);
+assert.match(lostCockpit, /Session 已丢失，关联任务不再视为运行中/);
+
+const unknownCapabilitiesProjection = project(runtimeSnapshot({
+  state: 'running',
+  lastSeen: freshLastSeen,
+  capabilities: null
+}));
+assert.match(renderCockpit(unknownCapabilitiesProjection), /Capabilities: 未知 \(unknown\)/);
+
+console.log('realtime truth renderer check passed.');
+console.log('browser fallback DOM: configured=8, online=0, simulated/unavailable/source labels verified');
+console.log('fresh/late/stale/session-lost DOM: KPI, presence/activity, provenance and reason labels verified');
+console.log('capabilities null and local ranch/application snapshot separation: verified');
+`;
+
+try {
+  await build({
+    stdin: {
+      contents: fixtureSource,
+      loader: 'tsx',
+      resolveDir: process.cwd(),
+      sourcefile: 'renderer-truth-fixture.tsx'
+    },
+    outfile: outputFile,
+    bundle: true,
+    platform: 'node',
+    format: 'cjs',
+    logLevel: 'silent'
+  });
+
+  await import(`${pathToFileURL(outputFile).href}?t=${Date.now()}`);
+} catch (error) {
+  assert.fail(error instanceof Error ? error.stack ?? error.message : String(error));
+} finally {
+  await rm(temporaryDirectory, { recursive: true, force: true });
+}
