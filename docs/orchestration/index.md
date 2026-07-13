@@ -49,6 +49,7 @@ tracked business cards:
 - task: ⟦tag:v2|task|protected-cockpit-source-drift-v0.1⟧ -> `docs/orchestration/tasks/protected-cockpit-source-drift-v0.1.md`
 - task: ⟦tag:v2|task|cockpit-refactor-p0-v0.1⟧ -> `docs/orchestration/tasks/cockpit-refactor-p0-v0.1.md`
 - task: ⟦tag:v2|task|cockpit-ui-redesign-v3.1-v0.1⟧ -> `docs/orchestration/tasks/cockpit-ui-redesign-v3.1-v0.1.md`
+- task: ⟦tag:v2|task|cockpit-ui-redesign-v3.2-v0.1⟧ -> `docs/orchestration/tasks/cockpit-ui-redesign-v3.2-v0.1.md`
 - task: ⟦tag:v2|task|m5-longworker-dispatch-v0.1⟧ -> `docs/orchestration/tasks/m5-longworker-dispatch-v0.1.md`
 - task: ⟦tag:v2|task|homepage-ui-p0-v0.1⟧ -> `docs/orchestration/tasks/homepage-ui-p0-v0.1.md`
 - task: ⟦tag:v2|task|homepage-ui-p0-dispatch-v0.1⟧ -> `docs/orchestration/tasks/homepage-ui-p0-dispatch-v0.1.md`
@@ -139,6 +140,7 @@ current role split:
 - `[PM]#ranch-real-integration-r0-3-dryrun@v0.1`: standby R0-3 Codex controlled dry-run evidence collection lane; P0 ranch-real-integration-p0 整体 accepted(2026-07-07 拍板 ②),R0-3 段已转交本 lane;Codex approvalStatus/enabledByDefault/command 维持原值,trae/qoder 维持 placeholder;不主动启动 dry-run,等用户二次确认时机。
 - `[PM]#protected-cockpit-source-drift@v0.1`: standby PM disposition lane in W28;administrator selected bounded routing, but no source edit, format repair, acceptance, or rollback is authorized yet.
 - `[PM]#cockpit-ui-redesign-v3.1@v0.1`: summarized accepted visual-refinement lane pushed as `aa4cfa5`; future cockpit changes require a fresh bounded scope, while M5 lifecycle, protected animation/avatar, business logic, and connectors remain untouched.
+- `[PM]#cockpit-ui-redesign-v3.2@v0.1`: standby requirements-ready audit lane; P0 implementation is task-first information dedupe and progressive disclosure, but no product worker is dispatched by this documentation pass.
 - `[PM]#weekly-requirements@2026-07-07`: summarized W27 (2026-07-07~2026-07-13) weekly-requirements history; final closeout is recorded in `weekly-closeout-2026-07-11.md`.
 - `[PM]#weekly-requirements@2026-07-14`: active W28 planner; tracks the administrator-authorized M5 rolling schedule beginning 2026-07-11 while preserving per-card serial gates.
 - `[PM]#daily-plan@2026-07-09`: summarized 2026-07-09 daily plan;B②/C short-worker/D 今天/E1 evidence is retained as history.

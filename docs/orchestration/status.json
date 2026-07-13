@@ -267,6 +267,15 @@
       "evidence": "docs/orchestration/tasks/cockpit-ui-redesign-v3.1-v0.1.md"
     },
     {
+      "id": "cockpit-ui-redesign-v3-2",
+      "title": "[PM]#cockpit-ui-redesign-v3.2@v0.1",
+      "owner": "主控",
+      "status": "standby",
+      "responsibility": "Requirements-ready cockpit audit: deduplicate global state, prioritize task dispatch at 1280x720, reduce card action noise, and use progressive disclosure without changing product code in this lane.",
+      "tag": "⟦tag:v2|task|cockpit-ui-redesign-v3.2-v0.1⟧",
+      "evidence": "docs/orchestration/tasks/cockpit-ui-redesign-v3.2-v0.1.md"
+    },
+    {
       "id": "homepage-ui-design",
       "title": "[长工]#homepage-ui-design@v0.1",
       "owner": "长工",
