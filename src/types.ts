@@ -22,6 +22,23 @@ export type ConnectorBlockedReason =
   | 'confirmation-required'
   | 'runner-unsupported';
 
+export type ConnectorRuntimeBlockedReason = ConnectorBlockedReason
+  | 'adapter-unsupported'
+  | 'request-invalid'
+  | 'runtime-unavailable';
+
+export interface ConnectorRetryPolicyInput {
+  maxRetries?: number;
+  backoffMs?: number;
+  budgetMs?: number;
+}
+
+export interface ConnectorRetryPolicy {
+  maxRetries: number;
+  backoffMs: number;
+  budgetMs: number;
+}
+
 export interface ConnectorAuditFields {
   acceptedBy: string;
   acceptedAt: string;
@@ -100,21 +117,221 @@ export interface ConnectorRunRequest {
   agentId: string;
   connectorId: string;
   taskName: string;
+  prompt: string;
   requestedBy: 'default-action' | 'explicit-user-action';
   confirmationAccepted?: boolean;
+  retry?: ConnectorRetryPolicyInput;
 }
+
+export type ConnectorRunIntent = Omit<ConnectorRunRequest, 'requestedBy' | 'confirmationAccepted'>;
 
 export type ConnectorRunResult =
   | {
       status: 'blocked';
       connectorId: string;
-      blockedReasons: ConnectorBlockedReason[];
+      blockedReasons: ConnectorRuntimeBlockedReason[];
+      taskId?: string;
+      sessionId?: string;
     }
   | {
-      status: 'started';
+      status: 'accepted';
       connectorId: string;
       taskId: string;
+      sessionId: string;
     };
+
+export interface ConnectorStopRequest {
+  taskId: string;
+}
+
+export type ConnectorStopResult =
+  | {
+      status: 'stopped';
+      taskId: string;
+    }
+  | {
+      status: 'stopping';
+      taskId: string;
+    }
+  | {
+      status: 'not-found';
+      taskId: string;
+    };
+
+export type ConnectorRuntimeState =
+  | 'starting'
+  | 'running'
+  | 'stopping'
+  | 'retrying'
+  | 'recovering'
+  | 'reattached'
+  | 'success'
+  | 'error'
+  | 'stopped'
+  | 'timed-out'
+  | 'policy-blocked'
+  | 'permission-denied'
+  | 'session-lost';
+
+export type ConnectorRuntimeEventKind =
+  | 'lifecycle'
+  | 'stdout'
+  | 'stderr'
+  | 'error'
+  | 'timeout'
+  | 'retry'
+  | 'heartbeat'
+  | 'recovery'
+  | 'policy';
+
+export type ConnectorLifecycleSubtype =
+  | 'session-created'
+  | 'spawn-requested'
+  | 'session-started'
+  | 'attempt-started'
+  | 'stopping-requested'
+  | 'termination-escalated'
+  | 'retry-scheduled'
+  | 'retry-started'
+  | 'recovery-started'
+  | 'recovery-reattached'
+  | 'output-truncated'
+  | 'session-terminal';
+
+export type ConnectorFailureKind =
+  | 'exit-code'
+  | 'process-error'
+  | 'timeout'
+  | 'cancelled'
+  | 'policy-blocked'
+  | 'permission-denied';
+
+export type ProcessLivenessStatus = 'unknown' | 'fresh' | 'stale';
+export type ProcessLivenessSource = 'none' | 'process-event' | 'recovery-proof';
+
+export interface ProcessLivenessEvidence {
+  status: ProcessLivenessStatus;
+  source: ProcessLivenessSource;
+  lastSeen?: string;
+  staleAfterMs: number;
+}
+
+export type AgentInstanceStatus = 'configured' | 'online' | 'busy' | 'offline' | 'degraded' | 'unknown';
+export type AgentInstanceSource =
+  | 'static-config'
+  | 'connector-runtime'
+  | 'recovery-proof'
+  | 'session-lost'
+  | 'simulated'
+  | 'unknown';
+
+export interface AgentInstance {
+  instanceId: string;
+  agentId: string;
+  connectorId: string;
+  status: AgentInstanceStatus;
+  source: AgentInstanceSource;
+  lastSeen?: string;
+  capabilities: string[] | null;
+  capabilitySource: ConnectorCapabilitySource;
+  sessionId?: string;
+  liveness: ProcessLivenessEvidence;
+}
+
+export interface ConnectorRuntimeEvent {
+  eventId: string;
+  sequence: number;
+  timestamp: string;
+  kind: ConnectorRuntimeEventKind;
+  message: string;
+  lifecycle?: ConnectorLifecycleSubtype;
+  payload?: unknown;
+}
+
+export type ConnectorCapabilitySource = 'adapter-declaration' | 'runtime-observed' | 'unknown';
+
+export interface ConnectorOutputStats {
+  receivedBytes: number;
+  archivedBytes: number;
+  droppedBytes: number;
+  outputEvents: number;
+  truncatedLines: number;
+  backpressureEvents: number;
+}
+
+export interface ConnectorTerminationEvidence {
+  requestedAt: string;
+  reason: 'user-cancel' | 'timeout' | 'process-error' | 'dispose';
+  killAttempts: number;
+  exitConfirmed: boolean;
+  escalatedAt?: string;
+}
+
+export interface ConnectorSession {
+  taskId: string;
+  sessionId: string;
+  connectorId: string;
+  agentId: string;
+  taskName: string;
+  requestedBy: ConnectorRunRequest['requestedBy'];
+  source: 'runtime-spawn' | 'restart-recovery';
+  capabilities: string[] | null;
+  capabilitySource: ConnectorCapabilitySource;
+  state: ConnectorRuntimeState;
+  startedAt: string;
+  endedAt?: string;
+  pid?: number;
+  exitCode?: number;
+  signal?: string;
+  attempt: number;
+  maxAttempts: number;
+  retryPolicy: ConnectorRetryPolicy;
+  timeoutAt?: string;
+  failureKind?: ConnectorFailureKind;
+  output: ConnectorOutputStats;
+  termination?: ConnectorTerminationEvidence;
+  liveness: ProcessLivenessEvidence;
+  events: ConnectorRuntimeEvent[];
+}
+
+export type ConnectorRuntimeTask = ConnectorSession;
+
+export interface ConnectorSessionAudit {
+  taskId: string;
+  sessionId: string;
+  connectorId: string;
+  agentId: string;
+  state: ConnectorRuntimeState;
+  source: ConnectorSession['source'];
+  attempt: number;
+  maxAttempts: number;
+  startedAt: string;
+  endedAt?: string;
+  failureKind?: ConnectorFailureKind;
+  output: ConnectorOutputStats;
+  termination?: ConnectorTerminationEvidence;
+  events: ConnectorRuntimeEvent[];
+}
+
+export interface ConnectorRuntimeSnapshot {
+  version: 1;
+  updatedAt: string;
+  tasks: ConnectorSession[];
+  instances: AgentInstance[];
+  runtime: ConnectorRuntimeEnvelope;
+}
+
+export type ConnectorRuntimeAvailability = 'available' | 'unavailable' | 'recovering' | 'unknown';
+export type ConnectorRuntimeMode = 'real' | 'simulated';
+export type ConnectorRuntimeSource = 'electron-main' | 'browser-fallback' | 'persisted-recovery' | 'unknown';
+
+export interface ConnectorRuntimeEnvelope {
+  availability: ConnectorRuntimeAvailability;
+  mode: ConnectorRuntimeMode;
+  source: ConnectorRuntimeSource;
+  observedAt: string;
+  reason?: string;
+}
 
 export interface ConnectorPreflightResult {
   connectorId: string;
@@ -332,6 +549,11 @@ export interface DesktopApi {
   resetSeed: () => Promise<AgentSnapshot>;
   createTask: (input: CreateTaskInput) => Promise<AgentSnapshot>;
   evaluateConnectorGate: (input: ConnectorGateRequest) => Promise<ConnectorGateResult>;
+  runConnector: (input: ConnectorRunIntent) => Promise<ConnectorRunResult>;
+  stopConnector: (input: ConnectorStopRequest) => Promise<ConnectorStopResult>;
+  getConnectorRuntimeSnapshot: () => Promise<ConnectorRuntimeSnapshot>;
+  getConnectorSessionAudit: (sessionId: string) => Promise<ConnectorSessionAudit | null>;
+  onConnectorRuntimeSnapshotChanged: (callback: (snapshot: ConnectorRuntimeSnapshot) => void) => () => void;
   ranch: {
     getPrefs: () => Promise<RanchPrefs>;
     setPrefs: (patch: RanchPrefsPatch) => Promise<RanchPrefs>;

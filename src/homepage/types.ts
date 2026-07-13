@@ -1,4 +1,10 @@
-import type { AgentSystemMessage, NiuMaStatus } from '../types';
+import type {
+  AgentSystemMessage,
+  ConnectorRuntimeAvailability,
+  ConnectorRuntimeMode,
+  ConnectorRuntimeSource,
+  NiuMaStatus
+} from '../types';
 
 export type HomeMetricTone = 'green' | 'blue' | 'orange' | 'red' | 'violet';
 export type HomeMetricIcon = 'activity' | 'shield' | 'plug' | 'bell';
@@ -42,5 +48,10 @@ export interface HomePageData {
   connectorCount: number;
   acceptedConnectorCount: number;
   blockedConnectorCount: number;
+  onlineSessionCount: number;
+  runtimeAvailability: ConnectorRuntimeAvailability;
+  runtimeMode: ConnectorRuntimeMode;
+  runtimeSource: ConnectorRuntimeSource;
+  runtimeObservedAt: string;
   latestMessage: AgentSystemMessage | null;
 }

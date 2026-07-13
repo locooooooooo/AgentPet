@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { AgentSnapshot, DesktopApi } from './types';
+import type { AgentSnapshot, ConnectorRuntimeSnapshot, DesktopApi } from './types';
 import { getDesktopApi } from './lib/desktopClient';
+import { projectAgentInstances } from './lib/agentInstanceProjection';
 import NiuMaWorkspace from './components/NiuMaWorkspace';
 import HomePage from './homepage';
 
@@ -9,6 +10,8 @@ type AppView = 'home' | 'cockpit';
 export default function App() {
   const api = useMemo<DesktopApi>(() => getDesktopApi(), []);
   const [snapshot, setSnapshot] = useState<AgentSnapshot | null>(null);
+  const [connectorRuntimeSnapshot, setConnectorRuntimeSnapshot] = useState<ConnectorRuntimeSnapshot | null>(null);
+  const [projectionNow, setProjectionNow] = useState(() => Date.now());
   const [error, setError] = useState<string | null>(null);
   const [view, setView] = useState<AppView>('home');
 
@@ -35,6 +38,80 @@ export default function App() {
       unsubscribe();
     };
   }, [api]);
+
+  useEffect(() => {
+    let mounted = true;
+    let unsubscribe = () => {};
+
+    api.getConnectorRuntimeSnapshot()
+      .then((nextSnapshot) => {
+        if (mounted) {
+          setConnectorRuntimeSnapshot(nextSnapshot);
+        }
+      })
+      .catch((reason) => {
+        if (mounted) {
+          setConnectorRuntimeSnapshot(createFailClosedRuntimeSnapshot(
+            Date.now(),
+            reason instanceof Error ? reason.message : 'Connector runtime snapshot unavailable.'
+          ));
+        }
+      });
+
+    try {
+      unsubscribe = api.onConnectorRuntimeSnapshotChanged((nextSnapshot) => {
+        if (mounted) {
+          setConnectorRuntimeSnapshot(nextSnapshot);
+        }
+      });
+    } catch (reason) {
+      setConnectorRuntimeSnapshot(createFailClosedRuntimeSnapshot(
+        Date.now(),
+        reason instanceof Error ? reason.message : 'Connector runtime subscription unavailable.'
+      ));
+    }
+
+    return () => {
+      mounted = false;
+      unsubscribe();
+    };
+  }, [api]);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setProjectionNow(Date.now());
+    }, 1_000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const agentTruth = useMemo(() => {
+    const runtimeSnapshot = connectorRuntimeSnapshot ?? createFailClosedRuntimeSnapshot(
+      projectionNow,
+      'Connector runtime snapshot is still loading.'
+    );
+    try {
+      return projectAgentInstances({
+        configuredAgents: (snapshot?.agents ?? []).map((agent) => ({
+          id: agent.id,
+          connectorId: agent.id
+        })),
+        runtimeSnapshot,
+        now: projectionNow
+      });
+    } catch (reason) {
+      return projectAgentInstances({
+        configuredAgents: (snapshot?.agents ?? []).map((agent) => ({
+          id: agent.id,
+          connectorId: agent.id
+        })),
+        runtimeSnapshot: createFailClosedRuntimeSnapshot(
+          projectionNow,
+          reason instanceof Error ? reason.message : 'Connector runtime projection failed.'
+        ),
+        now: projectionNow
+      });
+    }
+  }, [connectorRuntimeSnapshot, projectionNow, snapshot]);
 
   const enterCockpit = useCallback(() => {
     setView('cockpit');
@@ -70,6 +147,7 @@ export default function App() {
     return (
       <HomePage
         snapshot={snapshot}
+        agentTruth={agentTruth}
         onEnterCockpit={enterCockpit}
         onFocusAnimal={focusRanchAnimal}
         onOpenSettings={enterCockpit}
@@ -81,8 +159,27 @@ export default function App() {
     <NiuMaWorkspace
       api={api}
       snapshot={snapshot}
+      agentTruth={agentTruth}
       onSnapshot={setSnapshot}
       onReturnHome={returnHome}
     />
   );
+}
+
+function createFailClosedRuntimeSnapshot(now: number, reason: string): ConnectorRuntimeSnapshot {
+  const isDesktopRuntime = typeof window !== 'undefined' && Boolean(window.niumaDesk);
+  const observedAt = new Date(now).toISOString();
+  return {
+    version: 1,
+    updatedAt: observedAt,
+    tasks: [],
+    instances: [],
+    runtime: {
+      availability: 'unavailable',
+      mode: isDesktopRuntime ? 'real' : 'simulated',
+      source: isDesktopRuntime ? 'unknown' : 'browser-fallback',
+      observedAt,
+      reason
+    }
+  };
 }

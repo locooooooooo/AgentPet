@@ -355,6 +355,33 @@
       "responsibility": "Retain the 2026-07-10 administrator decisions, W28 preparation, and docs-only closeout work as summarized history.",
       "tag": "⟦tag:v2|session|daily-plan-2026-07-10⟧",
       "evidence": "docs/orchestration/sessions/daily-plan-2026-07-10.md"
+    },
+    {
+      "id": "realtime-connector-runtime",
+      "title": "[长工]#realtime-connector-runtime@v0.1",
+      "owner": "长工",
+      "status": "active",
+      "responsibility": "P0-A A1-A5 blocked-safe runtime foundation is PM-verified: heartbeat/retry/recovery/persistence/audit, termination truth, bounded redacted events, and trusted-intent fail-closed. Production authorizer and real reattach remain absent; no external Agent CLI was executed and connector machine-gate fields remain unchanged.",
+      "tag": "⟦tag:v2|task|realtime-agent-cockpit-p0-a-connector-runtime-v0.1⟧",
+      "evidence": "docs/orchestration/tasks/realtime-agent-cockpit-p0-a-connector-runtime-v0.1.md"
+    },
+    {
+      "id": "realtime-truth-ui",
+      "title": "[长工]#realtime-truth-ui@v0.1",
+      "owner": "长工",
+      "status": "active",
+      "responsibility": "P0-B selector plus renderer truth slice is PM-verified: configured is distinct from online, simulation/unavailable/source/session/lastSeen/capabilities are explicit, and App/Home/Cockpit consume one projection. Renderer SSR fresh/stale/lost fixture remains incomplete; this role does not own runtime or connector policy.",
+      "tag": "⟦tag:v2|task|realtime-agent-cockpit-p0-b-data-truth-v0.1⟧",
+      "evidence": "docs/orchestration/tasks/realtime-agent-cockpit-p0-b-data-truth-v0.1.md"
+    },
+    {
+      "id": "realtime-requirements-control",
+      "title": "[长工]#realtime-requirements-control@v0.1",
+      "owner": "长工",
+      "status": "active",
+      "responsibility": "Docs-only real-time cockpit requirements and acceptance control: record the approximately 55% partial baseline, preserve A/B file fences and quantitative gates, keep P0-C Codex controlled dry-run standby, and record the remaining renderer fixture/trusted-authorizer/real-E2E gaps.",
+      "tag": "⟦tag:v2|session|realtime-agent-cockpit-progress-2026-07-13⟧",
+      "evidence": "docs/orchestration/sessions/realtime-agent-cockpit-progress-2026-07-13.md"
     }
   ],
   "lanes": [

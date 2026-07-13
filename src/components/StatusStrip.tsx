@@ -21,11 +21,11 @@ export default function StatusStrip({
   const lastEventLabel = lastEvent ? `${lastEvent.title} · ${formatRelativeTime(lastEvent.timestamp)}` : 'idle';
 
   return (
-    <section className="status-strip-shell" aria-label="状态管道摘要">
+    <section className="status-strip-shell" aria-label="Connector 策略状态摘要">
       <div className="status-strip" tabIndex={0}>
         <div className="status-strip-item primary">
           <Activity size={14} />
-          <span>connector · {gateSummary.label}</span>
+          <span>Connector 策略 · {gateSummary.label}</span>
         </div>
         <div className="status-strip-item grow">
           <span>last event: {lastEventLabel}</span>
@@ -37,7 +37,7 @@ export default function StatusStrip({
         className="status-strip-dropdown"
         data-status-source="connector-policy-grid"
         role="list"
-        aria-label="完整 connector 列表"
+        aria-label="完整 Connector 策略列表"
       >
         {connectors.map((connector) => (
           <article key={connector.id} className={`status-strip-connector-card ${connector.status}`} role="listitem">

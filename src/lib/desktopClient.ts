@@ -1,6 +1,10 @@
 import type {
   AgentSnapshot,
   ConnectorGateRequest,
+  ConnectorRunIntent,
+  ConnectorRuntimeSnapshot,
+  ConnectorSessionAudit,
+  ConnectorStopRequest,
   CreateTaskInput,
   DesktopApi,
   NiuMaAction,
@@ -92,6 +96,30 @@ export function getDesktopApi(): DesktopApi {
       connectorId: input.connectorId,
       blockedReasons: ['policy-unavailable']
     }),
+    runConnector: async (input: ConnectorRunIntent) => ({
+      status: 'blocked',
+      connectorId: input.connectorId,
+      blockedReasons: ['runtime-unavailable']
+    }),
+    stopConnector: async (input: ConnectorStopRequest) => ({
+      status: 'not-found',
+      taskId: input.taskId
+    }),
+    getConnectorRuntimeSnapshot: async (): Promise<ConnectorRuntimeSnapshot> => ({
+      version: 1,
+      updatedAt: new Date().toISOString(),
+      tasks: [],
+      instances: [],
+      runtime: {
+        availability: 'unavailable',
+        mode: 'simulated',
+        source: 'browser-fallback',
+        observedAt: new Date().toISOString(),
+        reason: 'Electron Connector runtime is unavailable in browser fallback mode.'
+      }
+    }),
+    getConnectorSessionAudit: async (_sessionId: string): Promise<ConnectorSessionAudit | null> => null,
+    onConnectorRuntimeSnapshotChanged: (_callback: (snapshot: ConnectorRuntimeSnapshot) => void) => () => {},
     ranch: {
       getPrefs: async () => ranchPrefs,
       setPrefs: async (patch: RanchPrefsPatch) => updateRanchPrefs(patch),

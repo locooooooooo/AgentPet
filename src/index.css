@@ -1112,6 +1112,11 @@ button {
   color: #d1fae5;
 }
 
+.runner-switch button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
 .quick-grid {
   display: grid;
   gap: 7px;
@@ -3372,6 +3377,51 @@ input:focus-visible {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.cockpit-header .title-row {
+  flex-wrap: wrap;
+}
+
+.cockpit-header .brand-mark,
+.cockpit-header .title-row h1,
+.cockpit-header .version-pill,
+.runtime-mode-badge {
+  flex-shrink: 0;
+}
+
+.runtime-mode-badge {
+  display: inline-flex;
+  min-width: 0;
+  min-height: 26px;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  font-size: 10px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.runtime-mode-badge span {
+  color: #f8fafc;
+  font-weight: 800;
+}
+
+.runtime-mode-badge small {
+  color: var(--text-muted);
+  font-size: 10px;
+}
+
+.runtime-mode-badge.preview {
+  border-color: rgba(245, 158, 11, 0.54);
+  background: rgba(120, 53, 15, 0.24);
+}
+
+.runtime-mode-badge.desktop {
+  border-color: rgba(56, 189, 248, 0.44);
+  background: rgba(7, 89, 133, 0.2);
 }
 
 .header-actions {

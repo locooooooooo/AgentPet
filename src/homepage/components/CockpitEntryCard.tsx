@@ -15,16 +15,16 @@ export default function CockpitEntryCard({ runningTaskCount, totalTaskCount, onE
           Control Cockpit
         </span>
         <h2>进入控制舱</h2>
-        <p>左轨看编排真源，中间保留 8 工位矩阵，右轨继续派活、看队列、查日志。</p>
+        <p>左轨查看控制面登记，中间保留已配置工位矩阵，右轨下发任务、看队列、查日志。</p>
       </div>
       <div className="homepage-cockpit-facts" aria-label="控制舱摘要">
         <span>
           <strong>{runningTaskCount}</strong>
-          running
+          应用任务运行中
         </span>
         <span>
           <strong>{totalTaskCount}</strong>
-          tasks
+          应用任务总数
         </span>
       </div>
       <button type="button" onClick={onEnter}>

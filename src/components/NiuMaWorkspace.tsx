@@ -8,7 +8,6 @@ import {
   Eraser,
   Flame,
   Home,
-  PauseCircle,
   Play,
   RefreshCcw,
   RotateCcw,
@@ -35,6 +34,12 @@ import type {
   RanchPrefsPatch
 } from '../types';
 import { getQuickTasks, STATE_METAS } from '../lib/agentCore';
+import {
+  selectAgentTruthByIdentity,
+  type AgentProjectionReason,
+  type AgentTruthProjection,
+  type ProjectedAgentTruth
+} from '../lib/agentInstanceProjection';
 import { CONNECTOR_POLICY, ORCHESTRATION_STATUS } from '../lib/orchestrationStatus';
 import NiuMaAvatar from './NiuMaAvatar';
 import StatusStrip from './StatusStrip';
@@ -42,6 +47,7 @@ import StatusStrip from './StatusStrip';
 interface NiuMaWorkspaceProps {
   api: DesktopApi;
   snapshot: AgentSnapshot;
+  agentTruth: AgentTruthProjection;
   onSnapshot: (snapshot: AgentSnapshot) => void;
   onReturnHome?: () => void;
 }
@@ -95,7 +101,10 @@ const cockpitTaskCards = [
   }
 ] as const;
 
-export default function NiuMaWorkspace({ api, snapshot, onSnapshot, onReturnHome }: NiuMaWorkspaceProps) {
+export default function NiuMaWorkspace({ api, snapshot, agentTruth, onSnapshot, onReturnHome }: NiuMaWorkspaceProps) {
+  const isDesktopRuntime = Boolean(window.niumaDesk);
+  const runtimeModeLabel = `Agent runtime · ${agentTruth.runtime.mode}`;
+  const runtimeModeDetail = `${agentTruth.runtime.availability} · ${agentTruth.runtime.source}`;
   const [selectedAgentId, setSelectedAgentId] = useState(snapshot.agents[0]?.id ?? '');
   const [connectorGateResults, setConnectorGateResults] = useState<Record<string, ConnectorGateResult>>({});
   const [ranchPrefs, setRanchPrefs] = useState<RanchPrefs | null>(null);
@@ -103,6 +112,9 @@ export default function NiuMaWorkspace({ api, snapshot, onSnapshot, onReturnHome
   const [cornerPanelOpen, setCornerPanelOpen] = useState(false);
 
   const selectedAgent = snapshot.agents.find((agent) => agent.id === selectedAgentId) ?? snapshot.agents[0];
+  const selectedAgentTruth = selectedAgent
+    ? selectAgentTruthByIdentity(agentTruth, selectedAgent.id, selectedAgent.id)
+    : null;
   const runtime = selectedAgent ? snapshot.runtime[selectedAgent.id] : undefined;
   const selectedTask = selectedAgent?.tasks.find((task) => task.status === 'running') ?? selectedAgent?.tasks[0];
   const selectedMeta = runtime ? STATE_METAS[runtime.status] : null;
@@ -249,26 +261,34 @@ export default function NiuMaWorkspace({ api, snapshot, onSnapshot, onReturnHome
             </span>
             <h1>桌面牧场 · 控制舱</h1>
             <span className="version-pill">OPS-RANCH v2.6</span>
+            <span
+              className={`runtime-mode-badge ${isDesktopRuntime ? 'desktop' : 'preview'}`}
+              role="status"
+              aria-label={`运行模式：${runtimeModeLabel}，${runtimeModeDetail}，观测时间 ${agentTruth.runtime.observedAt}`}
+            >
+              <span>{runtimeModeLabel}</span>
+              <small>{runtimeModeDetail}</small>
+            </span>
           </div>
-          <p>深色高对比控制台，左轨追踪调度真源，中央调度主工作区，右轨保留真实可操作的任务面板。</p>
+          <p>本地工位配置、本应用任务、Connector 策略与控制面登记分区呈现。</p>
 
           <div className="header-kpis">
             <SummaryTile
-              label="在线牛马"
+              label="已配置工位"
               value={`${snapshot.agents.length}`}
-              detail="核心部门已就位"
+              detail="本地配置数 · 非在线探针"
               tone="info"
             />
             <SummaryTile
-              label="正在拉磨"
-              value={`${runningCount}`}
-              detail="疯狂运转中"
-              tone={runningCount > 0 ? 'positive' : 'neutral'}
+              label="真实在线 Session"
+              value={`${agentTruth.summary.onlineSessionCount}`}
+              detail={`${agentTruth.runtime.availability} · ${agentTruth.runtime.mode} · ${agentTruth.runtime.source} · ${formatDateTime(agentTruth.runtime.observedAt)}`}
+              tone={agentTruth.summary.onlineSessionCount > 0 ? 'positive' : 'neutral'}
             />
             <SummaryTile
-              label="管道阻塞"
+              label="Connector 策略阻塞"
               value={`${gateBlockedCount}`}
-              detail="需要人工决策"
+              detail="策略门禁 · 非 Agent 离线"
               tone={gateBlockedCount > 0 ? 'danger' : 'positive'}
             />
           </div>
@@ -386,25 +406,25 @@ export default function NiuMaWorkspace({ api, snapshot, onSnapshot, onReturnHome
           </button>
           
           <div className="rail-content">
-            <section className="cockpit-panel rail-summary-panel" aria-label="调度总览">
+            <section className="cockpit-panel rail-summary-panel" aria-label="控制面调度登记">
               <PanelHeading
-                kicker="Dispatch State"
-                title="调度总览"
+                kicker="Control-plane Registry"
+                title="控制面调度登记"
               />
 
               <div className="dispatch-grid">
                 <SummaryTile
-                  label="监督身份"
+                  label="登记监督状态"
                   value={ORCHESTRATION_STATUS.loopState}
                   tone={getToneForState(ORCHESTRATION_STATUS.loopState)}
                 />
                 <SummaryTile
-                  label="派工状态"
+                  label="登记派工状态"
                   value={ORCHESTRATION_STATUS.dispatchState}
                   tone={getToneForState(ORCHESTRATION_STATUS.dispatchState)}
                 />
                 <SummaryTile
-                  label="今日阻塞"
+                  label="登记阻塞 Lane"
                   value={`${blockedLaneCount}`}
                   tone={blockedLaneCount > 0 ? 'danger' : 'neutral'}
                 />
@@ -422,13 +442,13 @@ export default function NiuMaWorkspace({ api, snapshot, onSnapshot, onReturnHome
               </div>
             </section>
 
-            <section className="cockpit-panel orchestration-panel" aria-label="LPS 角色与 lanes">
+            <section className="cockpit-panel orchestration-panel" aria-label="LPS 控制面角色与 Lane 登记">
               <PanelHeading
                 kicker={ORCHESTRATION_STATUS.source}
-                title="角色分工与监督"
-                meta={`${ORCHESTRATION_STATUS.roles.length} 角色 / ${ORCHESTRATION_STATUS.lanes.length} Lanes`}
+                title="控制面角色分工与监督"
+                meta={`控制面登记 ${ORCHESTRATION_STATUS.roles.length} 角色 / ${ORCHESTRATION_STATUS.lanes.length} Lanes`}
               />
-              <p>{ORCHESTRATION_STATUS.target}</p>
+              <p>控制面登记（非实时运行探针） · {ORCHESTRATION_STATUS.target}</p>
 
               <div className="orchestration-columns">
                 <div className="rail-group">
@@ -439,7 +459,7 @@ export default function NiuMaWorkspace({ api, snapshot, onSnapshot, onReturnHome
                   >
                     <div className="rail-group-head">
                       <Workflow size={14} />
-                      <span>角色工位 ({ORCHESTRATION_STATUS.roles.length})</span>
+                      <span>登记角色工位 ({ORCHESTRATION_STATUS.roles.length})</span>
                     </div>
                     <ChevronUp size={14} className={`accordion-chevron ${rolesExpanded ? 'is-open' : ''}`} />
                   </button>
@@ -467,7 +487,7 @@ export default function NiuMaWorkspace({ api, snapshot, onSnapshot, onReturnHome
                   >
                     <div className="rail-group-head">
                       <Activity size={14} />
-                      <span>推进 Lanes ({ORCHESTRATION_STATUS.lanes.length})</span>
+                      <span>登记推进 Lanes ({ORCHESTRATION_STATUS.lanes.length})</span>
                     </div>
                     <ChevronUp size={14} className={`accordion-chevron ${lanesExpanded ? 'is-open' : ''}`} />
                   </button>
@@ -499,7 +519,7 @@ export default function NiuMaWorkspace({ api, snapshot, onSnapshot, onReturnHome
                 meta={selectedAgent ? `${selectedAgent.name} 聚焦中` : '未选中牛马'}
               />
               <div className="board-meta">
-                <span>{runningCount} 头正在拉磨</span>
+                <span>{agentTruth.summary.onlineSessionCount} 个真实在线 Session · {runningCount} 个应用任务运行中</span>
               </div>
             </div>
 
@@ -542,6 +562,9 @@ export default function NiuMaWorkspace({ api, snapshot, onSnapshot, onReturnHome
                 api={api}
                 agent={selectedAgent}
                 runtime={runtime}
+                truth={selectedAgentTruth}
+                runtimeTruth={agentTruth.runtime}
+                localRunnerAvailable={isDesktopRuntime}
                 onSnapshot={onSnapshot}
                 onRunTask={runTask}
                 onCycle={(event) => cycleState(selectedAgent, event)}
@@ -596,7 +619,7 @@ export default function NiuMaWorkspace({ api, snapshot, onSnapshot, onReturnHome
               />
 
               <div className="corner-assist-copy">
-                <span className={`corner-status ${runtime.status}`}>{selectedMeta.name}</span>
+                <span className={`corner-status ${runtime.status}`}>本地牧场表现 · {selectedMeta.name}</span>
                 <strong>{selectedMeta.expression}</strong>
                 <p>{runtime.quote}</p>
               </div>
@@ -618,12 +641,12 @@ export default function NiuMaWorkspace({ api, snapshot, onSnapshot, onReturnHome
 
       <footer className="dock cockpit-dock">
         <div className="dock-item grow">
-          <span>数据更新时间</span>
-          <strong>{formatDateTime(snapshot.updatedAt)}</strong>
+          <span>本地快照更新时间</span>
+          <strong>{formatDateTime(snapshot.updatedAt)} · 非外部 Agent 心跳</strong>
         </div>
         <div className="dock-item grow" role="status" aria-live="polite">
-          <span>全局反馈</span>
-          <strong>控制舱数据已同步</strong>
+          <span>Agent runtime 真值来源</span>
+          <strong>{runtimeModeDetail} · 观测 {formatDateTime(agentTruth.runtime.observedAt)}</strong>
         </div>
       </footer>
     </div>
@@ -776,7 +799,7 @@ function AgentCard({ agent, runtime, selected, onSelect, onRun, onAction, onCycl
           />
         </div>
 
-        <div className="expression-line">{meta.expression}</div>
+        <div className="expression-line">本地牧场表现 · {meta.expression}</div>
       </button>
 
       <div className="metric-stack">
@@ -788,12 +811,12 @@ function AgentCard({ agent, runtime, selected, onSelect, onRun, onAction, onCycl
         <button
           type="button"
           className="card-primary-action"
-          title={running > 0 ? '继续派活' : '派活/拉磨'}
-          aria-label={`${agent.name}：${running > 0 ? '继续派活' : '派活/拉磨'}`}
+          title={running > 0 ? '继续模拟派活' : '模拟派活'}
+          aria-label={`${agent.name}：${running > 0 ? '继续模拟派活' : '模拟派活'}`}
           onClick={onRun}
         >
-          {running > 0 ? <PauseCircle size={15} /> : <Play size={15} />}
-          <span>{running > 0 ? '继续派活' : '派活'}</span>
+          <Play size={15} />
+          <span>{running > 0 ? '继续模拟派活' : '模拟派活'}</span>
         </button>
         {selected ? (
           <details
@@ -853,24 +876,39 @@ interface AgentDetailPanelProps {
   api: DesktopApi;
   agent: AIAgent;
   runtime: NiuMaRuntimeState;
+  truth: ProjectedAgentTruth | null;
+  runtimeTruth: AgentTruthProjection['runtime'];
+  localRunnerAvailable: boolean;
   onSnapshot: (snapshot: AgentSnapshot) => void;
   onRunTask: (agent: AIAgent, taskName?: string, command?: string, runner?: AgentTaskRunner) => Promise<void>;
   onCycle: (event: ReactMouseEvent) => void;
 }
 
-function AgentDetailPanel({ api, agent, runtime, onSnapshot, onRunTask, onCycle }: AgentDetailPanelProps) {
+function AgentDetailPanel({
+  api,
+  agent,
+  runtime,
+  truth,
+  runtimeTruth,
+  localRunnerAvailable,
+  onSnapshot,
+  onRunTask,
+  onCycle
+}: AgentDetailPanelProps) {
   const [taskName, setTaskName] = useState('');
   const [command, setCommand] = useState('');
-  const [runner, setRunner] = useState<AgentTaskRunner>('local');
+  const [runner, setRunner] = useState<AgentTaskRunner>(localRunnerAvailable ? 'local' : 'simulated');
   const [openTaskId, setOpenTaskId] = useState<string | null>(agent.tasks[0]?.id ?? null);
   const [activeDetailTab, setActiveDetailTab] = useState<DetailTabId>('command');
   const meta = STATE_METAS[runtime.status];
   const quickTasks = useMemo(() => getQuickTasks(agent.id), [agent.id]);
   const openTask = agent.tasks.find((task) => task.id === openTaskId) ?? agent.tasks[0];
+  const effectiveRunner: AgentTaskRunner = localRunnerAvailable ? runner : 'simulated';
+  const primaryInstance = truth?.primaryInstance ?? null;
 
   async function submitTask(event: React.FormEvent) {
     event.preventDefault();
-    await onRunTask(agent, taskName.trim() || undefined, command.trim() || undefined, runner);
+    await onRunTask(agent, taskName.trim() || undefined, command.trim() || undefined, effectiveRunner);
     setTaskName('');
     setCommand('');
   }
@@ -904,38 +942,70 @@ function AgentDetailPanel({ api, agent, runtime, onSnapshot, onRunTask, onCycle 
             <span>{agent.codename}</span>
           </div>
           <div className="detail-compact-status">
-            <span className={`stage-status ${runtime.status}`}>{meta.name}</span>
-            <p className="detail-desc">{agent.description}</p>
+            <span className={`stage-status ${runtime.status}`}>Session {truth?.presence ?? 'unknown'} · {truth?.activity ?? 'unknown'}</span>
+            <p className="detail-desc">本地牧场表现：{meta.name} · {agent.description}</p>
           </div>
         </div>
       </div>
 
       <details className="detail-more">
         <summary title="展开 Agent 状态与连接详情">
-          <span>状态与连接详情</span>
-          <small>{agent.modelName}</small>
+          <span>Session 真值与本地表现详情</span>
+          <small>{truth?.presence ?? 'unknown'} / {truth?.activity ?? 'unknown'}</small>
         </summary>
         <div className="detail-more-content">
           <div className="quote-box">
             <Bell size={14} aria-hidden="true" />
-            <span>{runtime.quote}</span>
+            <span>本地牧场台词 · {runtime.quote}</span>
           </div>
 
           <div className="detail-metrics-compact">
             <div className="metric-item-row">
-              <span className="metric-label">模型:</span>
+              <span className="metric-label">Runtime:</span>
+              <span className="metric-value">{runtimeTruth.availability} / {runtimeTruth.mode} / {runtimeTruth.source}</span>
+            </div>
+            <div className="metric-item-row">
+              <span className="metric-label">观测时间:</span>
+              <span className="metric-value">{formatDateTime(runtimeTruth.observedAt)}</span>
+            </div>
+            <div className="metric-item-row">
+              <span className="metric-label">Presence:</span>
+              <span className="metric-value">{truth?.presence ?? 'unknown'} / {truth?.activity ?? 'unknown'}</span>
+            </div>
+            <div className="metric-item-row">
+              <span className="metric-label">Instance 来源:</span>
+              <span className="metric-value">{primaryInstance?.source ?? 'unknown'}</span>
+            </div>
+            <div className="metric-item-row">
+              <span className="metric-label">Session ID:</span>
+              <span className="metric-value mono" title={primaryInstance?.sessionId ?? 'unknown'}>{primaryInstance?.sessionId ?? 'unknown'}</span>
+            </div>
+            <div className="metric-item-row">
+              <span className="metric-label">Last seen:</span>
+              <span className="metric-value">{primaryInstance?.lastSeen ? formatDateTime(primaryInstance.lastSeen) : 'unknown'}</span>
+            </div>
+            <div className="metric-item-row">
+              <span className="metric-label">Capabilities:</span>
+              <span className="metric-value" title={formatCapabilities(primaryInstance)}>{formatCapabilities(primaryInstance)}</span>
+            </div>
+            <div className="metric-item-row">
+              <span className="metric-label">真值说明:</span>
+              <span className="metric-value">{formatTruthReason(primaryInstance?.reason, runtimeTruth)}</span>
+            </div>
+            <div className="metric-item-row">
+              <span className="metric-label">工位模型配置:</span>
               <span className="metric-value">{agent.modelName}</span>
             </div>
             <div className="metric-item-row">
-              <span className="metric-label">端点:</span>
+              <span className="metric-label">工位端点配置:</span>
               <span className="metric-value mono" title={agent.endpoint}>{agent.endpoint}</span>
             </div>
             <div className="metric-item-row">
-              <span className="metric-label">状态:</span>
+              <span className="metric-label">本地牧场表现:</span>
               <span className="metric-value">{runtime.stress}% 压力 / {runtime.energy}% 电量 ({Math.round(runtime.temperature)}°C)</span>
             </div>
             <div className="metric-item-row">
-              <span className="metric-label">交互:</span>
+              <span className="metric-label">应用快照交互:</span>
               <span className="metric-value">{formatDateTime(runtime.lastInteractionAt)}</span>
             </div>
           </div>
@@ -973,18 +1043,21 @@ function AgentDetailPanel({ api, agent, runtime, onSnapshot, onRunTask, onCycle 
             aria-labelledby="detail-tab-command"
           >
             <div className="section-heading">
-              <h3>下发新任务 (画饼/派活)</h3>
+              <h3>{localRunnerAvailable ? '下发新任务 (本地/模拟)' : '下发模拟任务'}</h3>
               <div className="runner-switch" aria-label="选择 runner 模式">
                 <button
                   type="button"
-                  className={runner === 'local' ? 'is-active' : ''}
+                  className={effectiveRunner === 'local' ? 'is-active' : ''}
+                  disabled={!localRunnerAvailable}
+                  title={localRunnerAvailable ? '使用 Electron 本地命令 runner' : '本地命令仅 Electron 本地运行时可用'}
+                  aria-label={localRunnerAvailable ? '本地命令' : '本地命令不可用：仅 Electron 本地运行时可用'}
                   onClick={() => setRunner('local')}
                 >
-                  本地命令
+                  {localRunnerAvailable ? '本地命令' : '本地命令（仅 Electron）'}
                 </button>
                 <button
                   type="button"
-                  className={runner === 'simulated' ? 'is-active' : ''}
+                  className={effectiveRunner === 'simulated' ? 'is-active' : ''}
                   onClick={() => setRunner('simulated')}
                 >
                   模拟推进
@@ -1008,7 +1081,7 @@ function AgentDetailPanel({ api, agent, runtime, onSnapshot, onRunTask, onCycle 
               />
               <button type="submit">
                 <Play size={15} />
-                立即派活
+                {effectiveRunner === 'simulated' ? '立即模拟派活' : '立即派活'}
               </button>
             </form>
 
@@ -1039,7 +1112,7 @@ function AgentDetailPanel({ api, agent, runtime, onSnapshot, onRunTask, onCycle 
               </div>
               <div className="extra-metric-item">
                 <span>拉磨状态</span>
-                <strong>{agent.tasks.filter((task) => task.status === 'running').length} 正在拉磨 · {agent.tasks.filter((task) => task.runner === 'local').length} 本地 · {agent.tasks.filter((task) => task.runner === 'simulated').length} 模拟</strong>
+                <strong>{agent.tasks.filter((task) => task.status === 'running').length} 个应用任务运行中 · {agent.tasks.filter((task) => task.runner === 'local').length} 本地 · {agent.tasks.filter((task) => task.runner === 'simulated').length} 模拟</strong>
               </div>
               {openTask ? (
                 <div className="extra-metric-item">
@@ -1219,6 +1292,57 @@ function formatDateTime(value: string) {
     return value;
   }
   return date.toLocaleString('zh-CN', { hour12: false });
+}
+
+function formatCapabilities(instance: ProjectedAgentTruth['primaryInstance']) {
+  if (!instance || instance.capabilities === null) {
+    return '未知 (unknown)';
+  }
+  const capabilities = instance.capabilities.length > 0
+    ? instance.capabilities.join(', ')
+    : '无已声明能力';
+  return `${capabilities} · ${instance.capabilitySource}`;
+}
+
+function formatTruthReason(
+  reason: AgentProjectionReason | undefined,
+  runtime: AgentTruthProjection['runtime']
+) {
+  if (runtime.mode === 'simulated') {
+    return `模拟模式，不代表真实 Agent 在线${runtime.reason ? ` · ${runtime.reason}` : ''}`;
+  }
+  if (runtime.availability === 'unavailable') {
+    return `Runtime unavailable，在线数按 0 处理${runtime.reason ? ` · ${runtime.reason}` : ''}`;
+  }
+  if (runtime.availability === 'recovering') {
+    return 'Runtime recovering，恢复完成前不判定在线';
+  }
+  if (runtime.availability === 'unknown') {
+    return 'Runtime 状态 unknown，未补成功默认值';
+  }
+
+  const labels: Partial<Record<AgentProjectionReason, string>> = {
+    'configured-only': '仅有本地工位配置，未发现真实 Session',
+    'runtime-discovered': '仅发现运行入口，尚无真实 Session',
+    'fresh-session': '真实 Session 心跳在 5 秒新鲜窗口内',
+    'fresh-running-task': '真实 Session 新鲜，且关联任务正在运行',
+    'heartbeat-late': '心跳超过 5 秒，Session 已降级',
+    'heartbeat-stale': '心跳达到 15 秒，Session 已离线',
+    'session-lost': 'Session 已丢失，关联任务不再视为运行中',
+    'policy-blocked': 'Connector policy blocked，Session 不在线',
+    'permission-denied': 'Connector permission denied，Session 不在线',
+    'terminal-session': 'Session 已进入终态，不再在线',
+    'missing-session-id': '缺少 Session ID，无法证明在线',
+    'missing-source-proof': '缺少真实运行来源，无法证明在线',
+    'missing-last-seen': '缺少 lastSeen，无法证明在线',
+    'invalid-last-seen': 'lastSeen 无效，无法证明在线',
+    'future-last-seen': 'lastSeen 位于未来，证据无效',
+    'last-seen-after-runtime-observed-at': 'lastSeen 晚于 Runtime 观测时间，证据因果关系无效',
+    'duplicate-session-conflict': '同一 Session 存在冲突事实，已按 unknown 降级',
+    'task-identity-mismatch': '任务与 Session 身份不一致，未判定 busy',
+    'upstream-degraded': '上游已标记 degraded，不判定在线'
+  };
+  return reason ? labels[reason] ?? reason : '未发现真实 Session，状态 unknown';
 }
 
 const ranchSettingsAnchorStyle: CSSProperties = {

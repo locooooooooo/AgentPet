@@ -19,6 +19,20 @@ interface ConnectorPolicyGateEvaluation {
   discoveryAttempted: boolean;
 }
 
+export function createReadOnlyConnectorGateRequest(input: unknown): ConnectorGateRequest {
+  const connectorId = typeof input === 'object'
+    && input !== null
+    && typeof (input as { connectorId?: unknown }).connectorId === 'string'
+    && /^[a-zA-Z0-9._:-]{1,200}$/.test((input as { connectorId: string }).connectorId.trim())
+    ? (input as { connectorId: string }).connectorId.trim()
+    : '';
+  return {
+    connectorId,
+    requestedBy: 'preflight',
+    confirmationAccepted: false
+  };
+}
+
 export function evaluateConnectorPolicyGate(
   policy: ConnectorPolicyConfig,
   request: ConnectorGateRequest,

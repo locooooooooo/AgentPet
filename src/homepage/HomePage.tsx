@@ -1,5 +1,6 @@
 import './HomePage.css';
 import type { AgentSnapshot } from '../types';
+import type { AgentTruthProjection } from '../lib/agentInstanceProjection';
 import AnimalOverviewCard from './components/AnimalOverviewCard';
 import CockpitEntryCard from './components/CockpitEntryCard';
 import FooterLinks from './components/FooterLinks';
@@ -9,20 +10,26 @@ import { useHomePageData } from './hooks/useHomePageData';
 
 interface HomePageProps {
   snapshot: AgentSnapshot;
+  agentTruth: AgentTruthProjection;
   onEnterCockpit: () => void;
   onFocusAnimal: (agentId: string) => void | Promise<void>;
   onOpenSettings: () => void;
 }
 
-export default function HomePage({ snapshot, onEnterCockpit, onFocusAnimal, onOpenSettings }: HomePageProps) {
-  const data = useHomePageData(snapshot);
+export default function HomePage({ snapshot, agentTruth, onEnterCockpit, onFocusAnimal, onOpenSettings }: HomePageProps) {
+  const data = useHomePageData(snapshot, agentTruth);
+  const isDesktopRuntime = Boolean(window.niumaDesk);
 
   return (
     <div className="homepage-shell">
       <div className="homepage-surface" aria-hidden="true" />
 
       <header className="homepage-hero">
-        <Logo activeLaneCount={data.activeLaneCount} blockedLaneCount={data.blockedLaneCount} />
+        <Logo
+          activeLaneCount={data.activeLaneCount}
+          blockedLaneCount={data.blockedLaneCount}
+          isDesktopRuntime={isDesktopRuntime}
+        />
         <CockpitEntryCard
           runningTaskCount={data.runningTaskCount}
           totalTaskCount={data.totalTaskCount}
@@ -31,10 +38,10 @@ export default function HomePage({ snapshot, onEnterCockpit, onFocusAnimal, onOp
       </header>
 
       <main className="homepage-main">
-        <section className="homepage-animals" aria-label="8 动物概览">
+        <section className="homepage-animals" aria-label={`${data.agents.length} 个已配置工位概览`}>
           <div className="homepage-section-head">
-            <span>8 workers</span>
-            <h2>牛马工位概览</h2>
+            <span>{data.agents.length} 个已配置工位</span>
+            <h2>本地工位概览</h2>
           </div>
           <div className="homepage-animal-grid">
             {data.agents.map((agent, index) => (
@@ -48,10 +55,10 @@ export default function HomePage({ snapshot, onEnterCockpit, onFocusAnimal, onOp
           </div>
         </section>
 
-        <section className="homepage-metrics" aria-label="关键指标">
+        <section className="homepage-metrics" aria-label="Agent Session 真值、本地快照与数据来源">
           <div className="homepage-section-head">
-            <span>live signals</span>
-            <h2>关键指标</h2>
+            <span>Agent Session 真值 / 本地快照</span>
+            <h2>运行数据口径</h2>
           </div>
           <div className="homepage-metric-grid">
             {data.metrics.map((metric) => (
@@ -59,9 +66,9 @@ export default function HomePage({ snapshot, onEnterCockpit, onFocusAnimal, onOp
             ))}
           </div>
           <div className="homepage-last-event">
-            <span>last event</span>
+            <span>本地快照事件</span>
             <strong>{data.latestMessage?.title ?? '暂无事件'}</strong>
-            <p>{data.latestMessage?.content ?? '任务、connector 和 orchestration 状态会在这里 graceful degradation。'}</p>
+            <p>{data.latestMessage?.content ?? '本应用任务、Connector 策略与控制面登记会在这里降级呈现。'}</p>
           </div>
         </section>
       </main>

@@ -1,10 +1,11 @@
 import { useMemo } from 'react';
 import type { AgentSnapshot } from '../../types';
+import type { AgentTruthProjection } from '../../lib/agentInstanceProjection';
 import { STATE_METAS } from '../../lib/agentCore';
 import { CONNECTOR_POLICY, ORCHESTRATION_STATUS } from '../../lib/orchestrationStatus';
 import type { HomePageAgent, HomePageData, HomePageMetric } from '../types';
 
-export function useHomePageData(snapshot: AgentSnapshot): HomePageData {
+export function useHomePageData(snapshot: AgentSnapshot, agentTruth: AgentTruthProjection): HomePageData {
   return useMemo(() => {
     const agents: HomePageAgent[] = snapshot.agents.map((agent) => {
       const runtime = snapshot.runtime[agent.id];
@@ -45,34 +46,47 @@ export function useHomePageData(snapshot: AgentSnapshot): HomePageData {
     const blockedConnectorCount = CONNECTOR_POLICY.connectors.length - acceptedConnectorCount;
     const latestMessage = snapshot.messages[0] ?? null;
 
+    const runtimeDetail = [
+      agentTruth.runtime.availability,
+      agentTruth.runtime.mode,
+      agentTruth.runtime.source,
+      `观测 ${formatDateTime(agentTruth.runtime.observedAt)}`,
+      agentTruth.runtime.reason
+    ].filter(Boolean).join(' · ');
     const metrics: HomePageMetric[] = [
       {
         id: 'agents',
-        label: '在线牛马',
-        value: `${snapshot.agents.length}`,
-        detail: `${runningTaskCount} 头正在拉磨`,
+        label: '已配置工位',
+        value: `${agentTruth.summary.configuredCount}`,
+        detail: `${runningTaskCount} 个本地应用任务运行中 · 不计入在线`,
         tone: 'green',
         icon: 'activity'
       },
       {
-        id: 'lanes',
-        label: '活跃 Lanes',
-        value: `${activeLaneCount}`,
-        detail: `${blockedLaneCount} blocked / ${standbyLaneCount} standby`,
-        tone: blockedLaneCount > 0 ? 'orange' : 'blue',
-        icon: 'shield'
+        id: 'online-sessions',
+        label: '真实在线 Session',
+        value: `${agentTruth.summary.onlineSessionCount}`,
+        detail: runtimeDetail,
+        tone: agentTruth.summary.onlineSessionCount > 0
+          ? 'green'
+          : agentTruth.runtime.mode === 'simulated' || agentTruth.runtime.availability !== 'available'
+            ? 'orange'
+            : 'blue',
+        icon: 'activity'
       },
       {
         id: 'connectors',
-        label: 'Connector Gate',
+        label: 'Connector 默认策略',
         value: `${acceptedConnectorCount}/${CONNECTOR_POLICY.connectors.length}`,
-        detail: blockedConnectorCount > 0 ? `${blockedConnectorCount} 个仍禁用` : '全部可执行',
+        detail: blockedConnectorCount > 0
+          ? `${blockedConnectorCount} 个策略未默认放行`
+          : '策略均默认放行 · 非运行探针',
         tone: blockedConnectorCount > 0 ? 'red' : 'green',
         icon: 'plug'
       },
       {
         id: 'event',
-        label: 'Last Event',
+        label: '本地快照事件',
         value: latestMessage?.type ?? 'idle',
         detail: latestMessage?.title ?? '暂无事件',
         tone: latestMessage ? toneForMessage(latestMessage.type) : 'violet',
@@ -91,9 +105,21 @@ export function useHomePageData(snapshot: AgentSnapshot): HomePageData {
       connectorCount: CONNECTOR_POLICY.connectors.length,
       acceptedConnectorCount,
       blockedConnectorCount,
+      onlineSessionCount: agentTruth.summary.onlineSessionCount,
+      runtimeAvailability: agentTruth.runtime.availability,
+      runtimeMode: agentTruth.runtime.mode,
+      runtimeSource: agentTruth.runtime.source,
+      runtimeObservedAt: agentTruth.runtime.observedAt,
       latestMessage
     };
-  }, [snapshot]);
+  }, [agentTruth, snapshot]);
+}
+
+function formatDateTime(value: string) {
+  const timestamp = new Date(value);
+  return Number.isNaN(timestamp.getTime())
+    ? value
+    : timestamp.toLocaleString('zh-CN', { hour12: false });
 }
 
 function toneForMessage(type: NonNullable<HomePageData['latestMessage']>['type']) {

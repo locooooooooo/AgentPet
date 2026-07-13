@@ -3,6 +3,12 @@ import type {
   AgentSnapshot,
   ConnectorGateRequest,
   ConnectorGateResult,
+  ConnectorRunIntent,
+  ConnectorRunResult,
+  ConnectorRuntimeSnapshot,
+  ConnectorSessionAudit,
+  ConnectorStopRequest,
+  ConnectorStopResult,
   CreateTaskInput,
   NiuMaAction,
   RanchBounds,
@@ -23,6 +29,29 @@ const api = {
       requestedBy: input.requestedBy,
       confirmationAccepted: input.confirmationAccepted
     }),
+  runConnector: (input: ConnectorRunIntent): Promise<ConnectorRunResult> =>
+    ipcRenderer.invoke('connectors:run', {
+      connectorId: input.connectorId,
+      agentId: input.agentId,
+      taskName: input.taskName,
+      prompt: input.prompt,
+      retry: input.retry ? {
+        maxRetries: input.retry.maxRetries,
+        backoffMs: input.retry.backoffMs,
+        budgetMs: input.retry.budgetMs
+      } : undefined
+    }),
+  stopConnector: (input: ConnectorStopRequest): Promise<ConnectorStopResult> =>
+    ipcRenderer.invoke('connectors:stop', { taskId: input.taskId }),
+  getConnectorRuntimeSnapshot: (): Promise<ConnectorRuntimeSnapshot> =>
+    ipcRenderer.invoke('connectors:get-runtime-snapshot'),
+  getConnectorSessionAudit: (sessionId: string): Promise<ConnectorSessionAudit | null> =>
+    ipcRenderer.invoke('connectors:get-session-audit', { sessionId }),
+  onConnectorRuntimeSnapshotChanged: (callback: (snapshot: ConnectorRuntimeSnapshot) => void): (() => void) => {
+    const listener = (_event: Electron.IpcRendererEvent, snapshot: ConnectorRuntimeSnapshot) => callback(snapshot);
+    ipcRenderer.on('connectors:runtime-snapshot-changed', listener);
+    return () => ipcRenderer.removeListener('connectors:runtime-snapshot-changed', listener);
+  },
   ranch: {
     getPrefs: (): Promise<RanchPrefs> => ipcRenderer.invoke('ranch:get-prefs'),
     setPrefs: (patch: RanchPrefsPatch): Promise<RanchPrefs> => ipcRenderer.invoke('ranch:set-prefs', patch),

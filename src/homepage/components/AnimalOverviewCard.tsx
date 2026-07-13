@@ -52,7 +52,7 @@ export default function AnimalOverviewCard({ agent, index, onFocus }: AnimalOver
           <i style={{ width: `${progress}%` }} />
         </span>
         <span className="homepage-animal-footer">
-          <span>{agent.runningTaskCount}/{agent.taskCount} running</span>
+          <span>{agent.runningTaskCount} 运行中 / {agent.taskCount} 应用任务</span>
           <span>
             <LocateFixed size={13} />
             定位

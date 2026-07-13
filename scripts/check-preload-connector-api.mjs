@@ -10,32 +10,81 @@ const forbiddenPatterns = [
   /node:child_process/,
   /\bspawn(?:Sync)?\b/,
   /\bshell\b/i,
-  /connectors:(?:run|start|execute|spawn|create-task)/,
-  /connector(?:Run|Start|Execute|Spawn)/,
-  /runConnector|startConnector|executeConnector|spawnConnector/,
-  /rawCommand|commandLine/
+  /rawCommand/,
+  /commandLine/,
+  /input\.(?:command|args|env|cwd|executable)/,
+  /(?:command|args|env|cwd|executable):\s*input\./
 ];
 
 for (const pattern of forbiddenPatterns) {
   if (pattern.test(source)) {
-    errors.push(`preload exposes or references forbidden connector execution surface: ${pattern}`);
+    errors.push(`preload exposes or references forbidden connector process data: ${pattern}`);
   }
 }
 
-if (!source.includes('evaluateConnectorGate')) {
-  errors.push('preload must expose evaluateConnectorGate');
+const requiredApi = [
+  'evaluateConnectorGate',
+  'runConnector',
+  'stopConnector',
+  'getConnectorRuntimeSnapshot',
+  'getConnectorSessionAudit',
+  'onConnectorRuntimeSnapshotChanged'
+];
+
+for (const apiName of requiredApi) {
+  if (!source.includes(apiName)) {
+    errors.push(`preload must expose ${apiName}`);
+  }
 }
 
-if (!source.includes("'connectors:evaluate-gate'")) {
-  errors.push('preload must call only connectors:evaluate-gate for connector API');
+const requiredChannels = [
+  'connectors:evaluate-gate',
+  'connectors:run',
+  'connectors:stop',
+  'connectors:get-runtime-snapshot',
+  'connectors:get-session-audit',
+  'connectors:runtime-snapshot-changed'
+];
+
+for (const channel of requiredChannels) {
+  if (!source.includes(`'${channel}'`)) {
+    errors.push(`preload is missing connector channel: ${channel}`);
+  }
 }
 
-if (/evaluateConnectorGate\s*:\s*\([^)]*command/.test(source)) {
-  errors.push('evaluateConnectorGate must not accept a command parameter');
+const runBody = source.match(/runConnector:[\s\S]*?stopConnector:/)?.[0] ?? '';
+for (const field of ['connectorId', 'agentId', 'taskName', 'prompt']) {
+  if (!runBody.includes(`${field}: input.${field}`)) {
+    errors.push(`runConnector must copy the allowed ${field} field explicitly`);
+  }
 }
 
-if (!/connectorId:\s*input\.connectorId/.test(source)) {
-  errors.push('evaluateConnectorGate must forward connectorId instead of raw command');
+for (const forbiddenField of ['requestedBy', 'confirmationAccepted']) {
+  if (runBody.includes(`${forbiddenField}: input.${forbiddenField}`)) {
+    errors.push(`runConnector must not let renderer self-assert ${forbiddenField}`);
+  }
+}
+
+for (const field of ['maxRetries', 'backoffMs', 'budgetMs']) {
+  if (!runBody.includes(`${field}: input.retry.${field}`)) {
+    errors.push(`runConnector must copy the allowed retry.${field} field explicitly`);
+  }
+}
+
+if (/retry:\s*input\.retry(?:\s*[,}])/.test(runBody)) {
+  errors.push('runConnector must not pass the nested retry object through to IPC');
+}
+
+if (/ipcRenderer\.invoke\([^,]+,\s*input\s*\)/.test(runBody)) {
+  errors.push('runConnector must not pass the renderer object through to IPC');
+}
+
+if (!/stopConnector:[\s\S]*?\{\s*taskId:\s*input\.taskId\s*\}/.test(source)) {
+  errors.push('stopConnector must forward only taskId');
+}
+
+if (!/getConnectorSessionAudit:[\s\S]*?\{\s*sessionId\s*\}/.test(source)) {
+  errors.push('getConnectorSessionAudit must forward only sessionId');
 }
 
 if (errors.length > 0) {
@@ -45,5 +94,7 @@ if (errors.length > 0) {
 }
 
 console.log('preload connector API check passed.');
-console.log('exposed connector API: evaluateConnectorGate');
-console.log('raw connector execution surface: absent');
+console.log(`exposed connector API: ${requiredApi.join(', ')}`);
+console.log('raw executable/args/env/cwd passthrough: absent');
+
+await import('./check-connector-runtime.mjs');

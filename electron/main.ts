@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu, Notification, Tray, ipcMain, nativeImage, screen, type MenuItemConstructorOptions } from 'electron';
+import { app, BrowserWindow, Menu, Notification, Tray, ipcMain, nativeImage, screen, type IpcMainInvokeEvent, type MenuItemConstructorOptions } from 'electron';
 import { spawn, spawnSync, type ChildProcessWithoutNullStreams } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -8,6 +8,13 @@ import type {
   ConnectorGateRequest,
   ConnectorGateResult,
   ConnectorPolicyConfig,
+  ConnectorRunIntent,
+  ConnectorRunRequest,
+  ConnectorRunResult,
+  ConnectorRuntimeSnapshot,
+  ConnectorSessionAudit,
+  ConnectorStopRequest,
+  ConnectorStopResult,
   CreateTaskInput,
   NiuMaAction,
   RanchContextMenuInput,
@@ -18,7 +25,8 @@ import type {
   RanchPrefs,
   RanchPrefsPatch
 } from '../src/types';
-import { evaluateConnectorPolicyGate } from '../src/lib/connectorGate';
+import { createReadOnlyConnectorGateRequest, evaluateConnectorPolicyGate } from '../src/lib/connectorGate';
+import { ConnectorRuntime, selectDirectConnectorExecutable } from '../src/lib/connectorRuntime';
 import {
   appendSystemMessage,
   applyNiuMaAction,
@@ -38,6 +46,7 @@ let ranchWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let snapshot: AgentSnapshot;
 let ranchPrefs: RanchPrefs;
+let connectorRuntime: ConnectorRuntime;
 let isQuitting = false;
 let ranchUnreadCount = 0;
 let ranchMousePassthrough = false;
@@ -47,6 +56,7 @@ const runningProcesses = new Map<string, ChildProcessWithoutNullStreams>();
 
 const dataDir = path.join(app.getPath('userData'), 'agent-data');
 const snapshotPath = path.join(dataDir, 'agents.json');
+const connectorRuntimeSnapshotPath = path.join(dataDir, 'connector-runtime.json');
 const ranchPrefsPath = path.join(app.getPath('userData'), 'ranch-prefs.json');
 const connectorPolicyPath = resolveAppPath('docs/orchestration/connectors.json');
 const ranchDefaultSize = { width: 640, height: 360 };
@@ -125,6 +135,23 @@ function loadSnapshot(): AgentSnapshot {
 function saveSnapshot(nextSnapshot: AgentSnapshot) {
   ensureDataDir();
   fs.writeFileSync(snapshotPath, JSON.stringify(nextSnapshot, null, 2), 'utf8');
+}
+
+function loadConnectorRuntimeSnapshot(): unknown {
+  ensureDataDir();
+  if (!fs.existsSync(connectorRuntimeSnapshotPath)) {
+    return null;
+  }
+  try {
+    return JSON.parse(fs.readFileSync(connectorRuntimeSnapshotPath, 'utf8')) as unknown;
+  } catch {
+    return null;
+  }
+}
+
+function saveConnectorRuntimeSnapshot(runtimeSnapshot: ConnectorRuntimeSnapshot) {
+  ensureDataDir();
+  fs.writeFileSync(connectorRuntimeSnapshotPath, JSON.stringify(runtimeSnapshot, null, 2), 'utf8');
 }
 
 function ensureUserDataDir() {
@@ -771,16 +798,27 @@ function loadConnectorPolicy(): ConnectorPolicyConfig | null {
 }
 
 function resolveConnectorCommand(command: string) {
+  return Boolean(findConnectorExecutable(command));
+}
+
+function findConnectorExecutable(command: string) {
   if (!command.trim()) {
-    return false;
+    return null;
   }
 
-  const result = spawnSync('where.exe', [command], {
+  const locator = process.platform === 'win32' ? 'where.exe' : 'which';
+  const result = spawnSync(locator, [command], {
     cwd: process.cwd(),
     encoding: 'utf8',
+    shell: false,
     windowsHide: true
   });
-  return result.status === 0;
+
+  if (result.status !== 0 || !result.stdout) {
+    return null;
+  }
+
+  return selectDirectConnectorExecutable(result.stdout.split(/\r?\n/), process.platform);
 }
 
 function evaluateConnectorGateFromPolicy(input: ConnectorGateRequest): ConnectorGateResult {
@@ -794,6 +832,23 @@ function evaluateConnectorGateFromPolicy(input: ConnectorGateRequest): Connector
   }
 
   return evaluateConnectorPolicyGate(policy, input, resolveConnectorCommand).result;
+}
+
+function createConnectorRuntime() {
+  return new ConnectorRuntime({
+    loadPolicy: loadConnectorPolicy,
+    resolveExecutable: findConnectorExecutable,
+    spawnProcess: (file, args, options) => spawn(file, args, options),
+    workspaceRoot: process.cwd(),
+    sourceEnv: process.env,
+    loadPersistedSnapshot: loadConnectorRuntimeSnapshot,
+    persistSnapshot: saveConnectorRuntimeSnapshot,
+    publish: (runtimeSnapshot) => {
+      BrowserWindow.getAllWindows().forEach((window) => {
+        window.webContents.send('connectors:runtime-snapshot-changed', runtimeSnapshot);
+      });
+    }
+  });
 }
 
 function loadEntry(window: BrowserWindow, entry: 'index' | 'ranch') {
@@ -1223,9 +1278,43 @@ function registerRanchIpc() {
 function registerIpc() {
   ipcMain.handle('agents:get-snapshot', () => snapshot);
 
-  ipcMain.handle('connectors:evaluate-gate', (_event, input: ConnectorGateRequest) => (
-    evaluateConnectorGateFromPolicy(input)
+  ipcMain.handle('connectors:evaluate-gate', (_event, input: unknown) => (
+    evaluateConnectorGateFromPolicy(createReadOnlyConnectorGateRequest(input))
   ));
+
+  ipcMain.handle('connectors:run', (event, input: ConnectorRunIntent): ConnectorRunResult => {
+    if (!isTrustedConnectorSender(event)) {
+      return {
+        status: 'blocked',
+        connectorId: typeof input?.connectorId === 'string' ? input.connectorId : '',
+        blockedReasons: ['confirmation-required']
+      };
+    }
+    return connectorRuntime.start({
+      connectorId: input?.connectorId,
+      agentId: input?.agentId,
+      taskName: input?.taskName,
+      prompt: input?.prompt,
+      retry: input?.retry,
+      requestedBy: 'default-action',
+      confirmationAccepted: false
+    });
+  });
+
+  ipcMain.handle('connectors:stop', (_event, input: ConnectorStopRequest): ConnectorStopResult => (
+    connectorRuntime.stop(input)
+  ));
+
+  ipcMain.handle('connectors:get-runtime-snapshot', (): ConnectorRuntimeSnapshot => (
+    connectorRuntime.getSnapshot()
+  ));
+
+  ipcMain.handle(
+    'connectors:get-session-audit',
+    (_event, input: { sessionId?: string }): ConnectorSessionAudit | null => (
+      connectorRuntime.getSessionAudit(input?.sessionId)
+    )
+  );
 
   ipcMain.handle('agents:reset-seed', () => {
     const nextSnapshot = createSeedSnapshot();
@@ -1272,9 +1361,14 @@ function registerIpc() {
   });
 }
 
+function isTrustedConnectorSender(event: IpcMainInvokeEvent) {
+  return Boolean(mainWindow && !mainWindow.isDestroyed() && event.sender === mainWindow.webContents);
+}
+
 app.whenReady().then(() => {
   snapshot = loadSnapshot();
   ranchPrefs = loadRanchPrefs();
+  connectorRuntime = createConnectorRuntime();
   registerIpc();
   registerRanchIpc();
   createWindow();
@@ -1309,6 +1403,7 @@ app.whenReady().then(() => {
 
 app.on('before-quit', () => {
   isQuitting = true;
+  connectorRuntime?.dispose();
   runningProgressTimers.forEach((timer) => clearInterval(timer));
   runningProgressTimers.clear();
   runningProcesses.forEach((child) => child.kill());
