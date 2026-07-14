@@ -44,6 +44,7 @@ tracked business cards:
 - task: ⟦tag:v2|task|ranch-system-notify-v0.2⟧ -> `docs/orchestration/tasks/ranch-system-notify-v0.2.md`
 - task: ⟦tag:v2|task|ranch-pointer-smoke-v0.2⟧ -> `docs/orchestration/tasks/ranch-pointer-smoke-v0.2.md`
 - task: ⟦tag:v2|task|ranch-pointer-smoke-manual-evidence-v0.2⟧ -> `docs/orchestration/tasks/ranch-pointer-smoke-manual-evidence-v0.2.md`
+- session: ⟦tag:v2|session|ranch-fence-pointer-v0.2-acceptance-2026-07-14⟧ -> `docs/orchestration/sessions/ranch-fence-pointer-v0.2-acceptance-2026-07-14.md`
 - task: ⟦tag:v2|task|ranch-real-integration-p0-v0.1⟧ -> `docs/orchestration/tasks/ranch-real-integration-p0-v0.1.md`
 - task: ⟦tag:v2|task|ranch-real-integration-r0-3-dryrun-v0.1⟧ -> `docs/orchestration/tasks/ranch-real-integration-r0-3-dryrun-v0.1.md`
 - task: ⟦tag:v2|task|protected-cockpit-source-drift-v0.1⟧ -> `docs/orchestration/tasks/protected-cockpit-source-drift-v0.1.md`
@@ -111,7 +112,7 @@ dispatch gate:
 - Supervisor owns drift detection, blocker surfacing, and minimum correction.
 
 current target:
-- 2026-07-14 M5 Day 4 personality/notify existing implementation is matrix verified: chatty 4/4, quiet 3/4 critical, silent 0/4, shared persisted prefs and system fail-closed. Current status is `day5a_authorized_after_day4_code_backed_closeout`; only `ranch-fence-pointer-v0.2` may start next. Day 1/2 residual risk、Day 5B、R0-3 dry-run、protected source、quota 和项目 Codex/Trae/Qoder connector 继续各自 standby/blocked。
+- 2026-07-14 M5 Day 5A fence/pointer existing implementation is contract and Electron-capture verified without product changes. Current status is `day5b_authorized_after_day5a_code_backed_closeout`; only `ranch-system-notify-v0.2` may start next. Direct tray/pointer evidence、Windows notification visibility、R0-3 dry-run、protected source、quota 和项目 Codex/Trae/Qoder connector 继续各自 standby/blocked。
 
 current role split:
 - `[PM]#multi-agent-control@v0.1`: maintain this index, dispatch bounded lanes, collect callbacks, write acceptance.
@@ -139,8 +140,8 @@ current role split:
 - `[监督]#ranch-status-script@v0.1`: summarized M5 animal/status/single-toast notification evidence for FR-002/003/004/006 without reopening connector state.
 - `[监督]#ranch-personality@v0.1`: summarized M5 personality and control-cockpit prefs-linkage evidence for FR-007 and notifyPrefs.
 - `[短工]#ranch-m5-requirements@v0.2`: standby docs-only M5 requirements readiness lane; main card plus five child cards are created, but no M5 implementation or long-worker dispatch is authorized.
-- `[PM]#m5-longworker-dispatch@v0.1`: active bounded dispatch package; Day 4 personality is closed through existing implementation evidence, and `ranch-fence-pointer-v0.2` is the only authorized next worker.
-- `[PM]#m5-five-day-development@2026-07-14`: active five-day serial control card with custom status `day5a_authorized_after_day4_code_backed_closeout`; Day 5B remains pending.
+- `[PM]#m5-longworker-dispatch@v0.1`: active bounded dispatch package; Day 5A fence/pointer is code-backed closed with explicit pointer residual risk, and `ranch-system-notify-v0.2` is the only authorized next worker.
+- `[PM]#m5-five-day-development@2026-07-14`: active five-day serial control card with custom status `day5b_authorized_after_day5a_code_backed_closeout`; real Windows notification visibility remains pending.
 - `[监督]#ranch-pointer-smoke@v0.2`: standby verification package for transparent ranch pointer smoke; no implementation edit.
 - `[监督]#ranch-pointer-smoke-manual-evidence@v0.2`: standby manual evidence package for pointer-smoke callback recording; no pointer input executed yet.
 - `[长工]#homepage-ui-design@v0.1`: summarized HomePage / landing / 启动页 P0 lane; H0-1 design drafts accepted as C · 华丽, H0-2/H0-3 implemented, H0-4 protected-file audit passed in `homepage-ui-p0-c0-6-style-2026-07-07.md`; no edit to `NiuMaAvatar.tsx` / `index.css` / `agentCore.ts` / central 4x2 control-cockpit grid.
@@ -174,5 +175,5 @@ next action:
 - Keep Codex draft/pending/enabled=false and Trae/Qoder placeholder/not-requested/enabled=false until connector machine gate fields change.
 - Use `docs/orchestration/tasks/daily-decision-queue-2026-07-02.md` as the next PM callback surface for standby decisions.
 - Keep `docs/orchestration/tasks/daily-role-accountability-2026-07-02.md` aligned with role states before closing any daily supervision pass.
-- Commit the Day 4 validation script and control-plane closeout; GitHub push remains blocked by network.
-- Dispatch only `ranch-fence-pointer-v0.2`; Day 5B remains pending until its callback and bounded PM closeout.
+- Commit the Day 5A contract script and control-plane closeout; GitHub push remains blocked by network.
+- Dispatch only `ranch-system-notify-v0.2`; direct Windows notification visibility remains an explicit residual-risk boundary.

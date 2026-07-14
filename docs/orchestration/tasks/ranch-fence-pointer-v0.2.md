@@ -3,9 +3,9 @@
 [短工]#ranch-fence-pointer@v0.2
 ⟦tag:v2|task|ranch-fence-pointer-v0.2⟧
 
-loop state: standby
-dispatch state: standby
-status: standby
+loop state: summarized
+dispatch state: summarized
+status: accepted_code_backed_residual_risk_pointer_waived
 
 parent: `docs/orchestration/tasks/ranch-m5-requirements-v0.2.md`
 related verification: `docs/orchestration/tasks/ranch-pointer-smoke-v0.2.md`
@@ -40,9 +40,14 @@ acceptance for a future implementation lane:
 - `npm.cmd run lint`, `npm.cmd run build`, and `npm.cmd run orchestration:check` pass in the same verification pass.
 
 next action:
-- The `capturePage` visibility route is already archived and does not satisfy this card.
-- Keep standby until `ranch-personality-v0.2` is accepted, committed, pushed, and the worktree is clean; on 2026-07-18 PM may dispatch this card as the only `[短工]` product worker.
-- Do not accept or commit this card until click-through, double-click, right-click, floating drag, and dock persistence are directly observed and recorded under the pointer-smoke evidence route.
+- Day 5A is closed under the administrator's explicit `跳过验收，继续推进进度` waiver. The implementation contract and Electron capture route passed, while direct click-through, double-click, right-click, floating drag, and dock evidence remains residual risk rather than pass evidence.
+- Continue the serial plan with `ranch-system-notify-v0.2`; keep the real Windows notification observation separate and truthful.
 
 summary:
-- Requirements-ready child card for fence/pointer integration; capture investigation allowed, pointer acceptance still pending.
+- Existing fence/pointer implementation is code-backed closed without product changes. Desktop hot zones, forwarded passthrough, non-focusable desktop behavior, floating drag/snap persistence and non-interactive fence boundaries are verified by source contract; direct OS pointer behavior remains waived residual risk.
+
+evidence:
+- `node scripts/check-ranch-pointer-contract.mjs` -> bounded desktop hot zones, forwarded passthrough, floating-only drag, 32px snap and persisted dock edge passed.
+- 2026-07-14 Electron `capturePage` -> 640x360, 8 animals, 3 actions, transparent desktop field, no boot/error card, `avoidedSetIsBorderRequired=true`, `pointerInputExecuted=false`.
+- Long-worker audit found no new product defect and changed no product files; lint, build and diff checks passed.
+- Acceptance record: `docs/orchestration/sessions/ranch-fence-pointer-v0.2-acceptance-2026-07-14.md`.

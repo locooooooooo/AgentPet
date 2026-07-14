@@ -5,12 +5,12 @@
 
 loop state: active
 dispatch state: active
-status: day5a_authorized_after_day4_code_backed_closeout
+status: day5b_authorized_after_day5a_code_backed_closeout
 
 > **开发窗口**: 2026-07-11 ~ 2026-07-15 (管理员授权滚动五日串行开发)
 > **创建时间**: 2026-07-10 17:50 +08:00
-> **当前准入门**: Day 4 existing personality/notify implementation 已通过可重复矩阵检查与全门禁收口；放行 `ranch-fence-pointer-v0.2`。
-> **当前结论**: W27 summarized，W28 active，本卡为 `day5a_authorized_after_day4_code_backed_closeout`；Day 1/2 残余风险继续保留，Day 3/4 均无产品代码改动。
+> **当前准入门**: Day 5A existing fence/pointer implementation 已通过可重复契约检查与 Electron capture；按管理员人工验收豁免放行 `ranch-system-notify-v0.2`。
+> **当前结论**: W27 summarized，W28 active，本卡为 `day5b_authorized_after_day5a_code_backed_closeout`；直接 tray/pointer 证据仍是 residual risk，Day 3/4/5A 均无产品代码改动。
 
 ## objective
 
@@ -43,15 +43,15 @@ status: day5a_authorized_after_day4_code_backed_closeout
 | 2 | 2026-07-12 | same ranch-window worker | Double-click/right-click summon, desktop/floating, drag/dock, fence, Electron evidence | Day 1 residual risk accepted by administrator + bounded commit; no second worker | accepted_residual_risk_pointer_waived |
 | 3 | 2026-07-13 | `[短工]#ranch-status-script@v0.2` | Eight identities, visible status actions, one transient status band | ranch-window residual-risk closeout committed locally; push blocked only by GitHub network | accepted_existing_implementation_code_backed |
 | 4 | 2026-07-14 | `[短工]#ranch-personality@v0.2` | chatty/quiet/silent and persisted bubble/system/badge preferences | status-script code-backed closeout; no product diff | accepted_existing_implementation_code_backed |
-| 5A | 2026-07-15 | `[短工]#ranch-fence-pointer@v0.2` | Direct click-through, double-click, right-click, floating drag and dock evidence | personality code-backed closeout; no product diff | authorized_pending_worker |
-| 5B | 2026-07-15 | `[短工]#ranch-system-notify@v0.2` | Real Windows notification, disable path, icon fallback, shutdown cleanup | fence-pointer accepted, committed, pushed | pending_not_started |
+| 5A | 2026-07-15 | `[短工]#ranch-fence-pointer@v0.2` | Direct click-through, double-click, right-click, floating drag and dock evidence | personality code-backed closeout; no product diff | accepted_code_backed_residual_risk_pointer_waived |
+| 5B | 2026-07-15 | `[短工]#ranch-system-notify@v0.2` | Real Windows notification, disable path, icon fallback, shutdown cleanup | fence-pointer code-backed closeout; direct evidence waived | authorized_pending_worker |
 
 ## serial dispatch invariant
 
 - At most one product worker may be active.
 - The next lane may start only after the previous lane has: callback -> independent PM acceptance -> full gates -> commit -> push -> clean worktree.
 - Day 1 and Day 2 use the same ranch-window long-worker; do not create a second implementation owner.
-- Day 5B cannot start until Day 5A has direct pointer evidence and its commit is on `origin/main`.
+- Day 5B normally requires Day 5A direct pointer evidence and a pushed commit. The 2026-07-14 administrator waiver accepts that missing evidence as residual risk and allows a local-commit gate while GitHub is network-blocked; it does not convert the evidence to pass.
 - If work exceeds a calendar day, carry the same lane forward and leave later lanes pending; do not force a false daily pass.
 
 ## behavior-first FR interpretation
@@ -124,7 +124,8 @@ completed:
 incomplete:
 - Day 1 direct tray lifecycle evidence remains missing by explicit administrator waiver; it must stay recorded as residual risk rather than pass evidence.
 - Day 2 direct pointer evidence remains missing by explicit administrator waiver; it must stay recorded as residual risk rather than pass evidence.
-- Day 5A/5B callbacks, evidence sets, and commits remain pending; Day 5A is now authorized.
+- Day 5A callback and acceptance record are complete without product changes; its direct pointer rows remain waived residual risk.
+- Day 5B callback, evidence set and commit remain pending; Day 5B is now authorized.
 
 blockers:
 - Windows automation identified the Electron windows but failed to obtain a reliable transparent-window interaction state with `SetIsBorderRequired failed: 不支持此接口 (0x80004002)`; capture/CDP evidence does not prove tray interaction.
@@ -133,8 +134,8 @@ blockers:
 - Existing connector, pointer, protected-source, and live-subagent quota blockers remain separate; none is silently accepted by this plan.
 
 next action:
-- Commit the Day 4 validation script/control-plane closeout; GitHub push remains a network blocker, not a product gate under the administrator override.
-- Dispatch `[短工]#ranch-fence-pointer@v0.2` only. Day 5B remains pending behind its callback and bounded PM closeout.
+- Commit the Day 5A contract script/control-plane closeout; GitHub push remains a network blocker, not a product gate under the administrator override.
+- Dispatch `[短工]#ranch-system-notify@v0.2` only. Keep real Windows notification visibility separate from code-backed checks.
 
 evidence:
 - Baseline at creation: `HEAD == origin/main == 1d9d5b0`; worktree clean.
@@ -143,6 +144,7 @@ evidence:
 - 2026-07-11 administrator schedule authorization moves Day 1 to today and rolls the serial window through 2026-07-15; product evidence remains pending.
 - 2026-07-11 Day 1 worker completed the allowed `electron/main.ts` implementation and isolated prefs/relaunch checks; PM direct tray replay remained unaccepted after Windows automation returned `0x80004002`.
 - W27 is summarized and W28 is active; `m5-longworker-dispatch-v0.1` and all five implementation cards remain standby.
+- 2026-07-14 Day 5A long-worker found no new product defect; `check-ranch-pointer-contract.mjs` and a fresh Electron 640x360 capture passed with 8 animals, 3 actions and `pointerInputExecuted=false`.
 
 summary:
-- Five-day M5 serial development control is active at Day 5A authorization after Day 4 code-backed closeout. Missing Day 1/2 tray/pointer evidence remains recorded; Day 5B remains pending.
+- Five-day M5 serial development control is active at Day 5B authorization after Day 5A code-backed closeout. Missing tray/pointer evidence remains recorded, and real Windows notification visibility is the final evidence boundary.
