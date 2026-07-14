@@ -1,10 +1,10 @@
-# ranch-window-v0.2 Day 1 progress
+# ranch-window-v0.2 Day 1/2 progress
 
 [长工]#ranch-window@v0.2
 ⟦tag:v2|session|ranch-window-v0.2-progress⟧
 
-status: day1_correction_required
-scope: Day 1 only
+status: day2_accepted_residual_risk_pointer_waived
+scope: Day 1 and Day 2
 
 ## Day 1 boundary
 
@@ -44,3 +44,21 @@ scope: Day 1 only
 - In isolated corrected-build PID `62148`, Electron `window.close()` left the root process alive and retained ranch `BrowserWindow id=2` as `visible=false`, `destroyed=false`. A subsequent summon-equivalent `showInactive()` restored the same `id=2` as `visible=true`, `destroyed=false`.
 - An inspector-triggered explicit `app.quit()` closed the renderer targets and debugging endpoint. The debugger kept the root at `Waiting for the debugger to disconnect`, so the test instance and its remaining helper children were then stopped and verified absent. This is cleanup diagnostics, not accepted tray-click evidence.
 - Direct tray `召唤桌面牧场` and `退出` clicks remain for PM manual replay. No `capturePage()` result or summon-equivalent call is claimed as tray interaction evidence.
+
+## 2026-07-14 Day 2 continuation
+
+- Administrator instruction `跳过验收，继续推进进度` applies to the missing direct Day 1 tray replay and Day 2 OS-pointer replay. Both remain explicit residual risk, not passed evidence.
+- Source audit confirmed existing chains for animal double-click -> `ranch:open-cockpit`, ranch right-click -> native menu, desktop/floating preference persistence, floating drag/dock persistence, bounded interactive regions, and ranch/cockpit coexistence.
+- One real Day 2 defect was corrected in `electron/main.ts`: desktop hot-zone transitions no longer call `setFocusable(true)`; focusability is now determined only by `ranchPrefs.mode === 'floating'`.
+- Two isolated Electron automation attempts did not reach their readiness selectors, so they produced no behavioral pass/fail evidence and were cleaned up. Direct double-click/right-click/click-through/drag/dock remain `code-backed only / waived residual risk`.
+- PM independently passed lint, build, orchestration check/report/preflight/connector-safety, realtime truth, Electron latency and `git diff --check` after the one-line fix.
+
+## Day 2 callback
+
+```text
+completed: desktop focusability defect fixed; summon/menu/mode/drag/dock/fence/coexistence source chains audited; full automated gates passed.
+incomplete: no direct OS pointer replay for double-click, right-click, click-through, drag or dock.
+blockers: none under the administrator acceptance waiver; direct pointer evidence remains residual risk for the dedicated pointer lane.
+next action: commit Day 2 independently, then continue the serial M5 plan with ranch-status-script-v0.2.
+evidence: electron/main.ts focusability hunk; RanchApp/useDockAndDrag/main source audit; full PM gate output.
+```

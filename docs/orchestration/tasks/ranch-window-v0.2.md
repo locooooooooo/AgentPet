@@ -41,7 +41,7 @@ acceptance for the Day 1/2 implementation lane:
 - Any skipped pointer behavior remains incomplete and must be routed through `ranch-pointer-smoke-v0.2`.
 
 next action:
-- 2026-07-14 administrator waived the missing Day 1 manual tray acceptance and accepted the residual risk. Commit/push the bounded Day 1 correction after automated gates, then continue the same `[长工]#ranch-window@v0.2` owner into Day 2 without claiming the waived evidence passed.
+- Day 1/2 are closed as `day2_accepted_residual_risk_pointer_waived`: one Day 2 desktop-focusability defect is fixed and automated gates pass; direct tray/pointer evidence remains explicitly waived residual risk. Commit the bounded Day 2 hunk, then continue the serial plan with `ranch-status-script-v0.2`.
 
 summary:
 - Requirements-ready child card for M5 window behavior; no source edit authorized here.

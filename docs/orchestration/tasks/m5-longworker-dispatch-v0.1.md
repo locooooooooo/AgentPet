@@ -209,8 +209,8 @@ dispatch state: standby
 
 ## next action:
 
-- 2026-07-14 administrator waived the missing Day 1 manual tray acceptance and accepted its residual risk. Preserve the failed/missing evidence, commit/push the bounded correction after automated gates, and resume the same `[长工]#ranch-window@v0.2` for Day 2.
-- Do not create a second ranch-window owner and do not start Day 3 or later cards before Day 2 callback and bounded PM closeout.
+- Day 1/2 ranch-window work is closed locally under the administrator waiver with tray/pointer residual risk retained. Commit the one-line Day 2 focusability correction, then dispatch `[短工]#ranch-status-script@v0.2`.
+- Do not start Day 4 or later cards before the ranch-status-script callback and bounded PM closeout.
 - 长工交付后,PM-direct 跑三件套 + commit/push
 - ranch-window-v0.2 收口后再按串行序列开 ranch-status-script-v0.2
 

@@ -1008,7 +1008,7 @@ function setRanchMousePassthrough(passthrough: boolean) {
   }
 
   ranchMousePassthrough = nextPassthrough;
-  ranchWindow.setFocusable(!nextPassthrough);
+  ranchWindow.setFocusable(ranchPrefs.mode === 'floating');
   if (nextPassthrough) {
     ranchWindow.setIgnoreMouseEvents(true, { forward: true });
     return;

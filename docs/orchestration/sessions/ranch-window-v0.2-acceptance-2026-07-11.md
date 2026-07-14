@@ -3,8 +3,8 @@
 [PM]#ranch-window@v0.2
 ⟦tag:v2|session|ranch-window-v0.2-acceptance-2026-07-11⟧
 
-status: accepted_residual_risk_manual_acceptance_waived
-scope: Day 1 only
+status: day2_accepted_residual_risk_pointer_waived
+scope: Day 1 and Day 2
 
 ## Acceptance matrix
 
@@ -61,3 +61,16 @@ scope: Day 1 only
 - PM therefore waives the missing manual tray replay as a release gate and accepts the residual risk. This is not a claim that close -> hide -> tray summon or tray exit -> cleanup was directly observed.
 - The historical PID `62196` failure and the missing direct tray evidence remain in this card. The corrected `electron/main.ts` implementation plus automated gates may be committed, and the same `[长工]#ranch-window@v0.2` owner may proceed to Day 2.
 - Connector policy, protected source, P0-C and unrelated pointer evidence remain blocked; this waiver applies only to the M5 Day 1 manual acceptance gate.
+
+## 2026-07-14 Day 2 disposition
+
+| Requirement | Current evidence | Disposition |
+| --- | --- | --- |
+| Double-click animal -> cockpit | `RanchApp.handleDoubleClick -> openCockpit -> ranch:open-cockpit -> showAndFocusCockpit` | code-backed only; direct pointer acceptance waived with residual risk |
+| Right-click ranch -> native menu | `RanchApp.showContextMenu -> ranch:show-context-menu -> Menu.popup` | code-backed only; direct pointer acceptance waived with residual risk |
+| desktop/floating semantics | preference/main-process chain verified; desktop focusability defect corrected | automated/static accepted; OS focus replay waived with residual risk |
+| Floating drag/dock persistence | `useDockAndDrag` live bounds, snap and `dockedEdge` persistence audited | code-backed only; direct drag acceptance waived with residual risk |
+| Fence/hit-zone boundary | desktop interactive selector is limited to animals/actions; fence is non-interactive | code-backed only; click-through acceptance waived with residual risk |
+| Ranch/cockpit coexistence | main creates both windows and existing isolated Electron evidence observed both renderer targets | accepted as code/runtime evidence |
+
+Day 2 is accepted only under the administrator's explicit acceptance waiver. The dedicated pointer lane still owns any future direct OS input evidence.
