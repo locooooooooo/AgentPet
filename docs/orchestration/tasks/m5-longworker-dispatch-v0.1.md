@@ -209,8 +209,8 @@ dispatch state: standby
 
 ## next action:
 
-- Day 1/2 ranch-window residual risk is retained and Day 3 status-script is closed through existing implementation evidence. Commit the Day 3 validation/control package, then dispatch `[短工]#ranch-personality@v0.2`.
-- Do not start Day 5 cards before the ranch-personality callback and bounded PM closeout.
+- Day 1/2 ranch-window residual risk is retained and Day 3/4 are closed through existing implementation evidence. Commit the Day 4 validation/control package, then dispatch `[短工]#ranch-fence-pointer@v0.2`.
+- Do not start Day 5B before the fence-pointer callback and bounded PM closeout.
 - 长工交付后,PM-direct 跑三件套 + commit/push
 - ranch-window-v0.2 收口后再按串行序列开 ranch-status-script-v0.2
 

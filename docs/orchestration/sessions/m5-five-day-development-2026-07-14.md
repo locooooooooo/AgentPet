@@ -5,12 +5,12 @@
 
 loop state: active
 dispatch state: active
-status: day4_authorized_after_day3_code_backed_closeout
+status: day5a_authorized_after_day4_code_backed_closeout
 
 > **开发窗口**: 2026-07-11 ~ 2026-07-15 (管理员授权滚动五日串行开发)
 > **创建时间**: 2026-07-10 17:50 +08:00
-> **当前准入门**: Day 3 existing implementation 已通过 AST coverage、Electron capture 与全门禁收口；放行 `ranch-personality-v0.2`。
-> **当前结论**: W27 summarized，W28 active，本卡为 `day4_authorized_after_day3_code_backed_closeout`；Day 1 tray 与 Day 2 pointer 残余风险继续保留，Day 3 无产品代码改动。
+> **当前准入门**: Day 4 existing personality/notify implementation 已通过可重复矩阵检查与全门禁收口；放行 `ranch-fence-pointer-v0.2`。
+> **当前结论**: W27 summarized，W28 active，本卡为 `day5a_authorized_after_day4_code_backed_closeout`；Day 1/2 残余风险继续保留，Day 3/4 均无产品代码改动。
 
 ## objective
 
@@ -42,8 +42,8 @@ status: day4_authorized_after_day3_code_backed_closeout
 | 1 | 2026-07-11 | `[长工]#ranch-window@v0.2` | FR-001 lifecycle, default desktop mode, size/position/mode persistence | Administrator authorization + W27 summarized + W28 active + fresh clean baseline | accepted_residual_risk_manual_evidence_waived |
 | 2 | 2026-07-12 | same ranch-window worker | Double-click/right-click summon, desktop/floating, drag/dock, fence, Electron evidence | Day 1 residual risk accepted by administrator + bounded commit; no second worker | accepted_residual_risk_pointer_waived |
 | 3 | 2026-07-13 | `[短工]#ranch-status-script@v0.2` | Eight identities, visible status actions, one transient status band | ranch-window residual-risk closeout committed locally; push blocked only by GitHub network | accepted_existing_implementation_code_backed |
-| 4 | 2026-07-14 | `[短工]#ranch-personality@v0.2` | chatty/quiet/silent and persisted bubble/system/badge preferences | status-script code-backed closeout; no product diff | authorized_pending_worker |
-| 5A | 2026-07-15 | `[短工]#ranch-fence-pointer@v0.2` | Direct click-through, double-click, right-click, floating drag and dock evidence | personality accepted, committed, pushed | pending_not_started |
+| 4 | 2026-07-14 | `[短工]#ranch-personality@v0.2` | chatty/quiet/silent and persisted bubble/system/badge preferences | status-script code-backed closeout; no product diff | accepted_existing_implementation_code_backed |
+| 5A | 2026-07-15 | `[短工]#ranch-fence-pointer@v0.2` | Direct click-through, double-click, right-click, floating drag and dock evidence | personality code-backed closeout; no product diff | authorized_pending_worker |
 | 5B | 2026-07-15 | `[短工]#ranch-system-notify@v0.2` | Real Windows notification, disable path, icon fallback, shutdown cleanup | fence-pointer accepted, committed, pushed | pending_not_started |
 
 ## serial dispatch invariant
@@ -124,7 +124,7 @@ completed:
 incomplete:
 - Day 1 direct tray lifecycle evidence remains missing by explicit administrator waiver; it must stay recorded as residual risk rather than pass evidence.
 - Day 2 direct pointer evidence remains missing by explicit administrator waiver; it must stay recorded as residual risk rather than pass evidence.
-- Day 4 and all later implementation callbacks, evidence sets, and commits remain pending; Day 4 is now authorized.
+- Day 5A/5B callbacks, evidence sets, and commits remain pending; Day 5A is now authorized.
 
 blockers:
 - Windows automation identified the Electron windows but failed to obtain a reliable transparent-window interaction state with `SetIsBorderRequired failed: 不支持此接口 (0x80004002)`; capture/CDP evidence does not prove tray interaction.
@@ -133,8 +133,8 @@ blockers:
 - Existing connector, pointer, protected-source, and live-subagent quota blockers remain separate; none is silently accepted by this plan.
 
 next action:
-- Commit the Day 3 validation script/control-plane closeout; GitHub push remains a network blocker, not a product gate under the administrator override.
-- Dispatch `[短工]#ranch-personality@v0.2` only. Day 5 cards remain pending behind its callback and bounded PM closeout.
+- Commit the Day 4 validation script/control-plane closeout; GitHub push remains a network blocker, not a product gate under the administrator override.
+- Dispatch `[短工]#ranch-fence-pointer@v0.2` only. Day 5B remains pending behind its callback and bounded PM closeout.
 
 evidence:
 - Baseline at creation: `HEAD == origin/main == 1d9d5b0`; worktree clean.
@@ -145,4 +145,4 @@ evidence:
 - W27 is summarized and W28 is active; `m5-longworker-dispatch-v0.1` and all five implementation cards remain standby.
 
 summary:
-- Five-day M5 serial development control is active at Day 4 authorization after Day 3 code-backed closeout. Missing Day 1/2 tray/pointer evidence remains recorded; Day 5 cards remain pending.
+- Five-day M5 serial development control is active at Day 5A authorization after Day 4 code-backed closeout. Missing Day 1/2 tray/pointer evidence remains recorded; Day 5B remains pending.

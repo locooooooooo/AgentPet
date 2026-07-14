@@ -574,7 +574,7 @@ incomplete:
 - Daily role accountability ledger is standby and records state/evidence/action without changing role states.
 - R0-3 Codex controlled dry-run lane is standby: P0 ranch-real-integration-p0 accepted after user decision ② on 2026-07-07; the 2026-07-10 administrator decision moves execution to W28; Codex machine-gate fields (approvalStatus / enabledByDefault / command) remain untouched; trae/qoder remain placeholder; dry-run execution still requires a W28 second execution-window confirmation.
 - Protected cockpit source drift is pending PM disposition activation: the administrator-selected W28 route is active as planning context, but the source lane remains standby until a fresh bounded authorization exists.
-- W27 is summarized, W28 weekly requirements is active, and the M5 control card is `day4_authorized_after_day3_code_backed_closeout`; Day 1/2 residual risk remains, Day 3 status-script is code-backed closed, ranch-personality Day 4 is authorized, and Day 5 remains pending.
+- W27 is summarized, W28 weekly requirements is active, and the M5 control card is `day5a_authorized_after_day4_code_backed_closeout`; Day 1/2 residual risk remains, Day 3/4 are code-backed closed, ranch-fence-pointer Day 5A is authorized, and Day 5B remains pending.
 
 blockers:
 - External connector execution remains disabled.
@@ -591,7 +591,7 @@ next action:
 - Keep connector-policy and `connector-acceptance-review-v0.1` on standby until PM/user accepts or revises machine gate fields.
 - Keep Git manager, `git-repair-agentpet-v0.1`, and `git-staging-review-agentpet-v0.1` on standby for unrelated Git state; use the current narrow authorization only for the declared docs/script closeout.
 - Keep `protected-cockpit-source-drift-v0.1` standby in W28; open a fresh bounded lane before touching the registered protected whitespace.
-- Keep W28 and `m5-five-day-development-2026-07-14` active with custom status `day4_authorized_after_day3_code_backed_closeout`; dispatch only ranch-personality-v0.2 and keep Day 5 pending.
+- Keep W28 and `m5-five-day-development-2026-07-14` active with custom status `day5a_authorized_after_day4_code_backed_closeout`; dispatch only ranch-fence-pointer-v0.2 and keep Day 5B pending.
 - Use `daily-decision-queue-2026-07-02` as the next PM callback surface for standby decisions.
 - Keep `daily-role-accountability-2026-07-02` aligned with role states before closing any daily supervision pass.
 

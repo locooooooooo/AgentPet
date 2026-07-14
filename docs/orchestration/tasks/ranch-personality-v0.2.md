@@ -3,9 +3,9 @@
 [短工]#ranch-personality@v0.2
 ⟦tag:v2|task|ranch-personality-v0.2⟧
 
-loop state: standby
-dispatch state: standby
-status: standby
+loop state: summarized
+dispatch state: summarized
+status: accepted_existing_implementation_code_backed
 
 parent: `docs/orchestration/tasks/ranch-m5-requirements-v0.2.md`
 source summary: `docs/orchestration/tasks/ranch-personality-v0.1.md`
@@ -38,7 +38,11 @@ acceptance for a future implementation lane:
 - `npm.cmd run lint`, `npm.cmd run build`, and `npm.cmd run orchestration:check` pass.
 
 next action:
-- Keep standby until `ranch-status-script-v0.2` is accepted, committed, pushed, and the worktree is clean; on 2026-07-17 PM may dispatch this card as the only `[短工]` product worker.
+- Day 4 is closed without product-code changes: existing personality, notify preference, persistence and shared-settings implementation passes the repeatable matrix check. Continue the serial plan with `ranch-fence-pointer-v0.2`; real Windows notification visibility remains residual risk for the system-notify lane.
 
 summary:
-- Requirements-ready child card for personality and notification preferences; no source edit authorized here.
+- Existing implementation accepted as code-backed evidence: chatty allows all four message types, quiet allows success/warning/error, silent suppresses all ranch toasts and clears current output, system-disabled is renderer/main fail-closed, and bubble/system/cockpitBadge share persisted RanchPrefs.
+
+evidence:
+- `node scripts/check-ranch-personality.mjs` -> chatty=4/4, quiet=3/4 critical, silent=0/4, system-disabled renderer+main fail-closed.
+- Long-worker audit found no product gap and changed no files; real Windows notification visibility was not directly observed and remains residual risk.

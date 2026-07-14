@@ -57,12 +57,12 @@ role ledger:
 | `[PM]#protected-cockpit-source-drift@v0.1` | standby | `docs/orchestration/tasks/protected-cockpit-source-drift-v0.1.md` | Preserve the W28 bounded-lane route without editing protected source until a fresh bounded authorization exists. |
 | `[长工]#homepage-ui-design@v0.1` homepage-ui-design lane | summarized | `docs/orchestration/sessions/homepage-ui-p0-c0-6-style-2026-07-07.md` | C · 华丽 HomePage is verified; do not create a duplicate thread and keep §〇·quarter selling-point files untouched. |
 | `[PM]#weekly-requirements@2026-07-07` | summarized | `docs/orchestration/sessions/weekly-requirements-2026-07-07.md` | Preserve W27 accepted outcomes and final closeout evidence as history. |
-| `[PM]#weekly-requirements@2026-07-14` weekly-requirements lane | active | `docs/orchestration/status.json` | Own the active weekly lane; preserve Day 1/2 residual risk and allow only ranch-personality-v0.2 next. |
-| `[PM]#weekly-requirements@2026-07-14` | active | `docs/orchestration/sessions/weekly-requirements-2026-07-14.md` | Maintain W28 planning; Day 3 is code-backed closed while Day 4 proceeds. |
+| `[PM]#weekly-requirements@2026-07-14` weekly-requirements lane | active | `docs/orchestration/status.json` | Own the active weekly lane; preserve Day 1/2 residual risk and allow only ranch-fence-pointer-v0.2 next. |
+| `[PM]#weekly-requirements@2026-07-14` | active | `docs/orchestration/sessions/weekly-requirements-2026-07-14.md` | Maintain W28 planning; Day 4 is code-backed closed while Day 5A proceeds. |
 | `[PM]#daily-plan@2026-07-09` | summarized | `docs/orchestration/sessions/daily-plan-2026-07-09.md` | Retain B②/C short-worker/D 今天/E1 as summarized historical evidence. |
 | `[PM]#daily-plan@2026-07-10` | summarized | `docs/orchestration/sessions/daily-plan-2026-07-10.md` | Preserve the administrator decisions and W27/W28 preparation as summarized history. |
-| `[PM]#m5-longworker-dispatch@v0.1` | active | `docs/orchestration/tasks/m5-longworker-dispatch-v0.1.md` | Day 3 status-script is code-backed closed; dispatch only ranch-personality-v0.2 next. |
-| `[PM]#m5-five-day-development@2026-07-14` | active | `docs/orchestration/sessions/m5-five-day-development-2026-07-14.md` | Track `day4_authorized_after_day3_code_backed_closeout`; preserve Day 1/2 residual risk and dispatch only ranch-personality-v0.2 next. |
+| `[PM]#m5-longworker-dispatch@v0.1` | active | `docs/orchestration/tasks/m5-longworker-dispatch-v0.1.md` | Day 4 personality is code-backed closed; dispatch only ranch-fence-pointer-v0.2 next. |
+| `[PM]#m5-five-day-development@2026-07-14` | active | `docs/orchestration/sessions/m5-five-day-development-2026-07-14.md` | Track `day5a_authorized_after_day4_code_backed_closeout`; preserve Day 1/2 residual risk and dispatch only ranch-fence-pointer-v0.2 next. |
 
 acceptance:
 - Every non-summarized open item has an accountability action and evidence source.
