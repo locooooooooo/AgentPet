@@ -8,7 +8,7 @@ loop state: active
 dispatch state: active
 
 > **计划周期**: 2026-07-14 ~ 2026-07-20 (W28)
-> **当前状态**: active; M5 Day 1 implementation complete but PM tray lifecycle acceptance blocked on 2026-07-12
+> **当前状态**: active; 2026-07-14 administrator waived M5 Day 1 manual tray acceptance and accepted the residual risk; Day 2 is authorized for the same worker after bounded commit/push
 > **激活证据**: 2026-07-11 16:00 +08:00 W27 final closeout 已通过 fresh gates，并将 W27 summarized。
 > **硬边界**: Day 1 未接受和推送前不得以 2026-07-12 日历门启动 Day 2；仍仅按 `m5-five-day-development-2026-07-14.md` 串行实施,不执行项目 Codex/Trae/Qoder connector、不修改 protected source 或 connector machine gate。
 
@@ -25,6 +25,7 @@ dispatch state: active
 - W27 已完成的 capture-only evidence、M5 docs-only readiness 和 cockpit v3.1 task intake 作为 W28 输入,不等同于实施验收。
 - 2026-07-11 actual-time closeout 已完成: W27 summarized，W28 active；随后管理员授权将 M5 Day 1 提前至今天，M5 控制卡为 `active_ready_day1`，但尚未派 worker。
 - 2026-07-12 truth refresh:唯一 Day 1 worker 已完成 allowed-scope 实现并回调；PM 未获得直接 tray lifecycle 证据，当前转为 `blocked_day1_acceptance`，未 commit/push，Day 2 未启动。
+- 2026-07-14 administrator override: `跳过验收，继续推进进度`。缺失的 tray replay 保留为 residual risk，不伪写为通过；Day 1 correction 可在自动门禁后 commit/push，并放行同一 ranch-window worker 继续 Day 2。
 - Pre-edit baseline: `HEAD == origin/main == b17c717`; 80-card orchestration check、report、preflight、connector-safety、lint、build 全绿。
 - W27 遗留项保持分离：M5 serial implementation、direct pointer evidence、R0-3 execution-window confirmation、protected bounded disposition、quota recheck；没有任何一项因 W28 激活被自动接受。
 
@@ -32,7 +33,7 @@ dispatch state: active
 
 | 优先级 | 候选 | 当前边界 | 激活前置 |
 | --- | --- | --- | --- |
-| P0-1 | M5 v0.2 五日串行实施,首卡 `ranch-window-v0.2` | Day 1 implementation complete but PM acceptance blocked; source and evidence remain uncommitted | Direct tray lifecycle evidence -> PM acceptance -> full gates -> commit/push -> clean baseline; only then resume the same worker for Day 2 |
+| P0-1 | M5 v0.2 五日串行实施,首卡 `ranch-window-v0.2` | Day 1 manual acceptance waived with residual risk; Day 2 authorized for the same worker | Automated gates -> bounded Day 1 commit/push -> resume same worker for Day 2; do not claim waived tray evidence passed |
 | P0-2 | R0-3 Codex controlled dry-run | 仍 standby;不改 `approvalStatus` / `enabledByDefault` / `command` | W28 明确执行窗口、隔离 cwd 和 evidence 路径后再二次确认 |
 | P0-3 | Transparent ranch full pointer input evidence | capturePage 仅证明可见渲染;完整 pointer input 未 accepted | 明确 observer/automation route,保持 implementation 与 evidence 分离 |
 
@@ -72,8 +73,8 @@ acceptance:
 - `npm.cmd run orchestration:check` passes。
 
 next action:
-- 保持 M5 五日总控为 `blocked_day1_acceptance`；获取真实 tray lifecycle 证据前不接受、不 commit/push、不启动 Day 2。
-- Day 1 通过 PM acceptance、full gates、commit/push、clean baseline 后，才允许继续同一 `[长工]#ranch-window@v0.2` 承接 Day 2；后续卡继续受逐卡门约束。
+- 将 M5 五日总控切到 `day2_authorized_by_day1_manual_waiver`；保留 tray lifecycle 缺失证据和残余风险。
+- Day 1 自动门禁与 bounded commit/push 后，继续同一 `[长工]#ranch-window@v0.2` 承接 Day 2；后续卡继续受逐卡门约束。
 - R0-3 dry-run、protected source、quota recheck 和 pointer evidence 仍需各自 bounded activation。
 
 summary:

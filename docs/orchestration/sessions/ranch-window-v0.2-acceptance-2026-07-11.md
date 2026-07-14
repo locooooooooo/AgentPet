@@ -3,18 +3,18 @@
 [PM]#ranch-window@v0.2
 ⟦tag:v2|session|ranch-window-v0.2-acceptance-2026-07-11⟧
 
-status: day1_correction_required
+status: accepted_residual_risk_manual_acceptance_waived
 scope: Day 1 only
 
 ## Acceptance matrix
 
 | Requirement | Expected Day 1 evidence | Current state |
 | --- | --- | --- |
-| FR-001 lifecycle | Electron creates ranch in desktop mode; close hides; tray summons; quit destroys resources | PM replay pending |
+| FR-001 lifecycle | Electron creates ranch in desktop mode; close hides; tray summons; quit destroys resources | manual tray replay waived by administrator; worker correction evidence retained; residual risk accepted |
 | Default desktop | Fresh or invalid preferences seed `desktop` | worker verified |
 | Persistence | Size, position, and mode restore after relaunch | worker verified |
 | Work-area recovery | Missing, corrupt, and off-screen preference cases recover to a visible active display work area | worker verified |
-| Cleanup | Quit stops ranch hot-zone polling and destroys the ranch/tray resources | PM replay pending |
+| Cleanup | Quit stops ranch hot-zone polling and destroys the ranch/tray resources | manual tray replay waived by administrator; static/build evidence retained; residual risk accepted |
 
 ## Explicit exclusions
 
@@ -54,3 +54,10 @@ scope: Day 1 only
 - Corrected-build isolated replay used root PID `62148`: Electron `window.close()` retained ranch `BrowserWindow id=2` as hidden and not destroyed while the root stayed alive; summon-equivalent `showInactive()` restored the same `id=2` without recreation.
 - An explicit inspector `app.quit()` removed renderer targets and closed the debugging endpoint, but the attached debugger held the root in `Waiting for the debugger to disconnect`; the remaining isolated test processes were stopped afterward and verified absent.
 - This section does **not** accept Day 1. PM must still directly click tray `召唤桌面牧场`, observe the existing ranch return, click tray `退出`, and observe a clean non-debug process exit before changing acceptance status or starting Day 2.
+
+## 2026-07-14 administrator waiver
+
+- The administrator explicitly instructed: `跳过验收，继续推进进度`.
+- PM therefore waives the missing manual tray replay as a release gate and accepts the residual risk. This is not a claim that close -> hide -> tray summon or tray exit -> cleanup was directly observed.
+- The historical PID `62196` failure and the missing direct tray evidence remain in this card. The corrected `electron/main.ts` implementation plus automated gates may be committed, and the same `[长工]#ranch-window@v0.2` owner may proceed to Day 2.
+- Connector policy, protected source, P0-C and unrelated pointer evidence remain blocked; this waiver applies only to the M5 Day 1 manual acceptance gate.

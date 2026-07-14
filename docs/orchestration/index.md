@@ -111,7 +111,7 @@ dispatch gate:
 - Supervisor owns drift detection, blocker surfacing, and minimum correction.
 
 current target:
-- 2026-07-12 M5 Day 1 direct manual replay confirmed a lifecycle failure: closing `桌面牧场` terminated verified project Electron PID `62196` instead of hiding the window. Current status is `day1_correction_required`; Day 2 and all later cards remain pending. W27 summarized、W28 active；R0-3 dry-run、protected source、quota、cockpit redesign、pointer evidence 和项目 Codex/Trae/Qoder connector 继续各自 standby/blocked。
+- 2026-07-14 administrator waived the missing M5 Day 1 manual tray acceptance and accepted the recorded residual risk after the PID `62196` failure/correction history. Current status is `day2_authorized_by_day1_manual_waiver`; only the same ranch-window owner may continue Day 2 after bounded commit/push. Day 3+、R0-3 dry-run、protected source、quota、pointer evidence 和项目 Codex/Trae/Qoder connector 继续各自 standby/blocked。
 
 current role split:
 - `[PM]#multi-agent-control@v0.1`: maintain this index, dispatch bounded lanes, collect callbacks, write acceptance.
@@ -139,8 +139,8 @@ current role split:
 - `[监督]#ranch-status-script@v0.1`: summarized M5 animal/status/single-toast notification evidence for FR-002/003/004/006 without reopening connector state.
 - `[监督]#ranch-personality@v0.1`: summarized M5 personality and control-cockpit prefs-linkage evidence for FR-007 and notifyPrefs.
 - `[短工]#ranch-m5-requirements@v0.2`: standby docs-only M5 requirements readiness lane; main card plus five child cards are created, but no M5 implementation or long-worker dispatch is authorized.
-- `[PM]#m5-longworker-dispatch@v0.1`: standby dispatch package; Day 1 worker callback is absorbed, but PM acceptance is blocked on direct tray lifecycle evidence and no Day 2 continuation is authorized.
-- `[PM]#m5-five-day-development@2026-07-14`: active five-day serial control card with custom status `day1_correction_required`; calendar dates do not override the failed lifecycle gate.
+- `[PM]#m5-longworker-dispatch@v0.1`: active bounded dispatch package; Day 1 manual tray acceptance is waived with residual risk, and the same ranch-window owner is authorized to continue Day 2 after the bounded Day 1 commit/push.
+- `[PM]#m5-five-day-development@2026-07-14`: active five-day serial control card with custom status `day2_authorized_by_day1_manual_waiver`; Day 3 and later remain pending.
 - `[监督]#ranch-pointer-smoke@v0.2`: standby verification package for transparent ranch pointer smoke; no implementation edit.
 - `[监督]#ranch-pointer-smoke-manual-evidence@v0.2`: standby manual evidence package for pointer-smoke callback recording; no pointer input executed yet.
 - `[长工]#homepage-ui-design@v0.1`: summarized HomePage / landing / 启动页 P0 lane; H0-1 design drafts accepted as C · 华丽, H0-2/H0-3 implemented, H0-4 protected-file audit passed in `homepage-ui-p0-c0-6-style-2026-07-07.md`; no edit to `NiuMaAvatar.tsx` / `index.css` / `agentCore.ts` / central 4x2 control-cockpit grid.
@@ -174,5 +174,5 @@ next action:
 - Keep Codex draft/pending/enabled=false and Trae/Qoder placeholder/not-requested/enabled=false until connector machine gate fields change.
 - Use `docs/orchestration/tasks/daily-decision-queue-2026-07-02.md` as the next PM callback surface for standby decisions.
 - Keep `docs/orchestration/tasks/daily-role-accountability-2026-07-02.md` aligned with role states before closing any daily supervision pass.
-- Keep the uncommitted Day 1 delivery bounded to `electron/main.ts` and its two evidence cards; do not stage/commit/push until direct tray lifecycle evidence is accepted.
-- Obtain direct close -> hide -> tray summon and tray exit -> cleanup evidence, rerun full gates, then PM may accept and push Day 1; Day 2 and every later M5 card remain pending meanwhile.
+- Commit/push the bounded Day 1 `electron/main.ts` correction with the 2026-07-14 manual-acceptance waiver and retained residual-risk evidence after automated gates.
+- Continue only the same ranch-window owner into Day 2; Day 3 and every later M5 card remain pending until the Day 2 callback and bounded PM closeout.

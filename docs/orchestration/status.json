@@ -2,12 +2,12 @@
   "identity": "[PM]#multi-agent-control@v0.1",
   "loopState": "active",
   "dispatchState": "active",
-  "target": "2026-07-12 M5 Day 1 direct manual replay confirmed a lifecycle failure: closing `桌面牧场` terminated verified project Electron PID `62196` instead of hiding the window. Current status is `day1_correction_required`; Day 2 and all later cards remain pending. W27 summarized、W28 active；R0-3 dry-run、protected source、quota、cockpit redesign、pointer evidence 和项目 Codex/Trae/Qoder connector 继续各自 standby/blocked。",
+  "target": "2026-07-14 administrator waived the missing M5 Day 1 manual tray acceptance and accepted the recorded residual risk after the PID `62196` failure/correction history. Current status is `day2_authorized_by_day1_manual_waiver`; only the same ranch-window owner may continue Day 2 after bounded commit/push. Day 3+、R0-3 dry-run、protected source、quota、pointer evidence 和项目 Codex/Trae/Qoder connector 继续各自 standby/blocked。",
   "source": "docs/orchestration/index.md",
   "todayPlan": {
-    "date": "2026-07-12",
+    "date": "2026-07-14",
     "session": "docs/orchestration/sessions/m5-five-day-development-2026-07-14.md",
-    "selectedRoute": "Day 1 manual replay failed because closing the ranch terminated the project Electron process; run a bounded Day 1 correction, keep the delivery unaccepted and uncommitted, and do not start Day 2",
+    "selectedRoute": "Administrator waived the missing Day 1 manual tray acceptance and accepted residual risk; commit/push the bounded correction after automated gates, then continue only the same ranch-window owner into Day 2",
     "progress": "docs/orchestration/sessions/m5-five-day-development-2026-07-14.md"
   },
   "p0Cards": [
@@ -298,7 +298,7 @@
       "title": "[PM]#weekly-requirements@2026-07-14",
       "owner": "主控",
       "status": "active",
-      "responsibility": "Maintain active W28 requirements; Day 1 is implementation-complete but blocked on PM tray lifecycle acceptance, so Day 2 and later cards remain pending.",
+      "responsibility": "Maintain active W28 requirements; Day 1 manual tray acceptance is waived with residual risk, so the same ranch-window owner may continue Day 2 after bounded commit/push while Day 3+ remain pending.",
       "tag": "⟦tag:v2|session|weekly-requirements-2026-07-14⟧",
       "evidence": "docs/orchestration/sessions/weekly-requirements-2026-07-14.md"
     },
@@ -306,8 +306,8 @@
       "id": "m5-longworker-dispatch",
       "title": "[PM]#m5-longworker-dispatch@v0.1",
       "owner": "主控",
-      "status": "standby",
-      "responsibility": "M5 long-worker dispatch package (ranch-window-v0.2 优先); Day 1 callback is absorbed, but PM direct tray lifecycle evidence is missing. Do not resume Day 2 before acceptance and push; project Codex/Trae/Qoder connectors remain disabled.",
+      "status": "active",
+      "responsibility": "M5 long-worker dispatch package (ranch-window-v0.2 优先); Day 1 manual tray evidence is waived with accepted residual risk. After bounded commit/push, resume only the same ranch-window owner for Day 2; project Codex/Trae/Qoder connectors remain disabled.",
       "tag": "⟦tag:v2|task|m5-longworker-dispatch-v0.1⟧",
       "evidence": "docs/orchestration/tasks/m5-longworker-dispatch-v0.1.md"
     },
@@ -316,7 +316,7 @@
       "title": "[PM]#m5-five-day-development@2026-07-14",
       "owner": "主控",
       "status": "active",
-      "responsibility": "Track M5 in `day1_correction_required`; keep Day 2 and every later card pending until the close/hide lifecycle failure is corrected, directly replayed, accepted, committed, and pushed.",
+      "responsibility": "Track M5 in `day2_authorized_by_day1_manual_waiver`; retain the missing tray evidence as accepted residual risk, continue the same ranch-window owner for Day 2 after bounded commit/push, and keep Day 3+ pending.",
       "tag": "⟦tag:v2|session|m5-five-day-development-2026-07-14⟧",
       "evidence": "docs/orchestration/sessions/m5-five-day-development-2026-07-14.md"
     },
@@ -418,7 +418,7 @@
       "title": "每日计划督办",
       "role": "[PM]#daily-supervision@2026-07-02",
       "state": "active",
-      "nextAction": "监督 W28 active 与 M5 day1_correction_required；只允许 bounded Day 1 lifecycle correction，不接受、不提交、不启动 Day 2，并继续守住 connector、protected source 和 pointer evidence 边界。"
+      "nextAction": "监督 W28 active 与 M5 day2_authorized_by_day1_manual_waiver；保留 Day 1 残余风险，完成 bounded commit/push 后只放行同一 ranch-window owner 的 Day 2，并继续守住 connector、protected source 和 Day 3+ 边界。"
     },
     {
       "id": "codex-evidence-closeout",

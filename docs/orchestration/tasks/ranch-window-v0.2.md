@@ -41,7 +41,7 @@ acceptance for the Day 1/2 implementation lane:
 - Any skipped pointer behavior remains incomplete and must be routed through `ranch-pointer-smoke-v0.2`.
 
 next action:
-- Day 1 implementation callback is absorbed but PM acceptance is blocked on direct tray lifecycle evidence. Keep Day 1 uncommitted and Day 2 pending until close -> hide -> tray summon and tray exit -> cleanup are directly observed, full gates pass, and PM commit/push completes.
+- 2026-07-14 administrator waived the missing Day 1 manual tray acceptance and accepted the residual risk. Commit/push the bounded Day 1 correction after automated gates, then continue the same `[长工]#ranch-window@v0.2` owner into Day 2 without claiming the waived evidence passed.
 
 summary:
 - Requirements-ready child card for M5 window behavior; no source edit authorized here.

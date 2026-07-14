@@ -5,12 +5,12 @@
 
 loop state: active
 dispatch state: active
-status: day1_correction_required
+status: day2_authorized_by_day1_manual_waiver
 
 > **开发窗口**: 2026-07-11 ~ 2026-07-15 (管理员授权滚动五日串行开发)
 > **创建时间**: 2026-07-10 17:50 +08:00
-> **当前准入门**: Day 1 实现回调已吸收；下一道门是 PM 直接复放 close -> hide -> tray summon 与 tray exit -> cleanup，随后 full gates、commit/push 和 clean baseline。
-> **当前结论**: W27 summarized，W28 active，本卡为 `day1_correction_required`；direct manual replay proved that ranch close terminated the application, so Day 1 is rejected and Day 2 plus later cards remain pending.
+> **当前准入门**: 2026-07-14 管理员明确跳过 Day 1 人工验收并接受残余风险；保留失败历史，完成自动门禁与 bounded commit/push 后放行同一 ranch-window 长工继续 Day 2。
+> **当前结论**: W27 summarized，W28 active，本卡为 `day2_authorized_by_day1_manual_waiver`；Day 1 人工 tray 证据仍缺失但不再阻塞 Day 2，不得改写为直接验收通过。
 
 ## objective
 
@@ -39,8 +39,8 @@ status: day1_correction_required
 
 | Day | Date | Only allowed product lane | Intended outcome | Start gate | Current state |
 | --- | --- | --- | --- | --- | --- |
-| 1 | 2026-07-11 | `[长工]#ranch-window@v0.2` | FR-001 lifecycle, default desktop mode, size/position/mode persistence | Administrator authorization + W27 summarized + W28 active + fresh clean baseline | correction_required_close_exits_app |
-| 2 | 2026-07-12 | same ranch-window worker | Double-click/right-click summon, desktop/floating, drag/dock, fence, Electron evidence | Day 1 accepted, committed, pushed; no second worker | pending_blocked_by_day1 |
+| 1 | 2026-07-11 | `[长工]#ranch-window@v0.2` | FR-001 lifecycle, default desktop mode, size/position/mode persistence | Administrator authorization + W27 summarized + W28 active + fresh clean baseline | accepted_residual_risk_manual_evidence_waived |
+| 2 | 2026-07-12 | same ranch-window worker | Double-click/right-click summon, desktop/floating, drag/dock, fence, Electron evidence | Day 1 residual risk accepted by administrator + bounded commit/push; no second worker | authorized_pending_same_worker |
 | 3 | 2026-07-13 | `[短工]#ranch-status-script@v0.2` | Eight identities, visible status actions, one transient status band | ranch-window accepted, committed, pushed | pending_not_started |
 | 4 | 2026-07-14 | `[短工]#ranch-personality@v0.2` | chatty/quiet/silent and persisted bubble/system/badge preferences | status-script accepted, committed, pushed | pending_not_started |
 | 5A | 2026-07-15 | `[短工]#ranch-fence-pointer@v0.2` | Direct click-through, double-click, right-click, floating drag and dock evidence | personality accepted, committed, pushed | pending_not_started |
@@ -122,18 +122,18 @@ completed:
 - Day 1 allowed-scope risks are identified before dispatch: desktop close/hide semantics and display-work-area recovery for persisted x/y require explicit correction/evidence in `electron/main.ts`.
 
 incomplete:
-- Day 1 implementation callback exists, but direct tray lifecycle evidence, PM acceptance, commit, and push are pending.
-- Day 2 and all later implementation callbacks, desktop evidence sets, and commits remain pending.
+- Day 1 direct tray lifecycle evidence remains missing by explicit administrator waiver; it must stay recorded as residual risk rather than pass evidence.
+- Day 2 and all later implementation callbacks, desktop evidence sets, and commits remain pending; Day 2 is now authorized for the same ranch-window owner after the bounded Day 1 commit/push.
 
 blockers:
 - Windows automation identified the Electron windows but failed to obtain a reliable transparent-window interaction state with `SetIsBorderRequired failed: 不支持此接口 (0x80004002)`; capture/CDP evidence does not prove tray interaction.
-- Day 2 cannot start merely because the calendar reached 2026-07-12; Day 1 still lacks direct close -> hide -> tray summon and tray exit -> cleanup acceptance.
+- Day 1 still lacks direct close -> hide -> tray summon and tray exit -> cleanup acceptance, but the administrator waived this manual gate on 2026-07-14 and accepted the residual risk for Day 2 progression.
 - 2026-07-12 direct replay produced a failing result: closing the ranch removed verified Electron PID `62196`, so the implementation does not currently provide the required resident close -> hide behavior.
 - Existing connector, pointer, protected-source, and live-subagent quota blockers remain separate; none is silently accepted by this plan.
 
 next action:
-- Obtain direct Day 1 tray lifecycle evidence, update `ranch-window-v0.2-acceptance-2026-07-11.md`, rerun full gates, and only then PM may commit/push the bounded Day 1 delivery.
-- Do not resume the ranch-window worker for Day 2 or start any later M5 card until Day 1 acceptance, commit, push, and clean-baseline proof are complete.
+- Commit/push the bounded Day 1 correction with the waiver record after automated gates; do not describe the waived tray replay as passed.
+- Resume the same `[长工]#ranch-window@v0.2` for Day 2 only. Day 3 and later cards remain pending behind Day 2 callback and bounded commit/push.
 
 evidence:
 - Baseline at creation: `HEAD == origin/main == 1d9d5b0`; worktree clean.
@@ -144,4 +144,4 @@ evidence:
 - W27 is summarized and W28 is active; `m5-longworker-dispatch-v0.1` and all five implementation cards remain standby.
 
 summary:
-- Five-day M5 serial development control is active but blocked at Day 1 PM acceptance; implementation exists uncommitted, and Day 2 plus all later cards remain pending.
+- Five-day M5 serial development control is active at Day 2 authorization after an explicit Day 1 manual-acceptance waiver. Day 1 residual risk remains recorded; Day 3 and later cards remain pending.

@@ -239,7 +239,7 @@ function normalizeRanchPrefs(value: unknown): RanchPrefs {
     isExactNumber(position.y, legacyPosition.y)
   );
 
-  return {
+  return clampRanchPrefsToWorkArea({
     version: 1,
     mode: shouldMigrateLegacyDefaults
       ? seed.mode
@@ -269,7 +269,7 @@ function normalizeRanchPrefs(value: unknown): RanchPrefs {
       cockpitBadge: boolOr(notifyPrefs.cockpitBadge, true)
     },
     schemaVersion: 1
-  };
+  });
 }
 
 function mergeRanchPrefsPatch(patch: RanchPrefsPatch): RanchPrefs {
@@ -294,11 +294,40 @@ function mergeRanchPrefsPatch(patch: RanchPrefsPatch): RanchPrefs {
 function normalizeRanchBounds(bounds: RanchBounds): RanchBounds {
   const candidate = asRecord(bounds);
 
-  return {
+  return clampRanchBoundsToWorkArea({
     x: numberOr(candidate?.x, ranchPrefs.position.x),
     y: numberOr(candidate?.y, ranchPrefs.position.y),
     width: clampNumber(numberOr(candidate?.width, ranchPrefs.size.width), ranchSizeLimits.minWidth, ranchSizeLimits.maxWidth),
     height: clampNumber(numberOr(candidate?.height, ranchPrefs.size.height), ranchSizeLimits.minHeight, ranchSizeLimits.maxHeight)
+  });
+}
+
+function clampRanchPrefsToWorkArea(prefs: RanchPrefs): RanchPrefs {
+  const bounds = clampRanchBoundsToWorkArea({
+    x: prefs.position.x,
+    y: prefs.position.y,
+    width: prefs.size.width,
+    height: prefs.size.height
+  });
+
+  return {
+    ...prefs,
+    position: { x: bounds.x, y: bounds.y },
+    size: { width: bounds.width, height: bounds.height }
+  };
+}
+
+function clampRanchBoundsToWorkArea(bounds: RanchBounds): RanchBounds {
+  const display = screen.getDisplayMatching(bounds);
+  const workArea = display.workArea;
+  const width = Math.min(bounds.width, workArea.width);
+  const height = Math.min(bounds.height, workArea.height);
+
+  return {
+    x: clampNumber(bounds.x, workArea.x, workArea.x + workArea.width - width),
+    y: clampNumber(bounds.y, workArea.y, workArea.y + workArea.height - height),
+    width,
+    height
   };
 }
 
@@ -955,9 +984,7 @@ function createRanchWindow() {
   ranchWindow.on('close', (event) => {
     if (!isQuitting) {
       event.preventDefault();
-      if (ranchPrefs.mode === 'floating') {
-        ranchWindow?.hide();
-      }
+      ranchWindow?.hide();
     }
   });
 
@@ -1064,6 +1091,17 @@ function applyRanchPrefsToWindow() {
   };
   ranchWindow.setBounds(bounds);
   applyRanchMode(ranchPrefs.mode);
+}
+
+function destroyRanchWindow() {
+  stopRanchHotzonePolling();
+  ranchMousePassthrough = false;
+
+  if (ranchWindow && !ranchWindow.isDestroyed()) {
+    ranchWindow.destroy();
+  }
+
+  ranchWindow = null;
 }
 
 function createTray() {
@@ -1404,6 +1442,9 @@ app.whenReady().then(() => {
 app.on('before-quit', () => {
   isQuitting = true;
   connectorRuntime?.dispose();
+  destroyRanchWindow();
+  tray?.destroy();
+  tray = null;
   runningProgressTimers.forEach((timer) => clearInterval(timer));
   runningProgressTimers.clear();
   runningProcesses.forEach((child) => child.kill());
@@ -1411,7 +1452,7 @@ app.on('before-quit', () => {
 });
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
+  if (isQuitting && process.platform !== 'darwin') {
     app.quit();
   }
 });
