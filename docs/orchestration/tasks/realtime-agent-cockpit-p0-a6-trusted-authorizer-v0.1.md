@@ -3,9 +3,9 @@
 [长工]#realtime-trusted-authorizer@v0.1
 ⟦tag:v2|task|realtime-agent-cockpit-p0-a6-trusted-authorizer-v0.1⟧
 
-loop state: active
-dispatch state: active
-status: authorized_pending_worker
+loop state: summarized
+dispatch state: summarized
+status: accepted_blocked_safe_authorizer
 priority: P0-A6
 
 ## objective
@@ -74,9 +74,9 @@ changed files:
 
 ## next action
 
-- Dispatch exactly one A6 runtime worker after this card is committed and pushed.
-- Keep A7, B2 and P0-C standby until A6 callback, independent PM verification and commit/push.
+- A6 implementation/check commit `a44abd6` is pushed and independently PM-verified.
+- Continue serially with A7 process reattach only; B2 and P0-C remain standby.
 
 ## summary
 
-- A6 is the only authorized product lane. It may install the trusted authorization boundary but may not enable or execute a Connector.
+- A6 is accepted as blocked-safe authorization infrastructure: main-owned dialog/grant, intent binding, single use, TTL, replay/expiry/mismatch/policy-drift/cancel cleanup and exact audit reasons pass; current production policy remains `discovery=0/spawn=0` and no external Agent CLI ran.

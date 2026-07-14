@@ -3,9 +3,9 @@
 [长工]#realtime-process-reattach@v0.1
 ⟦tag:v2|task|realtime-agent-cockpit-p0-a7-process-reattach-v0.1⟧
 
-loop state: standby
-dispatch state: standby
-status: pending_a6_closeout
+loop state: active
+dispatch state: active
+status: authorized_pending_worker
 priority: P0-A7
 
 ## objective
@@ -51,8 +51,8 @@ priority: P0-A7
 
 ## next action
 
-- Keep standby until A6 independent closeout.
-- After A7 closeout, authorize B2 only.
+- Dispatch exactly one A7 process-reattach worker after this control switch is committed and pushed.
+- After A7 independent verification/commit/push, authorize B2 only.
 
 ## summary
 

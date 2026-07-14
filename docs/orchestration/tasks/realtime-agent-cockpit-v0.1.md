@@ -5,7 +5,7 @@
 
 loop state: active
 dispatch state: active
-status: a6_authorized_after_partial_acceptance
+status: a7_authorized_after_a6_acceptance
 control lane: standby_control
 date: 2026-07-13
 
@@ -43,8 +43,8 @@ date: 2026-07-13
 | P0-A | `[长工]#realtime-connector-runtime@v0.1` | partial_accepted_blocked_safe_foundation | A1-A5 runtime/fixture/full-gate 通过；production authorizer、真实 reattach 和外部 E2E 未启用 |
 | P0-B | `[长工]#realtime-truth-ui@v0.1` | partial_accepted_renderer_truth_slice | selector + App/Home/Cockpit 接线、fallback 1280/1440/1920 浏览器复核、fresh/stale/lost SSR fixture 和 Electron event p95 通过；真实 E2E 待补 |
 | P0-C | `[长工]#realtime-requirements-control@v0.1` + PM | standby / authorization_required | Codex controlled dry-run 与 E2E acceptance；当前不得执行 |
-| P0-A6 | `[长工]#realtime-trusted-authorizer@v0.1` | authorized_pending_worker | main-owned trusted confirmation；policy remains blocked，external spawn=0 |
-| P0-A7 | future serial worker | standby | production process identity proof and restart reattach after A6 closeout |
+| P0-A6 | `[长工]#realtime-trusted-authorizer@v0.1` | accepted / `a44abd6` | main-owned trusted confirmation；policy remains blocked，external spawn=0 |
+| P0-A7 | `[长工]#realtime-process-reattach@v0.1` | authorized_pending_worker | production process identity proof and restart reattach using non-Agent controlled child |
 | P0-B2 | future serial worker | standby | non-Agent production Electron path rehearsal after A7 closeout |
 
 主 control lane 保持 `standby_control`：它只协调 A/B 合同和 C 验收。A/B 的 partial accepted 只代表受限切片已被 PM 验收，不代表 Connector runtime 已可执行。
@@ -123,5 +123,5 @@ evidence:
 
 ## next action
 
-- Commit and push the next-stage control reset, then dispatch only P0-A6 trusted authorizer.
-- A7 and B2 remain serially gated behind independent callbacks and commits; P0-C remains standby and still requires a new explicit execution authorization.
+- Commit and push the A6 acceptance/A7 switch, then dispatch only P0-A7 process reattach.
+- B2 remains gated behind A7 independent callback/commit; P0-C remains standby and still requires a new explicit execution authorization.

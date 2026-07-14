@@ -2,12 +2,12 @@
   "identity": "[PM]#multi-agent-control@v0.1",
   "loopState": "active",
   "dispatchState": "active",
-  "target": "2026-07-14 realtime Agent cockpit next stage is `a6_authorized`: install a production main-owned trusted authorization boundary while every Connector machine gate remains unchanged and external Agent spawn remains 0. A7 process reattach、B2 production-path rehearsal、P0-C Codex dry-run、M5 residual evidence、protected source 和 quota recheck 保持各自 standby/closed。",
+  "target": "2026-07-14 realtime Agent cockpit next stage is `a7_authorized_after_a6_acceptance`: A6 blocked-safe trusted authorization is pushed as `a44abd6`; only production process identity/reattach may change next using a non-Agent controlled child. B2、P0-C Codex dry-run、M5 residual evidence、protected source 和 quota recheck 保持各自 standby/closed。",
   "source": "docs/orchestration/index.md",
   "todayPlan": {
     "date": "2026-07-14",
     "session": "docs/orchestration/sessions/realtime-agent-cockpit-next-stage-2026-07-14.md",
-    "selectedRoute": "Commit and push the realtime control reset, then dispatch only P0-A6 trusted authorizer with external Agent spawn=0 and unchanged machine gates",
+    "selectedRoute": "Commit and push A6 acceptance/A7 authorization, then dispatch only P0-A7 process reattach with non-Agent controlled child evidence and unchanged machine gates",
     "progress": "docs/orchestration/sessions/realtime-agent-cockpit-next-stage-2026-07-14.md"
   },
   "p0Cards": [
@@ -31,7 +31,7 @@
     },
     {
       "id": "realtime-agent-cockpit-p0",
-      "status": "active-a6-authorized",
+      "status": "active-a7-authorized",
       "task": "docs/orchestration/tasks/realtime-agent-cockpit-v0.1.md",
       "progress": "docs/orchestration/sessions/realtime-agent-cockpit-next-stage-2026-07-14.md"
     }
@@ -367,7 +367,7 @@
       "title": "[长工]#realtime-connector-runtime@v0.1",
       "owner": "长工",
       "status": "active",
-      "responsibility": "P0-A A1-A5 is partial-accepted and A6 is the only authorized next runtime lane. Install a main-owned single-use trusted authorization boundary while production policy remains blocked, machine gates stay unchanged and external Agent spawn remains 0.",
+      "responsibility": "P0-A A1-A6 is partial-accepted and A7 is the only authorized next runtime lane. Prove production process identity/reattach with a non-Agent controlled child while machine gates stay unchanged and external Agent CLI remains forbidden.",
       "tag": "⟦tag:v2|task|realtime-agent-cockpit-p0-a-connector-runtime-v0.1⟧",
       "evidence": "docs/orchestration/tasks/realtime-agent-cockpit-p0-a-connector-runtime-v0.1.md"
     },
@@ -375,10 +375,19 @@
       "id": "realtime-trusted-authorizer",
       "title": "[长工]#realtime-trusted-authorizer@v0.1",
       "owner": "长工",
-      "status": "active",
-      "responsibility": "Implement only P0-A6 trusted authorization: main-owned, intent-bound, single-use and expiring confirmation; keep A7/B2/P0-C standby and execute no external Agent CLI.",
+      "status": "summarized",
+      "responsibility": "A6 trusted authorization is accepted and pushed as a44abd6: main-owned, intent-bound, single-use and expiring confirmation; production policy stayed blocked and external spawn stayed 0.",
       "tag": "⟦tag:v2|task|realtime-agent-cockpit-p0-a6-trusted-authorizer-v0.1⟧",
       "evidence": "docs/orchestration/tasks/realtime-agent-cockpit-p0-a6-trusted-authorizer-v0.1.md"
+    },
+    {
+      "id": "realtime-process-reattach",
+      "title": "[长工]#realtime-process-reattach@v0.1",
+      "owner": "长工",
+      "status": "active",
+      "responsibility": "Implement only P0-A7 process fingerprint and restart reattach using a non-Agent controlled child; reject PID reuse and unproven identity to session-lost within 10 seconds.",
+      "tag": "⟦tag:v2|task|realtime-agent-cockpit-p0-a7-process-reattach-v0.1⟧",
+      "evidence": "docs/orchestration/tasks/realtime-agent-cockpit-p0-a7-process-reattach-v0.1.md"
     },
     {
       "id": "realtime-truth-ui",
@@ -394,7 +403,7 @@
       "title": "[长工]#realtime-requirements-control@v0.1",
       "owner": "长工",
       "status": "active",
-      "responsibility": "Own the realtime next-stage serial control: A6 active, A7/B2 gated, P0-C authorization-required; preserve A/B fences, quantitative gates and the distinction between controlled local process evidence and real Agent E2E.",
+      "responsibility": "Own the realtime next-stage serial control: A6 accepted, A7 active, B2 gated, P0-C authorization-required; preserve A/B fences and the distinction between controlled local process evidence and real Agent E2E.",
       "tag": "⟦tag:v2|session|realtime-agent-cockpit-progress-2026-07-13⟧",
       "evidence": "docs/orchestration/sessions/realtime-agent-cockpit-progress-2026-07-13.md"
     },
@@ -403,7 +412,7 @@
       "title": "[PM]#realtime-cockpit-next-stage@2026-07-14",
       "owner": "主控",
       "status": "active",
-      "responsibility": "Enforce the A6 -> A7 -> B2 serial gate, accept each independent callback/commit, and keep P0-C authorization-required with all Connector machine gates unchanged.",
+      "responsibility": "Enforce the A7 -> B2 remaining serial gate after A6 acceptance, accept each independent callback/commit, and keep P0-C authorization-required with all Connector machine gates unchanged.",
       "tag": "⟦tag:v2|session|realtime-agent-cockpit-next-stage-2026-07-14⟧",
       "evidence": "docs/orchestration/sessions/realtime-agent-cockpit-next-stage-2026-07-14.md"
     }
@@ -442,7 +451,7 @@
       "title": "每日计划督办",
       "role": "[PM]#daily-supervision@2026-07-02",
       "state": "active",
-      "nextAction": "监督 realtime next stage `a6_authorized`；提交控制面后只派 A6 trusted-authorizer，保持 A7/B2/P0-C、Connector machine gate、protected source 和外部 Agent execution 边界。"
+      "nextAction": "监督 realtime next stage `a7_authorized_after_a6_acceptance`；提交控制面后只派 A7 process-reattach，保持 B2/P0-C、Connector machine gate、protected source 和外部 Agent execution 边界。"
     },
     {
       "id": "codex-evidence-closeout",

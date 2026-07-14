@@ -8,9 +8,9 @@ loop state: active
 dispatch state: active
 
 > **计划周期**: 2026-07-14 ~ 2026-07-20 (W28)
-> **当前状态**: active; M5 is closed and pushed; realtime Agent cockpit next stage is active with only A6 trusted-authorizer authorized
+> **当前状态**: active; M5 is closed and pushed; realtime A6 is accepted/pushed and only A7 process-reattach is authorized
 > **激活证据**: 2026-07-11 16:00 +08:00 W27 final closeout 已通过 fresh gates，并将 W27 summarized。
-> **硬边界**: Realtime A6/A7/B2 严格串行；A6 不执行外部 Agent CLI、不修改 protected source 或 Connector machine gate，A7/B2/P0-C 未过前置门不得启动。
+> **硬边界**: Realtime A7/B2 严格串行；A7 只用非 Agent 受控子进程、不修改 protected source 或 Connector machine gate，B2/P0-C 未过前置门不得启动。
 
 ---
 
@@ -34,7 +34,7 @@ dispatch state: active
 | 优先级 | 候选 | 当前边界 | 激活前置 |
 | --- | --- | --- | --- |
 | P0-1 | M5 v0.2 五日串行实施 | Code-backed complete and pushed through `8df940c`; manual evidence retained as residual risk | No further M5 product action; preserve closeout during W28 buffer |
-| P0-2 | Realtime Agent cockpit execution readiness | A1-A5/B truth slice partial-accepted; only A6 trusted authorizer is active | A6 -> A7 -> B2 independent callback/PM verify/commit/push |
+| P0-2 | Realtime Agent cockpit execution readiness | A1-A6/B truth slice partial-accepted; only A7 process reattach is active | A7 -> B2 independent callback/PM verify/commit/push |
 | P0-3 | P0-C Codex controlled dry-run | standby;不改 `approvalStatus` / `enabledByDefault` / `command` | A6/A7/B2 pass + new explicit execution authorization |
 | P0-4 | Transparent ranch full pointer input evidence | capturePage 仅证明可见渲染;完整 pointer input 未 accepted | 明确 observer/automation route,保持 implementation 与 evidence 分离 |
 
@@ -76,8 +76,8 @@ acceptance:
 
 next action:
 - M5 已收口并推送；保留直接 tray/pointer 与 Windows notification visibility 残余风险，不重开产品 lane。
-- 提交/推送 realtime next-stage 控制卡后，只派 A6 trusted-authorizer 长工；A7/B2/P0-C 继续逐卡受门禁约束。
+- A6 `a44abd6` 已验收推送；提交/推送控制面切换后，只派 A7 process-reattach 长工，B2/P0-C 继续逐卡受门禁约束。
 - Protected source、quota recheck 和 pointer evidence 仍需各自 bounded activation。
 
 summary:
-- W28 active; M5 is closed, and realtime Agent cockpit execution readiness is the single active goal at A6 authorization. External Agent execution and P0-C remain unauthorized.
+- W28 active; M5 is closed, and realtime Agent cockpit execution readiness is the single active goal at A7 authorization after A6 acceptance. External Agent execution and P0-C remain unauthorized.

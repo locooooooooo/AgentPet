@@ -63,6 +63,7 @@ tracked business cards:
 - task: ⟦tag:v2|task|realtime-agent-cockpit-p0-b2-production-path-e2e-v0.1⟧ -> `docs/orchestration/tasks/realtime-agent-cockpit-p0-b2-production-path-e2e-v0.1.md`
 - session: ⟦tag:v2|session|realtime-agent-cockpit-progress-2026-07-13⟧ -> `docs/orchestration/sessions/realtime-agent-cockpit-progress-2026-07-13.md`
 - session: ⟦tag:v2|session|realtime-agent-cockpit-next-stage-2026-07-14⟧ -> `docs/orchestration/sessions/realtime-agent-cockpit-next-stage-2026-07-14.md`
+- session: ⟦tag:v2|session|realtime-agent-cockpit-p0-a6-acceptance-2026-07-14⟧ -> `docs/orchestration/sessions/realtime-agent-cockpit-p0-a6-acceptance-2026-07-14.md`
 - task: ⟦tag:v2|task|m5-longworker-dispatch-v0.1⟧ -> `docs/orchestration/tasks/m5-longworker-dispatch-v0.1.md`
 - task: ⟦tag:v2|task|homepage-ui-p0-v0.1⟧ -> `docs/orchestration/tasks/homepage-ui-p0-v0.1.md`
 - task: ⟦tag:v2|task|homepage-ui-p0-dispatch-v0.1⟧ -> `docs/orchestration/tasks/homepage-ui-p0-dispatch-v0.1.md`
@@ -117,7 +118,7 @@ dispatch gate:
 - Supervisor owns drift detection, blocker surfacing, and minimum correction.
 
 current target:
-- 2026-07-14 realtime Agent cockpit next stage is `a6_authorized`: install a production main-owned trusted authorization boundary while every Connector machine gate remains unchanged and external Agent spawn remains 0. A7 process reattach、B2 production-path rehearsal、P0-C Codex dry-run、M5 residual evidence、protected source 和 quota recheck 保持各自 standby/closed。
+- 2026-07-14 realtime Agent cockpit next stage is `a7_authorized_after_a6_acceptance`: A6 blocked-safe trusted authorization is pushed as `a44abd6`; only production process identity/reattach may change next using a non-Agent controlled child. B2、P0-C Codex dry-run、M5 residual evidence、protected source 和 quota recheck 保持各自 standby/closed。
 
 current role split:
 - `[PM]#multi-agent-control@v0.1`: maintain this index, dispatch bounded lanes, collect callbacks, write acceptance.
@@ -154,11 +155,12 @@ current role split:
 - `[PM]#protected-cockpit-source-drift@v0.1`: standby PM disposition lane in W28;administrator selected bounded routing, but no source edit, format repair, acceptance, or rollback is authorized yet.
 - `[PM]#cockpit-ui-redesign-v3.1@v0.1`: summarized accepted visual-refinement lane pushed as `aa4cfa5`; future cockpit changes require a fresh bounded scope, while M5 lifecycle, protected animation/avatar, business logic, and connectors remain untouched.
 - `[PM]#cockpit-ui-redesign-v3.2@v0.1`: standby after accepted/pushed P0; task-first state dedupe, first-screen dispatch, card-action reduction, and conditional Corner Assist passed PM replay after two bounded menu corrections. P1/P2 remain unauthorized.
-- `[长工]#realtime-connector-runtime@v0.1`: active at A6 authorization after A1-A5 partial acceptance; only the production trusted-authorizer boundary may change next, while A7/B2/P0-C remain standby and external Agent CLI execution remains forbidden.
-- `[长工]#realtime-trusted-authorizer@v0.1`: active A6 implementation owner; confirmation must be main-owned, intent-bound, single-use and expiring, with production policy still blocked and external spawn fixed at 0.
+- `[长工]#realtime-connector-runtime@v0.1`: active at A7 authorization after A6 blocked-safe acceptance; only process identity proof/reattach may change next, while B2/P0-C remain standby and external Agent CLI execution remains forbidden.
+- `[长工]#realtime-trusted-authorizer@v0.1`: summarized A6 owner; main-owned intent-bound single-use grants passed all negative paths, production policy remains blocked and external spawn stayed 0.
+- `[长工]#realtime-process-reattach@v0.1`: active A7 owner; prove process fingerprint and restart recovery with a non-Agent controlled child, otherwise fail to session-lost within 10 seconds.
 - `[长工]#realtime-truth-ui@v0.1`: partial-accepted after selector plus App/Home/Cockpit truth wiring, 1280/1440/1920 browser fallback replay, renderer SSR fresh/late/stale/session-lost fixture and Electron event p95; configured/online/simulated/source/session semantics are separated, while real E2E remains pending.
 - `[长工]#realtime-requirements-control@v0.1`: active docs/control owner; records the approximately 60% bounded baseline, A/B fences, quantitative acceptance and remaining trusted-authorizer/real-reattach/real-E2E gaps. P0-C Codex controlled dry-run remains standby pending full A/B acceptance and a second explicit execution authorization.
-- `[PM]#realtime-cockpit-next-stage@2026-07-14`: active serial control session; A6 is authorized, A7/B2 are gated behind independent closeouts, and P0-C still requires a new explicit execution authorization.
+- `[PM]#realtime-cockpit-next-stage@2026-07-14`: active serial control session; A6 is accepted, A7 is authorized, B2 remains gated, and P0-C still requires a new explicit execution authorization.
 - `[PM]#weekly-requirements@2026-07-07`: summarized W27 (2026-07-07~2026-07-13) weekly-requirements history; final closeout is recorded in `weekly-closeout-2026-07-11.md`.
 - `[PM]#weekly-requirements@2026-07-14`: active W28 planner; tracks the administrator-authorized M5 rolling schedule beginning 2026-07-11 while preserving per-card serial gates.
 - `[PM]#daily-plan@2026-07-09`: summarized 2026-07-09 daily plan;B②/C short-worker/D 今天/E1 evidence is retained as history.
@@ -172,8 +174,8 @@ blockers:
 - Transparent Electron ranch pointer smoke now has an additional Electron `webContents.capturePage()` evidence route that captured `ranch.html` without `SetIsBorderRequired failed`; full click-through / double-click / right-click / drag / dock evidence is still pending.
 
 next action:
-- Commit and push the realtime next-stage control reset, then dispatch only `[长工]#realtime-trusted-authorizer@v0.1` from the A6 card.
-- Keep A7 process reattach, B2 production-path E2E and P0-C Codex dry-run standby until their preceding serial gates are accepted and pushed.
+- Commit and push the A6 acceptance/A7 authorization switch, then dispatch only `[长工]#realtime-process-reattach@v0.1` from the A7 card.
+- Keep B2 production-path E2E and P0-C Codex dry-run standby until their preceding serial gates are accepted and pushed.
 - PM has independently verified P0-A/P0-B callbacks, file fences, M5 hunk preservation, fixtures, truth UI, 1280/1440/1920 browser fallback and Electron event p95; keep P0-C blocked until trusted authorizer/real reattach/full A/B checks pass and a fresh explicit Codex dry-run authorization exists.
 - Keep M3 code gates accepted as passed after `lint`, `build`, and `orchestration:check`; use the identified Windows MCP Snapshot route only as capture evidence until full transparent-window pointer input is observed.
 - Keep connector policy and `connector-acceptance-review-v0.1` on standby until PM/user accepts or revises machine gate fields; do not dispatch connector execution binding and do not add schema-breaking connector fields.
