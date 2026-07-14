@@ -231,8 +231,12 @@ try {
     readFile(path.join(root, 'electron', 'preload.ts'), 'utf8')
   ]);
   assert.match(mainSource, /createReadOnlyConnectorGateRequest\(input\)/);
-  assert.match(mainSource, /requestedBy:\s*'default-action'[\s\S]*confirmationAccepted:\s*false/);
+  assert.match(mainSource, /authorizeRun:\s*\(request\)\s*=>\s*connectorRunAuthorizer\.consume\(request\)/);
+  assert.match(mainSource, /requestedBy:\s*'explicit-user-action'/);
+  assert.doesNotMatch(mainSource, /requestedBy:\s*input(?:\?|\.)/);
+  assert.doesNotMatch(mainSource, /confirmationAccepted:\s*input(?:\?|\.)/);
   const preloadRunBody = preloadSource.match(/runConnector:[\s\S]*?stopConnector:/)?.[0] ?? '';
+  assert.match(preloadRunBody, /authorizationGrant:\s*input\.authorizationGrant/);
   assert.doesNotMatch(preloadRunBody, /requestedBy:\s*input\./);
   assert.doesNotMatch(preloadRunBody, /confirmationAccepted:\s*input\./);
 
@@ -281,7 +285,7 @@ try {
   );
   console.log('path=ConnectorRuntime.publish -> webContents.send -> production preload -> renderer callback -> DOM');
   console.log('external Agent/Connector spawn calls=0; allowed project Electron launch=1');
-  console.log('gate=renderer authorization self-assertion absent; production authorizeRun absent');
+  console.log('gate=renderer authorization self-assertion absent; production authorizeRun consumes main-owned grant');
 } finally {
   await rm(temporaryDirectory, { recursive: true, force: true });
 }

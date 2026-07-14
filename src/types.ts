@@ -24,6 +24,12 @@ export type ConnectorBlockedReason =
 
 export type ConnectorRuntimeBlockedReason = ConnectorBlockedReason
   | 'adapter-unsupported'
+  | 'authorization-cancelled'
+  | 'authorization-expired'
+  | 'authorization-intent-mismatch'
+  | 'authorization-invalid'
+  | 'authorization-policy-drift'
+  | 'authorization-replayed'
   | 'request-invalid'
   | 'runtime-unavailable';
 
@@ -113,17 +119,48 @@ export type ConnectorGateResult =
       blockedReasons: ConnectorBlockedReason[];
     };
 
-export interface ConnectorRunRequest {
+export interface ConnectorAuthorizationIntent {
   agentId: string;
   connectorId: string;
   taskName: string;
   prompt: string;
-  requestedBy: 'default-action' | 'explicit-user-action';
-  confirmationAccepted?: boolean;
   retry?: ConnectorRetryPolicyInput;
 }
 
-export type ConnectorRunIntent = Omit<ConnectorRunRequest, 'requestedBy' | 'confirmationAccepted'>;
+export interface ConnectorRunIntent extends ConnectorAuthorizationIntent {
+  authorizationGrant?: string;
+}
+
+export interface ConnectorRunRequest extends ConnectorRunIntent {
+  requestedBy: 'default-action' | 'explicit-user-action';
+}
+
+export type ConnectorAuthorizationResult =
+  | {
+      status: 'granted';
+      connectorId: string;
+      grantId: string;
+      expiresAt: string;
+    }
+  | {
+      status: 'blocked';
+      connectorId: string;
+      blockedReasons: ConnectorRuntimeBlockedReason[];
+    };
+
+export interface ConnectorAuthorizationCancelRequest {
+  grantId: string;
+}
+
+export type ConnectorAuthorizationCancelResult =
+  | {
+      status: 'cancelled';
+      grantId: string;
+    }
+  | {
+      status: 'not-found';
+      grantId: string;
+    };
 
 export type ConnectorRunResult =
   | {
@@ -549,6 +586,8 @@ export interface DesktopApi {
   resetSeed: () => Promise<AgentSnapshot>;
   createTask: (input: CreateTaskInput) => Promise<AgentSnapshot>;
   evaluateConnectorGate: (input: ConnectorGateRequest) => Promise<ConnectorGateResult>;
+  requestConnectorAuthorization: (input: ConnectorAuthorizationIntent) => Promise<ConnectorAuthorizationResult>;
+  cancelConnectorAuthorization: (input: ConnectorAuthorizationCancelRequest) => Promise<ConnectorAuthorizationCancelResult>;
   runConnector: (input: ConnectorRunIntent) => Promise<ConnectorRunResult>;
   stopConnector: (input: ConnectorStopRequest) => Promise<ConnectorStopResult>;
   getConnectorRuntimeSnapshot: () => Promise<ConnectorRuntimeSnapshot>;

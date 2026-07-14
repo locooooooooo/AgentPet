@@ -1,10 +1,14 @@
-import { app, BrowserWindow, Menu, Notification, Tray, ipcMain, nativeImage, screen, type IpcMainInvokeEvent, type MenuItemConstructorOptions } from 'electron';
+import { app, BrowserWindow, Menu, Notification, Tray, dialog, ipcMain, nativeImage, screen, type IpcMainInvokeEvent, type MenuItemConstructorOptions } from 'electron';
 import { spawn, spawnSync, type ChildProcessWithoutNullStreams } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import type {
   AgentSnapshot,
   AgentTask,
+  ConnectorAuthorizationCancelRequest,
+  ConnectorAuthorizationCancelResult,
+  ConnectorAuthorizationIntent,
+  ConnectorAuthorizationResult,
   ConnectorGateRequest,
   ConnectorGateResult,
   ConnectorPolicyConfig,
@@ -26,7 +30,12 @@ import type {
   RanchPrefsPatch
 } from '../src/types';
 import { createReadOnlyConnectorGateRequest, evaluateConnectorPolicyGate } from '../src/lib/connectorGate';
-import { ConnectorRuntime, selectDirectConnectorExecutable } from '../src/lib/connectorRuntime';
+import {
+  ConnectorRunAuthorizer,
+  ConnectorRuntime,
+  normalizeConnectorRunIntent,
+  selectDirectConnectorExecutable
+} from '../src/lib/connectorRuntime';
 import {
   appendSystemMessage,
   applyNiuMaAction,
@@ -47,6 +56,7 @@ let tray: Tray | null = null;
 let snapshot: AgentSnapshot;
 let ranchPrefs: RanchPrefs;
 let connectorRuntime: ConnectorRuntime;
+let connectorRunAuthorizer: ConnectorRunAuthorizer;
 let isQuitting = false;
 let ranchUnreadCount = 0;
 let ranchMousePassthrough = false;
@@ -870,6 +880,7 @@ function createConnectorRuntime() {
     spawnProcess: (file, args, options) => spawn(file, args, options),
     workspaceRoot: process.cwd(),
     sourceEnv: process.env,
+    authorizeRun: (request) => connectorRunAuthorizer.consume(request),
     loadPersistedSnapshot: loadConnectorRuntimeSnapshot,
     persistSnapshot: saveConnectorRuntimeSnapshot,
     publish: (runtimeSnapshot) => {
@@ -878,6 +889,62 @@ function createConnectorRuntime() {
       });
     }
   });
+}
+
+function createConnectorRunAuthorizer() {
+  return new ConnectorRunAuthorizer({ loadPolicy: loadConnectorPolicy });
+}
+
+function blockedConnectorAuthorization(
+  input: unknown,
+  blockedReason: 'confirmation-required' | 'request-invalid' | 'runtime-unavailable'
+): ConnectorAuthorizationResult {
+  return {
+    status: 'blocked',
+    connectorId: typeof input === 'object'
+      && input !== null
+      && typeof (input as { connectorId?: unknown }).connectorId === 'string'
+      ? (input as { connectorId: string }).connectorId
+      : '',
+    blockedReasons: [blockedReason]
+  };
+}
+
+async function requestConnectorAuthorization(
+  event: IpcMainInvokeEvent,
+  input: unknown
+): Promise<ConnectorAuthorizationResult> {
+  if (!isTrustedConnectorSender(event) || isQuitting) {
+    return blockedConnectorAuthorization(input, 'confirmation-required');
+  }
+  const intent = normalizeConnectorRunIntent(input);
+  if (!intent) {
+    return blockedConnectorAuthorization(input, 'request-invalid');
+  }
+  const promptPreview = intent.prompt.length > 500
+    ? `${intent.prompt.slice(0, 500)}\n... (${intent.prompt.length} chars total)`
+    : intent.prompt;
+  try {
+    const confirmation = await dialog.showMessageBox(mainWindow!, {
+      type: 'warning',
+      buttons: ['取消', '授权一次'],
+      defaultId: 0,
+      cancelId: 0,
+      noLink: true,
+      title: '确认 Connector 执行',
+      message: `授权 ${intent.connectorId} 执行一次任务？`,
+      detail: `Agent: ${intent.agentId}\n任务: ${intent.taskName}\n\n${promptPreview}`
+    });
+    if (confirmation.response !== 1) {
+      return blockedConnectorAuthorization(intent, 'confirmation-required');
+    }
+    if (!isTrustedConnectorSender(event) || isQuitting) {
+      return blockedConnectorAuthorization(intent, 'runtime-unavailable');
+    }
+    return connectorRunAuthorizer.issueConfirmedGrant(intent);
+  } catch {
+    return blockedConnectorAuthorization(intent, 'runtime-unavailable');
+  }
 }
 
 function loadEntry(window: BrowserWindow, entry: 'index' | 'ranch') {
@@ -1320,6 +1387,23 @@ function registerIpc() {
     evaluateConnectorGateFromPolicy(createReadOnlyConnectorGateRequest(input))
   ));
 
+  ipcMain.handle(
+    'connectors:request-authorization',
+    (event, input: ConnectorAuthorizationIntent): Promise<ConnectorAuthorizationResult> => (
+      requestConnectorAuthorization(event, input)
+    )
+  );
+
+  ipcMain.handle(
+    'connectors:cancel-authorization',
+    (event, input: ConnectorAuthorizationCancelRequest): ConnectorAuthorizationCancelResult => {
+      if (!isTrustedConnectorSender(event)) {
+        return { status: 'not-found', grantId: '' };
+      }
+      return connectorRunAuthorizer.cancel(input?.grantId);
+    }
+  );
+
   ipcMain.handle('connectors:run', (event, input: ConnectorRunIntent): ConnectorRunResult => {
     if (!isTrustedConnectorSender(event)) {
       return {
@@ -1334,8 +1418,8 @@ function registerIpc() {
       taskName: input?.taskName,
       prompt: input?.prompt,
       retry: input?.retry,
-      requestedBy: 'default-action',
-      confirmationAccepted: false
+      authorizationGrant: input?.authorizationGrant,
+      requestedBy: 'explicit-user-action'
     });
   });
 
@@ -1406,6 +1490,7 @@ function isTrustedConnectorSender(event: IpcMainInvokeEvent) {
 app.whenReady().then(() => {
   snapshot = loadSnapshot();
   ranchPrefs = loadRanchPrefs();
+  connectorRunAuthorizer = createConnectorRunAuthorizer();
   connectorRuntime = createConnectorRuntime();
   registerIpc();
   registerRanchIpc();
@@ -1441,6 +1526,7 @@ app.whenReady().then(() => {
 
 app.on('before-quit', () => {
   isQuitting = true;
+  connectorRunAuthorizer?.dispose();
   connectorRuntime?.dispose();
   destroyRanchWindow();
   tray?.destroy();

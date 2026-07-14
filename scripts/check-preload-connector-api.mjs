@@ -24,6 +24,8 @@ for (const pattern of forbiddenPatterns) {
 
 const requiredApi = [
   'evaluateConnectorGate',
+  'requestConnectorAuthorization',
+  'cancelConnectorAuthorization',
   'runConnector',
   'stopConnector',
   'getConnectorRuntimeSnapshot',
@@ -39,6 +41,8 @@ for (const apiName of requiredApi) {
 
 const requiredChannels = [
   'connectors:evaluate-gate',
+  'connectors:request-authorization',
+  'connectors:cancel-authorization',
   'connectors:run',
   'connectors:stop',
   'connectors:get-runtime-snapshot',
@@ -53,7 +57,7 @@ for (const channel of requiredChannels) {
 }
 
 const runBody = source.match(/runConnector:[\s\S]*?stopConnector:/)?.[0] ?? '';
-for (const field of ['connectorId', 'agentId', 'taskName', 'prompt']) {
+for (const field of ['connectorId', 'agentId', 'taskName', 'prompt', 'authorizationGrant']) {
   if (!runBody.includes(`${field}: input.${field}`)) {
     errors.push(`runConnector must copy the allowed ${field} field explicitly`);
   }
@@ -77,6 +81,25 @@ if (/retry:\s*input\.retry(?:\s*[,}])/.test(runBody)) {
 
 if (/ipcRenderer\.invoke\([^,]+,\s*input\s*\)/.test(runBody)) {
   errors.push('runConnector must not pass the renderer object through to IPC');
+}
+
+const authorizationBody = source.match(/requestConnectorAuthorization:[\s\S]*?cancelConnectorAuthorization:/)?.[0] ?? '';
+for (const field of ['connectorId', 'agentId', 'taskName', 'prompt']) {
+  if (!authorizationBody.includes(`${field}: input.${field}`)) {
+    errors.push(`requestConnectorAuthorization must copy the allowed ${field} field explicitly`);
+  }
+}
+for (const forbiddenField of ['requestedBy', 'confirmationAccepted', 'authorizationGrant']) {
+  if (authorizationBody.includes(`${forbiddenField}: input.${forbiddenField}`)) {
+    errors.push(`requestConnectorAuthorization must not accept ${forbiddenField} from renderer input`);
+  }
+}
+if (/ipcRenderer\.invoke\([^,]+,\s*input\s*\)/.test(authorizationBody)) {
+  errors.push('requestConnectorAuthorization must not pass the renderer object through to IPC');
+}
+
+if (!/cancelConnectorAuthorization:[\s\S]*?\{\s*grantId:\s*input\.grantId\s*\}/.test(source)) {
+  errors.push('cancelConnectorAuthorization must forward only the opaque grantId');
 }
 
 if (!/stopConnector:[\s\S]*?\{\s*taskId:\s*input\.taskId\s*\}/.test(source)) {

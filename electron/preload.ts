@@ -1,6 +1,10 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import type {
   AgentSnapshot,
+  ConnectorAuthorizationCancelRequest,
+  ConnectorAuthorizationCancelResult,
+  ConnectorAuthorizationIntent,
+  ConnectorAuthorizationResult,
   ConnectorGateRequest,
   ConnectorGateResult,
   ConnectorRunIntent,
@@ -25,16 +29,29 @@ const api = {
   createTask: (input: CreateTaskInput): Promise<AgentSnapshot> => ipcRenderer.invoke('agents:create-task', input),
   evaluateConnectorGate: (input: ConnectorGateRequest): Promise<ConnectorGateResult> =>
     ipcRenderer.invoke('connectors:evaluate-gate', {
-      connectorId: input.connectorId,
-      requestedBy: input.requestedBy,
-      confirmationAccepted: input.confirmationAccepted
+      connectorId: input.connectorId
     }),
+  requestConnectorAuthorization: (input: ConnectorAuthorizationIntent): Promise<ConnectorAuthorizationResult> =>
+    ipcRenderer.invoke('connectors:request-authorization', {
+      connectorId: input.connectorId,
+      agentId: input.agentId,
+      taskName: input.taskName,
+      prompt: input.prompt,
+      retry: input.retry ? {
+        maxRetries: input.retry.maxRetries,
+        backoffMs: input.retry.backoffMs,
+        budgetMs: input.retry.budgetMs
+      } : undefined
+    }),
+  cancelConnectorAuthorization: (input: ConnectorAuthorizationCancelRequest): Promise<ConnectorAuthorizationCancelResult> =>
+    ipcRenderer.invoke('connectors:cancel-authorization', { grantId: input.grantId }),
   runConnector: (input: ConnectorRunIntent): Promise<ConnectorRunResult> =>
     ipcRenderer.invoke('connectors:run', {
       connectorId: input.connectorId,
       agentId: input.agentId,
       taskName: input.taskName,
       prompt: input.prompt,
+      authorizationGrant: input.authorizationGrant,
       retry: input.retry ? {
         maxRetries: input.retry.maxRetries,
         backoffMs: input.retry.backoffMs,

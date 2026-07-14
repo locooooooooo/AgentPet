@@ -1,5 +1,7 @@
 import type {
   AgentSnapshot,
+  ConnectorAuthorizationCancelRequest,
+  ConnectorAuthorizationIntent,
   ConnectorGateRequest,
   ConnectorRunIntent,
   ConnectorRuntimeSnapshot,
@@ -95,6 +97,15 @@ export function getDesktopApi(): DesktopApi {
       executable: false,
       connectorId: input.connectorId,
       blockedReasons: ['policy-unavailable']
+    }),
+    requestConnectorAuthorization: async (input: ConnectorAuthorizationIntent) => ({
+      status: 'blocked',
+      connectorId: input.connectorId,
+      blockedReasons: ['runtime-unavailable']
+    }),
+    cancelConnectorAuthorization: async (input: ConnectorAuthorizationCancelRequest) => ({
+      status: 'not-found',
+      grantId: input.grantId
     }),
     runConnector: async (input: ConnectorRunIntent) => ({
       status: 'blocked',

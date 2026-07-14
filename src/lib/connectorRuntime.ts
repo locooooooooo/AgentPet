@@ -1,5 +1,8 @@
 import type {
   AgentInstance,
+  ConnectorAuthorizationCancelResult,
+  ConnectorAuthorizationIntent,
+  ConnectorAuthorizationResult,
   ConnectorCapabilitySource,
   ConnectorFailureKind,
   ConnectorLifecycleSubtype,
@@ -44,6 +47,9 @@ const DEFAULT_HEARTBEAT_STALE_MS = 15_000;
 const MAX_RECOVERY_GRACE_MS = 10_000;
 const MAX_TERMINATION_GRACE_MS = 5_000;
 const DEFAULT_TERMINATION_GRACE_MS = 1_000;
+const DEFAULT_AUTHORIZATION_GRANT_TTL_MS = 30_000;
+const MAX_AUTHORIZATION_GRANT_TTL_MS = 60_000;
+const MAX_AUTHORIZATION_TOMBSTONES = 200;
 const ACTIVE_STATES = new Set<ConnectorRuntimeState>([
   'starting',
   'running',
@@ -104,7 +110,7 @@ export interface ConnectorRuntimeDependencies {
   workspaceRoot: string;
   sourceEnv: NodeJS.ProcessEnv;
   publish: (snapshot: ConnectorRuntimeSnapshot) => void;
-  authorizeRun?: (request: ConnectorRunRequest) => boolean;
+  authorizeRun?: (request: ConnectorRunRequest) => ConnectorAuthorizationDecision;
   loadPersistedSnapshot?: () => unknown;
   persistSnapshot?: (snapshot: ConnectorRuntimeSnapshot) => void;
   reattachProcess?: (session: ConnectorSession) => ConnectorReattachProof | null;
@@ -117,6 +123,173 @@ export interface ConnectorRuntimeDependencies {
   createId?: () => string;
   setTimer?: (callback: () => void, timeoutMs: number) => NodeJS.Timeout;
   clearTimer?: (timer: NodeJS.Timeout) => void;
+}
+
+export type ConnectorAuthorizationBlockedReason = Extract<
+  ConnectorRuntimeBlockedReason,
+  | 'confirmation-required'
+  | 'authorization-cancelled'
+  | 'authorization-expired'
+  | 'authorization-intent-mismatch'
+  | 'authorization-invalid'
+  | 'authorization-policy-drift'
+  | 'authorization-replayed'
+  | 'request-invalid'
+  | 'runtime-unavailable'
+>;
+
+export type ConnectorAuthorizationDecision =
+  | { authorized: true }
+  | { authorized: false; blockedReason: ConnectorAuthorizationBlockedReason };
+
+export interface ConnectorRunAuthorizerDependencies {
+  loadPolicy: () => ConnectorPolicyConfig | null;
+  grantTtlMs?: number;
+  now?: () => Date;
+  createId?: () => string;
+  setTimer?: (callback: () => void, timeoutMs: number) => NodeJS.Timeout;
+  clearTimer?: (timer: NodeJS.Timeout) => void;
+}
+
+interface ConnectorAuthorizationGrantRecord {
+  grantId: string;
+  intentKey: string;
+  policyFingerprint: string;
+  expiresAtMs: number;
+  expiryTimer: NodeJS.Timeout;
+}
+
+export class ConnectorRunAuthorizer {
+  private readonly now: () => Date;
+  private readonly createId: () => string;
+  private readonly setTimer: (callback: () => void, timeoutMs: number) => NodeJS.Timeout;
+  private readonly clearTimer: (timer: NodeJS.Timeout) => void;
+  private readonly grantTtlMs: number;
+  private readonly grants = new Map<string, ConnectorAuthorizationGrantRecord>();
+  private readonly tombstones = new Map<string, ConnectorAuthorizationBlockedReason>();
+  private disposed = false;
+
+  constructor(private readonly dependencies: ConnectorRunAuthorizerDependencies) {
+    this.now = dependencies.now ?? (() => new Date());
+    this.createId = dependencies.createId ?? (() => crypto.randomUUID());
+    this.setTimer = dependencies.setTimer ?? ((callback, timeoutMs) => setTimeout(callback, timeoutMs));
+    this.clearTimer = dependencies.clearTimer ?? ((timer) => clearTimeout(timer));
+    this.grantTtlMs = clampInteger(
+      dependencies.grantTtlMs,
+      1,
+      MAX_AUTHORIZATION_GRANT_TTL_MS,
+      DEFAULT_AUTHORIZATION_GRANT_TTL_MS
+    );
+  }
+
+  issueConfirmedGrant(input: unknown): ConnectorAuthorizationResult {
+    const intent = normalizeConnectorRunIntent(input);
+    if (!intent) {
+      return authorizationBlocked(readConnectorId(input), 'request-invalid');
+    }
+    if (this.disposed) {
+      return authorizationBlocked(intent.connectorId, 'runtime-unavailable');
+    }
+
+    const grantId = `connector-grant-${this.createId()}`;
+    const expiresAtMs = this.now().getTime() + this.grantTtlMs;
+    const expiryTimer = this.setTimer(() => {
+      const grant = this.grants.get(grantId);
+      if (!grant) {
+        return;
+      }
+      this.grants.delete(grantId);
+      this.recordTombstone(grantId, 'authorization-expired');
+    }, this.grantTtlMs);
+    this.grants.set(grantId, {
+      grantId,
+      intentKey: createRunIntentKey(intent),
+      policyFingerprint: this.readPolicyFingerprint(),
+      expiresAtMs,
+      expiryTimer
+    });
+    return {
+      status: 'granted',
+      connectorId: intent.connectorId,
+      grantId,
+      expiresAt: new Date(expiresAtMs).toISOString()
+    };
+  }
+
+  consume(request: ConnectorRunRequest): ConnectorAuthorizationDecision {
+    if (this.disposed) {
+      return { authorized: false, blockedReason: 'runtime-unavailable' };
+    }
+    const grantId = normalizeIdentifier(request.authorizationGrant);
+    if (!grantId) {
+      return { authorized: false, blockedReason: 'confirmation-required' };
+    }
+    const priorReason = this.tombstones.get(grantId);
+    if (priorReason) {
+      return { authorized: false, blockedReason: priorReason };
+    }
+    const grant = this.grants.get(grantId);
+    if (!grant) {
+      return { authorized: false, blockedReason: 'authorization-invalid' };
+    }
+
+    this.grants.delete(grantId);
+    this.clearTimer(grant.expiryTimer);
+    if (this.now().getTime() >= grant.expiresAtMs) {
+      this.recordTombstone(grantId, 'authorization-expired');
+      return { authorized: false, blockedReason: 'authorization-expired' };
+    }
+    const intent = normalizeConnectorRunIntent(request);
+    if (!intent || createRunIntentKey(intent) !== grant.intentKey) {
+      this.recordTombstone(grantId, 'authorization-intent-mismatch');
+      return { authorized: false, blockedReason: 'authorization-intent-mismatch' };
+    }
+    if (this.readPolicyFingerprint() !== grant.policyFingerprint) {
+      this.recordTombstone(grantId, 'authorization-policy-drift');
+      return { authorized: false, blockedReason: 'authorization-policy-drift' };
+    }
+    this.recordTombstone(grantId, 'authorization-replayed');
+    return { authorized: true };
+  }
+
+  cancel(grantIdInput: unknown): ConnectorAuthorizationCancelResult {
+    const grantId = normalizeIdentifier(grantIdInput) ?? '';
+    const grant = this.grants.get(grantId);
+    if (!grant) {
+      return { status: 'not-found', grantId };
+    }
+    this.grants.delete(grantId);
+    this.clearTimer(grant.expiryTimer);
+    this.recordTombstone(grantId, 'authorization-cancelled');
+    return { status: 'cancelled', grantId };
+  }
+
+  dispose(): void {
+    this.disposed = true;
+    this.grants.forEach((grant) => this.clearTimer(grant.expiryTimer));
+    this.grants.clear();
+    this.tombstones.clear();
+  }
+
+  private readPolicyFingerprint() {
+    try {
+      return stableSerialize(this.dependencies.loadPolicy());
+    } catch {
+      return stableSerialize(null);
+    }
+  }
+
+  private recordTombstone(grantId: string, reason: ConnectorAuthorizationBlockedReason) {
+    this.tombstones.delete(grantId);
+    this.tombstones.set(grantId, reason);
+    while (this.tombstones.size > MAX_AUTHORIZATION_TOMBSTONES) {
+      const oldest = this.tombstones.keys().next().value;
+      if (typeof oldest !== 'string') {
+        break;
+      }
+      this.tombstones.delete(oldest);
+    }
+  }
 }
 
 interface AdapterInvocation {
@@ -372,8 +545,9 @@ export class ConnectorRuntime {
       )]
     });
 
-    if (!this.isRunAuthorized(request)) {
-      const reasons: ConnectorRuntimeBlockedReason[] = ['confirmation-required'];
+    const authorization = this.authorizeRun(request);
+    if (!authorization.authorized) {
+      const reasons: ConnectorRuntimeBlockedReason[] = [authorization.blockedReason];
       this.blockSession(taskId, reasons);
       this.sensitivePrompts.delete(taskId);
       return blockedResult(request.connectorId, reasons, taskId, sessionId);
@@ -468,11 +642,18 @@ export class ConnectorRuntime {
     inactiveTaskIds.forEach((taskId) => this.stop({ taskId }));
   }
 
-  private isRunAuthorized(request: ConnectorRunRequest) {
+  private authorizeRun(request: ConnectorRunRequest): ConnectorAuthorizationDecision {
     try {
-      return this.dependencies.authorizeRun?.(request) === true;
+      const decision = this.dependencies.authorizeRun?.(request);
+      if (decision?.authorized === true) {
+        return { authorized: true };
+      }
+      if (decision?.authorized === false && isAuthorizationBlockedReason(decision.blockedReason)) {
+        return decision;
+      }
+      return { authorized: false, blockedReason: 'confirmation-required' };
     } catch {
-      return false;
+      return { authorized: false, blockedReason: 'authorization-invalid' };
     }
   }
 
@@ -487,7 +668,7 @@ export class ConnectorRuntime {
       {
         connectorId: request.connectorId,
         requestedBy: request.requestedBy,
-        confirmationAccepted: request.confirmationAccepted
+        confirmationAccepted: true
       },
       (command) => {
         resolvedExecutable = this.dependencies.resolveExecutable(command);
@@ -938,7 +1119,8 @@ export class ConnectorRuntime {
 
   private blockSession(taskId: string, blockedReasons: ConnectorRuntimeBlockedReason[]) {
     const permissionDenied = blockedReasons.includes('approval-not-accepted')
-      || blockedReasons.includes('confirmation-required');
+      || blockedReasons.includes('confirmation-required')
+      || blockedReasons.some((reason) => reason.startsWith('authorization-'));
     this.finishSession(taskId, permissionDenied ? 'permission-denied' : 'policy-blocked', {
       eventKind: 'policy',
       message: 'Connector execution was blocked before discovery or spawn.',
@@ -1354,14 +1536,37 @@ function normalizeRunRequest(input: unknown): ConnectorRunRequest | null {
     taskName,
     prompt,
     requestedBy,
-    confirmationAccepted: typeof input.confirmationAccepted === 'boolean'
-      ? input.confirmationAccepted
-      : undefined,
+    authorizationGrant: normalizeIdentifier(input.authorizationGrant) ?? undefined,
     retry: isRecord(input.retry) ? {
       maxRetries: numberOrUndefined(input.retry.maxRetries),
       backoffMs: numberOrUndefined(input.retry.backoffMs),
       budgetMs: numberOrUndefined(input.retry.budgetMs)
     } : undefined
+  };
+}
+
+export function normalizeConnectorRunIntent(input: unknown): ConnectorAuthorizationIntent | null {
+  if (!isRecord(input)) {
+    return null;
+  }
+  const connectorId = normalizeIdentifier(input.connectorId);
+  const agentId = normalizeIdentifier(input.agentId);
+  const taskName = normalizeText(input.taskName, MAX_TASK_NAME_LENGTH);
+  const prompt = normalizeText(input.prompt, MAX_PROMPT_LENGTH);
+  if (!connectorId || !agentId || !taskName || !prompt) {
+    return null;
+  }
+  const retry = normalizeRetryPolicy(isRecord(input.retry) ? {
+    maxRetries: numberOrUndefined(input.retry.maxRetries),
+    backoffMs: numberOrUndefined(input.retry.backoffMs),
+    budgetMs: numberOrUndefined(input.retry.budgetMs)
+  } : undefined);
+  return {
+    connectorId,
+    agentId,
+    taskName,
+    prompt,
+    retry
   };
 }
 
@@ -1406,6 +1611,53 @@ function blockedResult(
     ...(taskId ? { taskId } : {}),
     ...(sessionId ? { sessionId } : {})
   };
+}
+
+function authorizationBlocked(
+  connectorId: string,
+  blockedReason: ConnectorAuthorizationBlockedReason
+): ConnectorAuthorizationResult {
+  return {
+    status: 'blocked',
+    connectorId,
+    blockedReasons: [blockedReason]
+  };
+}
+
+function isAuthorizationBlockedReason(value: unknown): value is ConnectorAuthorizationBlockedReason {
+  return typeof value === 'string' && [
+    'confirmation-required',
+    'authorization-cancelled',
+    'authorization-expired',
+    'authorization-intent-mismatch',
+    'authorization-invalid',
+    'authorization-policy-drift',
+    'authorization-replayed',
+    'request-invalid',
+    'runtime-unavailable'
+  ].includes(value);
+}
+
+function createRunIntentKey(intent: ConnectorAuthorizationIntent) {
+  return stableSerialize({
+    connectorId: intent.connectorId,
+    agentId: intent.agentId,
+    taskName: intent.taskName,
+    prompt: intent.prompt,
+    retry: normalizeRetryPolicy(intent.retry)
+  });
+}
+
+function stableSerialize(value: unknown): string {
+  if (Array.isArray(value)) {
+    return `[${value.map(stableSerialize).join(',')}]`;
+  }
+  if (isRecord(value)) {
+    return `{${Object.keys(value).sort().map((key) => (
+      `${JSON.stringify(key)}:${stableSerialize(value[key])}`
+    )).join(',')}}`;
+  }
+  return JSON.stringify(value) ?? 'null';
 }
 
 function buildAgentInstances(sessions: ConnectorSession[]): AgentInstance[] {

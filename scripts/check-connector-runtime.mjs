@@ -18,18 +18,24 @@ const mainSource = fs.readFileSync(mainPath, 'utf8');
 const currentPolicy = JSON.parse(fs.readFileSync(policyPath, 'utf8'));
 
 const gateIndex = runtimeSource.indexOf('evaluateConnectorPolicyGate(');
+const authorizationIndex = runtimeSource.indexOf('const authorization = this.authorizeRun(request)');
 const discoveryIndex = runtimeSource.indexOf('this.dependencies.resolveExecutable(command)');
 const spawnIndex = runtimeSource.indexOf('this.dependencies.spawnProcess(');
+assert(authorizationIndex >= 0 && gateIndex > authorizationIndex, 'authorization must remain before policy gate');
 assert(gateIndex >= 0 && discoveryIndex > gateIndex && spawnIndex > discoveryIndex, 'gate must remain before discovery and spawn');
 assert(runtimeSource.includes('shell: false'), 'runtime spawn must force shell=false');
 assert(!/input\.(?:command|args|env|cwd|executable)/.test(runtimeSource), 'runtime must not read raw process fields');
 assert(mainSource.includes('isTrustedConnectorSender(event)'), 'main IPC must validate the sender window');
-assert(mainSource.includes("requestedBy: 'default-action'"), 'main IPC must override renderer requestedBy');
-assert(mainSource.includes('confirmationAccepted: false'), 'main IPC must reject renderer self-confirmation');
+assert(mainSource.includes("requestedBy: 'explicit-user-action'"), 'main IPC must own the explicit-user-action source');
+assert(!/requestedBy:\s*input(?:\?|\.)/.test(mainSource), 'main IPC must not accept renderer requestedBy');
+assert(!/confirmationAccepted:\s*input(?:\?|\.)/.test(mainSource), 'main IPC must not accept renderer confirmation');
 assert(mainSource.includes('createReadOnlyConnectorGateRequest(input)'), 'main gate query must normalize and override renderer proof');
 assert(!/connectors:evaluate-gate[\s\S]{0,250}evaluateConnectorGateFromPolicy\(input\)/.test(mainSource), 'main gate query must not forward renderer request object');
 const runtimeFactorySource = mainSource.match(/function createConnectorRuntime\(\)[\s\S]*?\n\}/)?.[0] ?? '';
-assert(!runtimeFactorySource.includes('authorizeRun:'), 'production runtime must not install a trusted authorizer in this slice');
+assert(runtimeFactorySource.includes('authorizeRun: (request) => connectorRunAuthorizer.consume(request)'), 'production runtime must consume the main-owned grant');
+assert(mainSource.includes('dialog.showMessageBox(mainWindow!'), 'main process must own the confirmation dialog');
+assert(mainSource.includes('connectorRunAuthorizer.issueConfirmedGrant(intent)'), 'main process must issue a grant only for normalized intent');
+assert(/app\.on\('before-quit'[\s\S]*?connectorRunAuthorizer\?\.dispose\(\)/.test(mainSource), 'app shutdown must dispose outstanding grants');
 assert(mainSource.includes('loadPersistedSnapshot: loadConnectorRuntimeSnapshot'), 'main must load persisted Connector sessions');
 assert(mainSource.includes('persistSnapshot: saveConnectorRuntimeSnapshot'), 'main must persist Connector sessions');
 assert(!mainSource.includes('reattachProcess:'), 'main must not probe external Agents in this slice');
@@ -49,7 +55,7 @@ const bundled = await build({
   write: false
 });
 const runtimeModule = await import(`data:text/javascript;base64,${Buffer.from(bundled.outputFiles[0].text).toString('base64')}`);
-const { ConnectorRuntime, computeHeartbeatFreshness, selectDirectConnectorExecutable } = runtimeModule;
+const { ConnectorRunAuthorizer, ConnectorRuntime, computeHeartbeatFreshness, selectDirectConnectorExecutable } = runtimeModule;
 
 const gateBundle = await build({
   entryPoints: [gatePath],
@@ -183,7 +189,7 @@ function createHarness(policy, options = {}) {
     },
     publish: (snapshot) => published.push(structuredClone(snapshot)),
     persistSnapshot: (snapshot) => persisted.push(structuredClone(snapshot)),
-    authorizeRun: options.authorizeRun ?? (() => true),
+    authorizeRun: options.authorizeRun ?? (() => ({ authorized: true })),
     heartbeatStaleAfterMs: options.heartbeatStaleAfterMs ?? 10_000,
     recoveryGraceMs: options.recoveryGraceMs ?? 500,
     terminationGraceMs: options.terminationGraceMs ?? 100,
@@ -246,29 +252,210 @@ function assertEventProof(session, expectedStarted, expectedTerminal) {
   assert(new Set(eventIds).size === eventIds.length, 'eventId must be unique within session audit');
 }
 
+function assertBlockedAudit(harness, result, expectedReason) {
+  assert(result.status === 'blocked', `${expectedReason} must return blocked`);
+  assert(result.blockedReasons.includes(expectedReason), `${expectedReason} must be returned to the caller`);
+  const audit = harness.runtime.getSessionAudit(result.sessionId);
+  assert(audit?.state === 'permission-denied', `${expectedReason} needs permission-denied audit`);
+  const policyEvent = audit.events.find((event) => event.kind === 'policy' && event.payload?.blockedReasons);
+  assert(policyEvent?.payload?.blockedReasons?.includes(expectedReason), `${expectedReason} must be retained in audit payload`);
+  assertEventProof(audit, 0, 1);
+}
+
+function createAuthorizerHarness(policy, options = {}) {
+  const timers = [];
+  let currentPolicy = structuredClone(policy);
+  let id = 0;
+  let nowMs = Date.parse(options.now ?? '2026-07-13T00:00:00.000Z');
+  const authorizer = new ConnectorRunAuthorizer({
+    loadPolicy: () => currentPolicy,
+    grantTtlMs: options.grantTtlMs ?? 1_000,
+    now: () => new Date(nowMs),
+    createId: () => `auth-${++id}`,
+    setTimer: (callback, timeoutMs) => {
+      const timer = { callback, timeoutMs, cleared: false };
+      timers.push(timer);
+      return timer;
+    },
+    clearTimer: (timer) => {
+      timer.cleared = true;
+    }
+  });
+  return {
+    authorizer,
+    timers,
+    advance(ms) {
+      nowMs += ms;
+    },
+    setPolicy(nextPolicy) {
+      currentPolicy = structuredClone(nextPolicy);
+    }
+  };
+}
+
 const request = {
   connectorId: 'codex',
   agentId: 'codex',
   taskName: 'fixture task',
   prompt: 'Return fixture JSON only.',
-  requestedBy: 'explicit-user-action',
-  confirmationAccepted: true
+  requestedBy: 'explicit-user-action'
 };
 
 const emptyRealHarness = createHarness(readyPolicy());
 assert(emptyRealHarness.runtime.getSnapshot().instances.length === 0, 'static policy/discovery must not create online instances');
 
 // Renderer-forged and replayed confirmation is blocked before discovery/spawn.
-const forgedHarness = createHarness(readyPolicy(), { authorizeRun: () => false });
+const forgedHarness = createHarness(readyPolicy(), {
+  authorizeRun: () => ({ authorized: false, blockedReason: 'authorization-invalid' })
+});
 for (let index = 0; index < 10; index += 1) {
   const blocked = forgedHarness.runtime.start({ ...request, replay: index });
-  assert(blocked.status === 'blocked', `forged request ${index} must be blocked`);
-  const audit = forgedHarness.runtime.getSessionAudit(blocked.sessionId);
-  assert(audit?.state === 'permission-denied', `forged request ${index} needs permission-denied audit`);
-  assertEventProof(audit, 0, 1);
+  assertBlockedAudit(forgedHarness, blocked, 'authorization-invalid');
 }
 assert(forgedHarness.discoveryCount === 0, 'forged confirmation 10/10 must not discover');
 assert(forgedHarness.spawnCalls.length === 0, 'forged confirmation 10/10 must not spawn');
+
+const authorizationIntent = {
+  connectorId: request.connectorId,
+  agentId: request.agentId,
+  taskName: request.taskName,
+  prompt: request.prompt
+};
+
+const missingAuthorizerHarness = createAuthorizerHarness(readyPolicy());
+const missingHarness = createHarness(readyPolicy(), {
+  authorizeRun: (candidate) => missingAuthorizerHarness.authorizer.consume(candidate)
+});
+for (let index = 0; index < 10; index += 1) {
+  assertBlockedAudit(missingHarness, missingHarness.runtime.start({
+    ...request,
+    taskName: `missing grant ${index}`
+  }), 'confirmation-required');
+}
+assert(missingHarness.discoveryCount === 0 && missingHarness.spawnCalls.length === 0, 'missing grant 10/10 must block before discovery/spawn');
+
+const invalidAuthorizerHarness = createAuthorizerHarness(readyPolicy());
+const invalidHarness = createHarness(readyPolicy(), {
+  authorizeRun: (candidate) => invalidAuthorizerHarness.authorizer.consume(candidate)
+});
+for (let index = 0; index < 10; index += 1) {
+  assertBlockedAudit(invalidHarness, invalidHarness.runtime.start({
+    ...request,
+    authorizationGrant: `connector-grant-forged-${index}`
+  }), 'authorization-invalid');
+}
+assert(invalidHarness.discoveryCount === 0 && invalidHarness.spawnCalls.length === 0, 'forged grant 10/10 must block before discovery/spawn');
+
+const replayAuthorizerHarness = createAuthorizerHarness(readyPolicy());
+const replayHarness = createHarness(readyPolicy(), {
+  authorizeRun: (candidate) => replayAuthorizerHarness.authorizer.consume(candidate)
+});
+const replayGrant = replayAuthorizerHarness.authorizer.issueConfirmedGrant(authorizationIntent);
+assert(replayGrant.status === 'granted', 'confirmed fixture must receive one opaque grant');
+const firstUse = replayHarness.runtime.start({ ...request, authorizationGrant: replayGrant.grantId });
+assert(firstUse.status === 'accepted', 'first matching grant use must be accepted by the ready fixture');
+for (let index = 0; index < 10; index += 1) {
+  assertBlockedAudit(replayHarness, replayHarness.runtime.start({
+    ...request,
+    authorizationGrant: replayGrant.grantId
+  }), 'authorization-replayed');
+}
+assert(replayHarness.discoveryCount === 1 && replayHarness.spawnCalls.length === 1, 'replay 10/10 must not add discovery/spawn after first fixture use');
+replayHarness.runtime.dispose();
+
+const expiryAuthorizerHarness = createAuthorizerHarness(readyPolicy(), { grantTtlMs: 1_000 });
+const expiryGrant = expiryAuthorizerHarness.authorizer.issueConfirmedGrant(authorizationIntent);
+assert(expiryGrant.status === 'granted', 'expiry fixture must receive a grant');
+expiryAuthorizerHarness.advance(1_000);
+const expiryHarness = createHarness(readyPolicy(), {
+  authorizeRun: (candidate) => expiryAuthorizerHarness.authorizer.consume(candidate)
+});
+assertBlockedAudit(expiryHarness, expiryHarness.runtime.start({
+  ...request,
+  authorizationGrant: expiryGrant.grantId
+}), 'authorization-expired');
+assert(expiryHarness.discoveryCount === 0 && expiryHarness.spawnCalls.length === 0, 'expired grant must block before discovery/spawn');
+
+const mismatchAuthorizerHarness = createAuthorizerHarness(readyPolicy());
+const mismatchHarness = createHarness(readyPolicy(), {
+  authorizeRun: (candidate) => mismatchAuthorizerHarness.authorizer.consume(candidate)
+});
+for (const [field, value] of [
+  ['connectorId', 'trae'],
+  ['agentId', 'agent-other'],
+  ['taskName', 'changed task'],
+  ['prompt', 'Changed prompt.']
+]) {
+  const grant = mismatchAuthorizerHarness.authorizer.issueConfirmedGrant(authorizationIntent);
+  assert(grant.status === 'granted', `${field} mismatch fixture must receive a grant`);
+  assertBlockedAudit(mismatchHarness, mismatchHarness.runtime.start({
+    ...request,
+    [field]: value,
+    authorizationGrant: grant.grantId
+  }), 'authorization-intent-mismatch');
+}
+assert(mismatchHarness.discoveryCount === 0 && mismatchHarness.spawnCalls.length === 0, 'intent mismatch must block before discovery/spawn');
+
+const driftAuthorizerHarness = createAuthorizerHarness(readyPolicy());
+const driftGrant = driftAuthorizerHarness.authorizer.issueConfirmedGrant(authorizationIntent);
+assert(driftGrant.status === 'granted', 'policy drift fixture must receive a grant');
+driftAuthorizerHarness.setPolicy({ ...readyPolicy(), version: 1, connectors: readyPolicy().connectors.map((connector) => ({
+  ...connector,
+  acceptanceGate: `${connector.acceptanceGate} changed`
+})) });
+const driftHarness = createHarness(readyPolicy(), {
+  authorizeRun: (candidate) => driftAuthorizerHarness.authorizer.consume(candidate)
+});
+assertBlockedAudit(driftHarness, driftHarness.runtime.start({
+  ...request,
+  authorizationGrant: driftGrant.grantId
+}), 'authorization-policy-drift');
+assert(driftHarness.discoveryCount === 0 && driftHarness.spawnCalls.length === 0, 'policy drift must block before discovery/spawn');
+
+const cancelledAuthorizerHarness = createAuthorizerHarness(readyPolicy());
+const cancelledGrant = cancelledAuthorizerHarness.authorizer.issueConfirmedGrant(authorizationIntent);
+assert(cancelledGrant.status === 'granted', 'cancellation fixture must receive a grant');
+assert(cancelledAuthorizerHarness.authorizer.cancel(cancelledGrant.grantId).status === 'cancelled', 'outstanding grant must cancel once');
+const cancelledHarness = createHarness(readyPolicy(), {
+  authorizeRun: (candidate) => cancelledAuthorizerHarness.authorizer.consume(candidate)
+});
+assertBlockedAudit(cancelledHarness, cancelledHarness.runtime.start({
+  ...request,
+  authorizationGrant: cancelledGrant.grantId
+}), 'authorization-cancelled');
+assert(cancelledHarness.discoveryCount === 0 && cancelledHarness.spawnCalls.length === 0, 'cancelled grant must block before discovery/spawn');
+
+const cleanupAuthorizerHarness = createAuthorizerHarness(readyPolicy());
+const cleanupGrant = cleanupAuthorizerHarness.authorizer.issueConfirmedGrant(authorizationIntent);
+cleanupAuthorizerHarness.authorizer.issueConfirmedGrant({ ...authorizationIntent, taskName: 'cleanup second grant' });
+assert(cleanupAuthorizerHarness.timers.filter((timer) => !timer.cleared).length === 2, 'authorizer fixture must start with two live expiry timers');
+cleanupAuthorizerHarness.authorizer.dispose();
+assert(cleanupAuthorizerHarness.timers.every((timer) => timer.cleared), 'authorizer dispose must clear every expiry timer');
+assert(cleanupGrant.status === 'granted' && cleanupAuthorizerHarness.authorizer.consume({
+  ...request,
+  authorizationGrant: cleanupGrant.grantId
+}).blockedReason === 'runtime-unavailable', 'disposed authorizer must invalidate outstanding grants');
+
+const codexPolicy = currentPolicy.connectors.find((connector) => connector.id === 'codex');
+assert(codexPolicy?.status === 'draft' && codexPolicy.approvalStatus === 'pending' && codexPolicy.enabledByDefault === false, 'current Codex policy must remain draft/pending/disabled');
+assert(currentPolicy.connectors.filter((connector) => connector.id === 'trae' || connector.id === 'qoder').every((connector) => connector.status === 'placeholder'), 'Trae/Qoder must remain placeholders');
+const productionAuthorizerHarness = createAuthorizerHarness(currentPolicy);
+const productionHarness = createHarness(currentPolicy, {
+  authorizeRun: (candidate) => productionAuthorizerHarness.authorizer.consume(candidate)
+});
+for (const connector of currentPolicy.connectors) {
+  const intent = { ...authorizationIntent, connectorId: connector.id, agentId: connector.id };
+  const grant = productionAuthorizerHarness.authorizer.issueConfirmedGrant(intent);
+  assert(grant.status === 'granted', `${connector.id} production policy fixture must receive confirmation grant`);
+  const blocked = productionHarness.runtime.start({
+    ...request,
+    ...intent,
+    authorizationGrant: grant.grantId
+  });
+  assert(blocked.status === 'blocked', `${connector.id} current production policy must stay blocked after confirmation`);
+  assertEventProof(productionHarness.runtime.getSessionAudit(blocked.sessionId), 0, 1);
+}
+assert(productionHarness.discoveryCount === 0 && productionHarness.spawnCalls.length === 0, 'current production policy must keep every Connector at spawn=0');
 
 const policyBlockedHarness = createHarness(currentPolicy);
 for (let index = 0; index < 10; index += 1) {
@@ -573,6 +760,8 @@ console.log('P2: deterministic active/fresh selector and capability evidence ver
 console.log('A4 P1-1: retrying clears prior pid/fresh lastSeen; new spawn provides new pid/liveness');
 console.log('A4 P1-2: Authorization/Bearer/spaced credential values redact without swallowing ordinary logs');
 console.log('A5: evaluate-gate ignores renderer requestedBy/confirmation and remains confirmation-required');
+console.log('A6: main-owned grant missing/forged/expired/replayed/mismatched/drift/cancelled paths verified');
+console.log('A6 production policy: Codex/Trae/Qoder discovery=0, spawn=0 after confirmation grant');
 console.log('security: forged/replayed renderer confirmation 10/10 blocked before discovery/spawn');
 console.log('external Agent CLI execution: not performed');
 
