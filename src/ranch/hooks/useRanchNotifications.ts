@@ -14,7 +14,7 @@ export function useRanchNotifications(
   const isHydratedRef = useRef(false);
   const lastMessageIdRef = useRef<string | null>(null);
   const prefsRef = useRef<RanchPrefs | null>(prefs);
-  const timeoutIdsRef = useRef<number[]>([]);
+  const toastTimeoutIdRef = useRef<number | null>(null);
 
   useEffect(() => {
     prefsRef.current = prefs;
@@ -30,8 +30,10 @@ export function useRanchNotifications(
   }, [snapshot]);
 
   useEffect(() => () => {
-    timeoutIdsRef.current.forEach((timeoutId) => window.clearTimeout(timeoutId));
-    timeoutIdsRef.current = [];
+    if (toastTimeoutIdRef.current !== null) {
+      window.clearTimeout(toastTimeoutIdRef.current);
+      toastTimeoutIdRef.current = null;
+    }
   }, []);
 
   useEffect(() => {
@@ -47,11 +49,18 @@ export function useRanchNotifications(
     }
 
     if (currentPrefs.notifyPrefs.bubble && allowsRanchToast(currentPrefs.personality, latestMessage)) {
-      setToasts((currentToasts) => [latestMessage, ...currentToasts.filter((toast) => toast.id !== latestMessage.id)].slice(0, MAX_TOASTS));
+      if (toastTimeoutIdRef.current !== null) {
+        window.clearTimeout(toastTimeoutIdRef.current);
+      }
+
+      setToasts([latestMessage].slice(0, MAX_TOASTS));
       const timeoutId = window.setTimeout(() => {
         setToasts((currentToasts) => currentToasts.filter((toast) => toast.id !== latestMessage.id));
+        if (toastTimeoutIdRef.current === timeoutId) {
+          toastTimeoutIdRef.current = null;
+        }
       }, TOAST_TTL_MS);
-      timeoutIdsRef.current.push(timeoutId);
+      toastTimeoutIdRef.current = timeoutId;
     }
 
     if (
@@ -68,6 +77,10 @@ export function useRanchNotifications(
 
   useEffect(() => {
     if (prefs?.personality === 'silent' || prefs?.notifyPrefs.bubble === false) {
+      if (toastTimeoutIdRef.current !== null) {
+        window.clearTimeout(toastTimeoutIdRef.current);
+        toastTimeoutIdRef.current = null;
+      }
       setToasts([]);
     }
   }, [prefs?.notifyPrefs.bubble, prefs?.personality]);
