@@ -3,8 +3,8 @@
 [PM]#m5-longworker-dispatch@v0.1
 ⟦tag:v2|task|m5-longworker-dispatch-v0.1⟧
 
-loop state: standby
-dispatch state: standby
+loop state: summarized
+dispatch state: summarized
 
 > **创建日期**:2026-07-10
 > **承接**:`docs/orchestration/sessions/weekly-requirements-2026-07-14.md` §一 P0-1 激活前置
@@ -209,8 +209,8 @@ dispatch state: standby
 
 ## next action:
 
-- Day 1/2 ranch-window residual risk is retained and Day 3/4/5A are closed through existing implementation evidence. Commit the Day 5A validation/control package, then dispatch `[短工]#ranch-system-notify@v0.2`.
-- Day 5A direct pointer evidence remains waived residual risk; do not rewrite it as passed while starting Day 5B.
+- All five M5 child cards are code-backed closed. Preserve direct tray/pointer and Windows notification visibility as waived residual risk; do not rewrite them as passed.
+- Keep M5 product dispatch closed after the Day 5B/final control-plane commit; any future replay requires a fresh bounded evidence lane.
 - 长工交付后,PM-direct 跑三件套 + commit/push
 - ranch-window-v0.2 收口后再按串行序列开 ranch-status-script-v0.2
 

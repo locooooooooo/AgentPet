@@ -2,12 +2,12 @@
   "identity": "[PM]#multi-agent-control@v0.1",
   "loopState": "active",
   "dispatchState": "active",
-  "target": "2026-07-14 M5 Day 5A fence/pointer existing implementation is contract and Electron-capture verified without product changes. Current status is `day5b_authorized_after_day5a_code_backed_closeout`; only `ranch-system-notify-v0.2` may start next. Direct tray/pointer evidence、Windows notification visibility、R0-3 dry-run、protected source、quota 和项目 Codex/Trae/Qoder connector 继续各自 standby/blocked。",
+  "target": "2026-07-14 M5 five-day development is `completed_code_backed_with_manual_evidence_waived`: Day 5B fixed stale toast timers and passed notification/icon/fallback checks. No M5 product worker is authorized next. Direct tray/pointer evidence、Windows notification visibility、R0-3 dry-run、protected source、quota 和项目 Codex/Trae/Qoder connector 继续各自 standby/blocked。",
   "source": "docs/orchestration/index.md",
   "todayPlan": {
     "date": "2026-07-14",
     "session": "docs/orchestration/sessions/m5-five-day-development-2026-07-14.md",
-    "selectedRoute": "Day 5A fence/pointer existing implementation is contract verified with direct pointer residual risk; commit validation/control evidence and dispatch only ranch-system-notify-v0.2 while GitHub push remains network-blocked",
+    "selectedRoute": "M5 five-day development code-backed closeout; Day 5B correction is committed as 115c621, so commit final control evidence, retry accumulated local commits push, and keep all M5 product lanes closed",
     "progress": "docs/orchestration/sessions/m5-five-day-development-2026-07-14.md"
   },
   "p0Cards": [
@@ -298,7 +298,7 @@
       "title": "[PM]#weekly-requirements@2026-07-14",
       "owner": "主控",
       "status": "active",
-      "responsibility": "Maintain active W28 requirements; Day 5A fence/pointer is code-backed closed with direct pointer residual risk, so ranch-system-notify-v0.2 is authorized next.",
+      "responsibility": "Maintain active W28 requirements; M5 five-day development is code-backed complete with manual tray/pointer/Windows notification evidence explicitly waived as residual risk.",
       "tag": "⟦tag:v2|session|weekly-requirements-2026-07-14⟧",
       "evidence": "docs/orchestration/sessions/weekly-requirements-2026-07-14.md"
     },
@@ -306,8 +306,8 @@
       "id": "m5-longworker-dispatch",
       "title": "[PM]#m5-longworker-dispatch@v0.1",
       "owner": "主控",
-      "status": "active",
-      "responsibility": "M5 serial dispatch package; Day 5A fence/pointer is contract verified without product changes. Dispatch only ranch-system-notify-v0.2 next; project Codex/Trae/Qoder connectors remain disabled.",
+      "status": "summarized",
+      "responsibility": "M5 serial dispatch package summarized after all five child cards closed; no further M5 product worker is authorized and project Codex/Trae/Qoder connectors remain disabled.",
       "tag": "⟦tag:v2|task|m5-longworker-dispatch-v0.1⟧",
       "evidence": "docs/orchestration/tasks/m5-longworker-dispatch-v0.1.md"
     },
@@ -315,8 +315,8 @@
       "id": "m5-five-day-development",
       "title": "[PM]#m5-five-day-development@2026-07-14",
       "owner": "主控",
-      "status": "active",
-      "responsibility": "Track M5 in `day5b_authorized_after_day5a_code_backed_closeout`; retain direct tray/pointer residual risk, dispatch ranch-system-notify-v0.2 next, and keep Windows notification visibility explicit.",
+      "status": "summarized",
+      "responsibility": "M5 closed as `completed_code_backed_with_manual_evidence_waived`; retain direct tray/pointer and Windows notification visibility as residual risk and authorize no further product worker.",
       "tag": "⟦tag:v2|session|m5-five-day-development-2026-07-14⟧",
       "evidence": "docs/orchestration/sessions/m5-five-day-development-2026-07-14.md"
     },
@@ -418,7 +418,7 @@
       "title": "每日计划督办",
       "role": "[PM]#daily-supervision@2026-07-02",
       "state": "active",
-      "nextAction": "监督 W28 active 与 M5 day5b_authorized_after_day5a_code_backed_closeout；保留直接 tray/pointer 残余风险，只放行 ranch-system-notify-v0.2，并继续守住 connector、protected source 和 Windows notification evidence 边界。"
+      "nextAction": "监督 W28 active 与 M5 completed_code_backed_with_manual_evidence_waived；保留直接 tray/pointer 和 Windows notification visibility 残余风险，关闭 M5 产品派工，并继续守住 connector 与 protected source 边界。"
     },
     {
       "id": "codex-evidence-closeout",

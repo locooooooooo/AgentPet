@@ -3,9 +3,9 @@
 [短工]#ranch-system-notify@v0.2
 ⟦tag:v2|task|ranch-system-notify-v0.2⟧
 
-loop state: standby
-dispatch state: standby
-status: standby
+loop state: summarized
+dispatch state: summarized
+status: accepted_code_backed_residual_risk_windows_notification_waived
 
 parent: `docs/orchestration/tasks/ranch-m5-requirements-v0.2.md`
 source summary: `docs/orchestration/tasks/ranch-status-script-v0.1.md`
@@ -39,7 +39,15 @@ acceptance for a future implementation lane:
 - `npm.cmd run lint`, `npm.cmd run build`, `npm.cmd run orchestration:check`, and connector safety gates pass.
 
 next action:
-- Keep standby until `ranch-fence-pointer-v0.2` is accepted, committed, pushed, and the worktree is clean; only then, on 2026-07-18, PM may dispatch this card as the only `[短工]` product worker.
+- Day 5B is closed under the administrator's explicit manual-acceptance waiver. Do not report a Windows notification as displayed; retain that observation as residual risk.
+- Complete the M5 five-day closeout after the full automated gate set and an independent commit.
 
 summary:
-- Requirements-ready child card for system notification behavior; no implementation started.
+- System notification behavior is code-backed closed after fixing stale toast timers. Enabled success/error routing, disabled renderer/main fail-closed, 8/8 existing icon lookup, missing-icon fallback, single 1500ms status band and unmount cleanup are verified; real Windows notification visibility remains waived residual risk.
+
+evidence:
+- `node scripts/check-ranch-system-notify.mjs` -> 8/8 icons, default missing-icon fallback, renderer/main disable gate, single timer and `windowsNotificationObserved=false`.
+- `node scripts/check-ranch-personality.mjs` and `node scripts/check-ranch-status-coverage.mjs` -> personality matrix, 8 identities, 14 statuses, one 1500ms status band.
+- Worker fixed `src/ranch/hooks/useRanchNotifications.ts` so rapid messages, silent/bubble-off transitions and unmount clear the single active timer.
+- Day 5B implementation/check commit: `115c621`.
+- Acceptance record: `docs/orchestration/sessions/ranch-system-notify-v0.2-acceptance-2026-07-14.md`.

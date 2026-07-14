@@ -57,12 +57,12 @@ role ledger:
 | `[PM]#protected-cockpit-source-drift@v0.1` | standby | `docs/orchestration/tasks/protected-cockpit-source-drift-v0.1.md` | Preserve the W28 bounded-lane route without editing protected source until a fresh bounded authorization exists. |
 | `[长工]#homepage-ui-design@v0.1` homepage-ui-design lane | summarized | `docs/orchestration/sessions/homepage-ui-p0-c0-6-style-2026-07-07.md` | C · 华丽 HomePage is verified; do not create a duplicate thread and keep §〇·quarter selling-point files untouched. |
 | `[PM]#weekly-requirements@2026-07-07` | summarized | `docs/orchestration/sessions/weekly-requirements-2026-07-07.md` | Preserve W27 accepted outcomes and final closeout evidence as history. |
-| `[PM]#weekly-requirements@2026-07-14` weekly-requirements lane | active | `docs/orchestration/status.json` | Own the active weekly lane; preserve direct tray/pointer residual risk and allow only ranch-system-notify-v0.2 next. |
-| `[PM]#weekly-requirements@2026-07-14` | active | `docs/orchestration/sessions/weekly-requirements-2026-07-14.md` | Maintain W28 planning; Day 5A is code-backed closed while Day 5B proceeds. |
+| `[PM]#weekly-requirements@2026-07-14` weekly-requirements lane | active | `docs/orchestration/status.json` | Own the active weekly lane; preserve M5 residual risk and keep all M5 product dispatch closed. |
+| `[PM]#weekly-requirements@2026-07-14` | active | `docs/orchestration/sessions/weekly-requirements-2026-07-14.md` | Maintain W28 planning after the code-backed M5 five-day closeout. |
 | `[PM]#daily-plan@2026-07-09` | summarized | `docs/orchestration/sessions/daily-plan-2026-07-09.md` | Retain B②/C short-worker/D 今天/E1 as summarized historical evidence. |
 | `[PM]#daily-plan@2026-07-10` | summarized | `docs/orchestration/sessions/daily-plan-2026-07-10.md` | Preserve the administrator decisions and W27/W28 preparation as summarized history. |
-| `[PM]#m5-longworker-dispatch@v0.1` | active | `docs/orchestration/tasks/m5-longworker-dispatch-v0.1.md` | Day 5A fence/pointer is code-backed closed with residual risk; dispatch only ranch-system-notify-v0.2 next. |
-| `[PM]#m5-five-day-development@2026-07-14` | active | `docs/orchestration/sessions/m5-five-day-development-2026-07-14.md` | Track `day5b_authorized_after_day5a_code_backed_closeout`; preserve direct tray/pointer residual risk and dispatch only ranch-system-notify-v0.2 next. |
+| `[PM]#m5-longworker-dispatch@v0.1` | summarized | `docs/orchestration/tasks/m5-longworker-dispatch-v0.1.md` | Preserve the completed five-card dispatch history and authorize no further M5 product worker. |
+| `[PM]#m5-five-day-development@2026-07-14` | summarized | `docs/orchestration/sessions/m5-five-day-development-2026-07-14.md` | Preserve `completed_code_backed_with_manual_evidence_waived` and its direct tray/pointer/Windows notification residual risk. |
 
 acceptance:
 - Every non-summarized open item has an accountability action and evidence source.

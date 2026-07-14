@@ -8,7 +8,7 @@ loop state: active
 dispatch state: active
 
 > **计划周期**: 2026-07-14 ~ 2026-07-20 (W28)
-> **当前状态**: active; M5 Day 5A fence/pointer existing implementation is contract verified without product changes; Day 5B `ranch-system-notify-v0.2` is authorized
+> **当前状态**: active; M5 five-day development is code-backed complete with manual tray/pointer/Windows notification evidence waived as residual risk; no M5 product worker remains authorized
 > **激活证据**: 2026-07-11 16:00 +08:00 W27 final closeout 已通过 fresh gates，并将 W27 summarized。
 > **硬边界**: Day 1 未接受和推送前不得以 2026-07-12 日历门启动 Day 2；仍仅按 `m5-five-day-development-2026-07-14.md` 串行实施,不执行项目 Codex/Trae/Qoder connector、不修改 protected source 或 connector machine gate。
 
@@ -33,7 +33,7 @@ dispatch state: active
 
 | 优先级 | 候选 | 当前边界 | 激活前置 |
 | --- | --- | --- | --- |
-| P0-1 | M5 v0.2 五日串行实施 | Direct tray/pointer residual risk retained; Day 3/4/5A code-backed closeout complete; GitHub push blocked by network | Commit Day 5A validation/control docs -> dispatch ranch-system-notify Day 5B |
+| P0-1 | M5 v0.2 五日串行实施 | Code-backed complete; Day 5B correction committed as `115c621`; manual evidence retained as residual risk | Commit final control-plane closeout -> retry accumulated GitHub push |
 | P0-2 | R0-3 Codex controlled dry-run | 仍 standby;不改 `approvalStatus` / `enabledByDefault` / `command` | W28 明确执行窗口、隔离 cwd 和 evidence 路径后再二次确认 |
 | P0-3 | Transparent ranch full pointer input evidence | capturePage 仅证明可见渲染;完整 pointer input 未 accepted | 明确 observer/automation route,保持 implementation 与 evidence 分离 |
 
@@ -73,8 +73,8 @@ acceptance:
 - `npm.cmd run orchestration:check` passes。
 
 next action:
-- 将 M5 五日总控切到 `day5b_authorized_after_day5a_code_backed_closeout`；保留直接 tray/pointer 残余风险。
-- Day 5A validation/control commit 后派 `[短工]#ranch-system-notify@v0.2`；真实 Windows notification visibility 继续单独记证据边界。
+- 将 M5 五日总控收口为 `completed_code_backed_with_manual_evidence_waived`；保留直接 tray/pointer 与 Windows notification visibility 残余风险。
+- 保留 Day 5B commit `115c621`，提交最终控制面并重试累计本地提交推送；不再放行 M5 产品 worker。
 - R0-3 dry-run、protected source、quota recheck 和 pointer evidence 仍需各自 bounded activation。
 
 summary:
