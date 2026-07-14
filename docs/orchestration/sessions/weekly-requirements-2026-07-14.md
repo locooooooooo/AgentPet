@@ -33,7 +33,7 @@ dispatch state: active
 
 | 优先级 | 候选 | 当前边界 | 激活前置 |
 | --- | --- | --- | --- |
-| P0-1 | M5 v0.2 五日串行实施 | Code-backed complete; Day 5B correction committed as `115c621`; manual evidence retained as residual risk | Commit final control-plane closeout -> retry accumulated GitHub push |
+| P0-1 | M5 v0.2 五日串行实施 | Code-backed complete and pushed through `8df940c`; manual evidence retained as residual risk | No further M5 product action; preserve closeout during W28 buffer |
 | P0-2 | R0-3 Codex controlled dry-run | 仍 standby;不改 `approvalStatus` / `enabledByDefault` / `command` | W28 明确执行窗口、隔离 cwd 和 evidence 路径后再二次确认 |
 | P0-3 | Transparent ranch full pointer input evidence | capturePage 仅证明可见渲染;完整 pointer input 未 accepted | 明确 observer/automation route,保持 implementation 与 evidence 分离 |
 
@@ -74,7 +74,7 @@ acceptance:
 
 next action:
 - 将 M5 五日总控收口为 `completed_code_backed_with_manual_evidence_waived`；保留直接 tray/pointer 与 Windows notification visibility 残余风险。
-- 保留 Day 5B commit `115c621`，提交最终控制面并重试累计本地提交推送；不再放行 M5 产品 worker。
+- M5 Day 5B `115c621` 与最终收口 `8df940c` 已推送；W28 buffer 内不再放行 M5 产品 worker。
 - R0-3 dry-run、protected source、quota recheck 和 pointer evidence 仍需各自 bounded activation。
 
 summary:

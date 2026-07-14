@@ -40,7 +40,7 @@ acceptance for a future implementation lane:
 
 next action:
 - Day 5B is closed under the administrator's explicit manual-acceptance waiver. Do not report a Windows notification as displayed; retain that observation as residual risk.
-- Complete the M5 five-day closeout after the full automated gate set and an independent commit.
+- Preserve pushed Day 5B commit `115c621` and final M5 closeout `8df940c`; any real Windows notification replay requires a fresh evidence lane.
 
 summary:
 - System notification behavior is code-backed closed after fixing stale toast timers. Enabled success/error routing, disabled renderer/main fail-closed, 8/8 existing icon lookup, missing-icon fallback, single 1500ms status band and unmount cleanup are verified; real Windows notification visibility remains waived residual risk.

@@ -210,9 +210,8 @@ dispatch state: summarized
 ## next action:
 
 - All five M5 child cards are code-backed closed. Preserve direct tray/pointer and Windows notification visibility as waived residual risk; do not rewrite them as passed.
-- Keep M5 product dispatch closed after the Day 5B/final control-plane commit; any future replay requires a fresh bounded evidence lane.
-- 长工交付后,PM-direct 跑三件套 + commit/push
-- ranch-window-v0.2 收口后再按串行序列开 ranch-status-script-v0.2
+- M5 product dispatch is closed after Day 5B `115c621` and final closeout `8df940c` were pushed; any future replay requires a fresh bounded evidence lane.
+- Preserve the completed serial history; do not restart an earlier child card from this package.
 
 ---
 

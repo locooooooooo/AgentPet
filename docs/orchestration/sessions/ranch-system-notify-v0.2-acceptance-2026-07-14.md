@@ -44,7 +44,7 @@ status: accepted_code_backed_residual_risk_windows_notification_waived
 
 ## next action
 
-- Day 5B correction/check is committed as `115c621`. Commit the final M5 control-plane closeout, then attempt the accumulated local commits push without reopening any connector or product lane.
+- Day 5B correction/check `115c621` and final M5 closeout `8df940c` are pushed to `origin/main`; no connector or M5 product lane is reopened.
 
 ## summary
 

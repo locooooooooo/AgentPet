@@ -51,7 +51,7 @@ status: completed_code_backed_with_manual_evidence_waived
 - At most one product worker may be active.
 - The next lane may start only after the previous lane has: callback -> independent PM acceptance -> full gates -> commit -> push -> clean worktree.
 - Day 1 and Day 2 use the same ranch-window long-worker; do not create a second implementation owner.
-- Day 5B normally requires Day 5A direct pointer evidence and a pushed commit. The 2026-07-14 administrator waiver accepts that missing evidence as residual risk and allows a local-commit gate while GitHub is network-blocked; it does not convert the evidence to pass.
+- Day 5B normally requires Day 5A direct pointer evidence and a pushed commit. The 2026-07-14 administrator waiver accepted that missing evidence as residual risk and temporarily allowed a local-commit gate while GitHub was network-blocked; the accumulated push later succeeded without converting the evidence to pass.
 - If work exceeds a calendar day, carry the same lane forward and leave later lanes pending; do not force a false daily pass.
 
 ## behavior-first FR interpretation
@@ -109,7 +109,7 @@ Additional Electron acceptance must cover the relevant success path, failure/dis
 
 - All five M5 child cards are summarized only after current evidence proves their acceptance.
 - Every ledger row truthfully names its worker/PM fallback, acceptance source, evidence limit and independent local commit.
-- W27 is summarized and W28 is active. The administrator waiver permits local serial commits while GitHub push is blocked; origin drift must remain explicit until a later push succeeds.
+- W27 is summarized and W28 is active. The administrator waiver permitted local serial commits during the temporary GitHub blocker; the accumulated commits through final closeout `8df940c` were later pushed successfully.
 - Connector machine gates and protected boundaries remain intact.
 - Final callback uses `completed / incomplete / blockers / next action / evidence / commits`.
 - If any lane is not accepted after the five-day window, write a truthful closeout and keep the goal active.
@@ -126,7 +126,7 @@ incomplete:
 - Day 2 direct pointer evidence remains missing by explicit administrator waiver; it must stay recorded as residual risk rather than pass evidence.
 - Day 5A callback and acceptance record are complete without product changes; its direct pointer rows remain waived residual risk.
 - Day 5B callback and acceptance record are complete; real Windows notification visibility remains waived residual risk.
-- The Day 5B correction is committed as `115c621`; the final control-plane closeout commit and accumulated GitHub push remain pending.
+- The Day 5B correction `115c621` and final control-plane closeout `8df940c` are pushed to `origin/main`.
 
 blockers:
 - Windows automation identified the Electron windows but failed to obtain a reliable transparent-window interaction state with `SetIsBorderRequired failed: 不支持此接口 (0x80004002)`; capture/CDP evidence does not prove tray interaction.
@@ -135,8 +135,8 @@ blockers:
 - Existing connector, pointer, protected-source, and live-subagent quota blockers remain separate; none is silently accepted by this plan.
 
 next action:
-- Commit the final M5 control-plane closeout; the Day 5B timer correction and notification check are already committed as `115c621`.
-- Retry the accumulated local commits push. Do not reopen M5 product work if GitHub remains network-blocked.
+- Keep the pushed M5 closeout immutable except for truthful evidence corrections.
+- Do not reopen M5 product work; any future tray/pointer/Windows notification replay requires a fresh bounded evidence lane.
 
 evidence:
 - Baseline at creation: `HEAD == origin/main == 1d9d5b0`; worktree clean.

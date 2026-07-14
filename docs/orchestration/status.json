@@ -7,7 +7,7 @@
   "todayPlan": {
     "date": "2026-07-14",
     "session": "docs/orchestration/sessions/m5-five-day-development-2026-07-14.md",
-    "selectedRoute": "M5 five-day development code-backed closeout; Day 5B correction is committed as 115c621, so commit final control evidence, retry accumulated local commits push, and keep all M5 product lanes closed",
+    "selectedRoute": "M5 five-day development code-backed closeout is pushed through 8df940c; keep all M5 product lanes closed and continue W28 only through separately authorized work",
     "progress": "docs/orchestration/sessions/m5-five-day-development-2026-07-14.md"
   },
   "p0Cards": [
