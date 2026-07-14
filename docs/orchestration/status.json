@@ -2,13 +2,13 @@
   "identity": "[PM]#multi-agent-control@v0.1",
   "loopState": "active",
   "dispatchState": "active",
-  "target": "2026-07-14 M5 five-day development is `completed_code_backed_with_manual_evidence_waived`: Day 5B fixed stale toast timers and passed notification/icon/fallback checks. No M5 product worker is authorized next. Direct tray/pointer evidence、Windows notification visibility、R0-3 dry-run、protected source、quota 和项目 Codex/Trae/Qoder connector 继续各自 standby/blocked。",
+  "target": "2026-07-14 realtime Agent cockpit next stage is `a6_authorized`: install a production main-owned trusted authorization boundary while every Connector machine gate remains unchanged and external Agent spawn remains 0. A7 process reattach、B2 production-path rehearsal、P0-C Codex dry-run、M5 residual evidence、protected source 和 quota recheck 保持各自 standby/closed。",
   "source": "docs/orchestration/index.md",
   "todayPlan": {
     "date": "2026-07-14",
-    "session": "docs/orchestration/sessions/m5-five-day-development-2026-07-14.md",
-    "selectedRoute": "M5 five-day development code-backed closeout is pushed through 8df940c; keep all M5 product lanes closed and continue W28 only through separately authorized work",
-    "progress": "docs/orchestration/sessions/m5-five-day-development-2026-07-14.md"
+    "session": "docs/orchestration/sessions/realtime-agent-cockpit-next-stage-2026-07-14.md",
+    "selectedRoute": "Commit and push the realtime control reset, then dispatch only P0-A6 trusted authorizer with external Agent spawn=0 and unchanged machine gates",
+    "progress": "docs/orchestration/sessions/realtime-agent-cockpit-next-stage-2026-07-14.md"
   },
   "p0Cards": [
     {
@@ -28,6 +28,12 @@
       "status": "accepted",
       "task": "docs/orchestration/tasks/cockpit-refactor-p0-v0.1.md",
       "progress": "docs/orchestration/sessions/cockpit-refactor-p0-progress.md"
+    },
+    {
+      "id": "realtime-agent-cockpit-p0",
+      "status": "active-a6-authorized",
+      "task": "docs/orchestration/tasks/realtime-agent-cockpit-v0.1.md",
+      "progress": "docs/orchestration/sessions/realtime-agent-cockpit-next-stage-2026-07-14.md"
     }
   ],
   "blocker": "外部 connector 仍 disabled；Codex 仅 draft/pending/discovery-only，Trae/Qoder 在当前范围内刻意保持 placeholder/command-empty，不作为可执行资源；live-subagents 仍受 403 DAILY_LIMIT_EXCEEDED 阻塞直到 quota 复查路径可用；control-cockpit 中央 4x2 网格和受保护卖点文件保持锁定；透明 Electron 窗口 capture 路线已用 Windows MCP Snapshot 与 Electron webContents.capturePage 两路观察到可见 ranch 渲染且未触发 SetIsBorderRequired failed，但完整 pointer smoke（click-through / double-click / right-click / drag / dock）仍未执行。",
@@ -361,9 +367,18 @@
       "title": "[长工]#realtime-connector-runtime@v0.1",
       "owner": "长工",
       "status": "active",
-      "responsibility": "P0-A A1-A5 blocked-safe runtime foundation is PM-verified: heartbeat/retry/recovery/persistence/audit, termination truth, bounded redacted events, and trusted-intent fail-closed. Production authorizer and real reattach remain absent; no external Agent CLI was executed and connector machine-gate fields remain unchanged.",
+      "responsibility": "P0-A A1-A5 is partial-accepted and A6 is the only authorized next runtime lane. Install a main-owned single-use trusted authorization boundary while production policy remains blocked, machine gates stay unchanged and external Agent spawn remains 0.",
       "tag": "⟦tag:v2|task|realtime-agent-cockpit-p0-a-connector-runtime-v0.1⟧",
       "evidence": "docs/orchestration/tasks/realtime-agent-cockpit-p0-a-connector-runtime-v0.1.md"
+    },
+    {
+      "id": "realtime-trusted-authorizer",
+      "title": "[长工]#realtime-trusted-authorizer@v0.1",
+      "owner": "长工",
+      "status": "active",
+      "responsibility": "Implement only P0-A6 trusted authorization: main-owned, intent-bound, single-use and expiring confirmation; keep A7/B2/P0-C standby and execute no external Agent CLI.",
+      "tag": "⟦tag:v2|task|realtime-agent-cockpit-p0-a6-trusted-authorizer-v0.1⟧",
+      "evidence": "docs/orchestration/tasks/realtime-agent-cockpit-p0-a6-trusted-authorizer-v0.1.md"
     },
     {
       "id": "realtime-truth-ui",
@@ -379,9 +394,18 @@
       "title": "[长工]#realtime-requirements-control@v0.1",
       "owner": "长工",
       "status": "active",
-      "responsibility": "Docs-only real-time cockpit requirements and acceptance control: record the approximately 60% partial baseline, preserve A/B file fences and quantitative gates, keep P0-C Codex controlled dry-run standby, and record the remaining trusted-authorizer/real-reattach/real-E2E gaps after browser fallback and Electron p95 acceptance.",
+      "responsibility": "Own the realtime next-stage serial control: A6 active, A7/B2 gated, P0-C authorization-required; preserve A/B fences, quantitative gates and the distinction between controlled local process evidence and real Agent E2E.",
       "tag": "⟦tag:v2|session|realtime-agent-cockpit-progress-2026-07-13⟧",
       "evidence": "docs/orchestration/sessions/realtime-agent-cockpit-progress-2026-07-13.md"
+    },
+    {
+      "id": "realtime-cockpit-next-stage",
+      "title": "[PM]#realtime-cockpit-next-stage@2026-07-14",
+      "owner": "主控",
+      "status": "active",
+      "responsibility": "Enforce the A6 -> A7 -> B2 serial gate, accept each independent callback/commit, and keep P0-C authorization-required with all Connector machine gates unchanged.",
+      "tag": "⟦tag:v2|session|realtime-agent-cockpit-next-stage-2026-07-14⟧",
+      "evidence": "docs/orchestration/sessions/realtime-agent-cockpit-next-stage-2026-07-14.md"
     }
   ],
   "lanes": [
@@ -418,7 +442,7 @@
       "title": "每日计划督办",
       "role": "[PM]#daily-supervision@2026-07-02",
       "state": "active",
-      "nextAction": "监督 W28 active 与 M5 completed_code_backed_with_manual_evidence_waived；保留直接 tray/pointer 和 Windows notification visibility 残余风险，关闭 M5 产品派工，并继续守住 connector 与 protected source 边界。"
+      "nextAction": "监督 realtime next stage `a6_authorized`；提交控制面后只派 A6 trusted-authorizer，保持 A7/B2/P0-C、Connector machine gate、protected source 和外部 Agent execution 边界。"
     },
     {
       "id": "codex-evidence-closeout",

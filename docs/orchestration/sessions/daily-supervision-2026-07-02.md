@@ -575,6 +575,7 @@ incomplete:
 - R0-3 Codex controlled dry-run lane is standby: P0 ranch-real-integration-p0 accepted after user decision ② on 2026-07-07; the 2026-07-10 administrator decision moves execution to W28; Codex machine-gate fields (approvalStatus / enabledByDefault / command) remain untouched; trae/qoder remain placeholder; dry-run execution still requires a W28 second execution-window confirmation.
 - Protected cockpit source drift is pending PM disposition activation: the administrator-selected W28 route is active as planning context, but the source lane remains standby until a fresh bounded authorization exists.
 - W27 is summarized, W28 weekly requirements is active, and M5 is `completed_code_backed_with_manual_evidence_waived`; direct tray/pointer and Windows notification visibility remain residual risk, and all M5 product lanes are closed.
+- Realtime Agent cockpit next stage is `a6_authorized`: only the trusted-authorizer worker may start after the control reset is committed/pushed; A7/B2/P0-C remain standby and external Agent execution remains forbidden.
 
 blockers:
 - External connector execution remains disabled.
@@ -592,6 +593,7 @@ next action:
 - Keep Git manager, `git-repair-agentpet-v0.1`, and `git-staging-review-agentpet-v0.1` on standby for unrelated Git state; use the current narrow authorization only for the declared docs/script closeout.
 - Keep `protected-cockpit-source-drift-v0.1` standby in W28; open a fresh bounded lane before touching the registered protected whitespace.
 - Keep W28 active and preserve summarized `m5-five-day-development-2026-07-14` at `completed_code_backed_with_manual_evidence_waived`; authorize no further M5 product worker and keep residual-risk evidence explicit.
+- Commit/push the realtime next-stage control reset, dispatch only A6 trusted-authorizer, and preserve A7/B2/P0-C serial gates plus unchanged Connector machine-gate fields.
 - Use `daily-decision-queue-2026-07-02` as the next PM callback surface for standby decisions.
 - Keep `daily-role-accountability-2026-07-02` aligned with role states before closing any daily supervision pass.
 
