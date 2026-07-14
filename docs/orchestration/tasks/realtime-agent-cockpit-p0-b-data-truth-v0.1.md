@@ -112,11 +112,11 @@ git diff --check
 ## callback
 
 ```text
-completed: AgentInstance selector、5s/15s freshness、terminal/duplicate/session 因果规则、App runtime snapshot 订阅与 1s tick、首页/控制舱 configured-vs-online/source/session 真值接线；browser fallback 0 online；SSR DOM fresh/late/stale/session-lost/capabilities unknown fixture 通过；1280x720、1440x900、1920x1080 浏览器 fallback 视口通过。
-incomplete: 未做真实 Electron Agent session 事件 p95 和 P0-C E2E；不宣称完整 P0-B accepted。
+completed: AgentInstance selector、5s/15s freshness、terminal/duplicate/session 因果规则、App runtime snapshot 订阅与 1s tick、首页/控制舱 configured-vs-online/source/session 真值接线；browser fallback 0 online；SSR DOM fresh/late/stale/session-lost/capabilities unknown fixture 通过；1280x720、1440x900、1920x1080 浏览器 fallback 视口通过；Electron main -> production preload -> renderer callback -> DOM 传播 p95 通过。
+incomplete: 未做 P0-C 真实 Agent E2E；不宣称完整 P0-B accepted。
 blockers: 无代码门禁 blocker；真实 session/heartbeat 仍受 P0-C 授权与 production authorizer 缺失约束。
-next action: 保持 partial accepted；后续补真实 Electron runtime event p95，再决定是否具备进入 P0-C 的条件。
-evidence: npm.cmd run realtime:truth-check；1280x720/1440x900/1920x1080 DOM+边界复核；1920 控制舱 scrollWidth=1920、scrollHeight=1080、configured=8、online=0、runtime=simulated/unavailable/browser-fallback、本地命令 disabled、模拟派活按钮=8、CTA inViewport=true；npm.cmd run lint/build/orchestration:check/report/preflight/connector-safety；git diff --check。
+next action: 保持 partial accepted；P0-C 继续等待 production authorizer、真实重挂和第二次明确执行授权。
+evidence: npm.cmd run realtime:truth-check；npm.cmd run realtime:electron-latency -> 200 samples、10 warmups、p50=0.216ms、p95=0.421ms、max=1.564ms、budget=500ms、external spawn=0；1280x720/1440x900/1920x1080 DOM+边界复核；1920 控制舱 scrollWidth=1920、scrollHeight=1080、configured=8、online=0、runtime=simulated/unavailable/browser-fallback、本地命令 disabled、模拟派活按钮=8、CTA inViewport=true；npm.cmd run lint/build/orchestration:check/report/preflight/connector-safety；git diff --check。
 ```
 
 必须提供状态矩阵截图/DOM 数值、source/lastSeen 样本、viewport 结果和 git diff 文件清单。不得 stage/commit/push/reset/clean，不得自报 accepted。

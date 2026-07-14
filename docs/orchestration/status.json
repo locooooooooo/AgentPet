@@ -370,7 +370,7 @@
       "title": "[长工]#realtime-truth-ui@v0.1",
       "owner": "长工",
       "status": "active",
-      "responsibility": "P0-B selector plus renderer truth slice is PM-verified: configured is distinct from online, simulation/unavailable/source/session/lastSeen/capabilities are explicit, App/Home/Cockpit consume one projection, SSR fresh/late/stale/session-lost DOM checks pass, and 1280/1440/1920 browser fallback viewports pass. Electron event p95 and real E2E remain incomplete; this role does not own runtime or connector policy.",
+      "responsibility": "P0-B selector plus renderer truth slice is PM-verified: configured is distinct from online, simulation/unavailable/source/session/lastSeen/capabilities are explicit, App/Home/Cockpit consume one projection, SSR fresh/late/stale/session-lost DOM checks pass, 1280/1440/1920 browser fallback viewports pass, and Electron event propagation p95 is 0.421ms across 200 samples. Real E2E remains incomplete; this role does not own runtime or connector policy.",
       "tag": "⟦tag:v2|task|realtime-agent-cockpit-p0-b-data-truth-v0.1⟧",
       "evidence": "docs/orchestration/tasks/realtime-agent-cockpit-p0-b-data-truth-v0.1.md"
     },
@@ -379,7 +379,7 @@
       "title": "[长工]#realtime-requirements-control@v0.1",
       "owner": "长工",
       "status": "active",
-      "responsibility": "Docs-only real-time cockpit requirements and acceptance control: record the approximately 60% partial baseline, preserve A/B file fences and quantitative gates, keep P0-C Codex controlled dry-run standby, and record the remaining Electron p95/trusted-authorizer/real-E2E gaps after 1280/1440/1920 browser fallback acceptance.",
+      "responsibility": "Docs-only real-time cockpit requirements and acceptance control: record the approximately 60% partial baseline, preserve A/B file fences and quantitative gates, keep P0-C Codex controlled dry-run standby, and record the remaining trusted-authorizer/real-reattach/real-E2E gaps after browser fallback and Electron p95 acceptance.",
       "tag": "⟦tag:v2|session|realtime-agent-cockpit-progress-2026-07-13⟧",
       "evidence": "docs/orchestration/sessions/realtime-agent-cockpit-progress-2026-07-13.md"
     }
