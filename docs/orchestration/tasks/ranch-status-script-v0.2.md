@@ -3,9 +3,9 @@
 [短工]#ranch-status-script@v0.2
 ⟦tag:v2|task|ranch-status-script-v0.2⟧
 
-loop state: standby
-dispatch state: standby
-status: standby
+loop state: summarized
+dispatch state: summarized
+status: accepted_existing_implementation_code_backed
 
 parent: `docs/orchestration/tasks/ranch-m5-requirements-v0.2.md`
 source summary: `docs/orchestration/tasks/ranch-status-script-v0.1.md`
@@ -39,7 +39,12 @@ acceptance for a future implementation lane:
 - `npm.cmd run lint`, `npm.cmd run build`, and `npm.cmd run orchestration:check` pass.
 
 next action:
-- Keep standby until `ranch-window-v0.2` is accepted, committed, pushed, and the worktree is clean; on 2026-07-16 PM may dispatch this card as the only `[短工]` product worker.
+- Day 3 is closed without product-code changes: existing implementation satisfies the bounded scope through AST coverage, Electron capture and full gates. Continue the serial plan with `ranch-personality-v0.2`; direct OS interaction remains outside this card.
 
 summary:
-- Requirements-ready child card for M5 animal/status presentation; no implementation started.
+- Existing implementation accepted as code-backed evidence: 8 unique identities exactly match seed truth, all 14 NiuMaStatus values have explicit action mappings, the notification band is capped at one 1500ms toast, and Electron capture renders 8 animals without boot/error state.
+
+evidence:
+- `node scripts/check-ranch-status-coverage.mjs` -> identities=8, statuses=14, maxToasts=1, toastTtlMs=1500.
+- `node scripts/ranch-pointer-capture.mjs --out-json=<temp> --out-png=<temp>` -> 640x360, animalCount=8, actionButtonCount=3, desktop mode, no boot/error card, transparent field, pass=true.
+- The dispatched short worker was rejected by service-side `403 DAILY_LIMIT_EXCEEDED`; PM completed evidence review without editing protected product logic.

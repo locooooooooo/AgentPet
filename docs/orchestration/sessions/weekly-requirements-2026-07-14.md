@@ -8,7 +8,7 @@ loop state: active
 dispatch state: active
 
 > **计划周期**: 2026-07-14 ~ 2026-07-20 (W28)
-> **当前状态**: active; M5 Day 1/2 are closed under the 2026-07-14 acceptance waiver with residual risk retained; Day 3 `ranch-status-script-v0.2` is authorized after the bounded Day 2 commit
+> **当前状态**: active; M5 Day 3 status-script existing implementation is code/Electron verified without product changes; Day 4 `ranch-personality-v0.2` is authorized
 > **激活证据**: 2026-07-11 16:00 +08:00 W27 final closeout 已通过 fresh gates，并将 W27 summarized。
 > **硬边界**: Day 1 未接受和推送前不得以 2026-07-12 日历门启动 Day 2；仍仅按 `m5-five-day-development-2026-07-14.md` 串行实施,不执行项目 Codex/Trae/Qoder connector、不修改 protected source 或 connector machine gate。
 
@@ -33,7 +33,7 @@ dispatch state: active
 
 | 优先级 | 候选 | 当前边界 | 激活前置 |
 | --- | --- | --- | --- |
-| P0-1 | M5 v0.2 五日串行实施 | Day 1/2 residual-risk closeout complete locally; GitHub push blocked by network | Commit Day 2 -> dispatch ranch-status-script Day 3; do not claim waived tray/pointer evidence passed |
+| P0-1 | M5 v0.2 五日串行实施 | Day 1/2 residual risk retained; Day 3 code-backed closeout complete; GitHub push blocked by network | Commit Day 3 validation/control docs -> dispatch ranch-personality Day 4 |
 | P0-2 | R0-3 Codex controlled dry-run | 仍 standby;不改 `approvalStatus` / `enabledByDefault` / `command` | W28 明确执行窗口、隔离 cwd 和 evidence 路径后再二次确认 |
 | P0-3 | Transparent ranch full pointer input evidence | capturePage 仅证明可见渲染;完整 pointer input 未 accepted | 明确 observer/automation route,保持 implementation 与 evidence 分离 |
 
@@ -73,8 +73,8 @@ acceptance:
 - `npm.cmd run orchestration:check` passes。
 
 next action:
-- 将 M5 五日总控切到 `day3_authorized_after_day2_residual_risk_closeout`；保留 tray/pointer 缺失证据和残余风险。
-- Day 2 bounded commit 后派 `[短工]#ranch-status-script@v0.2`；Day 4+ 继续受逐卡门约束。
+- 将 M5 五日总控切到 `day4_authorized_after_day3_code_backed_closeout`；保留 Day 1/2 tray/pointer 残余风险。
+- Day 3 validation/control commit 后派 `[短工]#ranch-personality@v0.2`；Day 5 继续受逐卡门约束。
 - R0-3 dry-run、protected source、quota recheck 和 pointer evidence 仍需各自 bounded activation。
 
 summary:
