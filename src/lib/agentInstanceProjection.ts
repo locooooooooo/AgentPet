@@ -81,6 +81,9 @@ export interface ProjectedRuntimeTask {
   sessionId: string;
   agentId: string;
   connectorId: string;
+  source: ConnectorSession['source'];
+  lastSeen?: string;
+  pid?: number;
   sourceState: ConnectorRuntimeState;
   effectiveState: ConnectorRuntimeState;
   relation: ProjectedTaskRelation;
@@ -310,6 +313,9 @@ function projectTasks(
       sessionId: task.sessionId,
       agentId: task.agentId,
       connectorId: task.connectorId,
+      source: task.source,
+      ...(task.liveness.lastSeen ? { lastSeen: task.liveness.lastSeen } : {}),
+      ...(typeof task.pid === 'number' ? { pid: task.pid } : {}),
       sourceState: task.state,
       effectiveState,
       relation,

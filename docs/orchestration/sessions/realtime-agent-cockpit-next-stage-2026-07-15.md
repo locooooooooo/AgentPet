@@ -5,11 +5,11 @@
 
 loop state: active
 dispatch state: active
-status: b2_authorized_after_a7_acceptance
+status: b2_blocked_by_sync_cim_latency
 
 ## goal
 
-- Exercise the production Electron main -> preload -> renderer -> visible DOM lifecycle with a controlled non-Agent process while every external Connector remains disabled.
+- Preserve the completed controlled production-path evidence, stop B2 at the proven synchronous-CIM latency blocker, and prepare A7.1 plus P0-C decision packets without authorizing implementation or external Agent execution.
 
 ## confirmed true
 
@@ -17,12 +17,14 @@ status: b2_authorized_after_a7_acceptance
 - A7 process fingerprint/restart recovery is independently accepted and pushed as `e2031cd`.
 - PID reuse, unproven identity and expired evidence fail closed; controlled child cleanup is zero.
 - Connector machine gates remain unchanged and no external Agent CLI has been executed.
+- B2 start/running/cancel/timeout/reload/restart and terminal `session-lost` DOM convergence passed with duplicate lifecycle/subscription counts `0`.
+- PM independent overlapping-CIM visible-DOM latency was `p50=1521ms`, `p95=1524ms`, `max=1524ms` against the `500ms` budget.
 
 ## remaining
 
-- B2 production-path lifecycle rehearsal through visible DOM.
-- A decision packet for separately authorized P0-C real Codex E2E.
-- A7.1 asynchronous process-proof packet only if B2 proves overlapping synchronous CIM violates the 500ms visible-DOM budget.
+- Separate user/PM authorization for A7.1 asynchronous process proof implementation.
+- A7.1 acceptance followed by a fresh B2 overlap rerun at `p95 <=500ms`.
+- A new explicit user execution authorization before any P0-C real Codex E2E.
 
 ## serial board
 
@@ -30,8 +32,9 @@ status: b2_authorized_after_a7_acceptance
 | --- | --- | --- | --- |
 | 1 | `realtime-agent-cockpit-p0-a6-trusted-authorizer-v0.1` | accepted / `a44abd6` | complete |
 | 2 | `realtime-agent-cockpit-p0-a7-process-reattach-v0.1` | accepted / `e2031cd` | complete with sync-CIM residual risk |
-| 3 | `realtime-agent-cockpit-p0-b2-production-path-e2e-v0.1` | authorized | one worker -> callback -> PM verification -> commit -> push |
-| 4 | `realtime-agent-cockpit-p0-c-codex-acceptance-v0.1` | authorization_required | B2 pass plus a new explicit user execution authorization |
+| 3 | `realtime-agent-cockpit-p0-b2-production-path-e2e-v0.1` | blocked_by_sync_cim_latency | PM p95 `1524ms` > `500ms`; no acceptance |
+| 4 | `realtime-agent-cockpit-p0-a7-1-async-process-proof-v0.1` | authorization_required | packet only; no implementation dispatched |
+| 5 | `realtime-agent-cockpit-p0-c-codex-acceptance-v0.1` | authorization_required / not eligible | A7.1 + B2 pass plus a new explicit user execution authorization |
 
 ## B2 acceptance lock
 
@@ -42,23 +45,25 @@ status: b2_authorized_after_a7_acceptance
 - Require p95 <=500ms, duplicate terminal events=0, duplicate UI subscriptions=0 and controlled child cleanup=0.
 - Keep browser fallback simulated/blocked and describe the run as production-path rehearsal, not real Agent E2E.
 
-## failure branch
+## failure branch result
 
-- If overlapping CIM polling produces p95 >500ms, stop B2 acceptance at `blocked_by_sync_cim_latency`.
-- Prepare an A7.1 asynchronous process-proof requirements packet; do not edit runtime/main from the B2 lane without new authorization.
+- The failure branch fired: PM independent overlapping-CIM p95 was `1524ms`.
+- B2 is not accepted and is classified `blocked_by_sync_cim_latency`.
+- A7.1 is requirements-only and does not authorize runtime/main edits.
 
 ## invariants
 
-- At most one runtime product worker is active.
+- No runtime product worker is active after the B2 callback.
 - No Codex, Trae, Qoder or other external Agent CLI execution.
 - No Connector machine-gate, UI design, ranch, avatar, keyframe, icon or `agentCore.ts` changes.
 - P0-C remains unauthorized even if B2 passes.
 
 ## next action
 
-- Commit and push this A7 acceptance/B2 authorization control switch.
-- Dispatch exactly one `[长工]#realtime-production-path-e2e@v0.1` from the B2 card.
+- Commit and push the B2 blocker evidence plus the A7.1 and P0-C decision packets.
+- Wait for a new explicit A7.1 implementation authorization; do not dispatch runtime work from this session.
+- Keep P0-C at `authorization_required` and do not execute any external Agent CLI.
 
 ## summary
 
-- Realtime cockpit next stage is active at B2 after A7 acceptance; P0-C remains authorization-required.
+- Realtime cockpit next stage is stopped at the proven B2 synchronous-CIM latency blocker; A7.1 and P0-C packets exist, but neither implementation nor external execution is authorized.

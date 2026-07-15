@@ -38,7 +38,8 @@ import {
   selectAgentTruthByIdentity,
   type AgentProjectionReason,
   type AgentTruthProjection,
-  type ProjectedAgentTruth
+  type ProjectedAgentTruth,
+  type ProjectedRuntimeTask
 } from '../lib/agentInstanceProjection';
 import { CONNECTOR_POLICY, ORCHESTRATION_STATUS } from '../lib/orchestrationStatus';
 import NiuMaAvatar from './NiuMaAvatar';
@@ -114,6 +115,13 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, onSnapshot, 
   const selectedAgent = snapshot.agents.find((agent) => agent.id === selectedAgentId) ?? snapshot.agents[0];
   const selectedAgentTruth = selectedAgent
     ? selectAgentTruthByIdentity(agentTruth, selectedAgent.id, selectedAgent.id)
+    : null;
+  const selectedRuntimeTask = selectedAgentTruth?.primaryInstance
+    ? agentTruth.tasks.find((task) => (
+        task.sessionId === selectedAgentTruth.primaryInstance?.sessionId
+        && task.agentId === selectedAgentTruth.agentId
+        && task.connectorId === selectedAgentTruth.connectorId
+      )) ?? null
     : null;
   const runtime = selectedAgent ? snapshot.runtime[selectedAgent.id] : undefined;
   const selectedTask = selectedAgent?.tasks.find((task) => task.status === 'running') ?? selectedAgent?.tasks[0];
@@ -563,6 +571,7 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, onSnapshot, 
                 agent={selectedAgent}
                 runtime={runtime}
                 truth={selectedAgentTruth}
+                runtimeTask={selectedRuntimeTask}
                 runtimeTruth={agentTruth.runtime}
                 localRunnerAvailable={isDesktopRuntime}
                 onSnapshot={onSnapshot}
@@ -877,6 +886,7 @@ interface AgentDetailPanelProps {
   agent: AIAgent;
   runtime: NiuMaRuntimeState;
   truth: ProjectedAgentTruth | null;
+  runtimeTask: ProjectedRuntimeTask | null;
   runtimeTruth: AgentTruthProjection['runtime'];
   localRunnerAvailable: boolean;
   onSnapshot: (snapshot: AgentSnapshot) => void;
@@ -889,6 +899,7 @@ function AgentDetailPanel({
   agent,
   runtime,
   truth,
+  runtimeTask,
   runtimeTruth,
   localRunnerAvailable,
   onSnapshot,
@@ -927,6 +938,20 @@ function AgentDetailPanel({
     <aside
       className="detail-panel"
       style={{ '--agent-accent': agent.accent } as CSSProperties}
+      data-runtime-task-id={runtimeTask?.taskId ?? ''}
+      data-runtime-session-id={runtimeTask?.sessionId ?? ''}
+      data-runtime-agent-id={runtimeTask?.agentId ?? ''}
+      data-runtime-connector-id={runtimeTask?.connectorId ?? ''}
+      data-runtime-source={runtimeTask?.source ?? ''}
+      data-runtime-state={runtimeTask?.effectiveState ?? ''}
+      data-runtime-last-seen={runtimeTask?.lastSeen ?? ''}
+      data-runtime-pid={runtimeTask?.pid ?? ''}
+      data-runtime-primary-instance-id={primaryInstance?.instanceId ?? ''}
+      data-runtime-primary-session-id={primaryInstance?.sessionId ?? ''}
+      data-runtime-primary-source={primaryInstance?.source ?? ''}
+      data-runtime-primary-reason={primaryInstance?.reason ?? ''}
+      data-runtime-primary-presence={primaryInstance?.presence ?? ''}
+      data-runtime-primary-activity={primaryInstance?.activity ?? ''}
     >
       <div className="detail-identity detail-identity-compact">
         <NiuMaAvatar
@@ -973,16 +998,40 @@ function AgentDetailPanel({
               <span className="metric-value">{truth?.presence ?? 'unknown'} / {truth?.activity ?? 'unknown'}</span>
             </div>
             <div className="metric-item-row">
+              <span className="metric-label">Task ID:</span>
+              <span className="metric-value mono" title={runtimeTask?.taskId ?? 'unknown'}>{runtimeTask?.taskId ?? 'unknown'}</span>
+            </div>
+            <div className="metric-item-row">
+              <span className="metric-label">Session ID:</span>
+              <span className="metric-value mono" title={runtimeTask?.sessionId ?? primaryInstance?.sessionId ?? 'unknown'}>{runtimeTask?.sessionId ?? primaryInstance?.sessionId ?? 'unknown'}</span>
+            </div>
+            <div className="metric-item-row">
+              <span className="metric-label">Agent ID:</span>
+              <span className="metric-value mono">{runtimeTask?.agentId ?? primaryInstance?.agentId ?? 'unknown'}</span>
+            </div>
+            <div className="metric-item-row">
+              <span className="metric-label">Connector ID:</span>
+              <span className="metric-value mono">{runtimeTask?.connectorId ?? primaryInstance?.connectorId ?? 'unknown'}</span>
+            </div>
+            <div className="metric-item-row">
+              <span className="metric-label">Session 来源:</span>
+              <span className="metric-value">{runtimeTask?.source ?? primaryInstance?.source ?? 'unknown'}</span>
+            </div>
+            <div className="metric-item-row">
               <span className="metric-label">Instance 来源:</span>
               <span className="metric-value">{primaryInstance?.source ?? 'unknown'}</span>
             </div>
             <div className="metric-item-row">
-              <span className="metric-label">Session ID:</span>
-              <span className="metric-value mono" title={primaryInstance?.sessionId ?? 'unknown'}>{primaryInstance?.sessionId ?? 'unknown'}</span>
+              <span className="metric-label">Runtime task state:</span>
+              <span className="metric-value">{runtimeTask?.effectiveState ?? 'unknown'}</span>
             </div>
             <div className="metric-item-row">
               <span className="metric-label">Last seen:</span>
-              <span className="metric-value">{primaryInstance?.lastSeen ? formatDateTime(primaryInstance.lastSeen) : 'unknown'}</span>
+              <span className="metric-value">{runtimeTask?.lastSeen ? formatDateTime(runtimeTask.lastSeen) : 'unknown'}</span>
+            </div>
+            <div className="metric-item-row">
+              <span className="metric-label">PID:</span>
+              <span className="metric-value mono">{runtimeTask?.pid ?? 'unknown'}</span>
             </div>
             <div className="metric-item-row">
               <span className="metric-label">Capabilities:</span>

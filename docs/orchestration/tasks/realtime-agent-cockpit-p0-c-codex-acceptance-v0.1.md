@@ -17,7 +17,7 @@ priority: P0-C
 
 以下全部满足前，本卡保持 standby：
 
-1. A/B 分别按固定 callback 交付，未解决 blocker 为 0。
+1. A7.1 已独立验收并提交推送，B2 fresh rerun 通过且未解决 blocker 为 0。
 2. 主控核对文件围栏，保留 M5 `electron/main.ts` 基线改动。
 3. orchestration:check/report/preflight/connector-safety、lint、build、git diff --check 全通过。
 4. blocked-path fixture 10/10 不 spawn，并有审计。
@@ -98,4 +98,6 @@ next action:
 evidence:
 ```
 
-当前 callback 应保持：`completed=acceptance plan`、`incomplete=controlled dry-run`、`blockers=A/B acceptance + second authorization`。
+当前 callback 应保持：`completed=acceptance plan + 2026-07-15 decision packet`、`incomplete=controlled dry-run`、`blockers=A7.1 acceptance + B2 rerun pass + second authorization`。
+
+当前决策真源：`docs/orchestration/sessions/realtime-agent-cockpit-p0-c-authorization-decision-2026-07-15.md`，结论为 `DO NOT AUTHORIZE P0-C NOW`。

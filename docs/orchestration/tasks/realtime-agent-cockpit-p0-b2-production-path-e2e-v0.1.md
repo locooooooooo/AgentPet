@@ -3,9 +3,9 @@
 [长工]#realtime-production-path-e2e@v0.1
 ⟦tag:v2|task|realtime-agent-cockpit-p0-b2-production-path-e2e-v0.1⟧
 
-loop state: active
-dispatch state: active
-status: authorized_pending_worker
+loop state: blocked
+dispatch state: blocked
+status: blocked_by_sync_cim_latency
 priority: P0-B2
 
 ## objective
@@ -42,10 +42,11 @@ priority: P0-B2
 
 ## next action
 
-- Dispatch exactly one B2 production-path worker after this control switch is committed and pushed.
-- If overlapping CIM polling exceeds the 500ms budget, report `blocked_by_sync_cim_latency` and prepare an A7.1 packet without editing runtime/main from this lane.
-- A passing B2 only prepares the P0-C authorization packet; it does not authorize Codex.
+- Preserve the accepted lifecycle/DOM evidence and the PM-independent overlap result (`p95=1524ms`).
+- Route any runtime/main correction through `realtime-agent-cockpit-p0-a7-1-async-process-proof-v0.1`; this B2 lane does not authorize that implementation.
+- Rerun B2 only after A7.1 is separately authorized, implemented, accepted, committed and pushed.
+- P0-C remains `authorization_required` and is not eligible while B2 is blocked.
 
 ## summary
 
-- Authorized B2 production-path rehearsal; real Agent E2E remains owned by separately authorized P0-C.
+- B2 proved the controlled production lifecycle and terminal DOM, then stopped at `blocked_by_sync_cim_latency`; real Agent E2E remains unexecuted and unauthorized.
