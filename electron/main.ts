@@ -34,13 +34,13 @@ import { createReadOnlyConnectorGateRequest, evaluateConnectorPolicyGate } from 
 import {
   ConnectorRunAuthorizer,
   ConnectorRuntime,
-  createConnectorProcessFingerprint,
-  createReattachedConnectorProcess,
-  inspectConnectorProcessEvidence,
+  createAsyncReattachedConnectorProcess,
   normalizeConnectorRunIntent,
   selectDirectConnectorExecutable,
   type ConnectorProcessFingerprintContext,
+  type ConnectorProcessProofRequest,
 } from '../src/lib/connectorRuntime';
+import { createConnectorProcessProofService } from './connectorProcessProof';
 import {
   appendSystemMessage,
   applyNiuMaAction,
@@ -63,11 +63,13 @@ let ranchPrefs: RanchPrefs;
 let connectorRuntime: ConnectorRuntime;
 let connectorRunAuthorizer: ConnectorRunAuthorizer;
 let isQuitting = false;
+let shutdownInFlight: Promise<void> | null = null;
 let ranchUnreadCount = 0;
 let ranchMousePassthrough = false;
 let ranchHotzonePoll: NodeJS.Timeout | null = null;
 let ranchInteractiveRegions: RanchInteractiveRegion[] = [];
 const runningProcesses = new Map<string, ChildProcessWithoutNullStreams>();
+const connectorProcessProofService = createConnectorProcessProofService();
 
 const dataDir = path.join(app.getPath('userData'), 'agent-data');
 const snapshotPath = path.join(dataDir, 'agents.json');
@@ -878,7 +880,10 @@ function evaluateConnectorGateFromPolicy(input: ConnectorGateRequest): Connector
   return evaluateConnectorPolicyGate(policy, input, resolveConnectorCommand).result;
 }
 
-function reattachConnectorProcess(session: ConnectorSession) {
+async function reattachConnectorProcess(
+  session: ConnectorSession,
+  request: ConnectorProcessProofRequest
+) {
   const fingerprint = session.processFingerprint;
   const timeoutAt = Date.parse(session.timeoutAt ?? '');
   if (!fingerprint || !Number.isFinite(timeoutAt) || timeoutAt <= Date.now()) {
@@ -892,8 +897,11 @@ function reattachConnectorProcess(session: ConnectorSession) {
     executablePath: fingerprint.executablePath,
     cwd: process.cwd()
   };
-  const recoveredProcess = createReattachedConnectorProcess(session, context);
-  return recoveredProcess ? { process: recoveredProcess, provenAt: new Date().toISOString() } : null;
+  return createAsyncReattachedConnectorProcess(session, context, {
+    proveIdentity: connectorProcessProofService.prove,
+    initialRequest: request,
+    pollIntervalMs: 5_000
+  });
 }
 
 function createConnectorRuntime() {
@@ -906,12 +914,7 @@ function createConnectorRuntime() {
     authorizeRun: (request) => connectorRunAuthorizer.consume(request),
     loadPersistedSnapshot: loadConnectorRuntimeSnapshot,
     persistSnapshot: saveConnectorRuntimeSnapshot,
-    captureProcessFingerprint: (child, context) => {
-      const evidence = typeof child.pid === 'number' ? inspectConnectorProcessEvidence(child.pid) : null;
-      return evidence
-        ? createConnectorProcessFingerprint(evidence, context, new Date().toISOString())
-        : null;
-    },
+    captureProcessFingerprint: (_child, _context, request) => connectorProcessProofService.prove(request),
     reattachProcess: reattachConnectorProcess,
     publish: (runtimeSnapshot) => {
       BrowserWindow.getAllWindows().forEach((window) => {
@@ -1554,10 +1557,13 @@ app.whenReady().then(() => {
   });
 });
 
-app.on('before-quit', () => {
+app.on('before-quit', (event) => {
   isQuitting = true;
+  event.preventDefault();
+  if (shutdownInFlight) {
+    return;
+  }
   connectorRunAuthorizer?.dispose();
-  connectorRuntime?.dispose();
   destroyRanchWindow();
   tray?.destroy();
   tray = null;
@@ -1565,6 +1571,11 @@ app.on('before-quit', () => {
   runningProgressTimers.clear();
   runningProcesses.forEach((child) => child.kill());
   runningProcesses.clear();
+  shutdownInFlight = (async () => {
+    await connectorRuntime?.disposeAndWait();
+    await connectorProcessProofService.dispose();
+    app.exit(0);
+  })();
 });
 
 app.on('window-all-closed', () => {

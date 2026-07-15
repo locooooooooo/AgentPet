@@ -7,6 +7,7 @@ import { build } from 'esbuild';
 
 const root = process.cwd();
 const runtimePath = path.join(root, 'src/lib/connectorRuntime.ts');
+const proofHelperPath = path.join(root, 'electron/connectorProcessProof.ts');
 const bundled = await build({
   entryPoints: [runtimePath],
   bundle: true,
@@ -20,10 +21,23 @@ const runtimeModule = await import(
 );
 const {
   ConnectorRuntime,
+  createAsyncReattachedConnectorProcess,
   createConnectorProcessFingerprint,
   createReattachedConnectorProcess,
   inspectConnectorProcessEvidence
 } = runtimeModule;
+const proofHelperBundle = await build({
+  entryPoints: [proofHelperPath],
+  bundle: true,
+  platform: 'node',
+  format: 'esm',
+  target: 'node22',
+  write: false
+});
+const { createConnectorProcessProofService } = await import(
+  `data:text/javascript;base64,${Buffer.from(proofHelperBundle.outputFiles[0].text).toString('base64')}`
+);
+const proofService = createConnectorProcessProofService();
 
 const controlledChildren = new Set();
 const inspectLatenciesMs = [];
@@ -35,6 +49,13 @@ function timedInspect(pid) {
   const evidence = inspectConnectorProcessEvidence(pid);
   inspectLatenciesMs.push(performance.now() - startedAt);
   return evidence;
+}
+
+async function timedAsyncProof(request) {
+  const startedAt = performance.now();
+  const result = await proofService.prove(request);
+  inspectLatenciesMs.push(performance.now() - startedAt);
+  return result;
 }
 
 function spawnControlledChild(label) {
@@ -171,19 +192,19 @@ function createRecoveryRuntime(fixture, options = {}) {
     loadPersistedSnapshot: () => structuredClone(fixture.snapshot),
     persistSnapshot: (snapshot) => persisted.push(structuredClone(snapshot)),
     publish: (snapshot) => published.push(structuredClone(snapshot)),
-    recoveryGraceMs: options.recoveryGraceMs ?? 1_000,
+    recoveryGraceMs: options.recoveryGraceMs ?? 10_000,
     terminationGraceMs: options.terminationGraceMs ?? 1_000,
-    reattachProcess: options.reattachProcess ?? ((session) => {
-      const recovered = createReattachedConnectorProcess(session, fixture.context, {
-        inspectEvidence: timedInspect,
+    reattachProcess: options.reattachProcess ?? ((session, request) => (
+      createAsyncReattachedConnectorProcess(session, fixture.context, {
+        proveIdentity: timedAsyncProof,
+        initialRequest: request,
         killProcess: (pid) => {
           recoveredKillCalls += 1;
           return process.kill(pid);
         },
         pollIntervalMs: 100
-      });
-      return recovered ? { process: recovered, provenAt: new Date().toISOString() } : null;
-    })
+      })
+    ))
   });
   return { runtime, published, persisted };
 }
@@ -191,6 +212,7 @@ function createRecoveryRuntime(fixture, options = {}) {
 async function verifyStopRecovery() {
   const fixture = await createControlledFixture('stop');
   const { runtime } = createRecoveryRuntime(fixture);
+  await waitFor(() => runtime.getSnapshot().tasks[0].state === 'reattached', 5_000);
   const recovered = runtime.getSnapshot().tasks[0];
   assert.equal(recovered.state, 'reattached');
   assert.equal(recovered.source, 'restart-recovery');
@@ -198,11 +220,11 @@ async function verifyStopRecovery() {
   assert.ok(Date.now() - Date.parse(recovered.liveness.lastSeen) <= 1_000, 'Recovery proof time must be fresh.');
   assert.equal(lifecycleCount(recovered, 'session-started'), 1, 'Recovery must not duplicate started events.');
   const eventCount = recovered.events.length;
-  await waitFor(() => runtime.getSnapshot().tasks[0].liveness.lastSeen !== recovered.liveness.lastSeen, 3_000);
+  await waitFor(() => runtime.getSnapshot().tasks[0].liveness.lastSeen !== recovered.liveness.lastSeen, 5_000);
   assert.equal(runtime.getSnapshot().tasks[0].events.length, eventCount, 'Polling must refresh liveness without event growth.');
   const stopResult = runtime.stop({ taskId: recovered.taskId });
   assert.ok(stopResult.status === 'stopping' || stopResult.status === 'stopped');
-  await fixture.closed;
+  await waitForFixtureClose(fixture, runtime, 'stop');
   await waitFor(() => runtime.getSnapshot().tasks[0].state === 'stopped', 3_000);
   const stopped = runtime.getSnapshot().tasks[0];
   assert.equal(stopped.termination?.exitConfirmed, true);
@@ -213,8 +235,8 @@ async function verifyStopRecovery() {
 async function verifyTimeoutRecovery() {
   const fixture = await createControlledFixture('timeout', 3_000);
   const { runtime } = createRecoveryRuntime(fixture);
-  assert.equal(runtime.getSnapshot().tasks[0].state, 'reattached');
-  await fixture.closed;
+  await waitFor(() => runtime.getSnapshot().tasks[0].state === 'reattached', 5_000);
+  await waitForFixtureClose(fixture, runtime, 'timeout');
   await waitFor(() => runtime.getSnapshot().tasks[0].state === 'timed-out', 5_000);
   const timedOut = runtime.getSnapshot().tasks[0];
   assert.equal(timedOut.termination?.exitConfirmed, true);
@@ -224,29 +246,34 @@ async function verifyTimeoutRecovery() {
 async function verifyDisposeCleanup() {
   const fixture = await createControlledFixture('dispose');
   const { runtime } = createRecoveryRuntime(fixture);
-  assert.equal(runtime.getSnapshot().tasks[0].state, 'reattached');
+  await waitFor(() => runtime.getSnapshot().tasks[0].state === 'reattached', 5_000);
   runtime.dispose();
-  await fixture.closed;
-  assert.equal(runtime.getSnapshot().tasks[0].state, 'session-lost');
+  await waitForFixtureClose(fixture, runtime, 'dispose');
+  await waitFor(() => runtime.getSnapshot().tasks[0].state === 'session-lost', 3_000);
+  assert.equal(runtime.getSnapshot().tasks[0].termination?.exitConfirmed, true);
   assert.equal(lifecycleCount(runtime.getSnapshot().tasks[0], 'session-terminal'), 1);
 }
 
-function verifyKillTimePidReuse(fixture) {
+async function verifyKillTimePidReuse(fixture) {
   let evidence = fixture.evidence;
   let killCalls = 0;
-  const handle = createReattachedConnectorProcess(fixture.snapshot.tasks[0], fixture.context, {
-    inspectEvidence: () => evidence,
+  let generation = 0;
+  const initialRequest = proofRequest(fixture, ++generation);
+  const attempt = await createAsyncReattachedConnectorProcess(fixture.snapshot.tasks[0], fixture.context, {
+    initialRequest,
+    proveIdentity: async (request) => proofResult(request, evidence),
     killProcess: () => {
       killCalls += 1;
       return true;
     },
     pollIntervalMs: 100
   });
+  const handle = attempt.proof?.process;
   assert.ok(handle);
   let identityLost = 0;
   handle.on('identity-lost', () => { identityLost += 1; });
   evidence = { ...fixture.evidence, startedAt: new Date(Date.parse(fixture.evidence.startedAt) + 1_000).toISOString() };
-  assert.equal(handle.kill(), false);
+  assert.equal(await handle.kill(), false);
   assert.equal(killCalls, 0, 'PID reuse must be rejected before process.kill.');
   assert.equal(identityLost, 1);
 }
@@ -301,16 +328,120 @@ async function verifyRecoveryDeadlineIncludesProbe(baseFixture) {
   const startedAt = performance.now();
   const { runtime } = createRecoveryRuntime(fixture, {
     recoveryGraceMs: 100,
-    reattachProcess: () => {
-      const probeDeadline = performance.now() + 75;
-      while (performance.now() < probeDeadline) {
-        // Model a synchronous OS probe consuming the same recovery budget.
-      }
+    reattachProcess: async () => {
+      await delay(75);
       return null;
     }
   });
   await waitFor(() => runtime.getSnapshot().tasks[0].state === 'session-lost', 300);
   assert.ok(performance.now() - startedAt < 160, 'OS probe time must be deducted from the recovery deadline.');
+}
+
+async function verifyProofWorkerFailures(fixture) {
+  const evidenceJson = JSON.stringify({
+    pid: fixture.evidence.pid,
+    executablePath: fixture.evidence.executablePath,
+    startedAt: fixture.evidence.startedAt,
+    commandLine: fixture.evidence.commandLine
+  });
+
+  for (const [label, expectedStatus, spawnProcess] of [
+    ['crash', 'crashed', () => fakeProofWorker((child) => {
+      queueMicrotask(() => child.emit('error', new Error('fixture-worker-crash')));
+    })],
+    ['unavailable', 'unavailable', () => fakeProofWorker((child) => {
+      const error = Object.assign(new Error('fixture-worker-unavailable'), { code: 'ENOENT' });
+      queueMicrotask(() => child.emit('error', error));
+    })],
+    ['timeout', 'timeout', () => fakeProofWorker(() => {}, { closeOnKill: true })]
+  ]) {
+    const service = createConnectorProcessProofService({ spawnProcess });
+    const result = await service.prove(proofRequest(fixture, 1, label === 'timeout' ? 1 : 1_000));
+    assert.equal(result.status, expectedStatus, `${label} worker must fail closed.`);
+    await waitFor(() => service.activeWorkerCount() === 0, 1_000);
+    await service.dispose();
+    assert.equal(service.activeWorkerCount(), 0, `${label} worker cleanup must reach zero.`);
+  }
+
+  const abortController = new AbortController();
+  const abortService = createConnectorProcessProofService({
+    spawnProcess: () => fakeProofWorker(() => {}, { closeOnKill: true })
+  });
+  const abortPromise = abortService.prove({ ...proofRequest(fixture, 1), signal: abortController.signal });
+  abortController.abort('fixture-abort');
+  assert.equal((await abortPromise).status, 'cancelled', 'aborted worker must fail closed as cancelled.');
+  await abortService.dispose();
+  assert.equal(abortService.activeWorkerCount(), 0, 'aborted worker cleanup must reach zero.');
+
+  const lateController = new AbortController();
+  const lateService = createConnectorProcessProofService({
+    spawnProcess: () => fakeProofWorker((child) => {
+      setTimeout(() => {
+        child.stdout.emit('data', Buffer.from(evidenceJson));
+        closeFakeWorker(child, 0, null);
+      }, 20).unref();
+    })
+  });
+  const latePromise = lateService.prove({ ...proofRequest(fixture, 1), signal: lateController.signal });
+  lateController.abort('fixture-late-abort');
+  const lateResult = await latePromise;
+  assert.equal(lateResult.status, 'cancelled', 'late success after abort must remain cancelled.');
+  await waitFor(() => lateService.activeWorkerCount() === 0, 1_000);
+  await lateService.dispose();
+
+  let supersededSpawn = 0;
+  const supersededService = createConnectorProcessProofService({
+    spawnProcess: () => {
+      supersededSpawn += 1;
+      return supersededSpawn === 1
+        ? fakeProofWorker(() => {}, { closeOnKill: true })
+        : fakeProofWorker((child) => {
+            queueMicrotask(() => {
+              child.stdout.emit('data', Buffer.from(evidenceJson));
+              closeFakeWorker(child, 0, null);
+            });
+          });
+    }
+  });
+  const first = supersededService.prove(proofRequest(fixture, 1));
+  const second = supersededService.prove(proofRequest(fixture, 2));
+  const [superseded, newest] = await Promise.all([first, second]);
+  assert.equal(superseded.status, 'cancelled', 'superseded generation must be discarded.');
+  assert.equal(newest.status, 'proven', 'newest generation must remain authoritative.');
+  await supersededService.dispose();
+  assert.equal(supersededService.activeWorkerCount(), 0, 'superseded worker cleanup must reach zero.');
+
+  return {
+    crash: 'crashed',
+    unavailable: 'unavailable',
+    timeout: 'timeout',
+    abort: 'cancelled',
+    late: 'cancelled',
+    superseded: 'cancelled',
+    activeWorkerCount: 0
+  };
+}
+
+function fakeProofWorker(start, options = {}) {
+  const child = new EventEmitter();
+  child.stdout = new EventEmitter();
+  child.stderr = new EventEmitter();
+  child.exitCode = null;
+  child.signalCode = null;
+  child.kill = () => {
+    if (options.closeOnKill) {
+      queueMicrotask(() => closeFakeWorker(child, null, 'SIGTERM'));
+    }
+    return true;
+  };
+  start(child);
+  return child;
+}
+
+function closeFakeWorker(child, code, signal) {
+  child.exitCode = code;
+  child.signalCode = signal;
+  child.emit('close', code, signal);
 }
 
 function fakeProcess(pid) {
@@ -359,18 +490,35 @@ function delay(timeoutMs) {
   return new Promise((resolve) => setTimeout(resolve, timeoutMs));
 }
 
+async function waitForFixtureClose(fixture, runtime, label) {
+  await Promise.race([
+    fixture.closed,
+    delay(8_000).then(() => {
+      throw new Error(`${label} controlled child did not close: ${JSON.stringify(runtime.getSnapshot().tasks[0])}; proofWorkers=${proofService.activeWorkerCount()}`);
+    })
+  ]);
+}
+
 let negativeFixture;
 try {
   await verifyStopRecovery();
+  console.log('A7.1_PROGRESS stop recovery passed');
   await verifyTimeoutRecovery();
+  console.log('A7.1_PROGRESS timeout recovery passed');
   await verifyDisposeCleanup();
+  console.log('A7.1_PROGRESS dispose cleanup passed');
   negativeFixture = await createControlledFixture('negative-base');
-  verifyKillTimePidReuse(negativeFixture);
+  await verifyKillTimePidReuse(negativeFixture);
   await verifyNegativeRecovery(negativeFixture);
+  console.log('A7.1_PROGRESS negative recovery passed');
   await verifyRecoveryDeadlineIncludesProbe(negativeFixture);
+  const workerFailureEvidence = await verifyProofWorkerFailures(negativeFixture);
+  console.log('A7.1_PROGRESS worker failure matrix passed');
   process.kill(negativeFixture.child.pid);
   await negativeFixture.closed;
   assert.equal(controlledChildren.size, 0, 'All controlled non-Agent children must be cleaned up.');
+  await proofService.dispose();
+  assert.equal(proofService.activeWorkerCount(), 0, 'All asynchronous proof workers must be cleaned up.');
   assert.equal(connectorSpawnCalls, 0, 'Recovery verification must not spawn a Connector or Agent CLI.');
 
   const sortedLatencies = [...inspectLatenciesMs].sort((left, right) => left - right);
@@ -380,8 +528,11 @@ try {
   console.log('positive=restart-recovery + fresh proof + liveness polling + bounded stop/timeout/dispose');
   console.log('negative=missing/wrong/expired/future/reused PID/executable/start/cwd/identity -> one session-lost');
   console.log(`controlled non-Agent child cleanup=0; recovered kill calls=${recoveredKillCalls}`);
+  console.log('asynchronous proof worker cleanup=0');
+  console.log(`worker failure evidence=${JSON.stringify(workerFailureEvidence)}`);
   console.log('external Agent CLI spawn count=0');
 } finally {
+  await proofService.dispose();
   for (const child of controlledChildren) {
     try {
       process.kill(child.pid);
@@ -389,4 +540,27 @@ try {
       // Already gone.
     }
   }
+}
+
+function proofRequest(fixture, generation, timeoutMs = 1_000) {
+  return {
+    taskId: fixture.snapshot.tasks[0].taskId,
+    sessionId: fixture.snapshot.tasks[0].sessionId,
+    pid: fixture.fingerprint.pid,
+    generation,
+    timeoutMs,
+    signal: new AbortController().signal
+  };
+}
+
+function proofResult(request, evidence, status = 'proven', reason = 'fixture-proof') {
+  const observedAt = new Date().toISOString();
+  return {
+    generation: request.generation,
+    status,
+    observedAt,
+    expiresAt: new Date(Date.parse(observedAt) + 5_000).toISOString(),
+    ...(evidence ? { evidence } : {}),
+    reason
+  };
 }

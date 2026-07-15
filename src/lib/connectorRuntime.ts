@@ -50,6 +50,8 @@ const MAX_RETRY_BUDGET_MS = 120_000;
 const DEFAULT_RETRY_BACKOFF_MS = 1_000;
 const DEFAULT_HEARTBEAT_STALE_MS = 15_000;
 const MAX_RECOVERY_GRACE_MS = 10_000;
+const DEFAULT_PROCESS_PROOF_TIMEOUT_MS = 3_000;
+const MAX_PROCESS_PROOF_TIMEOUT_MS = 5_000;
 const MAX_TERMINATION_GRACE_MS = 5_000;
 const DEFAULT_TERMINATION_GRACE_MS = 1_000;
 const DEFAULT_AUTHORIZATION_GRANT_TTL_MS = 30_000;
@@ -85,13 +87,13 @@ export interface ConnectorRuntimeProcess {
   on(event: 'error', listener: (error: Error) => void): void;
   on(event: 'close', listener: (code: number | null, signal: NodeJS.Signals | null) => void): void;
   on(event: 'heartbeat', listener: (provenAt: string) => void): void;
-  on(event: 'identity-lost', listener: () => void): void;
+  on(event: 'identity-lost', listener: (reason?: string) => void): void;
   off(event: 'spawn', listener: () => void): void;
   off(event: 'error', listener: (error: Error) => void): void;
   off(event: 'close', listener: (code: number | null, signal: NodeJS.Signals | null) => void): void;
   off(event: 'heartbeat', listener: (provenAt: string) => void): void;
-  off(event: 'identity-lost', listener: () => void): void;
-  kill(): boolean;
+  off(event: 'identity-lost', listener: (reason?: string) => void): void;
+  kill(): boolean | Promise<boolean>;
   dispose?(): void;
 }
 
@@ -113,6 +115,43 @@ export interface ConnectorFailureDecision {
 export interface ConnectorReattachProof {
   process: ConnectorRuntimeProcess;
   provenAt?: string;
+  generation?: number;
+  expiresAt?: string;
+}
+
+export type ConnectorProcessProofStatus =
+  | 'proven'
+  | 'missing'
+  | 'timeout'
+  | 'cancelled'
+  | 'unavailable'
+  | 'crashed';
+
+export interface ConnectorProcessProofRequest {
+  taskId: string;
+  sessionId: string;
+  pid: number;
+  generation: number;
+  timeoutMs: number;
+  signal: AbortSignal;
+}
+
+export interface ConnectorProcessProofResult {
+  generation: number;
+  status: ConnectorProcessProofStatus;
+  observedAt: string;
+  expiresAt: string;
+  evidence?: ConnectorObservedProcessEvidence;
+  reason?: string;
+}
+
+export interface ConnectorReattachAttempt {
+  proof?: ConnectorReattachProof;
+  generation: number;
+  status: ConnectorProcessProofStatus;
+  observedAt: string;
+  expiresAt: string;
+  reason?: string;
 }
 
 export interface ConnectorObservedProcessEvidence {
@@ -145,12 +184,19 @@ export interface ConnectorRuntimeDependencies {
   persistSnapshot?: (snapshot: ConnectorRuntimeSnapshot) => void;
   captureProcessFingerprint?: (
     process: ConnectorRuntimeProcess,
-    context: ConnectorProcessFingerprintContext
-  ) => ConnectorProcessFingerprint | null;
-  reattachProcess?: (session: ConnectorSession) => ConnectorReattachProof | null;
+    context: ConnectorProcessFingerprintContext,
+    request: ConnectorProcessProofRequest
+  ) => ConnectorProcessFingerprint | ConnectorProcessProofResult | null
+    | Promise<ConnectorProcessFingerprint | ConnectorProcessProofResult | null>;
+  reattachProcess?: (
+    session: ConnectorSession,
+    request: ConnectorProcessProofRequest
+  ) => ConnectorReattachProof | ConnectorReattachAttempt | null
+    | Promise<ConnectorReattachProof | ConnectorReattachAttempt | null>;
   classifyFailure?: (failure: ConnectorFailureDecision) => ConnectorFailureDecision;
   heartbeatStaleAfterMs?: number;
   recoveryGraceMs?: number;
+  processProofTimeoutMs?: number;
   terminationGraceMs?: number;
   outputFlushMs?: number;
   now?: () => Date;
@@ -362,7 +408,7 @@ interface PendingOutput {
 }
 
 interface TerminationIntent {
-  desiredState: 'stopped' | 'timed-out' | 'error' | 'permission-denied';
+  desiredState: 'stopped' | 'timed-out' | 'error' | 'permission-denied' | 'session-lost';
   reason: ConnectorTerminationEvidence['reason'];
   failure: ConnectorFailureDecision;
   allowRetry: boolean;
@@ -379,7 +425,9 @@ interface ActiveExecution {
   fingerprintContext?: ConnectorProcessFingerprintContext;
   spawnConfirmed: boolean;
   identityLost: boolean;
+  initialProofFailed: boolean;
   termination?: TerminationIntent;
+  terminationKillInFlight: boolean;
   stdoutBuffer: string;
   stderrBuffer: string;
   pendingOutput: PendingOutput;
@@ -687,6 +735,246 @@ export function createReattachedConnectorProcess(
   } as ConnectorRuntimeProcess;
 }
 
+export interface AsyncReattachedConnectorProcessDependencies {
+  proveIdentity: (request: ConnectorProcessProofRequest) => Promise<ConnectorProcessProofResult>;
+  initialRequest: ConnectorProcessProofRequest;
+  killProcess?: (pid: number) => boolean;
+  now?: () => Date;
+  pollIntervalMs?: number;
+}
+
+export async function createAsyncReattachedConnectorProcess(
+  session: ConnectorSession,
+  context: ConnectorProcessFingerprintContext,
+  dependencies: AsyncReattachedConnectorProcessDependencies
+): Promise<ConnectorReattachAttempt> {
+  const fingerprint = session.processFingerprint;
+  const now = dependencies.now ?? (() => new Date());
+  if (!fingerprint) {
+    return failedReattachAttempt(dependencies.initialRequest, 'missing', now, 'process-fingerprint-missing');
+  }
+  const initialResult = await dependencies.proveIdentity(dependencies.initialRequest);
+  const initialEvidence = readFreshProcessProof(initialResult, dependencies.initialRequest, now());
+  if (!initialEvidence || !matchesConnectorProcessFingerprint(fingerprint, initialEvidence, context)) {
+    return {
+      generation: dependencies.initialRequest.generation,
+      status: initialResult.status === 'proven' ? 'missing' : initialResult.status,
+      observedAt: initialResult.observedAt,
+      expiresAt: initialResult.expiresAt,
+      reason: initialResult.status === 'proven'
+        ? 'process-identity-mismatch'
+        : initialResult.reason ?? `process-proof-${initialResult.status}`
+    };
+  }
+
+  const emitter = new EventEmitter();
+  const stdout = new EventEmitter();
+  const stderr = new EventEmitter();
+  const killProcess = dependencies.killProcess ?? ((pid: number) => process.kill(pid));
+  const pollIntervalMs = clampInteger(dependencies.pollIntervalMs, 100, 5_000, 5_000);
+  let generation = dependencies.initialRequest.generation;
+  let closed = false;
+  let terminationRequested = false;
+  let inFlight: { generation: number; controller: AbortController } | undefined;
+  let killInFlight: Promise<boolean> | undefined;
+  let lastHeartbeatAt = 0;
+
+  const closeUnproven = (reason: string) => {
+    if (closed) {
+      return;
+    }
+    closed = true;
+    clearInterval(pollTimer);
+    inFlight?.controller.abort(reason);
+    inFlight = undefined;
+    if (!terminationRequested) {
+      emitter.emit('identity-lost', reason);
+    }
+    emitter.emit('close', null, null);
+  };
+
+  const requestProof = async (purpose: 'poll' | 'kill') => {
+    if (closed) {
+      return null;
+    }
+    if (inFlight) {
+      if (purpose === 'poll') {
+        return null;
+      }
+      inFlight.controller.abort('process-proof-superseded-by-kill');
+    }
+    generation += 1;
+    const controller = new AbortController();
+    const current = { generation, controller };
+    inFlight = current;
+    const request: ConnectorProcessProofRequest = {
+      taskId: session.taskId,
+      sessionId: session.sessionId,
+      pid: fingerprint.pid,
+      generation,
+      timeoutMs: dependencies.initialRequest.timeoutMs,
+      signal: controller.signal
+    };
+    try {
+      const result = await dependencies.proveIdentity(request);
+      if (closed || inFlight !== current || controller.signal.aborted) {
+        return null;
+      }
+      const evidence = readFreshProcessProof(result, request, now());
+      return evidence && matchesConnectorProcessFingerprint(fingerprint, evidence, context)
+        ? { result, evidence }
+        : { result, evidence: null };
+    } catch (error) {
+      if (closed || inFlight !== current || controller.signal.aborted) {
+        return null;
+      }
+      return {
+        result: createFailedProcessProofResult(request, now(), 'crashed', `process-proof-threw:${formatError(error)}`),
+        evidence: null
+      };
+    } finally {
+      if (inFlight === current) {
+        inFlight = undefined;
+      }
+    }
+  };
+
+  const poll = () => {
+    if (closed || inFlight) {
+      return;
+    }
+    void requestProof('poll').then((proof) => {
+      if (!proof || closed) {
+        return;
+      }
+      if (!proof.evidence) {
+        closeUnproven(proof.result.reason ?? `process-proof-${proof.result.status}`);
+        return;
+      }
+      const provenAt = now();
+      if (provenAt.getTime() - lastHeartbeatAt >= 5_000) {
+        lastHeartbeatAt = provenAt.getTime();
+        emitter.emit('heartbeat', provenAt.toISOString());
+      }
+    });
+  };
+  const pollTimer = setInterval(poll, pollIntervalMs);
+  pollTimer.unref();
+
+  const processHandle = {
+    pid: fingerprint.pid,
+    stdout,
+    stderr,
+    on: (event: string, listener: (...args: never[]) => void) => {
+      emitter.on(event, listener as (...args: unknown[]) => void);
+    },
+    off: (event: string, listener: (...args: never[]) => void) => {
+      emitter.off(event, listener as (...args: unknown[]) => void);
+    },
+    kill: () => {
+      if (closed) {
+        return Promise.resolve(false);
+      }
+      if (killInFlight) {
+        return killInFlight;
+      }
+      killInFlight = (async () => {
+        const proof = await requestProof('kill');
+        if (!proof?.evidence || closed) {
+          closeUnproven(proof?.result.reason ?? 'kill-reproof-unavailable');
+          return false;
+        }
+        try {
+          const killed = killProcess(fingerprint.pid);
+          terminationRequested = killed;
+          if (!killed) {
+            closeUnproven('process-kill-returned-false');
+          }
+          return killed;
+        } catch (error) {
+          closeUnproven(`process-kill-threw:${formatError(error)}`);
+          return false;
+        }
+      })().finally(() => {
+        killInFlight = undefined;
+      });
+      return killInFlight;
+    },
+    dispose: () => {
+      if (!closed) {
+        closed = true;
+        clearInterval(pollTimer);
+        inFlight?.controller.abort('reattached-process-disposed');
+        inFlight = undefined;
+      }
+    }
+  } as ConnectorRuntimeProcess;
+
+  return {
+    proof: {
+      process: processHandle,
+      provenAt: initialResult.observedAt,
+      generation: initialResult.generation,
+      expiresAt: initialResult.expiresAt
+    },
+    generation: initialResult.generation,
+    status: 'proven',
+    observedAt: initialResult.observedAt,
+    expiresAt: initialResult.expiresAt,
+    reason: initialResult.reason
+  };
+}
+
+function readFreshProcessProof(
+  result: ConnectorProcessProofResult,
+  request: ConnectorProcessProofRequest,
+  now: Date
+): ConnectorObservedProcessEvidence | null {
+  const observedAtMs = Date.parse(result.observedAt);
+  const expiresAtMs = Date.parse(result.expiresAt);
+  return result.status === 'proven'
+    && result.generation === request.generation
+    && result.evidence?.pid === request.pid
+    && Number.isFinite(observedAtMs)
+    && Number.isFinite(expiresAtMs)
+    && observedAtMs <= now.getTime() + 1_000
+    && expiresAtMs > now.getTime()
+    ? result.evidence
+    : null;
+}
+
+function failedReattachAttempt(
+  request: ConnectorProcessProofRequest,
+  status: ConnectorProcessProofStatus,
+  now: () => Date,
+  reason: string
+): ConnectorReattachAttempt {
+  const observedAt = now().toISOString();
+  return {
+    generation: request.generation,
+    status,
+    observedAt,
+    expiresAt: observedAt,
+    reason
+  };
+}
+
+function createFailedProcessProofResult(
+  request: ConnectorProcessProofRequest,
+  now: Date,
+  status: ConnectorProcessProofStatus,
+  reason: string
+): ConnectorProcessProofResult {
+  const observedAt = now.toISOString();
+  return {
+    generation: request.generation,
+    status,
+    observedAt,
+    expiresAt: observedAt,
+    reason
+  };
+}
+
 export function sanitizeRuntimeSnapshotForPersistence(
   snapshot: ConnectorRuntimeSnapshot,
   sensitiveTerms: string[] = []
@@ -721,15 +1009,19 @@ export class ConnectorRuntime {
   private readonly clearTimer: (timer: NodeJS.Timeout) => void;
   private readonly heartbeatStaleAfterMs: number;
   private readonly recoveryGraceMs: number;
+  private readonly processProofTimeoutMs: number;
   private readonly terminationGraceMs: number;
   private readonly outputFlushMs: number;
   private readonly active = new Map<string, ActiveExecution>();
   private readonly plans = new Map<string, ExecutionPlan>();
   private readonly retryTimers = new Map<string, NodeJS.Timeout>();
   private readonly recoveryTimers = new Map<string, NodeJS.Timeout>();
+  private readonly proofGenerations = new Map<string, number>();
+  private readonly proofControllers = new Map<string, AbortController>();
   private readonly sensitivePrompts = new Map<string, string>();
   private snapshot: ConnectorRuntimeSnapshot;
   private eventSequence = 0;
+  private disposed = false;
 
   constructor(private readonly dependencies: ConnectorRuntimeDependencies) {
     this.now = dependencies.now ?? (() => new Date());
@@ -747,6 +1039,12 @@ export class ConnectorRuntime {
       1,
       MAX_RECOVERY_GRACE_MS,
       MAX_RECOVERY_GRACE_MS
+    );
+    this.processProofTimeoutMs = clampInteger(
+      dependencies.processProofTimeoutMs,
+      1,
+      MAX_PROCESS_PROOF_TIMEOUT_MS,
+      DEFAULT_PROCESS_PROOF_TIMEOUT_MS
     );
     this.terminationGraceMs = clampInteger(
       dependencies.terminationGraceMs,
@@ -924,9 +1222,11 @@ export class ConnectorRuntime {
   }
 
   dispose(): void {
+    this.disposed = true;
+    [...this.proofControllers.keys()].forEach((taskId) => this.cancelProcessProof(taskId, 'runtime-disposed'));
     [...this.active.values()].forEach((execution) => {
       this.requestTermination(execution, {
-        desiredState: 'error',
+        desiredState: 'session-lost',
         reason: 'dispose',
         failure: {
           kind: 'cancelled',
@@ -935,10 +1235,27 @@ export class ConnectorRuntime {
         },
         allowRetry: false
       });
-      this.abandonTermination(execution, 'Runtime disposed before process exit confirmation.');
     });
     const inactiveTaskIds = new Set([...this.retryTimers.keys(), ...this.recoveryTimers.keys()]);
     inactiveTaskIds.forEach((taskId) => this.stop({ taskId }));
+  }
+
+  async disposeAndWait(timeoutMs = MAX_TERMINATION_GRACE_MS * 2 + MAX_PROCESS_PROOF_TIMEOUT_MS): Promise<boolean> {
+    this.dispose();
+    const deadline = Date.now() + Math.max(1, timeoutMs);
+    while (Date.now() < deadline) {
+      if (this.active.size === 0
+        && this.retryTimers.size === 0
+        && this.recoveryTimers.size === 0
+        && this.proofControllers.size === 0) {
+        return true;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    }
+    return this.active.size === 0
+      && this.retryTimers.size === 0
+      && this.recoveryTimers.size === 0
+      && this.proofControllers.size === 0;
   }
 
   private authorizeRun(request: ConnectorRunRequest): ConnectorAuthorizationDecision {
@@ -1078,6 +1395,8 @@ export class ConnectorRuntime {
     execution.fingerprintContext = fingerprintContext;
     execution.spawnConfirmed = spawnConfirmed;
     execution.identityLost = false;
+    execution.initialProofFailed = false;
+    execution.terminationKillInFlight = false;
     execution.stdoutBuffer = '';
     execution.stderrBuffer = '';
     execution.pendingOutput = createPendingOutput();
@@ -1136,15 +1455,20 @@ export class ConnectorRuntime {
     if (execution.termination) {
       return;
     }
-    const seenAt = this.now().toISOString();
-    let processFingerprint: ConnectorProcessFingerprint | undefined;
-    try {
-      processFingerprint = execution.fingerprintContext && this.dependencies.captureProcessFingerprint
-        ? this.dependencies.captureProcessFingerprint(execution.process, execution.fingerprintContext) ?? undefined
-        : undefined;
-    } catch {
-      processFingerprint = undefined;
+    if (execution.fingerprintContext && this.dependencies.captureProcessFingerprint) {
+      this.updateSession(execution.taskId, (session) => ({
+        ...session,
+        pid: execution.process.pid,
+        liveness: createFreshLiveness('process-event', this.now().toISOString(), this.heartbeatStaleAfterMs)
+      }));
+      this.captureSpawnFingerprint(execution);
+      return;
     }
+    this.markSpawnRunning(execution);
+  }
+
+  private markSpawnRunning(execution: ActiveExecution, processFingerprint?: ConnectorProcessFingerprint) {
+    const seenAt = this.now().toISOString();
     this.updateSession(execution.taskId, (session) => {
       const alreadyStarted = hasLifecycle(session, 'session-started');
       return {
@@ -1155,11 +1479,105 @@ export class ConnectorRuntime {
         liveness: createFreshLiveness('process-event', seenAt, this.heartbeatStaleAfterMs),
         events: appendEvent(session.events, this.createEvent(
           'lifecycle',
-          `OS confirmed process attempt ${session.attempt}.`,
-          { attempt: session.attempt, evidence: 'child-process-spawn-event' },
+          `OS confirmed process attempt ${session.attempt} with bounded identity proof.`,
+          { attempt: session.attempt, evidence: processFingerprint ? 'async-process-proof' : 'child-process-spawn-event' },
           alreadyStarted ? 'attempt-started' : 'session-started'
         ))
       };
+    });
+  }
+
+  private captureSpawnFingerprint(execution: ActiveExecution) {
+    const context = execution.fingerprintContext;
+    const pid = execution.process.pid;
+    if (!context || !this.dependencies.captureProcessFingerprint || !Number.isInteger(pid) || Number(pid) <= 0) {
+      return;
+    }
+    const request = this.beginProcessProof(execution.taskId, Number(pid));
+    let pending:
+      | ConnectorProcessFingerprint
+      | ConnectorProcessProofResult
+      | null
+      | Promise<ConnectorProcessFingerprint | ConnectorProcessProofResult | null>;
+    try {
+      pending = this.dependencies.captureProcessFingerprint(execution.process, context, request);
+    } catch (error) {
+      this.failSpawnFingerprint(execution, request, `process-proof-threw:${formatError(error)}`, 'crashed');
+      this.completeProcessProof(request);
+      return;
+    }
+    if (isPromiseLike(pending)) {
+      void pending.then(
+        (result) => this.applySpawnFingerprint(execution, context, Number(pid), request, result),
+        (error) => this.failSpawnFingerprint(execution, request, `process-proof-rejected:${formatError(error)}`, 'crashed')
+      ).finally(() => this.completeProcessProof(request));
+      return;
+    }
+    this.applySpawnFingerprint(execution, context, Number(pid), request, pending);
+    this.completeProcessProof(request);
+  }
+
+  private applySpawnFingerprint(
+    execution: ActiveExecution,
+    context: ConnectorProcessFingerprintContext,
+    pid: number,
+    request: ConnectorProcessProofRequest,
+    result: ConnectorProcessFingerprint | ConnectorProcessProofResult | null
+  ) {
+    if (!this.isCurrentProcessProof(request)
+      || this.active.get(execution.taskId) !== execution
+      || execution.termination
+      || this.disposed) {
+      return;
+    }
+    const fingerprint = isProcessProofResult(result)
+      ? (() => {
+          const evidence = readFreshProcessProof(result, request, this.now());
+          return evidence ? createConnectorProcessFingerprint(evidence, context, result.observedAt) : null;
+        })()
+      : result;
+    if (!fingerprint || fingerprint.pid !== pid) {
+      this.failSpawnFingerprint(
+        execution,
+        request,
+        isProcessProofResult(result) ? result.reason ?? result.status : 'missing-fingerprint',
+        isProcessProofResult(result) ? result.status : 'missing'
+      );
+      return;
+    }
+    this.markSpawnRunning(execution, fingerprint);
+  }
+
+  private failSpawnFingerprint(
+    execution: ActiveExecution,
+    request: ConnectorProcessProofRequest,
+    reason: string,
+    status: ConnectorProcessProofStatus
+  ) {
+    if (!this.isCurrentProcessProof(request)
+      || this.active.get(execution.taskId) !== execution
+      || execution.termination
+      || this.disposed) {
+      return;
+    }
+    execution.initialProofFailed = true;
+    this.updateSession(execution.taskId, (session) => ({
+      ...session,
+      events: appendEvent(session.events, this.createEvent(
+        'error',
+        `Spawned process identity proof failed closed: ${reason}.`,
+        { proofStatus: status, generation: request.generation }
+      ))
+    }));
+    this.requestTermination(execution, {
+      desiredState: 'error',
+      reason: 'process-error',
+      failure: {
+        kind: 'process-error',
+        message: 'Spawned process identity could not be proven.',
+        retryable: false
+      },
+      allowRetry: false
     });
   }
 
@@ -1291,6 +1709,7 @@ export class ConnectorRuntime {
     if (this.active.get(execution.taskId) !== execution || !execution.termination) {
       return;
     }
+    const terminationWaitMs = Math.max(this.terminationGraceMs, this.processProofTimeoutMs);
     execution.terminationTimer = this.setTimer(() => {
       if (this.active.get(execution.taskId) !== execution || !execution.termination) {
         return;
@@ -1298,6 +1717,10 @@ export class ConnectorRuntime {
       if (execution.terminationTimer) {
         this.clearTimer(execution.terminationTimer);
         execution.terminationTimer = undefined;
+      }
+      if (execution.termination.reason === 'dispose') {
+        this.abandonTermination(execution, 'Runtime disposed before process exit confirmation.');
+        return;
       }
       const escalatedAt = this.now().toISOString();
       this.updateSession(execution.taskId, (session) => ({
@@ -1324,10 +1747,14 @@ export class ConnectorRuntime {
         }
         this.abandonTermination(execution, 'Process exit was not confirmed after termination escalation.');
       }, this.terminationGraceMs);
-    }, this.terminationGraceMs);
+    }, terminationWaitMs);
   }
 
   private attemptTerminationKill(execution: ActiveExecution) {
+    if (execution.terminationKillInFlight) {
+      return;
+    }
+    execution.terminationKillInFlight = true;
     this.updateSession(execution.taskId, (session) => ({
       ...session,
       termination: session.termination ? {
@@ -1335,16 +1762,83 @@ export class ConnectorRuntime {
         killAttempts: session.termination.killAttempts + 1
       } : session.termination
     }));
-    const result = safeKill(execution.process);
-    if (result.error && this.active.get(execution.taskId) === execution) {
-      this.updateSession(execution.taskId, (session) => ({
-        ...session,
-        events: appendEvent(session.events, this.createEvent(
-        'error',
-        `Process kill attempt failed: ${result.error}`,
-        { killReturned: result.killed }
-        ))
-      }));
+    void this.safeKillExecution(execution).then((result) => {
+      execution.terminationKillInFlight = false;
+      if (result.error && this.active.get(execution.taskId) === execution) {
+        this.updateSession(execution.taskId, (session) => ({
+          ...session,
+          events: appendEvent(session.events, this.createEvent(
+            'error',
+            `Process kill attempt failed: ${result.error}`,
+            { killReturned: result.killed }
+          ))
+        }));
+      }
+    });
+  }
+
+  private async safeKillExecution(execution: ActiveExecution) {
+    if (!execution.plan || !execution.fingerprintContext || !this.dependencies.captureProcessFingerprint) {
+      return safeKill(execution.process);
+    }
+    const session = this.snapshot.tasks.find((candidate) => candidate.taskId === execution.taskId);
+    const expected = session?.processFingerprint;
+    const pid = execution.process.pid;
+    if (!session
+      || !Number.isInteger(pid)
+      || Number(pid) <= 0
+      || (session.pid !== undefined && session.pid !== Number(pid))
+      || (expected && Number(pid) !== expected.pid)) {
+      return { killed: false, error: 'fresh kill reproof unavailable: session PID changed' };
+    }
+    if (!expected
+      && execution.initialProofFailed
+      && execution.spawnConfirmed
+      && !hasLifecycle(session, 'session-started')) {
+      return safeKill(execution.process);
+    }
+    const request = this.beginProcessProof(execution.taskId, Number(pid), session.sessionId);
+    try {
+      const result = await this.dependencies.captureProcessFingerprint(
+        execution.process,
+        execution.fingerprintContext,
+        request
+      );
+      if (!this.isCurrentProcessProof(request) || this.active.get(execution.taskId) !== execution) {
+        return { killed: false, error: 'fresh kill reproof was cancelled or superseded' };
+      }
+      const candidate = isProcessProofResult(result)
+        ? (() => {
+            const evidence = readFreshProcessProof(result, request, this.now());
+            return evidence
+              ? createConnectorProcessFingerprint(evidence, execution.fingerprintContext!, result.observedAt)
+              : null;
+          })()
+        : result;
+      const matches = Boolean(candidate && (
+        expected
+          ? candidate.pid === expected.pid
+            && candidate.processIdentitySha256 === expected.processIdentitySha256
+            && candidate.runEnvelopeSha256 === expected.runEnvelopeSha256
+            && candidate.startedAt === expected.startedAt
+          : execution.spawnConfirmed
+            && session.state === 'stopping'
+            && candidate.pid === Number(pid)
+            && candidate.runEnvelopeSha256.length > 0
+      ));
+      if (!matches) {
+        return {
+          killed: false,
+          error: `fresh kill reproof rejected identity: ${isProcessProofResult(result)
+            ? result.reason ?? result.status
+            : 'fingerprint-mismatch'}`
+        };
+      }
+      return safeKill(execution.process);
+    } catch (error) {
+      return { killed: false, error: `fresh kill reproof crashed: ${formatError(error)}` };
+    } finally {
+      this.completeProcessProof(request);
     }
   }
 
@@ -1664,57 +2158,7 @@ export class ConnectorRuntime {
           'recovery-started'
         ))
       }));
-      const recovering = this.snapshot.tasks.find((candidate) => candidate.taskId === session.taskId);
-      let proof: ConnectorReattachProof | null = null;
       const recoveryDeadlineMs = this.now().getTime() + this.recoveryGraceMs;
-      const timeoutAtMs = Date.parse(recovering?.timeoutAt ?? '');
-      const recoveryEligible = Boolean(
-        recovering?.processFingerprint
-        && Number.isFinite(timeoutAtMs)
-        && timeoutAtMs > this.now().getTime()
-      );
-      try {
-        proof = recoveryEligible && recovering && this.dependencies.reattachProcess
-          ? this.dependencies.reattachProcess(cloneSession(recovering))
-          : null;
-      } catch {
-        proof = null;
-      }
-      const provenAt = proof
-        ? normalizeFreshProofTime(proof.provenAt, this.now(), this.recoveryGraceMs)
-        : null;
-      if (
-        proof
-        && provenAt
-        && recovering?.processFingerprint
-        && proof.process.pid === recovering.processFingerprint.pid
-      ) {
-        this.updateSessionInternal(session.taskId, (current) => ({
-          ...current,
-          state: 'reattached',
-          pid: proof.process.pid,
-          liveness: createFreshLiveness('recovery-proof', provenAt, this.heartbeatStaleAfterMs),
-          events: appendEvent(current.events, this.createEvent(
-            'recovery',
-            'OS process identity proof reattached the persisted session.',
-            { source: 'restart-recovery', provenAt },
-            'recovery-reattached'
-          ))
-        }));
-        const remainingTimeout = Math.max(
-          1,
-          (Date.parse(recovering.timeoutAt ?? '') || this.now().getTime() + this.recoveryGraceMs) - this.now().getTime()
-        );
-        const execution = this.createExecution(
-          session.taskId,
-          proof.process,
-          remainingTimeout,
-          undefined,
-          true
-        );
-        this.active.set(session.taskId, execution);
-        return;
-      }
       const remainingRecoveryGraceMs = Math.max(1, recoveryDeadlineMs - this.now().getTime());
       const timer = this.setTimer(() => {
         if (this.recoveryTimers.get(session.taskId) !== timer) {
@@ -1722,14 +2166,148 @@ export class ConnectorRuntime {
         }
         this.clearTimer(timer);
         this.recoveryTimers.delete(session.taskId);
+        this.cancelProcessProof(session.taskId, 'recovery-deadline-elapsed');
         this.finishSession(session.taskId, 'session-lost', {
           eventKind: 'recovery',
           message: 'Process identity could not be re-proven before the recovery deadline.'
         });
       }, remainingRecoveryGraceMs);
       this.recoveryTimers.set(session.taskId, timer);
+      void this.attemptPersistedRecovery(session.taskId, recoveryDeadlineMs);
     });
     this.publishCurrent();
+  }
+
+  private async attemptPersistedRecovery(taskId: string, recoveryDeadlineMs: number) {
+    const recovering = this.snapshot.tasks.find((candidate) => candidate.taskId === taskId);
+    const timeoutAtMs = Date.parse(recovering?.timeoutAt ?? '');
+    const fingerprint = recovering?.processFingerprint;
+    const recoveryEligible = Boolean(
+      fingerprint
+      && Number.isFinite(timeoutAtMs)
+      && timeoutAtMs > this.now().getTime()
+      && this.dependencies.reattachProcess
+    );
+    if (!recoveryEligible || !recovering || !fingerprint || !this.dependencies.reattachProcess) {
+      return;
+    }
+    const request = this.beginProcessProof(taskId, fingerprint.pid, recovering.sessionId);
+    try {
+      const result = await this.dependencies.reattachProcess(cloneSession(recovering), request);
+      if (!this.isCurrentProcessProof(request)
+        || this.disposed
+        || this.now().getTime() > recoveryDeadlineMs) {
+        return;
+      }
+      const current = this.snapshot.tasks.find((candidate) => candidate.taskId === taskId);
+      if (!current || current.state !== 'recovering' || hasLifecycle(current, 'session-terminal')) {
+        return;
+      }
+      const attempt = normalizeReattachAttempt(result, request, this.now());
+      const proof = attempt?.proof;
+      const provenAt = proof
+        ? normalizeFreshProofTime(proof.provenAt ?? attempt.observedAt, this.now(), this.recoveryGraceMs)
+        : null;
+      if (attempt?.status === 'proven'
+        && proof
+        && provenAt
+        && proof.process.pid === fingerprint.pid
+        && Date.parse(attempt.expiresAt) > this.now().getTime()) {
+        const recoveryTimer = this.recoveryTimers.get(taskId);
+        if (recoveryTimer) {
+          this.clearTimer(recoveryTimer);
+          this.recoveryTimers.delete(taskId);
+        }
+        this.updateSessionInternal(taskId, (session) => ({
+          ...session,
+          state: 'reattached',
+          pid: proof.process.pid,
+          liveness: createFreshLiveness('recovery-proof', provenAt, this.heartbeatStaleAfterMs),
+          events: appendEvent(session.events, this.createEvent(
+            'recovery',
+            'Asynchronous OS process identity proof reattached the persisted session.',
+            {
+              source: 'restart-recovery',
+              provenAt,
+              generation: request.generation,
+              expiresAt: attempt.expiresAt
+            },
+            'recovery-reattached'
+          ))
+        }));
+        const remainingTimeout = Math.max(1, timeoutAtMs - this.now().getTime());
+        const execution = this.createExecution(taskId, proof.process, remainingTimeout, undefined, true);
+        this.active.set(taskId, execution);
+        this.publishCurrent();
+        return;
+      }
+      this.recordRecoveryProofFailure(taskId, request, attempt?.status ?? 'missing', attempt?.reason);
+    } catch (error) {
+      if (this.isCurrentProcessProof(request)) {
+        this.recordRecoveryProofFailure(taskId, request, 'crashed', formatError(error));
+      }
+    } finally {
+      this.completeProcessProof(request);
+    }
+  }
+
+  private recordRecoveryProofFailure(
+    taskId: string,
+    request: ConnectorProcessProofRequest,
+    status: ConnectorProcessProofStatus,
+    reason?: string
+  ) {
+    const current = this.snapshot.tasks.find((candidate) => candidate.taskId === taskId);
+    if (!current || current.state !== 'recovering' || hasLifecycle(current, 'session-terminal')) {
+      return;
+    }
+    this.updateSession(taskId, (session) => ({
+      ...session,
+      events: appendEvent(session.events, this.createEvent(
+        'recovery',
+        `Asynchronous process identity proof failed closed: ${reason ?? status}.`,
+        { proofStatus: status, generation: request.generation, reason: reason ?? status }
+      ))
+    }));
+  }
+
+  private beginProcessProof(taskId: string, pid: number, sessionIdOverride?: string): ConnectorProcessProofRequest {
+    this.cancelProcessProof(taskId, 'process-proof-superseded');
+    const generation = (this.proofGenerations.get(taskId) ?? 0) + 1;
+    const controller = new AbortController();
+    const sessionId = sessionIdOverride
+      ?? this.snapshot.tasks.find((candidate) => candidate.taskId === taskId)?.sessionId
+      ?? 'unknown-session';
+    this.proofGenerations.set(taskId, generation);
+    this.proofControllers.set(taskId, controller);
+    return {
+      taskId,
+      sessionId,
+      pid,
+      generation,
+      timeoutMs: Math.min(this.processProofTimeoutMs, this.recoveryGraceMs),
+      signal: controller.signal
+    };
+  }
+
+  private isCurrentProcessProof(request: ConnectorProcessProofRequest) {
+    return !request.signal.aborted
+      && this.proofGenerations.get(request.taskId) === request.generation
+      && this.proofControllers.get(request.taskId)?.signal === request.signal;
+  }
+
+  private completeProcessProof(request: ConnectorProcessProofRequest) {
+    if (this.proofControllers.get(request.taskId)?.signal === request.signal) {
+      this.proofControllers.delete(request.taskId);
+    }
+  }
+
+  private cancelProcessProof(taskId: string, reason: string) {
+    const controller = this.proofControllers.get(taskId);
+    if (controller) {
+      controller.abort(reason);
+      this.proofControllers.delete(taskId);
+    }
   }
 
   private finishSession(
@@ -1748,6 +2326,7 @@ export class ConnectorRuntime {
     if (!current || hasLifecycle(current, 'session-terminal')) {
       return;
     }
+    this.cancelProcessProof(taskId, `session-terminal:${state}`);
     this.updateSession(taskId, (session) => ({
       ...session,
       state,
@@ -2158,9 +2737,56 @@ function isPermissionError(message: string) {
   return /\b(?:EACCES|EPERM)\b|permission denied|access denied/i.test(message);
 }
 
-function safeKill(process: ConnectorRuntimeProcess) {
+function isProcessProofResult(value: unknown): value is ConnectorProcessProofResult {
+  return isRecord(value)
+    && typeof value.generation === 'number'
+    && typeof value.status === 'string'
+    && typeof value.observedAt === 'string'
+    && typeof value.expiresAt === 'string';
+}
+
+function isPromiseLike<T>(value: T | Promise<T>): value is Promise<T> {
+  return typeof value === 'object'
+    && value !== null
+    && 'then' in value
+    && typeof value.then === 'function';
+}
+
+function normalizeReattachAttempt(
+  value: ConnectorReattachProof | ConnectorReattachAttempt | null,
+  request: ConnectorProcessProofRequest,
+  now: Date
+): ConnectorReattachAttempt | null {
+  if (!value) {
+    return null;
+  }
+  if ('status' in value) {
+    const observedAtMs = Date.parse(value.observedAt);
+    const expiresAtMs = Date.parse(value.expiresAt);
+    return value.generation === request.generation
+      && Number.isFinite(observedAtMs)
+      && Number.isFinite(expiresAtMs)
+      && observedAtMs <= now.getTime() + 1_000
+      && expiresAtMs > now.getTime()
+      ? value
+      : null;
+  }
+  const observedAt = normalizeFreshProofTime(value.provenAt, now, request.timeoutMs);
+  if (!observedAt) {
+    return null;
+  }
+  return {
+    proof: value,
+    generation: request.generation,
+    status: 'proven',
+    observedAt,
+    expiresAt: new Date(now.getTime() + request.timeoutMs).toISOString()
+  };
+}
+
+async function safeKill(process: ConnectorRuntimeProcess) {
   try {
-    const killed = process.kill();
+    const killed = await process.kill();
     return { killed, error: killed ? null : 'kill returned false' };
   } catch (error) {
     return { killed: false, error: formatError(error) };

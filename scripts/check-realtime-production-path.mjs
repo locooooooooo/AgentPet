@@ -176,10 +176,12 @@ try {
   assert.equal(phaseTwo.externalAgentSpawnCount, 0);
   assert.equal(phaseTwo.overlap.samples, overlapSampleCount);
   assert.ok(phaseTwo.overlap.probeDurationsMs.every((value) => value > 0));
+  assert.equal(phaseTwo.overlap.visibleBeforeProofClosedCount, overlapSampleCount);
+  assert.equal(phaseTwo.overlap.proofWorkerResidue, 0);
   assert.equal(isProcessAlive(survivorPid), false, 'Final controlled Node process count must be zero.');
 
   const result = {
-    status: phaseTwo.overlap.p95Ms <= p95BudgetMs ? 'pass' : 'blocked_by_sync_cim_latency',
+    status: phaseTwo.overlap.p95Ms <= p95BudgetMs ? 'pass' : 'blocked_by_async_process_proof_latency',
     path: 'production electron/main.ts -> production preload -> actual React renderer -> visible DOM',
     rehearsal: 'controlled non-Agent Node process; not real Agent E2E',
     lifecycle: {
@@ -213,7 +215,7 @@ try {
   console.log(`B2_PRODUCTION_PATH_RESULT ${JSON.stringify(result)}`);
   console.log(`B2 production-path status=${result.status}`);
   console.log('path=unmodified built production main -> production preload -> actual renderer projection -> DOM');
-  console.log(`overlapping CIM samples=${result.overlap.samples}, p50=${result.overlap.p50Ms.toFixed(3)}ms, p95=${result.overlap.p95Ms.toFixed(3)}ms, max=${result.overlap.maxMs.toFixed(3)}ms, budget=${p95BudgetMs}ms`);
+  console.log(`overlapping async CIM samples=${result.overlap.samples}, p50=${result.overlap.p50Ms.toFixed(3)}ms, p95=${result.overlap.p95Ms.toFixed(3)}ms, max=${result.overlap.maxMs.toFixed(3)}ms, budget=${p95BudgetMs}ms`);
   console.log(`CIM probe duration p50=${result.overlap.probeP50Ms.toFixed(3)}ms, p95=${result.overlap.probeP95Ms.toFixed(3)}ms, max=${result.overlap.probeMaxMs.toFixed(3)}ms`);
   console.log('duplicate started=0; duplicate terminal=0; duplicate renderer probe deliveries=0');
   console.log('controlled non-Agent child cleanup=0; external Agent CLI spawn count=0');
@@ -521,7 +523,7 @@ async function phaseOneHarness() {
     externalAgentSpawnCount
   };
   console.log(`B2_PHASE_ONE_RESULT ${JSON.stringify(result)}`);
-  app.exit(0);
+  app.quit();
 
   function setFixtureTimeout(fsModule, timeoutSeconds) {
     const policy = structuredClone(CONFIG.fixturePolicy);
@@ -546,7 +548,9 @@ async function phaseTwoHarness() {
   let rawSend = null;
   let lastRuntimeSnapshot = null;
   let targetTaskId = '';
-  const cimProbeDurationsMs = [];
+  const measuredProofs = new Map();
+  let activeCimWorkers = 0;
+  let peakCimWorkers = 0;
 
   app.setPath('userData', CONFIG.userDataDirectory);
   app.commandLine.appendSwitch('disable-gpu');
@@ -558,26 +562,51 @@ async function phaseTwoHarness() {
       externalAgentSpawnCount += 1;
       throw new Error(`External Agent CLI execution is forbidden: ${executable}`);
     }
-    return originalSpawn.call(this, file, args, options);
+    const isWindowsCim = executable === 'powershell.exe'
+      && Array.isArray(args)
+      && args.some((arg) => String(arg).includes('Get-CimInstance Win32_Process'));
+    const shouldMeasure = isWindowsCim && measurementArmed && measuredProbeCount < CONFIG.overlapSampleCount;
+    const sample = shouldMeasure ? measuredProbeCount + 1 : 0;
+    const t0EpochMs = Date.now();
+    const startedAt = performance.now();
+    const child = originalSpawn.call(this, file, args, options);
+    if (isWindowsCim) {
+      activeCimWorkers += 1;
+      peakCimWorkers = Math.max(peakCimWorkers, activeCimWorkers);
+      let workerSettled = false;
+      const settleWorker = (code, signal, error) => {
+        if (workerSettled) return;
+        workerSettled = true;
+        activeCimWorkers -= 1;
+        if (shouldMeasure) {
+          measuredProofs.set(sample, {
+            sample,
+            t0EpochMs,
+            probeDurationMs: performance.now() - startedAt,
+            proofClosedAtEpochMs: Date.now(),
+            code,
+            signal,
+            error: error ? String(error.message || error) : ''
+          });
+        }
+      };
+      child.once('error', (error) => settleWorker(null, null, error));
+      child.once('close', (code, signal) => settleWorker(code, signal, null));
+    }
+    if (shouldMeasure) {
+      measuredProbeCount += 1;
+      setImmediate(() => publishOverlapMarker({ sample, t0EpochMs, proofMode: 'async-cim-worker' }));
+    }
+    return child;
   };
-  childProcess.spawnSync = function measuredSpawnSync(file, args, options) {
+  childProcess.spawnSync = function rejectSynchronousCim(file, args, options) {
     const isWindowsCim = String(file).toLowerCase().endsWith('powershell.exe')
       && Array.isArray(args)
       && args.some((arg) => String(arg).includes('Get-CimInstance Win32_Process'));
-    if (!isWindowsCim) {
-      return originalSpawnSync.call(this, file, args, options);
+    if (isWindowsCim) {
+      throw new Error('Synchronous Windows CIM is forbidden in A7.1 production main.');
     }
-    const t0EpochMs = Date.now();
-    const startedAt = performance.now();
-    const result = originalSpawnSync.call(this, file, args, options);
-    const probeDurationMs = performance.now() - startedAt;
-    cimProbeDurationsMs.push(probeDurationMs);
-    if (measurementArmed && measuredProbeCount < CONFIG.overlapSampleCount) {
-      measuredProbeCount += 1;
-      const sample = measuredProbeCount;
-      setImmediate(() => publishOverlapMarker({ sample, t0EpochMs, probeDurationMs }));
-    }
-    return result;
+    return originalSpawnSync.call(this, file, args, options);
   };
 
   require(CONFIG.mainModulePath);
@@ -598,7 +627,7 @@ async function phaseTwoHarness() {
   await enterCockpit(mainWindow);
   await installRendererProbe(mainWindow, true);
 
-  const initialSnapshot = await execute(mainWindow, 'window.niumaDesk.getConnectorRuntimeSnapshot()');
+  const initialSnapshot = await waitForReattachedSnapshot(10_000);
   const reattached = initialSnapshot.tasks.find((task) => task.state === 'reattached');
   assert.ok(reattached, 'Production main must reattach the persisted controlled Node task.');
   targetTaskId = reattached.taskId;
@@ -614,8 +643,20 @@ async function phaseTwoHarness() {
   measurementArmed = true;
 
   const markerResults = await waitForOverlapMarkers(mainWindow, CONFIG.overlapSampleCount, 45_000);
-  const sortedLatencies = markerResults.map((item) => item.latencyMs).sort((a, b) => a - b);
-  const measuredProbeDurations = markerResults.map((item) => item.probeDurationMs).sort((a, b) => a - b);
+  const proofResults = await waitForMeasuredProofs(CONFIG.overlapSampleCount, 15_000);
+  const samplesDetail = markerResults.map((marker) => {
+    const proof = proofResults.find((candidate) => candidate.sample === marker.sample);
+    assert.ok(proof, `Missing asynchronous CIM close evidence for sample ${marker.sample}.`);
+    return {
+      ...marker,
+      ...proof,
+      visibleAtEpochMs: marker.t0EpochMs + marker.latencyMs,
+      visibleBeforeProofClosed: marker.t0EpochMs + marker.latencyMs < proof.proofClosedAtEpochMs
+    };
+  });
+  assert.ok(samplesDetail.every((sample) => sample.visibleBeforeProofClosed), 'Visible DOM propagation must complete while each CIM worker is still running.');
+  const sortedLatencies = samplesDetail.map((item) => item.latencyMs).sort((a, b) => a - b);
+  const measuredProbeDurations = samplesDetail.map((item) => item.probeDurationMs).sort((a, b) => a - b);
   const overlap = {
     samples: sortedLatencies.length,
     p50Ms: percentile(sortedLatencies, 50),
@@ -626,8 +667,11 @@ async function phaseTwoHarness() {
     probeP95Ms: percentile(measuredProbeDurations, 95),
     probeMaxMs: measuredProbeDurations.at(-1),
     probeDurationsMs: measuredProbeDurations,
-    samplesDetail: markerResults,
-    publicationTiming: 't0 before real CIM; marker published only after synchronous probe returns',
+    samplesDetail,
+    publicationTiming: 'marker published immediately after asynchronous CIM worker spawn; worker close measured independently',
+    visibleBeforeProofClosedCount: samplesDetail.filter((sample) => sample.visibleBeforeProofClosed).length,
+    peakProofWorkers: peakCimWorkers,
+    proofWorkerResidue: activeCimWorkers,
     blocksMainThreadPropagation: percentile(sortedLatencies, 95) > CONFIG.p95BudgetMs
   };
   console.log(`B2_OVERLAP_AGGREGATE ${JSON.stringify(overlap)}`);
@@ -669,7 +713,7 @@ async function phaseTwoHarness() {
     externalAgentSpawnCount
   };
   console.log(`B2_PHASE_TWO_RESULT ${JSON.stringify(result)}`);
-  app.exit(0);
+  app.quit();
 
   function publishOverlapMarker(meta) {
     if (!mainWindow || mainWindow.isDestroyed() || !rawSend || !lastRuntimeSnapshot) {
@@ -695,6 +739,30 @@ async function phaseTwoHarness() {
     snapshot.runtime = { ...snapshot.runtime, observedAt: markerLastSeen };
     snapshot.__b2Overlap = { ...meta, markerLastSeen };
     rawSend('connectors:runtime-snapshot-changed', snapshot);
+  }
+
+  async function waitForMeasuredProofs(count, timeoutMs) {
+    const deadline = Date.now() + timeoutMs;
+    while (Date.now() < deadline) {
+      if (measuredProofs.size >= count) {
+        return [...measuredProofs.values()].sort((left, right) => left.sample - right.sample).slice(0, count);
+      }
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    }
+    throw new Error(`Only ${measuredProofs.size}/${count} asynchronous CIM workers produced close evidence.`);
+  }
+
+  async function waitForReattachedSnapshot(timeoutMs) {
+    const deadline = Date.now() + timeoutMs;
+    let current = null;
+    while (Date.now() < deadline) {
+      current = await execute(mainWindow, 'window.niumaDesk.getConnectorRuntimeSnapshot()');
+      if (current.tasks.some((task) => task.state === 'reattached')) {
+        return current;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    }
+    throw new Error(`Production main did not reattach within ${timeoutMs}ms: ${JSON.stringify(current)}`);
   }
 }
 
@@ -783,17 +851,28 @@ async function installRendererProbe(window, collectOverlap = false) {
         return;
       }
       window.__b2Probe.markerIds.push(marker.sample);
-      let frames = 0;
+      let checks = 0;
+      let observer;
       const observe = () => {
-        frames += 1;
+        checks += 1;
         const panel = document.querySelector('.detail-panel');
         if (panel && panel.dataset.runtimeLastSeen === marker.markerLastSeen) {
-          window.__b2Probe.markers.push({ ...marker, duplicate: false, frames, latencyMs: Date.now() - marker.t0EpochMs });
-          return;
+          observer?.disconnect();
+          window.__b2Probe.markers.push({ ...marker, duplicate: false, checks, latencyMs: Date.now() - marker.t0EpochMs });
+          return true;
         }
-        if (frames < 180) requestAnimationFrame(observe);
+        return false;
       };
-      requestAnimationFrame(observe);
+      if (!observe()) {
+        observer = new MutationObserver(observe);
+        observer.observe(document.documentElement, {
+          attributes: true,
+          childList: true,
+          characterData: true,
+          subtree: true
+        });
+        queueMicrotask(observe);
+      }
     });
     return true;
   })()`);

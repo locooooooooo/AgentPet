@@ -9,12 +9,14 @@ const gatePath = path.join(root, 'src/lib/connectorGate.ts');
 const typesPath = path.join(root, 'src/types.ts');
 const desktopClientPath = path.join(root, 'src/lib/desktopClient.ts');
 const mainPath = path.join(root, 'electron/main.ts');
+const processProofPath = path.join(root, 'electron/connectorProcessProof.ts');
 const policyPath = path.join(root, 'docs/orchestration/connectors.json');
 const runtimeSource = fs.readFileSync(runtimePath, 'utf8');
 const gateSource = fs.readFileSync(gatePath, 'utf8');
 const typesSource = fs.readFileSync(typesPath, 'utf8');
 const desktopClientSource = fs.readFileSync(desktopClientPath, 'utf8');
 const mainSource = fs.readFileSync(mainPath, 'utf8');
+const processProofSource = fs.readFileSync(processProofPath, 'utf8');
 const currentPolicy = JSON.parse(fs.readFileSync(policyPath, 'utf8'));
 
 const gateIndex = runtimeSource.indexOf('evaluateConnectorPolicyGate(');
@@ -40,7 +42,12 @@ assert(mainSource.includes('loadPersistedSnapshot: loadConnectorRuntimeSnapshot'
 assert(mainSource.includes('persistSnapshot: saveConnectorRuntimeSnapshot'), 'main must persist Connector sessions');
 assert(mainSource.includes('captureProcessFingerprint:'), 'main must capture bounded OS process identity after spawn');
 assert(mainSource.includes('reattachProcess: reattachConnectorProcess'), 'main must wire production restart recovery');
-assert(mainSource.includes('createReattachedConnectorProcess(session, context)'), 'main recovery must use the strongly verified recovered handle');
+assert(mainSource.includes('createAsyncReattachedConnectorProcess(session, context'), 'main recovery must use the asynchronous verified recovered handle');
+assert(!runtimeFactorySource.includes('inspectConnectorProcessEvidence'), 'production runtime factory must not run synchronous process inspection');
+assert(!mainSource.includes('Get-CimInstance Win32_Process'), 'Electron main must not embed synchronous CIM proof');
+assert(processProofSource.includes("spawnProcess('powershell.exe'"), 'process proof must use an asynchronous child-process boundary');
+assert(!processProofSource.includes('spawnSync'), 'process proof helper must not use spawnSync');
+assert(processProofSource.includes('process-proof-result-late-or-superseded'), 'late or superseded proof must fail closed');
 assert(!typesSource.includes('commandLine: string;'), 'persisted/public process fingerprint must not expose raw command line');
 assert(desktopClientSource.includes("availability: 'unavailable'"), 'browser fallback must report unavailable');
 assert(desktopClientSource.includes("mode: 'simulated'"), 'browser fallback must report simulated');
@@ -212,6 +219,7 @@ function createHarness(policy, options = {}) {
     heartbeatStaleAfterMs: options.heartbeatStaleAfterMs ?? 10_000,
     recoveryGraceMs: options.recoveryGraceMs ?? 500,
     terminationGraceMs: options.terminationGraceMs ?? 100,
+    processProofTimeoutMs: options.processProofTimeoutMs ?? options.terminationGraceMs ?? 100,
     outputFlushMs: options.outputFlushMs ?? 50,
     now: () => new Date(nowMs),
     createId: () => String(++id),
@@ -565,7 +573,9 @@ const synchronousCloseHarness = createHarness(readyPolicy(), {
 const synchronousAccepted = synchronousCloseHarness.runtime.start(request);
 synchronousCloseHarness.processes[0].confirmSpawn();
 const synchronousStop = synchronousCloseHarness.runtime.stop({ taskId: synchronousAccepted.taskId });
-assert(synchronousStop.status === 'stopped', 'synchronous close during kill must return settled stop');
+assert(synchronousStop.status === 'stopping', 'fresh asynchronous kill reproof must return stopping before close.');
+await settleAsync();
+assert(synchronousCloseHarness.runtime.getSnapshot().tasks[0].state === 'stopped', 'close during proven kill must settle stopped.');
 assert(liveTimers(synchronousCloseHarness).length === 0, 'synchronous close must not create orphan termination timers');
 assertEventProof(synchronousCloseHarness.runtime.getSnapshot().tasks[0], 1, 1);
 
@@ -577,8 +587,11 @@ const escalationHarness = createHarness(readyPolicy(), {
 const escalationAccepted = escalationHarness.runtime.start(request);
 escalationHarness.processes[0].confirmSpawn();
 escalationHarness.runtime.stop({ taskId: escalationAccepted.taskId });
+await settleAsync();
 assert(escalationHarness.processes[0].killCount === 1, 'stop must make first bounded kill attempt');
+await settleAsync();
 fireTimer(liveTimers(escalationHarness, 100)[0]);
+await settleAsync();
 assert(escalationHarness.processes[0].killCount === 2, 'termination grace must escalate kill exactly once');
 let escalationSession = escalationHarness.runtime.getSnapshot().tasks[0];
 assert(escalationSession.state === 'stopping' && lifecycleCount(escalationSession, 'termination-escalated') === 1, 'escalation must remain non-terminal while awaiting close');
@@ -741,6 +754,7 @@ const reattachHarness = createHarness(readyPolicy(), {
   persistedSnapshot: persistedActiveSnapshot,
   reattachProcess: () => ({ process: recoveryProcess, provenAt: '2026-07-13T00:00:00.500Z' })
 });
+await settleAsync();
 assert(reattachHarness.runtime.getSnapshot().tasks.some((session) => session.state === 'reattached'), 'injected proof must reattach persisted session');
 const reattachedSession = reattachHarness.runtime.getSnapshot().tasks.find((session) => session.state === 'reattached');
 assert(reattachedSession.source === 'restart-recovery', 'reattached session source must be restart-recovery');
@@ -810,6 +824,38 @@ assert(stopRaceHandle.kill() === false, 'stop must fail closed when PID identity
 assert(recoveredKillCount === 0, 'PID reuse at stop must never call process.kill');
 assert(stopRaceIdentityLost === 1, 'PID reuse at stop must emit exactly one identity-lost signal');
 
+let liveProofCall = 0;
+const liveReuseHarness = createHarness(readyPolicy(), {
+  captureProcessFingerprint: (child, context) => {
+    liveProofCall += 1;
+    return createConnectorProcessFingerprint({
+      pid: child.pid,
+      executablePath: context.executablePath,
+      startedAt: liveProofCall === 1 ? '2026-07-12T23:59:59.900Z' : '2026-07-12T23:59:58.900Z',
+      commandLine: `${context.executablePath} fixture-${child.pid}`,
+      evidenceSource: 'windows-cim'
+    }, context, '2026-07-13T00:00:00.000Z');
+  }
+});
+const liveReuseAccepted = liveReuseHarness.runtime.start(request);
+liveReuseHarness.processes[0].confirmSpawn();
+assert(liveReuseHarness.runtime.getSnapshot().tasks[0].state === 'running', 'initial live process proof must reach running.');
+liveReuseHarness.runtime.stop({ taskId: liveReuseAccepted.taskId });
+await settleAsync();
+assert(liveReuseHarness.processes[0].killCount === 0, 'fresh live-process PID reuse reproof must keep process.kill count at zero.');
+assert(
+  liveReuseHarness.runtime.getSnapshot().tasks[0].events.some((event) => event.message.includes('fresh kill reproof rejected identity')),
+  'fresh live-process PID reuse rejection must be auditable.'
+);
+for (const timer of [...liveTimers(liveReuseHarness)]) {
+  fireTimer(timer);
+  await settleAsync();
+}
+for (const timer of [...liveTimers(liveReuseHarness)]) {
+  fireTimer(timer);
+  await settleAsync();
+}
+
 const lostHarness = createHarness(readyPolicy(), { persistedSnapshot: persistedActiveSnapshot, recoveryGraceMs: 500 });
 assert(lostHarness.runtime.getSnapshot().runtime.availability === 'recovering', 'unproven persisted session must expose recovering envelope');
 const recoveryTimer = liveTimers(lostHarness, 500)[0];
@@ -850,12 +896,120 @@ const disposeHarness = createHarness(readyPolicy());
 disposeHarness.runtime.start(request);
 disposeHarness.processes[0].confirmSpawn();
 disposeHarness.runtime.dispose();
+await settleAsync();
+for (const timer of [...liveTimers(disposeHarness)]) {
+  fireTimer(timer);
+  await settleAsync();
+}
+for (const timer of [...liveTimers(disposeHarness)]) {
+  fireTimer(timer);
+  await settleAsync();
+}
 const disposedSession = disposeHarness.runtime.getSnapshot().tasks[0];
-assert(disposeHarness.processes[0].killCount === 1, 'dispose must issue bounded kill');
+assert(disposeHarness.processes[0].killCount === 1, 'dispose must issue exactly one bounded kill');
 assert(disposeHarness.processes[0].listenerCount('close') === 0, 'dispose must remove listeners');
 assert(liveTimers(disposeHarness).length === 0, 'dispose must clear every timer');
 assert(disposedSession.state === 'session-lost' && disposedSession.termination?.exitConfirmed === false, 'dispose without close must remain truthful');
 assertEventProof(disposedSession, 1, 1);
+
+let shutdownProofCall = 0;
+const shutdownDuringProofHarness = createHarness(readyPolicy(), {
+  spawnProcess: () => new FakeProcess(6200, { closeOnKill: true }),
+  captureProcessFingerprint: (child, context, proofRequest) => {
+    shutdownProofCall += 1;
+    if (shutdownProofCall === 1) {
+      return new Promise((resolve) => {
+        proofRequest.signal.addEventListener('abort', () => resolve(null), { once: true });
+      });
+    }
+    return createConnectorProcessFingerprint({
+      pid: child.pid,
+      executablePath: context.executablePath,
+      startedAt: '2026-07-12T23:59:59.900Z',
+      commandLine: `${context.executablePath} fixture-${child.pid}`,
+      evidenceSource: 'windows-cim'
+    }, context, '2026-07-13T00:00:00.000Z');
+  }
+});
+shutdownDuringProofHarness.runtime.start(request);
+shutdownDuringProofHarness.processes[0].confirmSpawn();
+assert(shutdownDuringProofHarness.runtime.getSnapshot().tasks[0].state === 'starting', 'async fingerprint proof must keep session non-running.');
+shutdownDuringProofHarness.runtime.dispose();
+await settleAsync();
+const shutdownDuringProofSession = shutdownDuringProofHarness.runtime.getSnapshot().tasks[0];
+assert(shutdownProofCall === 2, 'shutdown must cancel the stale initial proof and issue one fresh kill reproof.');
+assert(shutdownDuringProofHarness.processes[0].killCount === 1, 'shutdown during initial proof must still kill the controlled child exactly once.');
+assert(shutdownDuringProofSession.state === 'session-lost' && shutdownDuringProofSession.termination?.exitConfirmed === true, 'shutdown close must remain truthful and terminal.');
+assert(liveTimers(shutdownDuringProofHarness).length === 0, 'shutdown during proof must leave zero timers.');
+
+for (const failureMode of ['crash', 'unavailable']) {
+  const initialFailureHarness = createHarness(readyPolicy(), {
+    spawnProcess: () => new FakeProcess(6300, { closeOnKill: true }),
+    captureProcessFingerprint: (child, context, proofRequest) => {
+      if (failureMode === 'crash') {
+        throw new Error('fixture-initial-proof-crash');
+      }
+      const observedAt = '2026-07-13T00:00:00.000Z';
+      return {
+        generation: proofRequest.generation,
+        status: 'unavailable',
+        observedAt,
+        expiresAt: '2026-07-13T00:00:00.100Z',
+        reason: 'fixture-initial-proof-unavailable'
+      };
+    }
+  });
+  initialFailureHarness.runtime.start(request);
+  initialFailureHarness.processes[0].confirmSpawn();
+  await settleAsync();
+  const failed = initialFailureHarness.runtime.getSnapshot().tasks[0];
+  assert(initialFailureHarness.processes[0].killCount === 1, `${failureMode} initial proof must roll back the owned child exactly once.`);
+  assert(failed.state === 'error' && failed.termination?.exitConfirmed === true, `${failureMode} initial proof rollback must close truthfully.`);
+  assert(lifecycleCount(failed, 'session-started') === 0 && lifecycleCount(failed, 'session-terminal') === 1, `${failureMode} initial proof must never publish running.`);
+  assert(liveTimers(initialFailureHarness).length === 0, `${failureMode} initial proof rollback must leave zero timers.`);
+}
+
+let immediateStopProofCalls = 0;
+let resolveInitialProof;
+let resolveKillProof;
+let immediateStopContext;
+const immediateStopHarness = createHarness(readyPolicy(), {
+  spawnProcess: () => new FakeProcess(6400, { closeOnKill: true }),
+  captureProcessFingerprint: (_child, context) => {
+    immediateStopProofCalls += 1;
+    immediateStopContext = context;
+    return new Promise((resolve) => {
+      if (immediateStopProofCalls === 1) {
+        resolveInitialProof = resolve;
+      } else {
+        resolveKillProof = resolve;
+      }
+    });
+  }
+});
+const immediateStopAccepted = immediateStopHarness.runtime.start(request);
+immediateStopHarness.processes[0].confirmSpawn();
+assert(immediateStopHarness.runtime.getSnapshot().tasks[0].state === 'starting', 'pending initial proof must stay starting.');
+immediateStopHarness.runtime.stop({ taskId: immediateStopAccepted.taskId });
+assert(immediateStopProofCalls === 2, 'immediate stop must supersede initial proof with one fresh kill reproof.');
+const lateInitialFingerprint = createConnectorProcessFingerprint({
+  pid: 6400,
+  executablePath: immediateStopContext.executablePath,
+  startedAt: '2026-07-12T23:59:59.900Z',
+  commandLine: `${immediateStopContext.executablePath} fixture-6400`,
+  evidenceSource: 'windows-cim'
+}, immediateStopContext, '2026-07-13T00:00:00.000Z');
+resolveInitialProof(lateInitialFingerprint);
+await settleAsync();
+assert(immediateStopHarness.processes[0].killCount === 0, 'late superseded initial proof must not trigger kill or running.');
+assert(immediateStopHarness.runtime.getSnapshot().tasks[0].state === 'stopping', 'late superseded initial proof must not resurrect running.');
+resolveKillProof(lateInitialFingerprint);
+await settleAsync();
+const immediateStopped = immediateStopHarness.runtime.getSnapshot().tasks[0];
+assert(immediateStopHarness.processes[0].killCount === 1, 'fresh immediate-stop reproof must kill exactly once.');
+assert(immediateStopped.state === 'stopped' && immediateStopped.termination?.exitConfirmed === true, 'immediate stop must terminal truthfully.');
+assert(lifecycleCount(immediateStopped, 'session-started') === 0 && lifecycleCount(immediateStopped, 'session-terminal') === 1, 'late initial proof must not publish a started event.');
+assert(liveTimers(immediateStopHarness).length === 0, 'immediate stop must clean every timer.');
 
 console.log('connector runtime check passed.');
 console.log('P1-1: explicit spawn handshake and pre-spawn error truth verified');
@@ -878,4 +1032,9 @@ function assert(condition, message) {
   if (!condition) {
     throw new Error(message);
   }
+}
+
+async function settleAsync() {
+  await Promise.resolve();
+  await Promise.resolve();
 }
