@@ -1,3 +1,7 @@
+import { createHash } from 'node:crypto';
+import { spawnSync } from 'node:child_process';
+import { EventEmitter } from 'node:events';
+import { readFileSync, readlinkSync } from 'node:fs';
 import type {
   AgentInstance,
   ConnectorAuthorizationCancelResult,
@@ -7,6 +11,7 @@ import type {
   ConnectorFailureKind,
   ConnectorLifecycleSubtype,
   ConnectorOutputStats,
+  ConnectorProcessFingerprint,
   ConnectorPolicyConfig,
   ConnectorRetryPolicy,
   ConnectorRetryPolicyInput,
@@ -50,6 +55,8 @@ const DEFAULT_TERMINATION_GRACE_MS = 1_000;
 const DEFAULT_AUTHORIZATION_GRANT_TTL_MS = 30_000;
 const MAX_AUTHORIZATION_GRANT_TTL_MS = 60_000;
 const MAX_AUTHORIZATION_TOMBSTONES = 200;
+const MAX_PROCESS_PATH_LENGTH = 4_096;
+const MAX_PROCESS_COMMAND_LINE_LENGTH = 1_000_000;
 const ACTIVE_STATES = new Set<ConnectorRuntimeState>([
   'starting',
   'running',
@@ -77,10 +84,15 @@ export interface ConnectorRuntimeProcess {
   on(event: 'spawn', listener: () => void): void;
   on(event: 'error', listener: (error: Error) => void): void;
   on(event: 'close', listener: (code: number | null, signal: NodeJS.Signals | null) => void): void;
+  on(event: 'heartbeat', listener: (provenAt: string) => void): void;
+  on(event: 'identity-lost', listener: () => void): void;
   off(event: 'spawn', listener: () => void): void;
   off(event: 'error', listener: (error: Error) => void): void;
   off(event: 'close', listener: (code: number | null, signal: NodeJS.Signals | null) => void): void;
+  off(event: 'heartbeat', listener: (provenAt: string) => void): void;
+  off(event: 'identity-lost', listener: () => void): void;
   kill(): boolean;
+  dispose?(): void;
 }
 
 export interface ConnectorSpawnOptions {
@@ -103,6 +115,24 @@ export interface ConnectorReattachProof {
   provenAt?: string;
 }
 
+export interface ConnectorObservedProcessEvidence {
+  pid: number;
+  executablePath: string;
+  startedAt: string;
+  commandLine: string;
+  cwd?: string;
+  evidenceSource: ConnectorProcessFingerprint['evidenceSource'];
+}
+
+export interface ConnectorProcessFingerprintContext {
+  taskId: string;
+  sessionId: string;
+  connectorId: string;
+  agentId: string;
+  executablePath: string;
+  cwd: string;
+}
+
 export interface ConnectorRuntimeDependencies {
   loadPolicy: () => ConnectorPolicyConfig | null;
   resolveExecutable: (command: string) => string | null;
@@ -113,6 +143,10 @@ export interface ConnectorRuntimeDependencies {
   authorizeRun?: (request: ConnectorRunRequest) => ConnectorAuthorizationDecision;
   loadPersistedSnapshot?: () => unknown;
   persistSnapshot?: (snapshot: ConnectorRuntimeSnapshot) => void;
+  captureProcessFingerprint?: (
+    process: ConnectorRuntimeProcess,
+    context: ConnectorProcessFingerprintContext
+  ) => ConnectorProcessFingerprint | null;
   reattachProcess?: (session: ConnectorSession) => ConnectorReattachProof | null;
   classifyFailure?: (failure: ConnectorFailureDecision) => ConnectorFailureDecision;
   heartbeatStaleAfterMs?: number;
@@ -342,7 +376,9 @@ interface ActiveExecution {
   terminationFinalTimer?: NodeJS.Timeout;
   outputFlushTimer?: NodeJS.Timeout;
   plan?: ExecutionPlan;
+  fingerprintContext?: ConnectorProcessFingerprintContext;
   spawnConfirmed: boolean;
+  identityLost: boolean;
   termination?: TerminationIntent;
   stdoutBuffer: string;
   stderrBuffer: string;
@@ -352,6 +388,8 @@ interface ActiveExecution {
   onStderr: (chunk: unknown) => void;
   onError: (error: Error) => void;
   onClose: (code: number | null, signal: NodeJS.Signals | null) => void;
+  onHeartbeat: (provenAt: string) => void;
+  onIdentityLost: () => void;
 }
 
 type PrepareResult =
@@ -390,6 +428,265 @@ export function computeHeartbeatFreshness(
   return now.getTime() - timestamp <= staleAfterMs ? 'fresh' : 'stale';
 }
 
+export function createConnectorProcessFingerprint(
+  evidence: ConnectorObservedProcessEvidence,
+  context: ConnectorProcessFingerprintContext,
+  capturedAt: string
+): ConnectorProcessFingerprint | null {
+  const normalizedEvidence = normalizeObservedProcessEvidence(evidence);
+  const normalizedCapturedAt = normalizeIsoDate(capturedAt);
+  if (!normalizedEvidence || !normalizedCapturedAt) {
+    return null;
+  }
+  if (Date.parse(normalizedEvidence.startedAt) > Date.parse(normalizedCapturedAt) + 1_000) {
+    return null;
+  }
+  if (!sameProcessPath(
+    normalizedEvidence.executablePath,
+    context.executablePath,
+    normalizedEvidence.evidenceSource
+  )) {
+    return null;
+  }
+  if (normalizedEvidence.cwd && !sameProcessPath(
+    normalizedEvidence.cwd,
+    context.cwd,
+    normalizedEvidence.evidenceSource
+  )) {
+    return null;
+  }
+  if (normalizedEvidence.evidenceSource === 'linux-procfs' && !normalizedEvidence.cwd) {
+    return null;
+  }
+  const executablePath = normalizedEvidence.executablePath;
+  const cwd = normalizeProcessPath(context.cwd, normalizedEvidence.evidenceSource);
+  if (!cwd) {
+    return null;
+  }
+  const commandLineSha256 = sha256(normalizedEvidence.commandLine);
+  const processIdentitySha256 = sha256(stableFingerprintValue({
+    pid: normalizedEvidence.pid,
+    executablePath,
+    startedAt: normalizedEvidence.startedAt,
+    commandLineSha256,
+    evidenceSource: normalizedEvidence.evidenceSource
+  }));
+  const runEnvelopeSha256 = sha256(stableFingerprintValue({
+    taskId: context.taskId,
+    sessionId: context.sessionId,
+    connectorId: context.connectorId,
+    agentId: context.agentId,
+    executablePath,
+    cwd,
+    commandLineSha256
+  }));
+  return {
+    version: 1,
+    pid: normalizedEvidence.pid,
+    executablePath,
+    startedAt: normalizedEvidence.startedAt,
+    cwd,
+    cwdSource: normalizedEvidence.cwd ? 'linux-procfs' : 'spawn-envelope',
+    commandLineSha256,
+    processIdentitySha256,
+    runEnvelopeSha256,
+    capturedAt: normalizedCapturedAt,
+    evidenceSource: normalizedEvidence.evidenceSource
+  };
+}
+
+export function matchesConnectorProcessFingerprint(
+  fingerprint: ConnectorProcessFingerprint,
+  evidence: ConnectorObservedProcessEvidence,
+  context: ConnectorProcessFingerprintContext
+): boolean {
+  const candidate = createConnectorProcessFingerprint(evidence, context, fingerprint.capturedAt);
+  return candidate !== null
+    && candidate.pid === fingerprint.pid
+    && candidate.executablePath === fingerprint.executablePath
+    && candidate.startedAt === fingerprint.startedAt
+    && candidate.cwd === fingerprint.cwd
+    && candidate.cwdSource === fingerprint.cwdSource
+    && candidate.commandLineSha256 === fingerprint.commandLineSha256
+    && candidate.processIdentitySha256 === fingerprint.processIdentitySha256
+    && candidate.runEnvelopeSha256 === fingerprint.runEnvelopeSha256
+    && candidate.evidenceSource === fingerprint.evidenceSource;
+}
+
+export function inspectConnectorProcessEvidence(
+  pid: number,
+  platform: NodeJS.Platform = process.platform
+): ConnectorObservedProcessEvidence | null {
+  if (!Number.isInteger(pid) || pid <= 0) {
+    return null;
+  }
+  if (platform === 'win32') {
+    const script = "$ErrorActionPreference = 'Stop'; "
+      + `$p = Get-CimInstance Win32_Process -Filter \"ProcessId = ${pid}\" | Select-Object -First 1; `
+      + 'if ($null -eq $p) { exit 3 }; '
+      + '[ordered]@{ '
+      + 'pid = [int]$p.ProcessId; '
+      + 'executablePath = [string]$p.ExecutablePath; '
+      + "startedAt = $p.CreationDate.ToUniversalTime().ToString('o'); "
+      + 'commandLine = [string]$p.CommandLine '
+      + '} | ConvertTo-Json -Compress';
+    const result = spawnSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script], {
+      encoding: 'utf8',
+      shell: false,
+      windowsHide: true,
+      timeout: 3_000,
+      maxBuffer: 1_100_000
+    });
+    if (result.status !== 0 || !result.stdout) {
+      return null;
+    }
+    try {
+      const parsed = JSON.parse(result.stdout) as Record<string, unknown>;
+      return typeof parsed.pid === 'number'
+        && typeof parsed.executablePath === 'string'
+        && typeof parsed.startedAt === 'string'
+        && typeof parsed.commandLine === 'string'
+        ? {
+            pid: parsed.pid,
+            executablePath: parsed.executablePath,
+            startedAt: parsed.startedAt,
+            commandLine: parsed.commandLine,
+            evidenceSource: 'windows-cim'
+          }
+        : null;
+    } catch {
+      return null;
+    }
+  }
+  if (platform !== 'linux') {
+    return null;
+  }
+  try {
+    const stat = readFileSync(`/proc/${pid}/stat`, 'utf8');
+    const statTail = stat.slice(stat.lastIndexOf(') ') + 2).trim().split(/\s+/);
+    const startTicks = Number(statTail[19]);
+    const bootTimeLine = readFileSync('/proc/stat', 'utf8')
+      .split(/\r?\n/)
+      .find((line) => line.startsWith('btime '));
+    const bootTimeSeconds = Number(bootTimeLine?.split(/\s+/)[1]);
+    const clockTickResult = spawnSync('getconf', ['CLK_TCK'], {
+      encoding: 'utf8',
+      shell: false,
+      windowsHide: true,
+      timeout: 1_000
+    });
+    const clockTicksPerSecond = Number(clockTickResult.stdout.trim());
+    if (![startTicks, bootTimeSeconds, clockTicksPerSecond].every(Number.isFinite)) {
+      return null;
+    }
+    return {
+      pid,
+      executablePath: readlinkSync(`/proc/${pid}/exe`),
+      startedAt: new Date((bootTimeSeconds + (startTicks / clockTicksPerSecond)) * 1_000).toISOString(),
+      commandLine: readFileSync(`/proc/${pid}/cmdline`).toString('utf8'),
+      cwd: readlinkSync(`/proc/${pid}/cwd`),
+      evidenceSource: 'linux-procfs'
+    };
+  } catch {
+    return null;
+  }
+}
+
+export interface ReattachedConnectorProcessDependencies {
+  inspectEvidence?: (pid: number) => ConnectorObservedProcessEvidence | null;
+  killProcess?: (pid: number) => boolean;
+  now?: () => Date;
+  pollIntervalMs?: number;
+}
+
+export function createReattachedConnectorProcess(
+  session: ConnectorSession,
+  context: ConnectorProcessFingerprintContext,
+  dependencies: ReattachedConnectorProcessDependencies = {}
+): ConnectorRuntimeProcess | null {
+  const fingerprint = session.processFingerprint;
+  if (!fingerprint) {
+    return null;
+  }
+  const inspectEvidence = dependencies.inspectEvidence ?? inspectConnectorProcessEvidence;
+  const killProcess = dependencies.killProcess ?? ((pid: number) => process.kill(pid));
+  const now = dependencies.now ?? (() => new Date());
+  const initialEvidence = inspectEvidence(fingerprint.pid);
+  if (!initialEvidence || !matchesConnectorProcessFingerprint(fingerprint, initialEvidence, context)) {
+    return null;
+  }
+
+  const emitter = new EventEmitter();
+  const stdout = new EventEmitter();
+  const stderr = new EventEmitter();
+  let closed = false;
+  let terminationRequested = false;
+  let lastHeartbeatAt = 0;
+  let pollTimer: NodeJS.Timeout;
+  const closeUnproven = () => {
+    if (closed) {
+      return;
+    }
+    closed = true;
+    clearInterval(pollTimer);
+    if (!terminationRequested) {
+      emitter.emit('identity-lost');
+    }
+    emitter.emit('close', null, null);
+  };
+  const inspectStrongIdentity = () => {
+    const evidence = inspectEvidence(fingerprint.pid);
+    return Boolean(evidence && matchesConnectorProcessFingerprint(fingerprint, evidence, context));
+  };
+  const poll = () => {
+    if (!inspectStrongIdentity()) {
+      closeUnproven();
+      return;
+    }
+    const provenAt = now();
+    if (provenAt.getTime() - lastHeartbeatAt >= 5_000) {
+      lastHeartbeatAt = provenAt.getTime();
+      emitter.emit('heartbeat', provenAt.toISOString());
+    }
+  };
+  pollTimer = setInterval(poll, clampInteger(dependencies.pollIntervalMs, 100, 5_000, 5_000));
+  pollTimer.unref();
+  return {
+    pid: fingerprint.pid,
+    stdout,
+    stderr,
+    on: (event: string, listener: (...args: never[]) => void) => {
+      emitter.on(event, listener as (...args: unknown[]) => void);
+    },
+    off: (event: string, listener: (...args: never[]) => void) => {
+      emitter.off(event, listener as (...args: unknown[]) => void);
+    },
+    kill: () => {
+      if (closed) {
+        return false;
+      }
+      if (!inspectStrongIdentity()) {
+        closeUnproven();
+        return false;
+      }
+      try {
+        const killed = killProcess(fingerprint.pid);
+        terminationRequested = killed;
+        return killed;
+      } catch {
+        closeUnproven();
+        return false;
+      }
+    },
+    dispose: () => {
+      if (!closed) {
+        closed = true;
+        clearInterval(pollTimer);
+      }
+    }
+  } as ConnectorRuntimeProcess;
+}
+
 export function sanitizeRuntimeSnapshotForPersistence(
   snapshot: ConnectorRuntimeSnapshot,
   sensitiveTerms: string[] = []
@@ -402,6 +699,7 @@ export function sanitizeRuntimeSnapshotForPersistence(
       ...session,
       capabilities: session.capabilities ? [...session.capabilities] : null,
       output: { ...session.output },
+      processFingerprint: session.processFingerprint ? { ...session.processFingerprint } : undefined,
       termination: session.termination ? { ...session.termination } : undefined,
       liveness: { ...session.liveness },
       retryPolicy: { ...session.retryPolicy },
@@ -504,6 +802,7 @@ export class ConnectorRuntime {
       startedAt: session.startedAt,
       endedAt: session.endedAt,
       failureKind: session.failureKind,
+      processFingerprint: session.processFingerprint ? { ...session.processFingerprint } : undefined,
       output: { ...session.output },
       termination: session.termination ? { ...session.termination } : undefined,
       events: session.events.map((event) => ({ ...event }))
@@ -720,6 +1019,7 @@ export class ConnectorRuntime {
       state: 'starting',
       attempt: plan.attempt,
       pid: undefined,
+      processFingerprint: undefined,
       timeoutAt: new Date(this.now().getTime() + prepared.execution.timeoutMs).toISOString(),
       failureKind: undefined,
       termination: undefined,
@@ -745,7 +1045,21 @@ export class ConnectorRuntime {
       this.handleFailure(plan, this.classifyFailure(createProcessError(error)));
       return;
     }
-    const execution = this.createExecution(plan.taskId, child, prepared.execution.timeoutMs, plan, false);
+    const execution = this.createExecution(
+      plan.taskId,
+      child,
+      prepared.execution.timeoutMs,
+      plan,
+      false,
+      {
+        taskId: plan.taskId,
+        sessionId: plan.sessionId,
+        connectorId: plan.request.connectorId,
+        agentId: plan.request.agentId,
+        executablePath: prepared.execution.executable,
+        cwd: prepared.execution.options.cwd
+      }
+    );
     this.active.set(plan.taskId, execution);
   }
 
@@ -754,13 +1068,16 @@ export class ConnectorRuntime {
     child: ConnectorRuntimeProcess,
     timeoutMs: number,
     plan: ExecutionPlan | undefined,
-    spawnConfirmed: boolean
+    spawnConfirmed: boolean,
+    fingerprintContext?: ConnectorProcessFingerprintContext
   ): ActiveExecution {
     const execution = {} as ActiveExecution;
     execution.taskId = taskId;
     execution.process = child;
     execution.plan = plan;
+    execution.fingerprintContext = fingerprintContext;
     execution.spawnConfirmed = spawnConfirmed;
+    execution.identityLost = false;
     execution.stdoutBuffer = '';
     execution.stderrBuffer = '';
     execution.pendingOutput = createPendingOutput();
@@ -780,6 +1097,10 @@ export class ConnectorRuntime {
       });
     };
     execution.onClose = (code, signal) => this.observeClose(execution, code, signal);
+    execution.onHeartbeat = (provenAt) => this.observeHeartbeat(execution, provenAt);
+    execution.onIdentityLost = () => {
+      execution.identityLost = true;
+    };
     execution.timeoutTimer = this.setTimer(() => {
       if (this.active.get(taskId) !== execution || execution.termination) {
         return;
@@ -802,6 +1123,8 @@ export class ConnectorRuntime {
     child.on('spawn', execution.onSpawn);
     child.on('error', execution.onError);
     child.on('close', execution.onClose);
+    child.on('heartbeat', execution.onHeartbeat);
+    child.on('identity-lost', execution.onIdentityLost);
     return execution;
   }
 
@@ -814,12 +1137,21 @@ export class ConnectorRuntime {
       return;
     }
     const seenAt = this.now().toISOString();
+    let processFingerprint: ConnectorProcessFingerprint | undefined;
+    try {
+      processFingerprint = execution.fingerprintContext && this.dependencies.captureProcessFingerprint
+        ? this.dependencies.captureProcessFingerprint(execution.process, execution.fingerprintContext) ?? undefined
+        : undefined;
+    } catch {
+      processFingerprint = undefined;
+    }
     this.updateSession(execution.taskId, (session) => {
       const alreadyStarted = hasLifecycle(session, 'session-started');
       return {
         ...session,
         state: 'running',
         pid: execution.process.pid,
+        processFingerprint,
         liveness: createFreshLiveness('process-event', seenAt, this.heartbeatStaleAfterMs),
         events: appendEvent(session.events, this.createEvent(
           'lifecycle',
@@ -829,6 +1161,20 @@ export class ConnectorRuntime {
         ))
       };
     });
+  }
+
+  private observeHeartbeat(execution: ActiveExecution, provenAt: string) {
+    if (this.active.get(execution.taskId) !== execution || !execution.spawnConfirmed || execution.termination) {
+      return;
+    }
+    const normalizedProofTime = normalizeFreshProofTime(provenAt, this.now(), this.recoveryGraceMs);
+    if (!normalizedProofTime) {
+      return;
+    }
+    this.updateSession(execution.taskId, (session) => ({
+      ...session,
+      liveness: createFreshLiveness('recovery-proof', normalizedProofTime, this.heartbeatStaleAfterMs)
+    }));
   }
 
   private observeClose(
@@ -843,6 +1189,16 @@ export class ConnectorRuntime {
     this.cleanupExecution(execution);
     this.active.delete(execution.taskId);
 
+    if (execution.identityLost) {
+      this.plans.delete(execution.taskId);
+      this.finishSession(execution.taskId, 'session-lost', {
+        eventKind: 'recovery',
+        message: 'Recovered process identity became unavailable or mismatched.',
+        failureKind: execution.termination?.failure.kind
+      });
+      this.sensitivePrompts.delete(execution.taskId);
+      return;
+    }
     if (execution.termination) {
       this.finalizeTermination(execution, code, signal);
       return;
@@ -866,6 +1222,14 @@ export class ConnectorRuntime {
           signal: failure.signal
         });
       }
+      return;
+    }
+    const closedSession = this.snapshot.tasks.find((session) => session.taskId === execution.taskId);
+    if (!execution.plan && closedSession?.source === 'restart-recovery' && code === null) {
+      this.finishSession(execution.taskId, 'session-lost', {
+        eventKind: 'recovery',
+        message: 'Recovered process identity or liveness could no longer be proven.'
+      });
       return;
     }
     if (code === 0) {
@@ -1061,6 +1425,7 @@ export class ConnectorRuntime {
       ...session,
       state: 'retrying',
       pid: undefined,
+      processFingerprint: undefined,
       failureKind: failure.kind,
       timeoutAt: undefined,
       liveness: createUnknownLiveness(this.heartbeatStaleAfterMs),
@@ -1301,24 +1666,38 @@ export class ConnectorRuntime {
       }));
       const recovering = this.snapshot.tasks.find((candidate) => candidate.taskId === session.taskId);
       let proof: ConnectorReattachProof | null = null;
+      const recoveryDeadlineMs = this.now().getTime() + this.recoveryGraceMs;
+      const timeoutAtMs = Date.parse(recovering?.timeoutAt ?? '');
+      const recoveryEligible = Boolean(
+        recovering?.processFingerprint
+        && Number.isFinite(timeoutAtMs)
+        && timeoutAtMs > this.now().getTime()
+      );
       try {
-        proof = recovering && this.dependencies.reattachProcess
+        proof = recoveryEligible && recovering && this.dependencies.reattachProcess
           ? this.dependencies.reattachProcess(cloneSession(recovering))
           : null;
       } catch {
         proof = null;
       }
-      if (proof && recovering) {
-        const provenAt = normalizeIsoDate(proof.provenAt) ?? this.now().toISOString();
+      const provenAt = proof
+        ? normalizeFreshProofTime(proof.provenAt, this.now(), this.recoveryGraceMs)
+        : null;
+      if (
+        proof
+        && provenAt
+        && recovering?.processFingerprint
+        && proof.process.pid === recovering.processFingerprint.pid
+      ) {
         this.updateSessionInternal(session.taskId, (current) => ({
           ...current,
           state: 'reattached',
-          pid: proof?.process.pid,
+          pid: proof.process.pid,
           liveness: createFreshLiveness('recovery-proof', provenAt, this.heartbeatStaleAfterMs),
           events: appendEvent(current.events, this.createEvent(
             'recovery',
-            'Injected process proof reattached the persisted session.',
-            undefined,
+            'OS process identity proof reattached the persisted session.',
+            { source: 'restart-recovery', provenAt },
             'recovery-reattached'
           ))
         }));
@@ -1326,10 +1705,17 @@ export class ConnectorRuntime {
           1,
           (Date.parse(recovering.timeoutAt ?? '') || this.now().getTime() + this.recoveryGraceMs) - this.now().getTime()
         );
-        const execution = this.createExecution(session.taskId, proof.process, remainingTimeout, undefined, true);
+        const execution = this.createExecution(
+          session.taskId,
+          proof.process,
+          remainingTimeout,
+          undefined,
+          true
+        );
         this.active.set(session.taskId, execution);
         return;
       }
+      const remainingRecoveryGraceMs = Math.max(1, recoveryDeadlineMs - this.now().getTime());
       const timer = this.setTimer(() => {
         if (this.recoveryTimers.get(session.taskId) !== timer) {
           return;
@@ -1338,9 +1724,9 @@ export class ConnectorRuntime {
         this.recoveryTimers.delete(session.taskId);
         this.finishSession(session.taskId, 'session-lost', {
           eventKind: 'recovery',
-          message: 'No process reattachment proof arrived before the recovery deadline.'
+          message: 'Process identity could not be re-proven before the recovery deadline.'
         });
-      }, this.recoveryGraceMs);
+      }, remainingRecoveryGraceMs);
       this.recoveryTimers.set(session.taskId, timer);
     });
     this.publishCurrent();
@@ -1424,6 +1810,9 @@ export class ConnectorRuntime {
     execution.process.off('spawn', execution.onSpawn);
     execution.process.off('error', execution.onError);
     execution.process.off('close', execution.onClose);
+    execution.process.off('heartbeat', execution.onHeartbeat);
+    execution.process.off('identity-lost', execution.onIdentityLost);
+    execution.process.dispose?.();
   }
 
   private loadPersistedSnapshot(): ConnectorRuntimeSnapshot {
@@ -1793,6 +2182,7 @@ function cloneSessionWithFreshness(session: ConnectorSession, now: Date): Connec
   return {
     ...session,
     capabilities: session.capabilities ? [...session.capabilities] : null,
+    processFingerprint: session.processFingerprint ? { ...session.processFingerprint } : undefined,
     retryPolicy: { ...session.retryPolicy },
     output: { ...session.output },
     termination: session.termination ? { ...session.termination } : undefined,
@@ -1878,6 +2268,7 @@ function normalizePersistedSession(
     startedAt,
     endedAt: normalizeIsoDate(value.endedAt) ?? undefined,
     pid: numberOrUndefined(value.pid),
+    processFingerprint: normalizeProcessFingerprint(value.processFingerprint, now),
     exitCode: numberOrUndefined(value.exitCode),
     signal: typeof value.signal === 'string' ? value.signal : undefined,
     attempt: clampInteger(value.attempt, 0, MAX_RETRIES + 1, 0),
@@ -2005,6 +2396,135 @@ function createRuntimeEnvelope(
       ? { reason: 'Persisted active sessions require process reattachment proof.' }
       : {})
   };
+}
+
+function normalizeObservedProcessEvidence(
+  value: ConnectorObservedProcessEvidence
+): ConnectorObservedProcessEvidence | null {
+  if (!Number.isInteger(value.pid) || value.pid <= 0 || value.pid > 0x7fffffff) {
+    return null;
+  }
+  if (value.evidenceSource !== 'windows-cim' && value.evidenceSource !== 'linux-procfs') {
+    return null;
+  }
+  const executablePath = normalizeProcessPath(value.executablePath, value.evidenceSource);
+  const startedAt = normalizeIsoDate(value.startedAt);
+  const commandLine = typeof value.commandLine === 'string'
+    && value.commandLine.length > 0
+    && value.commandLine.length <= MAX_PROCESS_COMMAND_LINE_LENGTH
+    ? value.commandLine
+    : null;
+  const cwd = value.cwd === undefined
+    ? undefined
+    : normalizeProcessPath(value.cwd, value.evidenceSource) ?? undefined;
+  if (!executablePath || !startedAt || !commandLine) {
+    return null;
+  }
+  return {
+    pid: value.pid,
+    executablePath,
+    startedAt,
+    commandLine,
+    cwd,
+    evidenceSource: value.evidenceSource
+  };
+}
+
+function normalizeProcessFingerprint(
+  value: unknown,
+  now: Date
+): ConnectorProcessFingerprint | undefined {
+  if (!isRecord(value) || value.version !== 1) {
+    return undefined;
+  }
+  const evidenceSource = value.evidenceSource === 'windows-cim' || value.evidenceSource === 'linux-procfs'
+    ? value.evidenceSource
+    : null;
+  const cwdSource = value.cwdSource === 'spawn-envelope' || value.cwdSource === 'linux-procfs'
+    ? value.cwdSource
+    : null;
+  if (!evidenceSource || !cwdSource || (evidenceSource === 'linux-procfs') !== (cwdSource === 'linux-procfs')) {
+    return undefined;
+  }
+  const executablePath = normalizeProcessPath(value.executablePath, evidenceSource);
+  const cwd = normalizeProcessPath(value.cwd, evidenceSource);
+  const startedAt = normalizeIsoDate(value.startedAt);
+  const capturedAt = normalizeIsoDate(value.capturedAt);
+  const pid = numberOrUndefined(value.pid);
+  if (
+    !Number.isInteger(pid)
+    || (pid ?? 0) <= 0
+    || (pid ?? 0) > 0x7fffffff
+    || !executablePath
+    || !cwd
+    || !startedAt
+    || !capturedAt
+    || Date.parse(startedAt) > Date.parse(capturedAt) + 1_000
+    || Date.parse(capturedAt) > now.getTime() + 1_000
+  ) {
+    return undefined;
+  }
+  const hashes = [value.commandLineSha256, value.processIdentitySha256, value.runEnvelopeSha256];
+  if (!hashes.every((hash) => typeof hash === 'string' && /^[a-f0-9]{64}$/.test(hash))) {
+    return undefined;
+  }
+  return {
+    version: 1,
+    pid: pid!,
+    executablePath,
+    startedAt,
+    cwd,
+    cwdSource,
+    commandLineSha256: value.commandLineSha256 as string,
+    processIdentitySha256: value.processIdentitySha256 as string,
+    runEnvelopeSha256: value.runEnvelopeSha256 as string,
+    capturedAt,
+    evidenceSource
+  };
+}
+
+function normalizeProcessPath(
+  value: unknown,
+  evidenceSource: ConnectorProcessFingerprint['evidenceSource']
+) {
+  if (typeof value !== 'string' || !value.trim() || value.length > MAX_PROCESS_PATH_LENGTH) {
+    return null;
+  }
+  const trimmed = value.trim();
+  if (evidenceSource === 'windows-cim') {
+    const normalized = trimmed.replace(/\//g, '\\').replace(/\\+$/g, '');
+    return normalized.toLowerCase();
+  }
+  return trimmed.length > 1 ? trimmed.replace(/\/+$/g, '') : trimmed;
+}
+
+function sameProcessPath(
+  left: string,
+  right: string,
+  evidenceSource: ConnectorProcessFingerprint['evidenceSource']
+) {
+  const normalizedLeft = normalizeProcessPath(left, evidenceSource);
+  const normalizedRight = normalizeProcessPath(right, evidenceSource);
+  return Boolean(normalizedLeft && normalizedRight && normalizedLeft === normalizedRight);
+}
+
+function sha256(value: string) {
+  return createHash('sha256').update(value, 'utf8').digest('hex');
+}
+
+function stableFingerprintValue(value: Record<string, string | number>) {
+  return Object.keys(value).sort().map((key) => `${key.length}:${key}=${String(value[key]).length}:${value[key]}`).join('|');
+}
+
+function normalizeFreshProofTime(value: unknown, now: Date, maxAgeMs: number) {
+  const normalized = normalizeIsoDate(value);
+  if (!normalized) {
+    return null;
+  }
+  const proofMs = Date.parse(normalized);
+  return proofMs <= now.getTime() + 1_000 && now.getTime() - proofMs <= maxAgeMs
+    ? normalized
+    : null;
 }
 
 function normalizeIdentifier(value: unknown) {

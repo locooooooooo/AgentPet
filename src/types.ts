@@ -304,6 +304,23 @@ export interface ConnectorTerminationEvidence {
   escalatedAt?: string;
 }
 
+export type ConnectorProcessEvidenceSource = 'windows-cim' | 'linux-procfs';
+export type ConnectorProcessCwdSource = 'spawn-envelope' | 'linux-procfs';
+
+export interface ConnectorProcessFingerprint {
+  version: 1;
+  pid: number;
+  executablePath: string;
+  startedAt: string;
+  cwd: string;
+  cwdSource: ConnectorProcessCwdSource;
+  commandLineSha256: string;
+  processIdentitySha256: string;
+  runEnvelopeSha256: string;
+  capturedAt: string;
+  evidenceSource: ConnectorProcessEvidenceSource;
+}
+
 export interface ConnectorSession {
   taskId: string;
   sessionId: string;
@@ -318,6 +335,7 @@ export interface ConnectorSession {
   startedAt: string;
   endedAt?: string;
   pid?: number;
+  processFingerprint?: ConnectorProcessFingerprint;
   exitCode?: number;
   signal?: string;
   attempt: number;
@@ -345,6 +363,7 @@ export interface ConnectorSessionAudit {
   startedAt: string;
   endedAt?: string;
   failureKind?: ConnectorFailureKind;
+  processFingerprint?: ConnectorProcessFingerprint;
   output: ConnectorOutputStats;
   termination?: ConnectorTerminationEvidence;
   events: ConnectorRuntimeEvent[];

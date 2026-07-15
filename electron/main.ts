@@ -16,6 +16,7 @@ import type {
   ConnectorRunRequest,
   ConnectorRunResult,
   ConnectorRuntimeSnapshot,
+  ConnectorSession,
   ConnectorSessionAudit,
   ConnectorStopRequest,
   ConnectorStopResult,
@@ -33,8 +34,12 @@ import { createReadOnlyConnectorGateRequest, evaluateConnectorPolicyGate } from 
 import {
   ConnectorRunAuthorizer,
   ConnectorRuntime,
+  createConnectorProcessFingerprint,
+  createReattachedConnectorProcess,
+  inspectConnectorProcessEvidence,
   normalizeConnectorRunIntent,
-  selectDirectConnectorExecutable
+  selectDirectConnectorExecutable,
+  type ConnectorProcessFingerprintContext,
 } from '../src/lib/connectorRuntime';
 import {
   appendSystemMessage,
@@ -873,6 +878,24 @@ function evaluateConnectorGateFromPolicy(input: ConnectorGateRequest): Connector
   return evaluateConnectorPolicyGate(policy, input, resolveConnectorCommand).result;
 }
 
+function reattachConnectorProcess(session: ConnectorSession) {
+  const fingerprint = session.processFingerprint;
+  const timeoutAt = Date.parse(session.timeoutAt ?? '');
+  if (!fingerprint || !Number.isFinite(timeoutAt) || timeoutAt <= Date.now()) {
+    return null;
+  }
+  const context: ConnectorProcessFingerprintContext = {
+    taskId: session.taskId,
+    sessionId: session.sessionId,
+    connectorId: session.connectorId,
+    agentId: session.agentId,
+    executablePath: fingerprint.executablePath,
+    cwd: process.cwd()
+  };
+  const recoveredProcess = createReattachedConnectorProcess(session, context);
+  return recoveredProcess ? { process: recoveredProcess, provenAt: new Date().toISOString() } : null;
+}
+
 function createConnectorRuntime() {
   return new ConnectorRuntime({
     loadPolicy: loadConnectorPolicy,
@@ -883,6 +906,13 @@ function createConnectorRuntime() {
     authorizeRun: (request) => connectorRunAuthorizer.consume(request),
     loadPersistedSnapshot: loadConnectorRuntimeSnapshot,
     persistSnapshot: saveConnectorRuntimeSnapshot,
+    captureProcessFingerprint: (child, context) => {
+      const evidence = typeof child.pid === 'number' ? inspectConnectorProcessEvidence(child.pid) : null;
+      return evidence
+        ? createConnectorProcessFingerprint(evidence, context, new Date().toISOString())
+        : null;
+    },
+    reattachProcess: reattachConnectorProcess,
     publish: (runtimeSnapshot) => {
       BrowserWindow.getAllWindows().forEach((window) => {
         window.webContents.send('connectors:runtime-snapshot-changed', runtimeSnapshot);

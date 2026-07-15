@@ -38,7 +38,10 @@ assert(mainSource.includes('connectorRunAuthorizer.issueConfirmedGrant(intent)')
 assert(/app\.on\('before-quit'[\s\S]*?connectorRunAuthorizer\?\.dispose\(\)/.test(mainSource), 'app shutdown must dispose outstanding grants');
 assert(mainSource.includes('loadPersistedSnapshot: loadConnectorRuntimeSnapshot'), 'main must load persisted Connector sessions');
 assert(mainSource.includes('persistSnapshot: saveConnectorRuntimeSnapshot'), 'main must persist Connector sessions');
-assert(!mainSource.includes('reattachProcess:'), 'main must not probe external Agents in this slice');
+assert(mainSource.includes('captureProcessFingerprint:'), 'main must capture bounded OS process identity after spawn');
+assert(mainSource.includes('reattachProcess: reattachConnectorProcess'), 'main must wire production restart recovery');
+assert(mainSource.includes('createReattachedConnectorProcess(session, context)'), 'main recovery must use the strongly verified recovered handle');
+assert(!typesSource.includes('commandLine: string;'), 'persisted/public process fingerprint must not expose raw command line');
 assert(desktopClientSource.includes("availability: 'unavailable'"), 'browser fallback must report unavailable');
 assert(desktopClientSource.includes("mode: 'simulated'"), 'browser fallback must report simulated');
 assert(/tasks:\s*\[\],\s*instances:\s*\[\]/.test(desktopClientSource), 'browser fallback must expose zero instances');
@@ -55,7 +58,14 @@ const bundled = await build({
   write: false
 });
 const runtimeModule = await import(`data:text/javascript;base64,${Buffer.from(bundled.outputFiles[0].text).toString('base64')}`);
-const { ConnectorRunAuthorizer, ConnectorRuntime, computeHeartbeatFreshness, selectDirectConnectorExecutable } = runtimeModule;
+const {
+  ConnectorRunAuthorizer,
+  ConnectorRuntime,
+  computeHeartbeatFreshness,
+  createConnectorProcessFingerprint,
+  createReattachedConnectorProcess,
+  selectDirectConnectorExecutable
+} = runtimeModule;
 
 const gateBundle = await build({
   entryPoints: [gatePath],
@@ -189,6 +199,15 @@ function createHarness(policy, options = {}) {
     },
     publish: (snapshot) => published.push(structuredClone(snapshot)),
     persistSnapshot: (snapshot) => persisted.push(structuredClone(snapshot)),
+    captureProcessFingerprint: options.captureProcessFingerprint ?? ((child, context) => (
+      createConnectorProcessFingerprint({
+        pid: child.pid,
+        executablePath: context.executablePath,
+        startedAt: new Date(nowMs - 100).toISOString(),
+        commandLine: `${context.executablePath} fixture-${child.pid}`,
+        evidenceSource: 'windows-cim'
+      }, context, new Date(nowMs).toISOString())
+    )),
     authorizeRun: options.authorizeRun ?? (() => ({ authorized: true })),
     heartbeatStaleAfterMs: options.heartbeatStaleAfterMs ?? 10_000,
     recoveryGraceMs: options.recoveryGraceMs ?? 500,
@@ -714,16 +733,82 @@ const persistedActiveSnapshot = structuredClone(selectorHarness.persisted.findLa
   snapshot.tasks.some((session) => session.taskId === activeAccepted.taskId && session.state === 'running')
 )));
 assert(persistedActiveSnapshot, 'fixture needs a persisted active session');
-const recoveryProcess = new FakeProcess(9001);
+const persistedFingerprint = persistedActiveSnapshot.tasks.find((session) => session.taskId === activeAccepted.taskId)?.processFingerprint;
+assert(persistedFingerprint, 'active persisted session needs a bounded process fingerprint');
+assert(!Object.hasOwn(persistedFingerprint, 'commandLine'), 'fingerprint persistence must not expose raw command-line content');
+const recoveryProcess = new FakeProcess(persistedFingerprint.pid);
 const reattachHarness = createHarness(readyPolicy(), {
   persistedSnapshot: persistedActiveSnapshot,
   reattachProcess: () => ({ process: recoveryProcess, provenAt: '2026-07-13T00:00:00.500Z' })
 });
 assert(reattachHarness.runtime.getSnapshot().tasks.some((session) => session.state === 'reattached'), 'injected proof must reattach persisted session');
+const reattachedSession = reattachHarness.runtime.getSnapshot().tasks.find((session) => session.state === 'reattached');
+assert(reattachedSession.source === 'restart-recovery', 'reattached session source must be restart-recovery');
+assert(reattachedSession.liveness.lastSeen === '2026-07-13T00:00:00.500Z', 'reattachment must expose fresh proof time');
 const recoveredEvents = reattachHarness.runtime.getSnapshot().tasks.flatMap((session) => session.events);
 assert(new Set(recoveredEvents.map((event) => event.eventId)).size === recoveredEvents.length, 'recovery must not collide persisted eventIds');
-recoveryProcess.close(0, null);
+recoveryProcess.close(null, null);
 assert(liveTimers(reattachHarness).length === 0, 'reattached close must clean all timers');
+assert(
+  reattachHarness.runtime.getSnapshot().tasks.find((session) => session.sessionId === activeAccepted.sessionId)?.state === 'session-lost',
+  'unproven recovered close must never invent success'
+);
+
+const persistedSession = persistedActiveSnapshot.tasks.find((session) => session.taskId === activeAccepted.taskId);
+const fingerprintContext = {
+  taskId: persistedSession.taskId,
+  sessionId: persistedSession.sessionId,
+  connectorId: persistedSession.connectorId,
+  agentId: persistedSession.agentId,
+  executablePath: persistedFingerprint.executablePath,
+  cwd: persistedFingerprint.cwd
+};
+const matchingEvidence = {
+  pid: persistedFingerprint.pid,
+  executablePath: persistedFingerprint.executablePath,
+  startedAt: persistedFingerprint.startedAt,
+  commandLine: `C:\\fixture\\codex.exe fixture-${persistedFingerprint.pid}`,
+  evidenceSource: 'windows-cim'
+};
+assert(createReattachedConnectorProcess(persistedSession, fingerprintContext, {
+  inspectEvidence: () => ({ ...matchingEvidence, startedAt: '2026-07-12T23:59:58.000Z' })
+}) === null, 'wrong start time must reject reattachment');
+assert(createReattachedConnectorProcess(persistedSession, fingerprintContext, {
+  inspectEvidence: () => ({ ...matchingEvidence, executablePath: 'C:\\fixture\\other.exe' })
+}) === null, 'wrong executable must reject reattachment');
+assert(createReattachedConnectorProcess(persistedSession, {
+  ...fingerprintContext,
+  cwd: 'E:\\wrong-workspace'
+}, {
+  inspectEvidence: () => matchingEvidence
+}) === null, 'wrong main-owned cwd envelope must reject reattachment');
+assert(createReattachedConnectorProcess(persistedSession, fingerprintContext, {
+  inspectEvidence: () => ({ ...matchingEvidence, commandLine: 'identity-mismatch' })
+}) === null, 'wrong command identity must reject reattachment');
+assert(createReattachedConnectorProcess(persistedSession, fingerprintContext, {
+  inspectEvidence: () => ({ ...matchingEvidence, startedAt: '2026-07-12T23:59:59.000Z' })
+}) === null, 'reused PID evidence must reject reattachment');
+assert(createReattachedConnectorProcess(persistedSession, fingerprintContext, {
+  inspectEvidence: () => null
+}) === null, 'missing process evidence must reject reattachment');
+
+let stopEvidence = matchingEvidence;
+let recoveredKillCount = 0;
+const stopRaceHandle = createReattachedConnectorProcess(persistedSession, fingerprintContext, {
+  inspectEvidence: () => stopEvidence,
+  killProcess: () => {
+    recoveredKillCount += 1;
+    return true;
+  },
+  pollIntervalMs: 100
+});
+assert(stopRaceHandle, 'matching process evidence must create a recovered handle');
+let stopRaceIdentityLost = 0;
+stopRaceHandle.on('identity-lost', () => { stopRaceIdentityLost += 1; });
+stopEvidence = { ...matchingEvidence, startedAt: '2026-07-12T23:59:59.000Z' };
+assert(stopRaceHandle.kill() === false, 'stop must fail closed when PID identity changed after the prior proof');
+assert(recoveredKillCount === 0, 'PID reuse at stop must never call process.kill');
+assert(stopRaceIdentityLost === 1, 'PID reuse at stop must emit exactly one identity-lost signal');
 
 const lostHarness = createHarness(readyPolicy(), { persistedSnapshot: persistedActiveSnapshot, recoveryGraceMs: 500 });
 assert(lostHarness.runtime.getSnapshot().runtime.availability === 'recovering', 'unproven persisted session must expose recovering envelope');
@@ -732,6 +817,28 @@ assert(recoveryTimer.timeoutMs <= 10_000, 'recovery deadline must be <=10 second
 fireTimer(recoveryTimer);
 const lostSession = lostHarness.runtime.getSnapshot().tasks.find((session) => session.state === 'session-lost');
 assert(lostSession && lifecycleCount(lostSession, 'session-terminal') === 1, 'unproven recovery must terminal as session-lost once');
+
+for (const [label, mutateSnapshot, proof] of [
+  ['missing fingerprint', (session) => { delete session.processFingerprint; }, null],
+  ['expired timeout', (session) => { session.timeoutAt = '2026-07-13T00:00:00.000Z'; }, null],
+  ['mismatched PID', () => {}, { process: new FakeProcess(persistedFingerprint.pid + 1), provenAt: '2026-07-13T00:00:00.000Z' }],
+  ['stale proof', () => {}, { process: new FakeProcess(persistedFingerprint.pid), provenAt: '2026-07-12T23:59:59.000Z' }],
+  ['future proof', () => {}, { process: new FakeProcess(persistedFingerprint.pid), provenAt: '2026-07-13T00:00:02.000Z' }]
+]) {
+  const snapshot = structuredClone(persistedActiveSnapshot);
+  mutateSnapshot(snapshot.tasks.find((session) => session.sessionId === activeAccepted.sessionId));
+  const harness = createHarness(readyPolicy(), {
+    persistedSnapshot: snapshot,
+    recoveryGraceMs: 500,
+    ...(proof ? { reattachProcess: () => proof } : {})
+  });
+  const timer = liveTimers(harness, 500)[0];
+  assert(timer, `${label} must stay non-running only until the bounded recovery deadline`);
+  fireTimer(timer);
+  const session = harness.runtime.getSnapshot().tasks.find((candidate) => candidate.sessionId === activeAccepted.sessionId);
+  assert(session.state === 'session-lost', `${label} must terminal as session-lost`);
+  assert(lifecycleCount(session, 'session-terminal') === 1, `${label} must emit exactly one terminal event`);
+}
 
 const corruptHarness = createHarness(readyPolicy(), { persistedSnapshot: { version: 1, tasks: 'corrupt' } });
 assert(corruptHarness.runtime.getSnapshot().tasks.length === 0, 'corrupt persistence must degrade empty');
@@ -762,6 +869,8 @@ console.log('A4 P1-2: Authorization/Bearer/spaced credential values redact witho
 console.log('A5: evaluate-gate ignores renderer requestedBy/confirmation and remains confirmation-required');
 console.log('A6: main-owned grant missing/forged/expired/replayed/mismatched/drift/cancelled paths verified');
 console.log('A6 production policy: Codex/Trae/Qoder discovery=0, spawn=0 after confirmation grant');
+console.log('A7: bounded fingerprint, proof freshness, restart recovery and one terminal session-lost verified');
+console.log('A7 stop safety: kill-time PID identity reproof rejects reuse with process.kill count=0');
 console.log('security: forged/replayed renderer confirmation 10/10 blocked before discovery/spawn');
 console.log('external Agent CLI execution: not performed');
 
