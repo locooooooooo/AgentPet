@@ -3,9 +3,9 @@
 [长工]#realtime-process-reattach@v0.1
 ⟦tag:v2|task|realtime-agent-cockpit-p0-a7-process-reattach-v0.1⟧
 
-loop state: active
-dispatch state: active
-status: authorized_pending_worker
+loop state: summarized
+dispatch state: summarized
+status: accepted_with_sync_cim_residual_risk
 priority: P0-A7
 
 ## objective
@@ -51,9 +51,10 @@ priority: P0-A7
 
 ## next action
 
-- Dispatch exactly one A7 process-reattach worker after this control switch is committed and pushed.
-- After A7 independent verification/commit/push, authorize B2 only.
+- Preserve accepted product commit `e2031cd` and the 10-second fail-closed recovery evidence.
+- Carry synchronous Windows CIM main-thread blocking as an explicit B2 overlap risk.
+- Authorize B2 only; P0-C remains authorization-required.
 
 ## summary
 
-- Requirements-ready A7 lane; no implementation or process probing is authorized yet.
+- A7 accepted and pushed with controlled Node evidence, external Agent spawn=0 and synchronous-CIM residual risk.

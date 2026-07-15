@@ -3,9 +3,9 @@
 [长工]#realtime-production-path-e2e@v0.1
 ⟦tag:v2|task|realtime-agent-cockpit-p0-b2-production-path-e2e-v0.1⟧
 
-loop state: standby
-dispatch state: standby
-status: pending_a7_closeout
+loop state: active
+dispatch state: active
+status: authorized_pending_worker
 priority: P0-B2
 
 ## objective
@@ -14,7 +14,7 @@ priority: P0-B2
 
 ## start gate
 
-- A6 and A7 are accepted, independently committed/pushed and the worktree is clean.
+- A6 `a44abd6` and A7 `e2031cd` are accepted, independently committed/pushed and the worktree is clean.
 - The test envelope names the local non-Agent executable, cwd, timeout and cleanup route.
 
 ## allowed files
@@ -35,15 +35,17 @@ priority: P0-B2
 
 - Production main/preload/renderer path covers start, running, cancel, timeout, renderer reload and app restart.
 - UI exposes taskId/sessionId/agentId/connectorId/source/lastSeen/PID from one projection.
-- Event-to-visible-DOM p95 remains <=500ms and duplicate terminal/UI subscriptions remain zero.
+- Event-to-visible-DOM p95 remains <=500ms while the production 5-second CIM identity poll overlaps the measured path; idle-only samples are insufficient.
+- Duplicate terminal/UI subscriptions remain zero.
 - Browser fallback remains simulated/blocked and production cleanup leaves zero controlled children.
 - Full truth/runtime/orchestration/lint/build/diff gates pass.
 
 ## next action
 
-- Keep standby until A7 closeout.
+- Dispatch exactly one B2 production-path worker after this control switch is committed and pushed.
+- If overlapping CIM polling exceeds the 500ms budget, report `blocked_by_sync_cim_latency` and prepare an A7.1 packet without editing runtime/main from this lane.
 - A passing B2 only prepares the P0-C authorization packet; it does not authorize Codex.
 
 ## summary
 
-- Requirements-ready B2 production-path rehearsal; real Agent E2E remains owned by separately authorized P0-C.
+- Authorized B2 production-path rehearsal; real Agent E2E remains owned by separately authorized P0-C.

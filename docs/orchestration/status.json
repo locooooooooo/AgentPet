@@ -2,13 +2,13 @@
   "identity": "[PM]#multi-agent-control@v0.1",
   "loopState": "active",
   "dispatchState": "active",
-  "target": "2026-07-14 realtime Agent cockpit next stage is `a7_authorized_after_a6_acceptance`: A6 blocked-safe trusted authorization is pushed as `a44abd6`; only production process identity/reattach may change next using a non-Agent controlled child. B2、P0-C Codex dry-run、M5 residual evidence、protected source 和 quota recheck 保持各自 standby/closed。",
+  "target": "2026-07-15 realtime Agent cockpit next stage is `b2_authorized_after_a7_acceptance`: A6 `a44abd6` and A7 `e2031cd` are accepted/pushed; only the controlled non-Agent production Electron path rehearsal may run next. P0-C、Connector machine gates、M5 residual evidence、protected source 和 quota recheck 保持各自 standby/closed。",
   "source": "docs/orchestration/index.md",
   "todayPlan": {
-    "date": "2026-07-14",
-    "session": "docs/orchestration/sessions/realtime-agent-cockpit-next-stage-2026-07-14.md",
-    "selectedRoute": "Commit and push A6 acceptance/A7 authorization, then dispatch only P0-A7 process reattach with non-Agent controlled child evidence and unchanged machine gates",
-    "progress": "docs/orchestration/sessions/realtime-agent-cockpit-next-stage-2026-07-14.md"
+    "date": "2026-07-15",
+    "session": "docs/orchestration/sessions/realtime-agent-cockpit-next-stage-2026-07-15.md",
+    "selectedRoute": "Commit and push A7 acceptance/B2 authorization, then dispatch only P0-B2 controlled production-path rehearsal with overlapping CIM visible-DOM latency evidence",
+    "progress": "docs/orchestration/sessions/realtime-agent-cockpit-next-stage-2026-07-15.md"
   },
   "p0Cards": [
     {
@@ -31,9 +31,9 @@
     },
     {
       "id": "realtime-agent-cockpit-p0",
-      "status": "active-a7-authorized",
+      "status": "active-b2-authorized",
       "task": "docs/orchestration/tasks/realtime-agent-cockpit-v0.1.md",
-      "progress": "docs/orchestration/sessions/realtime-agent-cockpit-next-stage-2026-07-14.md"
+      "progress": "docs/orchestration/sessions/realtime-agent-cockpit-next-stage-2026-07-15.md"
     }
   ],
   "blocker": "外部 connector 仍 disabled；Codex 仅 draft/pending/discovery-only，Trae/Qoder 在当前范围内刻意保持 placeholder/command-empty，不作为可执行资源；live-subagents 仍受 403 DAILY_LIMIT_EXCEEDED 阻塞直到 quota 复查路径可用；control-cockpit 中央 4x2 网格和受保护卖点文件保持锁定；透明 Electron 窗口 capture 路线已用 Windows MCP Snapshot 与 Electron webContents.capturePage 两路观察到可见 ranch 渲染且未触发 SetIsBorderRequired failed，但完整 pointer smoke（click-through / double-click / right-click / drag / dock）仍未执行。",
@@ -367,7 +367,7 @@
       "title": "[长工]#realtime-connector-runtime@v0.1",
       "owner": "长工",
       "status": "active",
-      "responsibility": "P0-A A1-A6 is partial-accepted and A7 is the only authorized next runtime lane. Prove production process identity/reattach with a non-Agent controlled child while machine gates stay unchanged and external Agent CLI remains forbidden.",
+      "responsibility": "P0-A A1-A7 is accepted to the controlled-process boundary and B2 is the only authorized next lane. Rehearse the production Electron path without machine-gate changes or external Agent CLI execution.",
       "tag": "⟦tag:v2|task|realtime-agent-cockpit-p0-a-connector-runtime-v0.1⟧",
       "evidence": "docs/orchestration/tasks/realtime-agent-cockpit-p0-a-connector-runtime-v0.1.md"
     },
@@ -384,10 +384,19 @@
       "id": "realtime-process-reattach",
       "title": "[长工]#realtime-process-reattach@v0.1",
       "owner": "长工",
-      "status": "active",
-      "responsibility": "Implement only P0-A7 process fingerprint and restart reattach using a non-Agent controlled child; reject PID reuse and unproven identity to session-lost within 10 seconds.",
+      "status": "summarized",
+      "responsibility": "A7 process fingerprint/restart reattach is accepted and pushed as e2031cd with zero controlled-child residue and explicit synchronous Windows CIM residual risk.",
       "tag": "⟦tag:v2|task|realtime-agent-cockpit-p0-a7-process-reattach-v0.1⟧",
       "evidence": "docs/orchestration/tasks/realtime-agent-cockpit-p0-a7-process-reattach-v0.1.md"
+    },
+    {
+      "id": "realtime-production-path-e2e",
+      "title": "[长工]#realtime-production-path-e2e@v0.1",
+      "owner": "长工",
+      "status": "active",
+      "responsibility": "Run only B2 controlled non-Agent main/preload/renderer/DOM rehearsal; cover lifecycle/reload/restart and measure visible-DOM p95 during overlapping CIM polling.",
+      "tag": "⟦tag:v2|task|realtime-agent-cockpit-p0-b2-production-path-e2e-v0.1⟧",
+      "evidence": "docs/orchestration/tasks/realtime-agent-cockpit-p0-b2-production-path-e2e-v0.1.md"
     },
     {
       "id": "realtime-truth-ui",
@@ -403,18 +412,18 @@
       "title": "[长工]#realtime-requirements-control@v0.1",
       "owner": "长工",
       "status": "active",
-      "responsibility": "Own the realtime next-stage serial control: A6 accepted, A7 active, B2 gated, P0-C authorization-required; preserve A/B fences and the distinction between controlled local process evidence and real Agent E2E.",
+      "responsibility": "Own the realtime next-stage serial control: A6/A7 accepted, B2 active, P0-C authorization-required; preserve A/B fences and the distinction between controlled local process evidence and real Agent E2E.",
       "tag": "⟦tag:v2|session|realtime-agent-cockpit-progress-2026-07-13⟧",
       "evidence": "docs/orchestration/sessions/realtime-agent-cockpit-progress-2026-07-13.md"
     },
     {
       "id": "realtime-cockpit-next-stage",
-      "title": "[PM]#realtime-cockpit-next-stage@2026-07-14",
+      "title": "[PM]#realtime-cockpit-next-stage@2026-07-15",
       "owner": "主控",
       "status": "active",
-      "responsibility": "Enforce the A7 -> B2 remaining serial gate after A6 acceptance, accept each independent callback/commit, and keep P0-C authorization-required with all Connector machine gates unchanged.",
-      "tag": "⟦tag:v2|session|realtime-agent-cockpit-next-stage-2026-07-14⟧",
-      "evidence": "docs/orchestration/sessions/realtime-agent-cockpit-next-stage-2026-07-14.md"
+      "responsibility": "Accept or honestly block B2 after A7 acceptance, require overlapping CIM visible-DOM latency evidence, and keep P0-C authorization-required with all Connector machine gates unchanged.",
+      "tag": "⟦tag:v2|session|realtime-agent-cockpit-next-stage-2026-07-15⟧",
+      "evidence": "docs/orchestration/sessions/realtime-agent-cockpit-next-stage-2026-07-15.md"
     }
   ],
   "lanes": [
@@ -451,7 +460,7 @@
       "title": "每日计划督办",
       "role": "[PM]#daily-supervision@2026-07-02",
       "state": "active",
-      "nextAction": "监督 realtime next stage `a7_authorized_after_a6_acceptance`；提交控制面后只派 A7 process-reattach，保持 B2/P0-C、Connector machine gate、protected source 和外部 Agent execution 边界。"
+      "nextAction": "监督 realtime next stage `b2_authorized_after_a7_acceptance`；提交控制面后只派 B2 production-path rehearsal，保持 P0-C、Connector machine gate、protected source 和外部 Agent execution 边界。"
     },
     {
       "id": "codex-evidence-closeout",

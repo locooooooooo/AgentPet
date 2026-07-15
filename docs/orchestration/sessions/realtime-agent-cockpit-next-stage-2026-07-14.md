@@ -3,9 +3,9 @@
 [PM]#realtime-cockpit-next-stage@2026-07-14
 ⟦tag:v2|session|realtime-agent-cockpit-next-stage-2026-07-14⟧
 
-loop state: active
-dispatch state: active
-status: a7_authorized_after_a6_acceptance
+loop state: summarized
+dispatch state: summarized
+status: superseded_by_2026_07_15_b2_authorization
 
 ## goal
 
@@ -54,12 +54,11 @@ status: a7_authorized_after_a6_acceptance
 
 ## next action
 
-- Commit and push the A6 closeout/A7 authorization switch.
-- Dispatch only `[长工]#realtime-process-reattach@v0.1` from the A7 card.
+- Continue from `realtime-agent-cockpit-next-stage-2026-07-15.md`; A7 is accepted/pushed and only B2 is authorized.
 
 ## summary
 
-- Realtime cockpit next stage is active at A7 authorization after A6 blocked-safe acceptance; B2/P0-C remain serially gated.
+- Historical A7 authorization control session; superseded after A7 acceptance by the 2026-07-15 B2 control session.
 
 ## A6 acceptance evidence
 

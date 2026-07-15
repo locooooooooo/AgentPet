@@ -64,6 +64,8 @@ tracked business cards:
 - session: ⟦tag:v2|session|realtime-agent-cockpit-progress-2026-07-13⟧ -> `docs/orchestration/sessions/realtime-agent-cockpit-progress-2026-07-13.md`
 - session: ⟦tag:v2|session|realtime-agent-cockpit-next-stage-2026-07-14⟧ -> `docs/orchestration/sessions/realtime-agent-cockpit-next-stage-2026-07-14.md`
 - session: ⟦tag:v2|session|realtime-agent-cockpit-p0-a6-acceptance-2026-07-14⟧ -> `docs/orchestration/sessions/realtime-agent-cockpit-p0-a6-acceptance-2026-07-14.md`
+- session: ⟦tag:v2|session|realtime-agent-cockpit-p0-a7-acceptance-2026-07-15⟧ -> `docs/orchestration/sessions/realtime-agent-cockpit-p0-a7-acceptance-2026-07-15.md`
+- session: ⟦tag:v2|session|realtime-agent-cockpit-next-stage-2026-07-15⟧ -> `docs/orchestration/sessions/realtime-agent-cockpit-next-stage-2026-07-15.md`
 - task: ⟦tag:v2|task|m5-longworker-dispatch-v0.1⟧ -> `docs/orchestration/tasks/m5-longworker-dispatch-v0.1.md`
 - task: ⟦tag:v2|task|homepage-ui-p0-v0.1⟧ -> `docs/orchestration/tasks/homepage-ui-p0-v0.1.md`
 - task: ⟦tag:v2|task|homepage-ui-p0-dispatch-v0.1⟧ -> `docs/orchestration/tasks/homepage-ui-p0-dispatch-v0.1.md`
@@ -118,7 +120,7 @@ dispatch gate:
 - Supervisor owns drift detection, blocker surfacing, and minimum correction.
 
 current target:
-- 2026-07-14 realtime Agent cockpit next stage is `a7_authorized_after_a6_acceptance`: A6 blocked-safe trusted authorization is pushed as `a44abd6`; only production process identity/reattach may change next using a non-Agent controlled child. B2、P0-C Codex dry-run、M5 residual evidence、protected source 和 quota recheck 保持各自 standby/closed。
+- 2026-07-15 realtime Agent cockpit next stage is `b2_authorized_after_a7_acceptance`: A6 `a44abd6` and A7 `e2031cd` are accepted/pushed; only the controlled non-Agent production Electron path rehearsal may run next. P0-C、Connector machine gates、M5 residual evidence、protected source 和 quota recheck 保持各自 standby/closed。
 
 current role split:
 - `[PM]#multi-agent-control@v0.1`: maintain this index, dispatch bounded lanes, collect callbacks, write acceptance.
@@ -155,12 +157,14 @@ current role split:
 - `[PM]#protected-cockpit-source-drift@v0.1`: standby PM disposition lane in W28;administrator selected bounded routing, but no source edit, format repair, acceptance, or rollback is authorized yet.
 - `[PM]#cockpit-ui-redesign-v3.1@v0.1`: summarized accepted visual-refinement lane pushed as `aa4cfa5`; future cockpit changes require a fresh bounded scope, while M5 lifecycle, protected animation/avatar, business logic, and connectors remain untouched.
 - `[PM]#cockpit-ui-redesign-v3.2@v0.1`: standby after accepted/pushed P0; task-first state dedupe, first-screen dispatch, card-action reduction, and conditional Corner Assist passed PM replay after two bounded menu corrections. P1/P2 remain unauthorized.
-- `[长工]#realtime-connector-runtime@v0.1`: active at A7 authorization after A6 blocked-safe acceptance; only process identity proof/reattach may change next, while B2/P0-C remain standby and external Agent CLI execution remains forbidden.
+- `[长工]#realtime-connector-runtime@v0.1`: A1-A7 accepted to the controlled-process boundary; B2 is the only active extension, while P0-C and external Agent CLI execution remain forbidden.
 - `[长工]#realtime-trusted-authorizer@v0.1`: summarized A6 owner; main-owned intent-bound single-use grants passed all negative paths, production policy remains blocked and external spawn stayed 0.
-- `[长工]#realtime-process-reattach@v0.1`: active A7 owner; prove process fingerprint and restart recovery with a non-Agent controlled child, otherwise fail to session-lost within 10 seconds.
+- `[长工]#realtime-process-reattach@v0.1`: summarized A7 owner; commit `e2031cd` proves process fingerprint/restart recovery and 10-second fail-closed behavior, with synchronous Windows CIM blocking retained as B2 residual risk.
+- `[长工]#realtime-production-path-e2e@v0.1`: active B2 owner; rehearse main -> preload -> renderer -> DOM using a controlled Node process and measure visible latency during overlapping CIM polling.
 - `[长工]#realtime-truth-ui@v0.1`: partial-accepted after selector plus App/Home/Cockpit truth wiring, 1280/1440/1920 browser fallback replay, renderer SSR fresh/late/stale/session-lost fixture and Electron event p95; configured/online/simulated/source/session semantics are separated, while real E2E remains pending.
-- `[长工]#realtime-requirements-control@v0.1`: active docs/control owner; records the approximately 60% bounded baseline, A/B fences, quantitative acceptance and remaining trusted-authorizer/real-reattach/real-E2E gaps. P0-C Codex controlled dry-run remains standby pending full A/B acceptance and a second explicit execution authorization.
-- `[PM]#realtime-cockpit-next-stage@2026-07-14`: active serial control session; A6 is accepted, A7 is authorized, B2 remains gated, and P0-C still requires a new explicit execution authorization.
+- `[长工]#realtime-requirements-control@v0.1`: active docs/control owner; A6/A7 are accepted, B2 is active, and P0-C remains authorization-required. Controlled local process evidence remains distinct from real Agent E2E.
+- `[PM]#realtime-cockpit-next-stage@2026-07-14`: summarized historical A7 authorization session.
+- `[PM]#realtime-cockpit-next-stage@2026-07-15`: active B2 serial control session; A7 is accepted, B2 is authorized, and P0-C still requires a new explicit execution authorization.
 - `[PM]#weekly-requirements@2026-07-07`: summarized W27 (2026-07-07~2026-07-13) weekly-requirements history; final closeout is recorded in `weekly-closeout-2026-07-11.md`.
 - `[PM]#weekly-requirements@2026-07-14`: active W28 planner; tracks the administrator-authorized M5 rolling schedule beginning 2026-07-11 while preserving per-card serial gates.
 - `[PM]#daily-plan@2026-07-09`: summarized 2026-07-09 daily plan;B②/C short-worker/D 今天/E1 evidence is retained as history.
@@ -168,15 +172,15 @@ current role split:
 
 blockers:
 - External connector execution remains disabled; Codex is draft/pending/discovery-only, Trae/Qoder are intentionally command-empty placeholders, and no Codex/Trae/Qoder connector may be accepted, enabled, or executed until connector policy is accepted.
-- Real-time cockpit A/B implementation is partial-accepted as bounded fixture/browser slices, not execution-ready. Configured seeds, CLI discovery, static orchestration roles, and simulated ticks must not be reported as online Agent sessions; P0-C dry-run remains standby.
+- Real-time cockpit A6/A7 and renderer truth slices are accepted only to the trusted/controlled-process boundary. B2 visible production-path evidence is still missing; configured seeds, CLI discovery, controlled Node processes and simulated ticks must not be reported as online Agent sessions.
 - Treat service-side `403 DAILY_LIMIT_EXCEEDED` as a live sub-agent blocker until a quota recheck path is available; today's Codex app long-worker threads were used only as explicit user-authorized role sessions.
 - Control-cockpit central 4x2 grid and protected selling-point files remain locked; M4 header settings entry has been completed and accepted.
 - Transparent Electron ranch pointer smoke now has an additional Electron `webContents.capturePage()` evidence route that captured `ranch.html` without `SetIsBorderRequired failed`; full click-through / double-click / right-click / drag / dock evidence is still pending.
 
 next action:
-- Commit and push the A6 acceptance/A7 authorization switch, then dispatch only `[长工]#realtime-process-reattach@v0.1` from the A7 card.
-- Keep B2 production-path E2E and P0-C Codex dry-run standby until their preceding serial gates are accepted and pushed.
-- PM has independently verified P0-A/P0-B callbacks, file fences, M5 hunk preservation, fixtures, truth UI, 1280/1440/1920 browser fallback and Electron event p95; keep P0-C blocked until trusted authorizer/real reattach/full A/B checks pass and a fresh explicit Codex dry-run authorization exists.
+- Commit and push the A7 acceptance/B2 authorization switch, then dispatch only `[长工]#realtime-production-path-e2e@v0.1` from the B2 card.
+- B2 must overlap the production 5-second CIM poll with visible-DOM latency sampling; p95 >500ms becomes `blocked_by_sync_cim_latency` plus an A7.1 packet, not a hidden pass.
+- Keep P0-C blocked until B2 passes and a fresh explicit Codex execution authorization exists.
 - Keep M3 code gates accepted as passed after `lint`, `build`, and `orchestration:check`; use the identified Windows MCP Snapshot route only as capture evidence until full transparent-window pointer input is observed.
 - Keep connector policy and `connector-acceptance-review-v0.1` on standby until PM/user accepts or revises machine gate fields; do not dispatch connector execution binding and do not add schema-breaking connector fields.
 - Keep AgentPet Git log ignore / staging decisions behind explicit user confirmation. **2026-07-07 Git log ignore = ① 推 main 即可 已落档**(不引 pre-commit / pre-push hook,backup 为每周 manual 巡检);lane `git-staging-review-agentpet` 仍 standby 等待 PM/user 决定是否处理当前 Git state。The historical repair package is `docs/orchestration/tasks/git-repair-agentpet-v0.1.md`; the current Git state review package is `docs/orchestration/tasks/git-staging-review-agentpet-v0.1.md` and remains standby.

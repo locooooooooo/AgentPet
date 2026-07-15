@@ -5,7 +5,7 @@
 
 loop state: active
 dispatch state: active
-status: a7_authorized_after_a6_acceptance
+status: b2_authorized_after_a7_acceptance
 control lane: standby_control
 date: 2026-07-13
 
@@ -25,10 +25,12 @@ date: 2026-07-13
 - `docs/orchestration/tasks/realtime-agent-cockpit-p0-a7-process-reattach-v0.1.md`
 - `docs/orchestration/tasks/realtime-agent-cockpit-p0-b2-production-path-e2e-v0.1.md`
 - `docs/orchestration/sessions/realtime-agent-cockpit-next-stage-2026-07-14.md`
+- `docs/orchestration/sessions/realtime-agent-cockpit-p0-a7-acceptance-2026-07-15.md`
+- `docs/orchestration/sessions/realtime-agent-cockpit-next-stage-2026-07-15.md`
 
 ## current truth
 
-- 本地命令执行看板约 75%；真实多 Agent 实时控制舱暂记约 60%：blocked-safe runtime foundation、AgentInstance selector、renderer truth 和 SSR DOM state matrix 已落地，但没有真实 Electron session E2E、可信授权器或生产重挂证明。
+- 本地命令执行看板约 75%；真实多 Agent 实时控制舱仍是受限执行就绪切片：blocked-safe runtime、可信授权器、进程指纹/重挂、AgentInstance selector、renderer truth 和 SSR DOM state matrix 已落地，但生产 Electron 可见路径 B2 与真实 Agent E2E 尚未完成。
 - 当前只定义 Codex/Trae/Qoder 三个 Connector，三者全部 blocked/non-executable。
 - Codex 是 draft/pending/discovery-only；Trae/Qoder 是 intentionally command-empty placeholders。
 - 进入本轮前的本机发现快照：codex/openclaw/claude/minimax 可发现；trae/qoder/opencode 未发现。
@@ -44,8 +46,8 @@ date: 2026-07-13
 | P0-B | `[长工]#realtime-truth-ui@v0.1` | partial_accepted_renderer_truth_slice | selector + App/Home/Cockpit 接线、fallback 1280/1440/1920 浏览器复核、fresh/stale/lost SSR fixture 和 Electron event p95 通过；真实 E2E 待补 |
 | P0-C | `[长工]#realtime-requirements-control@v0.1` + PM | standby / authorization_required | Codex controlled dry-run 与 E2E acceptance；当前不得执行 |
 | P0-A6 | `[长工]#realtime-trusted-authorizer@v0.1` | accepted / `a44abd6` | main-owned trusted confirmation；policy remains blocked，external spawn=0 |
-| P0-A7 | `[长工]#realtime-process-reattach@v0.1` | authorized_pending_worker | production process identity proof and restart reattach using non-Agent controlled child |
-| P0-B2 | future serial worker | standby | non-Agent production Electron path rehearsal after A7 closeout |
+| P0-A7 | `[长工]#realtime-process-reattach@v0.1` | accepted / `e2031cd` | process fingerprint/restart reattach accepted with synchronous-CIM residual risk |
+| P0-B2 | `[长工]#realtime-production-path-e2e@v0.1` | authorized_pending_worker | controlled non-Agent production Electron path rehearsal with overlapping CIM latency evidence |
 
 主 control lane 保持 `standby_control`：它只协调 A/B 合同和 C 验收。A/B 的 partial accepted 只代表受限切片已被 PM 验收，不代表 Connector runtime 已可执行。
 
@@ -123,5 +125,5 @@ evidence:
 
 ## next action
 
-- Commit and push the A6 acceptance/A7 switch, then dispatch only P0-A7 process reattach.
-- B2 remains gated behind A7 independent callback/commit; P0-C remains standby and still requires a new explicit execution authorization.
+- Commit and push the A7 acceptance/B2 authorization switch, then dispatch only P0-B2 production-path rehearsal.
+- P0-C remains standby and still requires B2 acceptance plus a new explicit execution authorization.
