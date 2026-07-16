@@ -7,6 +7,7 @@ const SNAP_HOLD_MS = 1000;
 interface UseDockAndDragOptions {
   api: DesktopApi;
   prefs: RanchPrefs | null;
+  isDesktop: boolean;
   isFloating: boolean;
   onPrefsChange: (prefs: RanchPrefs) => void;
   onError: (message: string) => void;
@@ -31,6 +32,7 @@ interface ScreenWorkArea {
 export function useDockAndDrag({
   api,
   prefs,
+  isDesktop,
   isFloating,
   onPrefsChange,
   onError
@@ -65,13 +67,13 @@ export function useDockAndDrag({
   }, []);
 
   useEffect(() => {
-    if (!isFloating && dragging) {
+    if (!isDesktop && !isFloating && dragging) {
       resetDragSession();
     }
-  }, [dragging, isFloating]);
+  }, [dragging, isDesktop, isFloating]);
 
   useEffect(() => {
-    if (!dragging || !isFloating) {
+    if (!dragging) {
       return;
     }
 
@@ -171,10 +173,10 @@ export function useDockAndDrag({
       window.removeEventListener('mouseup', handleMouseUp, true);
       clearHoldTimer();
     };
-  }, [api, dragging, isFloating]);
+  }, [api, dragging]);
 
   function onMouseDown(event: ReactMouseEvent<HTMLElement>) {
-    if (!isFloating || event.button !== 0) {
+    if (event.button !== 0) {
       return;
     }
 
@@ -188,7 +190,15 @@ export function useDockAndDrag({
       return;
     }
 
+    const isDesktopDragHandle = target instanceof Element && Boolean(target.closest('.ranch-drag-handle'));
+    if (!isFloating && !(isDesktop && isDesktopDragHandle)) {
+      return;
+    }
+
     event.preventDefault();
+    if (isDesktop) {
+      void api.ranch.setMousePassthrough(false);
+    }
     dragRef.current = {
       startPointer: {
         screenX: event.screenX,

@@ -9,10 +9,14 @@ import { useRanchMode } from './hooks/useRanchMode';
 import { useRanchNotifications } from './hooks/useRanchNotifications';
 import { useSelectedAgent } from './hooks/useSelectedAgent';
 
-const DESKTOP_INTERACTIVE_SELECTOR = '.animal, .ranch-actions, .ranch-action-button';
+const DESKTOP_INTERACTIVE_SELECTOR = '.animal, .ranch-actions, .ranch-action-button, .ranch-drag-handle';
 
-function readDesktopInteractiveRegions(): RanchInteractiveRegion[] {
-  return Array.from(document.querySelectorAll<HTMLElement>(DESKTOP_INTERACTIVE_SELECTOR))
+function readDesktopInteractiveRegions(includeWholeWindow = false): RanchInteractiveRegion[] {
+  const elements = includeWholeWindow
+    ? Array.from(document.querySelectorAll<HTMLElement>('.ranch-shell'))
+    : Array.from(document.querySelectorAll<HTMLElement>(DESKTOP_INTERACTIVE_SELECTOR));
+
+  return elements
     .map((element) => {
       const rect = element.getBoundingClientRect();
       if (rect.width <= 0 || rect.height <= 0) {
@@ -73,10 +77,13 @@ export default function RanchApp() {
   const { dragging, dockPreviewEdge, onMouseDown } = useDockAndDrag({
     api,
     prefs,
+    isDesktop,
     isFloating,
     onPrefsChange: setPrefs,
     onError: (message) => console.error(message)
   });
+  const draggingRef = useRef(dragging);
+  draggingRef.current = dragging;
   const prefsReady = Boolean(prefs);
 
   async function selectAgent(agentId: string) {
@@ -210,7 +217,7 @@ export default function RanchApp() {
         return;
       }
 
-      void api.ranch.setInteractiveRegions(readDesktopInteractiveRegions());
+      void api.ranch.setInteractiveRegions(readDesktopInteractiveRegions(draggingRef.current));
     };
     const updatePassthroughFromPointer = (event: MouseEvent) => {
       const target = document.elementFromPoint(event.clientX, event.clientY) ?? event.target;
@@ -243,6 +250,20 @@ export default function RanchApp() {
       void api.ranch.setMousePassthrough(false);
     };
   }, [api, isDesktop, prefsReady]);
+
+  useEffect(() => {
+    if (!isDesktop || !prefsReady) {
+      return;
+    }
+
+    void api.ranch.setInteractiveRegions(readDesktopInteractiveRegions(dragging));
+    if (dragging) {
+      desktopPassthroughRef.current = false;
+      void api.ranch.setMousePassthrough(false);
+    } else {
+      desktopPassthroughRef.current = null;
+    }
+  }, [api, dragging, isDesktop, prefsReady]);
 
   if (bootError) {
     return (

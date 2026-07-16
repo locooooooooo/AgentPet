@@ -23,6 +23,10 @@ export default function RanchCanvas({ snapshot, selectedAgentId, onSelectAgent }
     <section className="ranch-canvas" aria-label="桌面牧场动物区">
       <div className="ranch-field">
         <div className="ranch-fence" aria-hidden="true" />
+        <div className="ranch-drag-handle drag-handle-top" aria-hidden="true" />
+        <div className="ranch-drag-handle drag-handle-right" aria-hidden="true" />
+        <div className="ranch-drag-handle drag-handle-bottom" aria-hidden="true" />
+        <div className="ranch-drag-handle drag-handle-left" aria-hidden="true" />
         <div className="ranch-ground">
           {RANCH_ZONES.map((zone) => (
             <span key={zone.id} className={`ranch-zone ${zone.className}`} aria-hidden="true">

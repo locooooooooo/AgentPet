@@ -1130,8 +1130,13 @@ function updateRanchPassthroughFromCursor() {
   }
 
   const cursor = screen.getCursorScreenPoint();
+  const windowBounds = ranchWindow.getBounds();
+  const localCursor = {
+    x: cursor.x - windowBounds.x,
+    y: cursor.y - windowBounds.y
+  };
   const overInteractiveRegion = ranchInteractiveRegions.some((region) => (
-    isPointInsideRanchRegion(cursor, region)
+    isPointInsideRanchRegion(localCursor, region)
   ));
   setRanchMousePassthrough(!overInteractiveRegion);
 }
@@ -1379,15 +1384,7 @@ function registerRanchIpc() {
   });
 
   ipcMain.handle('ranch:set-interactive-regions', (_event, regions: RanchInteractiveRegion[]) => {
-    const windowBounds = ranchWindow?.getBounds();
-    const nextRegions = normalizeRanchInteractiveRegions(regions);
-    ranchInteractiveRegions = windowBounds
-      ? nextRegions.map((region) => ({
-          ...region,
-          x: windowBounds.x + region.x,
-          y: windowBounds.y + region.y
-        }))
-      : [];
+    ranchInteractiveRegions = normalizeRanchInteractiveRegions(regions);
     updateRanchPassthroughFromCursor();
   });
 

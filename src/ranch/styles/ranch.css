@@ -1,3 +1,12 @@
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: transparent;
+}
+
 #ranch-root,
 #ranch-root * {
   box-sizing: border-box;
@@ -158,6 +167,47 @@
   box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.05);
   pointer-events: none;
   transition: box-shadow 180ms ease-in-out;
+}
+
+#ranch-root .ranch-drag-handle {
+  position: absolute;
+  z-index: 9;
+  cursor: grab;
+  -webkit-app-region: no-drag;
+}
+
+#ranch-root .drag-handle-top,
+#ranch-root .drag-handle-bottom {
+  right: 10px;
+  left: 10px;
+  height: 14px;
+}
+
+#ranch-root .drag-handle-top {
+  top: 0;
+}
+
+#ranch-root .drag-handle-bottom {
+  bottom: 0;
+}
+
+#ranch-root .drag-handle-right,
+#ranch-root .drag-handle-left {
+  top: 10px;
+  bottom: 10px;
+  width: 14px;
+}
+
+#ranch-root .drag-handle-right {
+  right: 0;
+}
+
+#ranch-root .drag-handle-left {
+  left: 0;
+}
+
+#ranch-root .ranch-shell.is-dragging .ranch-drag-handle {
+  cursor: grabbing;
 }
 
 #ranch-root .ranch-corner {
