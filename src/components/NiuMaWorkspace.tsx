@@ -5,12 +5,14 @@ import {
   Bell,
   ChevronUp,
   Coffee,
+  Copy,
   Eraser,
   Flame,
   Home,
   Play,
   RefreshCcw,
   RotateCcw,
+  Search,
   ShieldAlert,
   SlidersHorizontal,
   Square,
@@ -55,6 +57,8 @@ interface NiuMaWorkspaceProps {
 
 type SummaryTone = 'neutral' | 'positive' | 'info' | 'warning' | 'danger';
 type DetailTabId = 'command' | 'queue' | 'logs';
+type GovernanceStateFilter = 'all' | 'active' | 'blocked' | 'standby' | 'summarized';
+type CockpitRegionId = 'cockpit-health-region' | 'cockpit-agent-region' | 'cockpit-operator-region' | 'cockpit-governance-region';
 
 const ACTIVE_COCKPIT_TASK_CARD_ID = 'c0-5';
 
@@ -62,6 +66,14 @@ const detailTabs: Array<{ id: DetailTabId; label: string }> = [
   { id: 'command', label: '下发任务' },
   { id: 'queue', label: '任务队列' },
   { id: 'logs', label: '流式日志' }
+];
+
+const governanceStateOptions: Array<{ value: GovernanceStateFilter; label: string }> = [
+  { value: 'all', label: '全部状态' },
+  { value: 'active', label: 'active' },
+  { value: 'blocked', label: 'blocked' },
+  { value: 'standby', label: 'standby' },
+  { value: 'summarized', label: 'summarized' }
 ];
 
 const cockpitTaskCards = [
@@ -149,10 +161,38 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, onSnapshot, 
   // 左侧折叠状态
   const [rolesExpanded, setRolesExpanded] = useState(false);
   const [lanesExpanded, setLanesExpanded] = useState(false);
+  const [governanceQuery, setGovernanceQuery] = useState('');
+  const [governanceStateFilter, setGovernanceStateFilter] = useState<GovernanceStateFilter>('all');
+  const [governanceCopyFeedback, setGovernanceCopyFeedback] = useState('');
 
   // 侧边栏整体收起/展开状态
   const [leftRailOpen, setLeftRailOpen] = useState(true);
   const [rightRailOpen, setRightRailOpen] = useState(true);
+
+  const normalizedGovernanceQuery = governanceQuery.trim().toLocaleLowerCase();
+  const filteredRoles = useMemo(() => ORCHESTRATION_STATUS.roles.filter((role) => {
+    const matchesState = governanceStateFilter === 'all' || role.status === governanceStateFilter;
+    const matchesQuery = matchesGovernanceQuery(normalizedGovernanceQuery, [
+      role.id,
+      role.title,
+      role.owner,
+      role.responsibility,
+      role.tag,
+      role.evidence
+    ]);
+    return matchesState && matchesQuery;
+  }), [governanceStateFilter, normalizedGovernanceQuery]);
+  const filteredLanes = useMemo(() => ORCHESTRATION_STATUS.lanes.filter((lane) => {
+    const matchesState = governanceStateFilter === 'all' || lane.state === governanceStateFilter;
+    const matchesQuery = matchesGovernanceQuery(normalizedGovernanceQuery, [
+      lane.id,
+      lane.title,
+      lane.role,
+      lane.nextAction
+    ]);
+    return matchesState && matchesQuery;
+  }), [governanceStateFilter, normalizedGovernanceQuery]);
+  const governanceFilterActive = normalizedGovernanceQuery.length > 0 || governanceStateFilter !== 'all';
 
   useEffect(() => {
     // Connector gate display is status-only, not executable; do not add run/start actions here.
@@ -252,6 +292,52 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, onSnapshot, 
     setRanchPrefs(nextPrefs);
   }
 
+  function focusCockpitRegion(regionId: CockpitRegionId) {
+    if (regionId === 'cockpit-governance-region') {
+      setLeftRailOpen(true);
+    }
+    if (regionId === 'cockpit-operator-region') {
+      setRightRailOpen(true);
+      setCornerPanelOpen(false);
+    }
+
+    window.requestAnimationFrame(() => {
+      const target = document.getElementById(regionId);
+      target?.focus({ preventScroll: true });
+      target?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    });
+  }
+
+  function updateGovernanceQuery(query: string) {
+    setGovernanceQuery(query);
+    if (query.trim()) {
+      setRolesExpanded(true);
+      setLanesExpanded(true);
+    }
+  }
+
+  function updateGovernanceStateFilter(filter: GovernanceStateFilter) {
+    setGovernanceStateFilter(filter);
+    if (filter !== 'all') {
+      setRolesExpanded(true);
+      setLanesExpanded(true);
+    }
+  }
+
+  function clearGovernanceFilters() {
+    setGovernanceQuery('');
+    setGovernanceStateFilter('all');
+  }
+
+  async function copyGovernanceText(value: string, label: string) {
+    try {
+      await writeClipboardText(value);
+      setGovernanceCopyFeedback(`${label}已复制`);
+    } catch {
+      setGovernanceCopyFeedback(`${label}复制失败，请手动选择文本`);
+    }
+  }
+
   const gateHeadline =
     gatePendingCount > 0
       ? `${gatePendingCount} pending`
@@ -261,7 +347,24 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, onSnapshot, 
 
   return (
     <div className="workspace-shell">
-      <header className="app-header cockpit-header">
+      <nav className="cockpit-region-jumps" aria-label="控制舱区域跳转">
+        <button type="button" onClick={() => focusCockpitRegion('cockpit-health-region')}>全局健康</button>
+        <button type="button" onClick={() => focusCockpitRegion('cockpit-agent-region')}>Agent 矩阵</button>
+        <button
+          type="button"
+          onClick={() => focusCockpitRegion('cockpit-operator-region')}
+          disabled={!selectedAgent || !runtime}
+        >
+          Operator
+        </button>
+        <button type="button" onClick={() => focusCockpitRegion('cockpit-governance-region')}>治理详情</button>
+      </nav>
+
+      <header
+        id="cockpit-health-region"
+        className="app-header cockpit-header cockpit-region-target"
+        tabIndex={-1}
+      >
         <div className="header-brand">
           <div className="title-row">
             <span className="brand-mark" aria-hidden="true">
@@ -438,19 +541,48 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, onSnapshot, 
                 />
               </div>
 
-              <div className="supervision-note emphasis">
-                <ShieldAlert size={14} />
-                <span
-                  className="supervision-note-copy"
-                  title={ORCHESTRATION_STATUS.blocker}
-                  aria-label={`阻塞摘要：${ORCHESTRATION_STATUS.blocker}`}
-                >
-                  {ORCHESTRATION_STATUS.blocker}
-                </span>
-              </div>
+              <details className="blocker-disclosure">
+                <summary aria-label="切换阻塞全文与真源">
+                  <ShieldAlert size={14} aria-hidden="true" />
+                  <span className="supervision-note-copy">{ORCHESTRATION_STATUS.blocker}</span>
+                  <span className="blocker-disclosure-label blocker-label-closed">全文</span>
+                  <span className="blocker-disclosure-label blocker-label-open">收起</span>
+                </summary>
+                <div className="blocker-disclosure-content">
+                  <p>{ORCHESTRATION_STATUS.blocker}</p>
+                  <div className="blocker-truth-source">
+                    <span>治理真源</span>
+                    <code title={ORCHESTRATION_STATUS.source}>{ORCHESTRATION_STATUS.source}</code>
+                  </div>
+                  <div className="blocker-copy-actions">
+                    <button
+                      type="button"
+                      onClick={() => void copyGovernanceText(ORCHESTRATION_STATUS.blocker, '阻塞全文')}
+                    >
+                      <Copy size={13} aria-hidden="true" />
+                      <span>复制 blocker</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void copyGovernanceText(ORCHESTRATION_STATUS.source, '真源路径')}
+                    >
+                      <Copy size={13} aria-hidden="true" />
+                      <span>复制真源</span>
+                    </button>
+                  </div>
+                  <span className="blocker-copy-feedback" role="status" aria-live="polite">
+                    {governanceCopyFeedback}
+                  </span>
+                </div>
+              </details>
             </section>
 
-            <section className="cockpit-panel orchestration-panel" aria-label="LPS 控制面角色与 Lane 登记">
+            <section
+              id="cockpit-governance-region"
+              className="cockpit-panel orchestration-panel cockpit-region-target"
+              aria-label="LPS 控制面角色与 Lane 登记"
+              tabIndex={-1}
+            >
               <PanelHeading
                 kicker={ORCHESTRATION_STATUS.source}
                 title="控制面角色分工与监督"
@@ -458,22 +590,63 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, onSnapshot, 
               />
               <p>控制面登记（非实时运行探针） · {ORCHESTRATION_STATUS.target}</p>
 
+              <div className="governance-tools" role="search" aria-label="搜索与过滤治理登记">
+                <label className="governance-search-field">
+                  <span className="sr-only">搜索角色与 Lane</span>
+                  <Search size={13} aria-hidden="true" />
+                  <input
+                    type="search"
+                    value={governanceQuery}
+                    placeholder="搜索角色、Owner、Lane 或下一步"
+                    onChange={(event) => updateGovernanceQuery(event.target.value)}
+                  />
+                </label>
+                <label className="governance-state-field">
+                  <span>状态</span>
+                  <select
+                    value={governanceStateFilter}
+                    onChange={(event) => updateGovernanceStateFilter(event.target.value as GovernanceStateFilter)}
+                  >
+                    {governanceStateOptions.map((option) => (
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                </label>
+                <button
+                  type="button"
+                  className="governance-clear-button"
+                  onClick={clearGovernanceFilters}
+                  disabled={!governanceFilterActive}
+                  aria-label="清空治理搜索与状态过滤"
+                  title="清空治理搜索与状态过滤"
+                >
+                  <X size={13} aria-hidden="true" />
+                </button>
+              </div>
+
+              <div className="governance-result-count" role="status" aria-live="polite">
+                <span>角色 {filteredRoles.length}/{ORCHESTRATION_STATUS.roles.length}</span>
+                <span>Lanes {filteredLanes.length}/{ORCHESTRATION_STATUS.lanes.length}</span>
+              </div>
+
               <div className="orchestration-columns">
                 <div className="rail-group">
                   <button 
                     type="button" 
                     className="rail-group-head-btn"
                     onClick={() => setRolesExpanded(!rolesExpanded)}
+                    aria-expanded={rolesExpanded}
+                    aria-controls="governance-role-list"
                   >
                     <div className="rail-group-head">
                       <Workflow size={14} />
                       <span>登记角色工位 ({ORCHESTRATION_STATUS.roles.length})</span>
                     </div>
-                    <ChevronUp size={14} className={`accordion-chevron ${rolesExpanded ? 'is-open' : ''}`} />
+                    <ChevronUp size={14} className={`accordion-chevron ${rolesExpanded ? 'is-open' : ''}`} aria-hidden="true" />
                   </button>
-                  {rolesExpanded ? (
-                    <div className="role-grid">
-                      {ORCHESTRATION_STATUS.roles.map((role) => (
+                  <div id="governance-role-list" className="role-grid" hidden={!rolesExpanded}>
+                    {filteredRoles.length > 0 ? (
+                      filteredRoles.map((role) => (
                         <article key={role.id} className={`role-card ${role.status}`}>
                           <div>
                             <strong>{role.title}</strong>
@@ -482,9 +655,11 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, onSnapshot, 
                           <p>{role.responsibility}</p>
                           <code>{role.tag}</code>
                         </article>
-                      ))}
-                    </div>
-                  ) : null}
+                      ))
+                    ) : (
+                      <p className="governance-empty-state">没有匹配的角色登记。请调整关键词或状态。</p>
+                    )}
+                  </div>
                 </div>
 
                 <div className="rail-group">
@@ -492,16 +667,18 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, onSnapshot, 
                     type="button" 
                     className="rail-group-head-btn"
                     onClick={() => setLanesExpanded(!lanesExpanded)}
+                    aria-expanded={lanesExpanded}
+                    aria-controls="governance-lane-list"
                   >
                     <div className="rail-group-head">
                       <Activity size={14} />
                       <span>登记推进 Lanes ({ORCHESTRATION_STATUS.lanes.length})</span>
                     </div>
-                    <ChevronUp size={14} className={`accordion-chevron ${lanesExpanded ? 'is-open' : ''}`} />
+                    <ChevronUp size={14} className={`accordion-chevron ${lanesExpanded ? 'is-open' : ''}`} aria-hidden="true" />
                   </button>
-                  {lanesExpanded ? (
-                    <div className="lane-strip lane-stack">
-                      {ORCHESTRATION_STATUS.lanes.map((lane) => (
+                  <div id="governance-lane-list" className="lane-strip lane-stack" hidden={!lanesExpanded}>
+                    {filteredLanes.length > 0 ? (
+                      filteredLanes.map((lane) => (
                         <div key={lane.id} className={`lane-chip ${lane.state}`}>
                           <div className="lane-copy">
                             <span>{lane.title}</span>
@@ -509,9 +686,11 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, onSnapshot, 
                           </div>
                           <strong>{lane.state}</strong>
                         </div>
-                      ))}
-                    </div>
-                  ) : null}
+                      ))
+                    ) : (
+                      <p className="governance-empty-state">没有匹配的 Lane。请调整关键词或状态。</p>
+                    )}
+                  </div>
                 </div>
               </div>
             </section>
@@ -519,7 +698,12 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, onSnapshot, 
         </aside>
 
         <section className="center-stage">
-          <section className="cockpit-panel board-panel" aria-label="多 Agent 工位矩阵">
+          <section
+            id="cockpit-agent-region"
+            className="cockpit-panel board-panel cockpit-region-target"
+            aria-label="多 Agent 工位矩阵"
+            tabIndex={-1}
+          >
             <div className="board-panel-head">
               <PanelHeading
                 kicker="Workstations"
@@ -549,7 +733,12 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, onSnapshot, 
         </section>
 
         {selectedAgent && runtime ? (
-          <aside className={`right-rail ${rightRailOpen ? 'is-open' : 'is-collapsed'}`}>
+          <aside
+            id="cockpit-operator-region"
+            className={`right-rail cockpit-region-target ${rightRailOpen ? 'is-open' : 'is-collapsed'}`}
+            tabIndex={-1}
+            aria-label="Operator 任务与结果"
+          >
             <button 
               type="button" 
               className="rail-toggle-btn right-toggle"
@@ -1333,6 +1522,34 @@ function getToneForState(state: string): SummaryTone {
   }
 
   return 'neutral';
+}
+
+function matchesGovernanceQuery(query: string, values: string[]) {
+  if (!query) {
+    return true;
+  }
+  return values.some((value) => value.toLocaleLowerCase().includes(query));
+}
+
+async function writeClipboardText(value: string) {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(value);
+    return;
+  }
+
+  const textArea = document.createElement('textarea');
+  textArea.value = value;
+  textArea.setAttribute('readonly', '');
+  textArea.style.position = 'fixed';
+  textArea.style.opacity = '0';
+  document.body.appendChild(textArea);
+  textArea.select();
+
+  const copied = document.execCommand('copy');
+  textArea.remove();
+  if (!copied) {
+    throw new Error('Clipboard copy failed');
+  }
 }
 
 function formatDateTime(value: string) {

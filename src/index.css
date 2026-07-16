@@ -3933,3 +3933,346 @@ input:focus-visible {
     grid-template-columns: 1fr;
   }
 }
+
+/* ========== cockpit-ui-redesign-v3.2 P1 governance and keyboard path ========== */
+.workspace-shell .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.workspace-shell .cockpit-region-jumps {
+  position: fixed;
+  top: 8px;
+  left: 50%;
+  z-index: 120;
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  border: 1px solid rgba(56, 189, 248, 0.36);
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.98);
+  box-shadow: 0 12px 30px rgba(2, 6, 23, 0.58);
+  transform: translateX(-50%);
+}
+
+.workspace-shell .cockpit-region-jumps:not(:focus-within) {
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  border: 0;
+  white-space: nowrap;
+}
+
+.workspace-shell .cockpit-region-jumps button {
+  min-width: max-content;
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #151515;
+  color: #e2e8f0;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.workspace-shell .cockpit-region-jumps button:hover,
+.workspace-shell .cockpit-region-jumps button:focus-visible {
+  border-color: rgba(56, 189, 248, 0.54);
+  background: #1f2937;
+  color: #f8fafc;
+}
+
+.workspace-shell .cockpit-region-jumps button:disabled {
+  cursor: not-allowed;
+  opacity: 0.46;
+}
+
+.workspace-shell .cockpit-region-target:focus {
+  outline: 2px solid rgba(56, 189, 248, 0.92);
+  outline-offset: -2px;
+}
+
+.workspace-shell .blocker-disclosure {
+  min-width: 0;
+  border: 1px solid rgba(255, 214, 10, 0.26);
+  border-radius: 8px;
+  background: rgba(113, 63, 18, 0.22);
+  color: #fef3c7;
+}
+
+.workspace-shell .blocker-disclosure > summary {
+  display: grid;
+  min-width: 0;
+  min-height: 38px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: start;
+  padding: 8px;
+  cursor: pointer;
+  font-size: 11px;
+  line-height: 1.4;
+  list-style: none;
+}
+
+.workspace-shell .blocker-disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+
+.workspace-shell .blocker-disclosure > summary:hover,
+.workspace-shell .blocker-disclosure > summary:focus-visible {
+  background: rgba(113, 63, 18, 0.34);
+}
+
+.workspace-shell .blocker-disclosure > summary:focus-visible {
+  outline: 2px solid rgba(56, 189, 248, 0.9);
+  outline-offset: 2px;
+}
+
+.workspace-shell .blocker-disclosure-label {
+  color: #fde68a;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.workspace-shell .blocker-label-open,
+.workspace-shell .blocker-disclosure:not([open]) > .blocker-disclosure-content {
+  display: none;
+}
+
+.workspace-shell .blocker-disclosure[open] .blocker-label-open {
+  display: inline;
+}
+
+.workspace-shell .blocker-disclosure[open] .blocker-label-closed {
+  display: none;
+}
+
+.workspace-shell .blocker-disclosure-content {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 0 8px 8px;
+  border-top: 1px solid rgba(255, 214, 10, 0.16);
+}
+
+.workspace-shell .blocker-disclosure-content > p {
+  margin: 8px 0 0;
+  color: #fef3c7;
+  font-size: 11px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.workspace-shell .blocker-truth-source {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.workspace-shell .blocker-truth-source > span {
+  color: #d6d3d1;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.workspace-shell .blocker-truth-source code {
+  min-width: 0;
+  padding: 6px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 214, 10, 0.16);
+  border-radius: 6px;
+  background: rgba(2, 6, 23, 0.42);
+  color: #fef3c7;
+  font-size: 10px;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-shell .blocker-copy-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.workspace-shell .blocker-copy-actions button {
+  display: inline-flex;
+  min-width: 0;
+  min-height: 32px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 8px;
+  border: 1px solid rgba(255, 214, 10, 0.2);
+  border-radius: 6px;
+  background: rgba(2, 6, 23, 0.52);
+  color: #fef3c7;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.workspace-shell .blocker-copy-actions button:hover,
+.workspace-shell .blocker-copy-actions button:focus-visible {
+  border-color: rgba(255, 214, 10, 0.42);
+  background: rgba(30, 41, 59, 0.78);
+}
+
+.workspace-shell .blocker-copy-feedback {
+  min-height: 1.4em;
+  color: #bae6fd;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.workspace-shell .governance-tools {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 32px;
+  gap: 6px;
+  min-width: 0;
+}
+
+.workspace-shell .governance-search-field {
+  grid-column: 1 / -1;
+  display: grid;
+  min-width: 0;
+  min-height: 32px;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 7px;
+  align-items: center;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: rgba(2, 6, 23, 0.52);
+  color: var(--text-muted);
+}
+
+.workspace-shell .governance-search-field:focus-within {
+  border-color: rgba(56, 189, 248, 0.54);
+}
+
+.workspace-shell .governance-search-field input {
+  width: 100%;
+  min-width: 0;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #e2e8f0;
+  font: inherit;
+  font-size: 11px;
+  text-overflow: ellipsis;
+}
+
+.workspace-shell .governance-search-field input::placeholder {
+  color: #94a3b8;
+}
+
+.workspace-shell .governance-state-field {
+  display: grid;
+  min-width: 0;
+  min-height: 32px;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 6px;
+  align-items: center;
+  padding: 0 7px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: rgba(2, 6, 23, 0.52);
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.workspace-shell .governance-state-field:focus-within {
+  border-color: rgba(56, 189, 248, 0.54);
+}
+
+.workspace-shell .governance-state-field select {
+  width: 100%;
+  min-width: 0;
+  height: 30px;
+  border: 0;
+  outline: 0;
+  background: #0f172a;
+  color: #e2e8f0;
+  font: inherit;
+  font-size: 10px;
+}
+
+.workspace-shell .governance-clear-button {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: rgba(2, 6, 23, 0.52);
+  color: #e2e8f0;
+}
+
+.workspace-shell .governance-clear-button:hover:not(:disabled),
+.workspace-shell .governance-clear-button:focus-visible {
+  border-color: rgba(56, 189, 248, 0.54);
+  background: #1f2937;
+}
+
+.workspace-shell .governance-clear-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.workspace-shell .governance-result-count {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.workspace-shell .governance-result-count span {
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.42);
+}
+
+.workspace-shell #governance-role-list[hidden],
+.workspace-shell #governance-lane-list[hidden] {
+  display: none !important;
+}
+
+.workspace-shell .governance-empty-state {
+  margin: 0;
+  padding: 10px;
+  border: 1px dashed var(--border-strong);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 10px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 760px) {
+  .workspace-shell .cockpit-region-jumps {
+    max-width: calc(100vw - 16px);
+    overflow-x: auto;
+  }
+
+  .workspace-shell .blocker-copy-actions {
+    grid-template-columns: 1fr;
+  }
+}
