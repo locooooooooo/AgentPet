@@ -135,12 +135,13 @@ class FakeProcess extends EventEmitter {
   }
 }
 
-function readyPolicy() {
-  const codex = currentPolicy.connectors.find((connector) => connector.id === 'codex');
+function readyPolicy(connectorId = 'codex', args) {
+  const connector = currentPolicy.connectors.find((candidate) => candidate.id === connectorId);
   return {
     ...currentPolicy,
     connectors: [{
-      ...codex,
+      ...connector,
+      ...(args ? { args } : {}),
       status: 'ready',
       approvalStatus: 'accepted',
       enabledByDefault: true,
@@ -187,7 +188,10 @@ function createHarness(policy, options = {}) {
     loadPolicy: () => policy,
     resolveExecutable: (command) => {
       discoveryCount += 1;
-      return command === 'codex' ? 'C:\\fixture\\codex.exe' : null;
+      if (command === 'codex') {
+        return 'C:\\fixture\\codex.exe';
+      }
+      return command === 'trae-cli' ? 'C:\\fixture\\trae-cli.exe' : null;
     },
     spawnProcess: (file, args, spawnOptions) => {
       const process = options.spawnProcess?.(file, args, spawnOptions, processes.length)
@@ -465,7 +469,10 @@ assert(cleanupGrant.status === 'granted' && cleanupAuthorizerHarness.authorizer.
 
 const codexPolicy = currentPolicy.connectors.find((connector) => connector.id === 'codex');
 assert(codexPolicy?.status === 'draft' && codexPolicy.approvalStatus === 'pending' && codexPolicy.enabledByDefault === false, 'current Codex policy must remain draft/pending/disabled');
-assert(currentPolicy.connectors.filter((connector) => connector.id === 'trae' || connector.id === 'qoder').every((connector) => connector.status === 'placeholder'), 'Trae/Qoder must remain placeholders');
+const traePolicy = currentPolicy.connectors.find((connector) => connector.id === 'trae');
+const qoderPolicy = currentPolicy.connectors.find((connector) => connector.id === 'qoder');
+assert(traePolicy?.status === 'draft' && traePolicy.approvalStatus === 'pending' && traePolicy.enabledByDefault === false, 'current Trae policy must remain draft/pending/disabled');
+assert(qoderPolicy?.status === 'disabled' && qoderPolicy.approvalStatus === 'rejected' && qoderPolicy.enabledByDefault === false, 'current Qoder policy must remain disabled/rejected');
 const productionAuthorizerHarness = createAuthorizerHarness(currentPolicy);
 const productionHarness = createHarness(currentPolicy, {
   authorizeRun: (candidate) => productionAuthorizerHarness.authorizer.consume(candidate)
@@ -483,6 +490,34 @@ for (const connector of currentPolicy.connectors) {
   assertEventProof(productionHarness.runtime.getSessionAudit(blocked.sessionId), 0, 1);
 }
 assert(productionHarness.discoveryCount === 0 && productionHarness.spawnCalls.length === 0, 'current production policy must keep every Connector at spawn=0');
+
+const traePrompt = 'Read package.json and return its name and version.';
+const traeHarness = createHarness(readyPolicy('trae', ['--query-timeout=30s']));
+const traeAccepted = traeHarness.runtime.start({
+  ...request,
+  connectorId: 'trae',
+  agentId: 'trae',
+  prompt: traePrompt
+});
+assert(traeAccepted.status === 'accepted', 'ready Trae fixture must be accepted');
+assert(traeHarness.spawnCalls.length === 1, 'ready Trae fixture must produce one controlled spawn');
+assert(JSON.stringify(traeHarness.spawnCalls[0].args) === JSON.stringify([
+  '--print',
+  '--output-format=stream-json',
+  '--query-timeout=30s',
+  traePrompt
+]), 'Trae adapter must keep fixed headless args, extensible policy args, and prompt last');
+traeHarness.processes[0].confirmSpawn();
+traeHarness.processes[0].stdout.emit('data', '{"session_id":"fixture","error":"Models is required"}\n');
+traeHarness.processes[0].close(0, null);
+const traeFailed = traeHarness.runtime.getSnapshot().tasks.find((session) => session.sessionId === traeAccepted.sessionId);
+assert(traeFailed?.state === 'error', 'Trae exit 0 with a top-level error payload must fail closed');
+assert(
+  traeFailed.failureKind === 'process-error' && traeFailed.exitCode === 0,
+  `Trae structured error must retain process-error truth and exit code 0 evidence: ${JSON.stringify(traeFailed)}`
+);
+assert(traeFailed.events.some((event) => event.message.includes('top-level error payload')), 'Trae structured error must remain auditable');
+assert(liveTimers(traeHarness).length === 0, 'Trae structured error close must clean every timer');
 
 const policyBlockedHarness = createHarness(currentPolicy);
 for (let index = 0; index < 10; index += 1) {
@@ -1023,6 +1058,7 @@ console.log('A4 P1-2: Authorization/Bearer/spaced credential values redact witho
 console.log('A5: evaluate-gate ignores renderer requestedBy/confirmation and remains confirmation-required');
 console.log('A6: main-owned grant missing/forged/expired/replayed/mismatched/drift/cancelled paths verified');
 console.log('A6 production policy: Codex/Trae/Qoder discovery=0, spawn=0 after confirmation grant');
+console.log('Trae adapter: fixed stream-json invocation, prompt-last policy args, and exit0+error fail-closed verified');
 console.log('A7: bounded fingerprint, proof freshness, restart recovery and one terminal session-lost verified');
 console.log('A7 stop safety: kill-time PID identity reproof rejects reuse with process.kill count=0');
 console.log('security: forged/replayed renderer confirmation 10/10 blocked before discovery/spawn');

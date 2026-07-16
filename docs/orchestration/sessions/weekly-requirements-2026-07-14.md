@@ -8,7 +8,7 @@ loop state: active
 dispatch state: active
 
 > **计划周期**: 2026-07-14 ~ 2026-07-20 (W28)
-> **当前状态**: active; M5 is closed and pushed; realtime A7.1 `8866305` and B2 are accepted, while P0-C remains authorization-required and unexecuted
+> **当前状态**: active; M5 is closed and pushed; realtime A7.1/B2 are accepted; bounded Trae/Qoder discovery is recorded, while every production Connector remains disabled
 > **激活证据**: 2026-07-11 16:00 +08:00 W27 final closeout 已通过 fresh gates，并将 W27 summarized。
 > **硬边界**: A7.1/B2 technical gates pass at PM visible-DOM p95 `7ms`; P0-C external execution still requires a new explicit authorization, and Connector machine gates remain unchanged.
 
@@ -47,6 +47,7 @@ dispatch state: active
 | P1-2 | `cockpit-ui-redesign-v3.1` bounded visual refinement | 2026-07-12 管理员已授权 shell/rail/status/operator/dock 视觉优化；不修改 M5 lifecycle、中央卡片业务结构、8 卡 keyframes、`NiuMaAvatar.tsx`、`agentCore.ts` 或 connector machine gate |
 | P1-3 | live-subagents `403 DAILY_LIMIT_EXCEEDED` quota 复查 | 本周不主动复查;W28 仅在安全 route 可用时记录精确结果 |
 | P1-4 | M5 后续子卡串行队列 | 按五日总控在前一卡 callback、PM acceptance、full gates、commit、push、clean worktree 后接续;任何时候最多一个产品 worker |
+| P1-5 | Trae/Qoder Connector discovery | Trae adapter implemented but blocked by `Models is required`; Qoder rejected because no headless Agent API exists; production spawn remains 0 |
 
 ## 三、W28 P2 候选
 
@@ -79,6 +80,7 @@ next action:
 - M5 已收口并推送；保留直接 tray/pointer 与 Windows notification visibility 残余风险，不重开产品 lane。
 - A7.1 `8866305` 与 B2 已验收推送；提交/推送控制面后不派 runtime worker，等待新的 P0-C 明确执行授权。
 - Protected source is closed with no current drift; quota recheck and pointer evidence still require their own bounded activation.
+- Keep Trae draft/pending/disabled until Models is configured and a new read-only smoke is authorized; keep Qoder disabled/rejected until a headless API exists.
 
 summary:
 - W28 active; M5 is closed, realtime A7.1/B2 controlled production readiness is accepted, and P0-C remains unexecuted behind a fresh explicit authorization gate.

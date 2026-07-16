@@ -36,7 +36,7 @@
       "progress": "docs/orchestration/sessions/realtime-agent-cockpit-next-stage-2026-07-15.md"
     }
   ],
-  "blocker": "Realtime A7.1/B2 technical gates are accepted, but P0-C still lacks a fresh explicit external execution authorization. 外部 connector 仍 disabled；Codex 仅 draft/pending/discovery-only，Trae/Qoder 保持 placeholder/command-empty；live-subagents 仍受 403 DAILY_LIMIT_EXCEEDED 阻塞；完整 transparent pointer smoke 保持既有边界。",
+  "blocker": "Realtime A7.1/B2 technical gates are accepted, but P0-C still lacks a fresh explicit external execution authorization. 外部 connector 仍 disabled；Codex 仅 draft/pending/discovery-only；Trae 为 draft/pending/enabled=false 且仍受 Models 配置阻塞；Qoder 为 disabled/rejected/enabled=false 且 command-empty；live-subagents 仍受 403 DAILY_LIMIT_EXCEEDED 阻塞；完整 transparent pointer smoke 保持既有边界。",
   "roles": [
     {
       "id": "pm",
@@ -79,7 +79,7 @@
       "title": "[短工]#connector-policy@v0.1",
       "owner": "短工",
       "status": "standby",
-      "responsibility": "Maintain non-executing connector readiness metadata for codex/trae/qoder: command, cwd, env, confirmation, and acceptance gates; discovery or placeholders do not count as connected.",
+      "responsibility": "Maintain non-executing connector readiness metadata: Codex and Trae remain draft/pending/disabled, Qoder is rejected/disabled, and discovery or adapter code never counts as connected.",
       "tag": "⟦tag:v2|task|connector-policy-v0.1⟧",
       "evidence": "docs/orchestration/tasks/connector-policy-v0.1.md"
     },
@@ -88,7 +88,7 @@
       "title": "[PM]#connector-acceptance-review@v0.1",
       "owner": "主控",
       "status": "standby",
-      "responsibility": "Keep acceptance review evidence explicit: codex is draft discovery-only, trae/qoder are intentionally command-empty placeholders, and no connector may be accepted, enabled, or executed from this lane.",
+      "responsibility": "Keep acceptance evidence explicit: Codex remains draft discovery-only, Trae is draft with a Models blocker, Qoder is rejected for lacking a headless API, and no connector is accepted or enabled.",
       "tag": "⟦tag:v2|task|connector-acceptance-review-v0.1⟧",
       "evidence": "docs/orchestration/tasks/connector-acceptance-review-v0.1.md"
     },
@@ -331,7 +331,7 @@
       "title": "[PM]#ranch-real-integration-r0-3-dryrun@v0.1",
       "owner": "主控",
       "status": "standby",
-      "responsibility": "R0-3 Codex controlled dry-run evidence collection lane;Codex approvalStatus/enabledByDefault/command 维持原值;trae/qoder 维持 placeholder;在 standby 阶段不主动启动 dry-run,等用户二次确认时机;evidence 归档至 docs/orchestration/sessions/codex-dryrun-2026-07-XX.{json,png,md}。",
+      "responsibility": "R0-3 Codex controlled dry-run evidence collection lane; Codex approvalStatus/enabledByDefault/command 维持原值；Trae 保持 draft/pending/disabled，Qoder 保持 disabled/rejected/command-empty；在 standby 阶段不主动启动 dry-run，等待用户二次确认时机。",
       "tag": "⟦tag:v2|task|ranch-real-integration-r0-3-dryrun-v0.1⟧",
       "evidence": "docs/orchestration/tasks/ranch-real-integration-r0-3-dryrun-v0.1.md"
     },
@@ -455,14 +455,14 @@
       "title": "外部 connector 策略",
       "role": "[短工]#connector-policy@v0.1",
       "state": "standby",
-      "nextAction": "Keep codex draft-only and keep trae/qoder intentionally command-empty placeholders; wait for PM/user to supply acceptance-grade evidence before any machine gate revision."
+      "nextAction": "Keep Codex and Trae draft/pending/disabled; resolve Trae Models configuration before any new smoke; keep Qoder rejected/disabled until a real headless API exists."
     },
     {
       "id": "connector-acceptance-review",
       "title": "Connector acceptance review",
       "role": "[PM]#connector-acceptance-review@v0.1",
       "state": "standby",
-      "nextAction": "PM/user must decide only after the docs name each connector's missing evidence and owner; keep approvalStatus unchanged, enabled=false, command-empty placeholders unchanged, and no execution."
+      "nextAction": "Review only fresh acceptance-grade evidence; Trae requires a successful separately authorized read-only smoke, while Qoder requires a new independent headless interface before reconsideration."
     },
     {
       "id": "daily-supervision",
@@ -668,36 +668,36 @@
     {
       "id": "trae",
       "label": "Trae",
-      "status": "placeholder",
-      "command": "",
+      "status": "draft",
+      "command": "trae-cli",
       "cwdPolicy": "workspace-root",
       "envAllowlist": ["PATH", "HOME", "USERPROFILE"],
       "confirmation": "required",
       "timeoutSeconds": 1800,
-      "acceptanceGate": "PM confirms executable path and non-interactive args; orchestration:preflight + connector-safety pass",
-      "approvalStatus": "not-requested",
+      "acceptanceGate": "Resolve a non-secret Models configuration; pass one separately authorized read-only stream-json smoke; orchestration:preflight + connector-safety pass",
+      "approvalStatus": "pending",
       "enabledByDefault": false,
-      "readinessEvidence": "No trae executable resolves via Get-Command; command intentionally stays empty in current scope.",
-      "missingReadiness": "Executable intentionally absent in current scope; changing this would require exact executable path, non-interactive args, safety evidence, and PM acceptance.",
+      "readinessEvidence": "trae-cli 0.120.40 resolves on PATH; headless print and structured output are available; one authorized smoke returned exit 0 plus a top-level Models error with no UI, workspace change, or process residue.",
+      "missingReadiness": "A valid non-secret Models configuration, successful model response, authentication proof, and a separately authorized read-only stream-json smoke.",
       "nextOwner": "[PM]#connector-acceptance-review@v0.1",
-      "nextAction": "Keep trae as placeholder/command-empty; do not enable or execute from this lane."
+      "nextAction": "Keep Trae draft/pending/disabled; do not execute again until Models configuration and a fresh explicit smoke authorization exist."
     },
     {
       "id": "qoder",
       "label": "Qoder",
-      "status": "placeholder",
+      "status": "disabled",
       "command": "",
       "cwdPolicy": "workspace-root",
       "envAllowlist": ["PATH", "HOME", "USERPROFILE"],
       "confirmation": "required",
       "timeoutSeconds": 1800,
-      "acceptanceGate": "PM confirms executable path and verification surface; orchestration:preflight + connector-safety pass",
-      "approvalStatus": "not-requested",
+      "acceptanceGate": "Rejected until an independent headless Agent CLI or API provides captured structured output, timeout, and failure semantics",
+      "approvalStatus": "rejected",
       "enabledByDefault": false,
-      "readinessEvidence": "No qoder executable resolves via Get-Command; command intentionally stays empty in current scope.",
-      "missingReadiness": "Executable intentionally absent in current scope; changing this would require exact executable path, verification surface, safety evidence, and PM acceptance.",
+      "readinessEvidence": "Static inspection found only a desktop CLI wrapper and UI chat subcommand; no Qoder prompt was executed.",
+      "missingReadiness": "An independent headless Agent CLI or API with captured structured output, timeout control, authentication status, and failure semantics.",
       "nextOwner": "[PM]#connector-acceptance-review@v0.1",
-      "nextAction": "Keep qoder as placeholder/command-empty; do not enable or execute from this lane."
+      "nextAction": "Keep Qoder disabled/rejected and command-empty; reconsider only when a real headless interface is installed and separately reviewed."
     }
   ]
 }

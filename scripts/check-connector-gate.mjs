@@ -54,7 +54,7 @@ const reasons = Object.fromEntries(results.map(([connectorId, evaluation]) => [
   evaluation.result.blockedReasons
 ]));
 assertReasons('codex', reasons.codex, ['status-not-ready', 'approval-not-accepted', 'disabled-by-default']);
-assertReasons('trae', reasons.trae, ['status-not-ready', 'approval-not-accepted', 'disabled-by-default', 'command-missing']);
+assertReasons('trae', reasons.trae, ['status-not-ready', 'approval-not-accepted', 'disabled-by-default']);
 assertReasons('qoder', reasons.qoder, ['status-not-ready', 'approval-not-accepted', 'disabled-by-default', 'command-missing']);
 
 const codex = policy.connectors.find((connector) => connector.id === 'codex');

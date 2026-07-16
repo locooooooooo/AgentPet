@@ -431,6 +431,7 @@ interface ActiveExecution {
   stdoutBuffer: string;
   stderrBuffer: string;
   pendingOutput: PendingOutput;
+  adapterFailure?: ConnectorFailureDecision;
   onSpawn: () => void;
   onStdout: (chunk: unknown) => void;
   onStderr: (chunk: unknown) => void;
@@ -1650,6 +1651,25 @@ export class ConnectorRuntime {
       });
       return;
     }
+    if (execution.adapterFailure) {
+      const failure = this.classifyFailure({
+        ...execution.adapterFailure,
+        exitCode: code ?? undefined,
+        signal: signal ?? undefined
+      });
+      if (execution.plan) {
+        this.handleFailure(execution.plan, failure);
+      } else {
+        this.finishSession(execution.taskId, 'error', {
+          eventKind: 'error',
+          message: failure.message,
+          failureKind: failure.kind,
+          exitCode: failure.exitCode,
+          signal: failure.signal
+        });
+      }
+      return;
+    }
     if (code === 0) {
       this.plans.delete(execution.taskId);
       this.finishSession(execution.taskId, 'success', {
@@ -2030,6 +2050,11 @@ export class ConnectorRuntime {
   ) {
     if (!line) {
       return;
+    }
+    if (!execution.adapterFailure) {
+      const connectorId = execution.plan?.request.connectorId
+        ?? this.snapshot.tasks.find((session) => session.taskId === execution.taskId)?.connectorId;
+      execution.adapterFailure = readConnectorOutputFailure(connectorId, stream, line) ?? undefined;
     }
     const bounded = truncateUtf8(line, MAX_OUTPUT_LINE_BYTES);
     const bytes = Buffer.byteLength(bounded.text);
@@ -2474,14 +2499,61 @@ function createConnectorInvocation(
   policyArgs: string[],
   prompt: string
 ): AdapterInvocation | null {
-  if (connectorId !== 'codex') {
+  if (connectorId === 'codex') {
+    return {
+      args: ['exec', '--json', '--skip-git-repo-check', ...policyArgs, prompt],
+      capabilities: ['structured-json-events', 'task-execution'],
+      capabilitySource: 'adapter-declaration'
+    };
+  }
+  if (connectorId === 'trae') {
+    return {
+      args: ['--print', '--output-format=stream-json', ...policyArgs, prompt],
+      capabilities: ['structured-json-events', 'task-execution'],
+      capabilitySource: 'adapter-declaration'
+    };
+  }
+  return null;
+}
+
+function readConnectorOutputFailure(
+  connectorId: string | undefined,
+  stream: 'stdout' | 'stderr',
+  line: string
+): ConnectorFailureDecision | null {
+  if (connectorId !== 'trae' || stream !== 'stdout') {
+    return null;
+  }
+  let payload: unknown;
+  try {
+    payload = JSON.parse(line);
+  } catch {
+    return null;
+  }
+  if (!isRecord(payload) || !hasNonEmptyErrorValue(payload.error)) {
     return null;
   }
   return {
-    args: ['exec', '--json', '--skip-git-repo-check', ...policyArgs, prompt],
-    capabilities: ['structured-json-events', 'task-execution'],
-    capabilitySource: 'adapter-declaration'
+    kind: 'process-error',
+    message: 'Trae stdout reported a top-level error payload.',
+    retryable: false
   };
+}
+
+function hasNonEmptyErrorValue(value: unknown): boolean {
+  if (value === null || value === undefined || value === false || value === 0) {
+    return false;
+  }
+  if (typeof value === 'string') {
+    return value.trim().length > 0;
+  }
+  if (Array.isArray(value)) {
+    return value.length > 0;
+  }
+  if (isRecord(value)) {
+    return Object.keys(value).length > 0;
+  }
+  return true;
 }
 
 function normalizeRunRequest(input: unknown): ConnectorRunRequest | null {

@@ -103,6 +103,7 @@ tracked business cards:
 - session: ⟦tag:v2|session|ranch-smoke-desktop-exe-2026-07-06⟧ -> `docs/orchestration/sessions/ranch-smoke-desktop-exe-2026-07-06.md`
 - session: ⟦tag:v2|session|weekly-requirements-2026-07-07⟧ -> `docs/orchestration/sessions/weekly-requirements-2026-07-07.md`
 - session: ⟦tag:v2|session|weekly-requirements-2026-07-14⟧ -> `docs/orchestration/sessions/weekly-requirements-2026-07-14.md`
+- session: ⟦tag:v2|session|trae-qoder-connector-discovery-2026-07-16⟧ -> `docs/orchestration/sessions/trae-qoder-connector-discovery-2026-07-16.md`
 - session: ⟦tag:v2|session|weekly-closeout-2026-07-11⟧ -> `docs/orchestration/sessions/weekly-closeout-2026-07-11.md`
 - session: ⟦tag:v2|session|m5-five-day-development-2026-07-14⟧ -> `docs/orchestration/sessions/m5-five-day-development-2026-07-14.md`
 - session: ⟦tag:v2|session|homepage-ui-p0-progress⟧ -> `docs/orchestration/sessions/homepage-ui-p0-progress.md`
@@ -132,8 +133,8 @@ current role split:
 - `[监督]#multi-agent-control@v0.1`: audit index/task/session consistency and stop drift.
 - `[短工]#local-runner@v0.1`: desktop local command runner implementation and verification.
 - `[短工]#orchestration-ui@v0.1`: show current role split and supervision state inside the control cockpit.
-- `[短工]#connector-policy@v0.1`: connector policy is drafted and visible; standby until PM/user accepts or revises machine gate fields.
-- `[PM]#connector-acceptance-review@v0.1`: standby decision-review package for connector acceptance; no connector accepted, enabled, or executed.
+- `[短工]#connector-policy@v0.1`: bounded Trae adapter exists, but Trae remains draft/pending/disabled behind the Models blocker; Qoder is rejected/disabled because no headless API was found.
+- `[PM]#connector-acceptance-review@v0.1`: standby decision-review package; Codex/Trae are not accepted, Qoder is rejected, and every production Connector remains disabled.
 - `[短工]#runtime-dispatch-cards@v0.1`: control-card setup for blocked-safe connector runtime implementation lanes.
 - `[短工]#runtime-blocked-path-closeout@v0.1`: close accepted blocked-path lanes and hold before execution binding.
 - `[短工]#codex-evidence-closeout@v0.1`: record Codex evidence result and keep acceptance pending.
@@ -158,7 +159,7 @@ current role split:
 - `[监督]#ranch-pointer-smoke@v0.2`: standby verification package for transparent ranch pointer smoke; no implementation edit.
 - `[监督]#ranch-pointer-smoke-manual-evidence@v0.2`: standby manual evidence package for pointer-smoke callback recording; no pointer input executed yet.
 - `[长工]#homepage-ui-design@v0.1`: summarized HomePage / landing / 启动页 P0 lane; H0-1 design drafts accepted as C · 华丽, H0-2/H0-3 implemented, H0-4 protected-file audit passed in `homepage-ui-p0-c0-6-style-2026-07-07.md`; no edit to `NiuMaAvatar.tsx` / `index.css` / `agentCore.ts` / central 4x2 control-cockpit grid.
-- `[PM]#ranch-real-integration-r0-3-dryrun@v0.1`: standby R0-3 Codex controlled dry-run evidence collection lane; P0 ranch-real-integration-p0 整体 accepted(2026-07-07 拍板 ②),R0-3 段已转交本 lane;Codex approvalStatus/enabledByDefault/command 维持原值,trae/qoder 维持 placeholder;不主动启动 dry-run,等用户二次确认时机。
+- `[PM]#ranch-real-integration-r0-3-dryrun@v0.1`: standby R0-3 Codex controlled dry-run evidence lane; Codex machine fields stay unchanged, Trae stays draft/pending/disabled behind Models configuration, and Qoder stays disabled/rejected/command-empty; no dry-run starts without a second confirmation.
 - `[PM]#protected-cockpit-source-drift@v0.1`: summarized after the 2026-07-16 fresh audit found no protected-source diff and both targeted/global diff checks passed; no source edit was manufactured.
 - `[PM]#cockpit-ui-redesign-v3.1@v0.1`: summarized accepted visual-refinement lane pushed as `aa4cfa5`; future cockpit changes require a fresh bounded scope, while M5 lifecycle, protected animation/avatar, business logic, and connectors remain untouched.
 - `[PM]#cockpit-ui-redesign-v3.2@v0.1`: standby after accepted/pushed P0; task-first state dedupe, first-screen dispatch, card-action reduction, and conditional Corner Assist passed PM replay after two bounded menu corrections. P1/P2 remain unauthorized.
@@ -177,7 +178,7 @@ current role split:
 - `[PM]#daily-plan@2026-07-10`: summarized 2026-07-10 daily plan;administrator decisions and W28/closeout preparation are retained as history.
 
 blockers:
-- External connector execution remains disabled; Codex is draft/pending/discovery-only, Trae/Qoder are intentionally command-empty placeholders, and no Codex/Trae/Qoder connector may be accepted, enabled, or executed until connector policy is accepted.
+- External connector execution remains disabled; Codex is draft/pending/discovery-only, Trae is draft/pending with `Models is required`, and Qoder is rejected/disabled because no independent headless Agent API exists.
 - Real-time cockpit A6/A7.1, renderer truth and B2 controlled production slices are accepted only to the trusted/controlled-process boundary. P0-C real Agent E2E is still unexecuted; configured seeds, CLI discovery, controlled Node processes and simulated ticks must not be reported as online Agent sessions.
 - Treat service-side `403 DAILY_LIMIT_EXCEEDED` as a live sub-agent blocker until a quota recheck path is available; today's Codex app long-worker threads were used only as explicit user-authorized role sessions.
 - Control-cockpit central 4x2 grid and protected selling-point files remain locked; M4 header settings entry has been completed and accepted.
@@ -188,12 +189,12 @@ next action:
 - Keep P0-C at `authorization_required_ready_for_decision` until a fresh explicit Codex execution authorization exists.
 - Do not execute or enable any external Agent Connector from this control closeout.
 - Keep M3 code gates accepted as passed after `lint`, `build`, and `orchestration:check`; use the identified Windows MCP Snapshot route only as capture evidence until full transparent-window pointer input is observed.
-- Keep connector policy and `connector-acceptance-review-v0.1` on standby until PM/user accepts or revises machine gate fields; do not dispatch connector execution binding and do not add schema-breaking connector fields.
+- Keep connector policy and `connector-acceptance-review-v0.1` on standby: do not rerun Trae before Models configuration plus fresh authorization, and do not reconsider Qoder before a headless API exists.
 - Keep AgentPet Git log ignore / staging decisions behind explicit user confirmation. **2026-07-07 Git log ignore = ① 推 main 即可 已落档**(不引 pre-commit / pre-push hook,backup 为每周 manual 巡检);lane `git-staging-review-agentpet` 仍 standby 等待 PM/user 决定是否处理当前 Git state。The historical repair package is `docs/orchestration/tasks/git-repair-agentpet-v0.1.md`; the current Git state review package is `docs/orchestration/tasks/git-staging-review-agentpet-v0.1.md` and remains standby.
 - Preserve the accepted M4 evidence from thread `019f227a-8978-7df1-8b3f-738ccdb01b18`; future ranch work must open a new bounded lane.
 - Keep `ranch-window-v0.1`, `ranch-status-script-v0.1`, and `ranch-personality-v0.1` summarized as M5 evidence cards; do not treat them as fresh active implementation lanes.
 - Keep ranch pointer-smoke verification and `ranch-pointer-smoke-manual-evidence-v0.2` standby for full pointer input; capture-only evidence is archived, but click-through / double-click / right-click / drag / dock are not accepted yet.
-- Keep Codex draft/pending/enabled=false and Trae/Qoder placeholder/not-requested/enabled=false until connector machine gate fields change.
+- Keep Codex and Trae `draft/pending/enabled=false`; keep Qoder `disabled/rejected/enabled=false` and command-empty.
 - Use `docs/orchestration/tasks/daily-decision-queue-2026-07-02.md` as the next PM callback surface for standby decisions.
 - Keep `docs/orchestration/tasks/daily-role-accountability-2026-07-02.md` aligned with role states before closing any daily supervision pass.
 - M5 Day 5B correction `115c621` and final closeout `8df940c` are pushed to `origin/main`; preserve the residual-risk record and keep all M5 product lanes closed.

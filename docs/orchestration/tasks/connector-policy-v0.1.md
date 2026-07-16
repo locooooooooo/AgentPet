@@ -10,10 +10,10 @@ scope:
 - Define connector fields: command, cwd, env allowlist, runner type, timeout, and confirmation level.
 - Define safety rules for dangerous commands and long-running tasks.
 - Define PM acceptance gates before enabling a connector by default.
-- Keep implementation separate from this policy lane unless PM explicitly dispatches a short-worker implementation task.
+- Record the explicitly dispatched bounded Trae adapter and structured-error safety contract without enabling production execution.
 
 not in scope:
-- Implementing full Codex/Trae/Qoder protocol adapters.
+- Implementing full Codex/Qoder protocol adapters or a generic adapter framework.
 - Storing secrets in repository files.
 - Enabling live sub-agents while `403 DAILY_LIMIT_EXCEEDED` persists.
 
@@ -29,36 +29,37 @@ acceptance:
 - PM can dispatch a later implementation short-worker from this task without guessing safety boundaries.
 
 current state:
-- Standby policy lane: policy is drafted, visible, and non-executing; next movement requires PM/user acceptance or revision.
-- Local command runner exists, but connector safety fields are not implemented yet.
+- Standby policy lane after bounded implementation: policy is visible and non-executing; next movement requires new acceptance-grade evidence.
+- Local command runner plus bounded Codex/Trae adapters exist; production machine gates still block every spawn.
 - Draft connector policy is represented in `docs/orchestration/status.json` under `connectors`.
 - Detailed connector policy is represented in `docs/orchestration/connectors.json`.
 - `npm run orchestration:report` reads connector details from `docs/orchestration/connectors.json`.
 - Codex is draft-only; command discovery resolves `codex` on PATH, but that is readiness evidence only and not a connected agent.
-- Trae and Qoder remain intentionally command-empty placeholders in the current scope; `Get-Command` does not currently resolve either executable, and no PM/user decision has supplied a replacement invocation.
+- Trae resolves as `trae-cli` and is `draft/pending/enabled=false`; one read-only smoke failed closed on `Models is required`.
+- Qoder is `disabled/rejected/enabled=false` with an empty command because static inspection found no independent headless Agent API.
 - Connector cards are visible in the cockpit, but no connector is enabled by default.
-- Current preflight finds `codex` on PATH and leaves Trae/Qoder pending.
-- Codex approval is `pending`; Trae/Qoder approval is `not-requested`.
+- Current preflight finds both `codex` and `trae-cli` on PATH while every production Connector remains statically blocked; Qoder has no command to discover.
+- Codex and Trae approval are `pending`; Qoder approval is `rejected`.
 
 readiness matrix:
 | connector | truth source | discovery evidence | missing before attach | next responsible |
 | --- | --- | --- | --- | --- |
 | Codex | `draft / pending / enabled=false` | `Get-Command` and `orchestration:preflight` resolve `codex` on PATH | Controlled dry-run design, non-interactive JSON/auth-quota/timeout evidence, no-interactive-UI proof, PM acceptance | `[PM]#connector-acceptance-review@v0.1` decides; `[短工]#connector-policy@v0.1` only updates metadata after that decision |
-| Trae | `placeholder / not-requested / enabled=false` | No executable resolved; `command` intentionally stays empty in current scope | Executable is intentionally absent in current scope; exact executable path, exact non-interactive args, safety evidence, and PM acceptance are required before any change | PM/user must supply the invocation; `[短工]#connector-policy@v0.1` keeps placeholder until then |
-| Qoder | `placeholder / not-requested / enabled=false` | No executable resolved; `command` intentionally stays empty in current scope | Executable is intentionally absent in current scope; exact executable path, exact verification surface, safety evidence, and PM acceptance are required before any change | PM/user must supply the invocation; `[短工]#connector-policy@v0.1` keeps placeholder until then |
+| Trae | `draft / pending / enabled=false` | CLI/headless/JSON discovery plus one exit-0 structured-error smoke | Non-secret Models configuration, successful response, auth proof, fresh explicit smoke authorization | `[PM]#connector-acceptance-review@v0.1` keeps disabled until all evidence exists |
+| Qoder | `disabled / rejected / enabled=false` | Desktop wrapper and UI chat only; no prompt executed | Independent headless API with captured structured output, timeout and failure semantics | Reconsider only after a new headless interface is installed |
 
 blockers:
 - External sub-agent quota remains blocked by `403 DAILY_LIMIT_EXCEEDED`.
 - Codex still lacks acceptance-grade non-interactive evidence; command discovery alone is insufficient.
-- Trae/Qoder executable commands are intentionally absent in the current scope; a future PM/user decision must supply exact invocations before either placeholder can change.
+- Trae is blocked by missing Models configuration; Qoder is rejected for lacking a headless Agent API.
 - PM/user has not accepted connector execution binding.
-- `docs/orchestration/connectors.schema.json` disallows ad-hoc connector fields, so placeholder permanence must be recorded in wording unless the schema is revised.
+- `docs/orchestration/connectors.schema.json` disallows ad-hoc connector fields, so the Qoder rejection reason remains in existing approval evidence and acceptance wording.
 
 next action:
-- Keep `docs/orchestration/connectors.json` and `docs/orchestration/status.json` as readiness-only truth; do not treat discovery or placeholders as connected.
+- Keep `docs/orchestration/connectors.json` and `docs/orchestration/status.json` as readiness-only truth; do not treat discovery, adapter availability, or rejected metadata as connected.
 - Wait for PM/user acceptance or revision of machine gate fields before wiring any connector to quick actions.
 - PM/user must authorize a controlled Codex dry-run plan before any Codex status change.
-- PM/user must confirm or replace Trae/Qoder executable commands before any implementation; until then they remain command-empty placeholders.
+- Do not rerun Trae without non-secret Models configuration and fresh authorization; keep Qoder command-empty/rejected.
 - After acceptance, dispatch a short-worker implementation lane with disjoint write scope.
 
 summary:

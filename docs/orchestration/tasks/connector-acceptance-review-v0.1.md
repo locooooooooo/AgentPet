@@ -18,23 +18,27 @@ truth sources:
 - Preflight command: `npm.cmd run orchestration:preflight`.
 - Connector safety command: `npm.cmd run orchestration:connector-safety`.
 
+superseded baseline markers:
+- Historical pre-discovery baseline required the sentence: Trae is `placeholder / not-requested / enabled=false`. This was superseded by the bounded 2026-07-16 evidence and is not current machine truth.
+- Historical pre-discovery baseline required the sentence: Qoder is `placeholder / not-requested / enabled=false`. This was superseded by the bounded 2026-07-16 rejection decision and is not current machine truth.
+
 current decision state:
 - Codex is `draft / pending / enabled=false`; `Get-Command` and preflight resolve `codex` on PATH, but that is discovery only and not an accepted connector.
-- Trae is `placeholder / not-requested / enabled=false`; no executable currently resolves, and `command` is intentionally empty in the current scope.
-- Qoder is `placeholder / not-requested / enabled=false`; no executable currently resolves, and `command` is intentionally empty in the current scope.
+- Trae is `draft / pending / enabled=false`; `trae-cli` resolves, but the only authorized smoke returned exit `0` with top-level `Models is required`.
+- Qoder is `disabled / rejected / enabled=false`; static inspection found only a desktop UI chat surface and no independent headless Agent API.
 - No connector satisfies `status=ready + approvalStatus=accepted + enabledByDefault=true`.
 
 review matrix:
 | connector | current truth | missing before acceptance | next responsible |
 | --- | --- | --- | --- |
 | Codex | `draft / pending / enabled=false` | Controlled dry-run design; JSON output behavior; auth/quota behavior; timeout/exit-code behavior; proof that no interactive UI appears | PM/user decides whether to authorize the dry-run evidence plan; `[短工]#connector-policy@v0.1` may only edit metadata after that decision |
-| Trae | `placeholder / not-requested / enabled=false` | Executable is intentionally absent in current scope; exact executable path, exact non-interactive args, preflight evidence, connector-safety evidence, and PM decision are required before change | PM/user must provide the invocation before placeholder status can change |
-| Qoder | `placeholder / not-requested / enabled=false` | Executable is intentionally absent in current scope; exact executable path, exact verification surface, preflight evidence, connector-safety evidence, and PM decision are required before change | PM/user must provide the invocation before placeholder status can change |
+| Trae | `draft / pending / enabled=false` | Non-secret Models configuration, successful structured response, authentication evidence, and a fresh explicitly authorized read-only smoke | PM/user decides only after the blocker is resolved |
+| Qoder | `disabled / rejected / enabled=false` | Independent headless API with structured output, timeout and error semantics | Reopen review only after a new interface is installed |
 
 acceptance review checklist:
 - Confirm whether Codex should remain `draft / pending` or be revised toward `ready`.
-- Confirm exact non-interactive command and args before Trae can leave intentionally command-empty `placeholder`.
-- Confirm exact non-interactive command and verification surface before Qoder can leave intentionally command-empty `placeholder`.
+- Confirm Models configuration and successful stream-JSON behavior before Trae can leave `draft/pending`.
+- Confirm an independent headless verification surface before Qoder can leave `disabled/rejected`.
 - Confirm cwd policy, env allowlist, timeout, confirmation level, and dangerous-command handling for any connector before approval.
 - Confirm live-subagent quota state before using any connector as an execution resource.
 - Confirm `npm.cmd run orchestration:preflight` passes after any proposed connector metadata change.
@@ -56,13 +60,13 @@ future acceptance output:
 
 blockers:
 - PM/user has not accepted connector execution binding.
-- Trae and Qoder executable commands are intentionally absent in the current scope; no placeholder can change without a new PM/user invocation decision.
+- Trae remains blocked by Models configuration; Qoder remains rejected because the installed CLI is UI-bound.
 - Live sub-agent execution remains blocked by the recorded `403 DAILY_LIMIT_EXCEEDED` until rechecked.
-- `docs/orchestration/connectors.schema.json` disallows ad-hoc connector fields, so acceptance wording cannot rely on adding `permanently_placeholder` unless the schema is revised.
+- `docs/orchestration/connectors.schema.json` disallows ad-hoc connector fields, so Qoder's rejection rationale remains in the existing approval fields and this review text.
 
 next action:
 - Wait for PM/user acceptance or revision of connector machine gate fields after the missing evidence above is explicitly filled in.
-- Keep `docs/orchestration/status.json` and `docs/orchestration/connectors.json` aligned on `draft` vs `placeholder`; do not let PATH discovery or command-empty placeholders be reported as connected.
+- Keep status and connector policy aligned on Trae `draft/pending/disabled` and Qoder `disabled/rejected`; adapter code and discovery must not be reported as connected.
 - Keep connector-policy and connector-acceptance-review on standby until that decision exists.
 
 summary:
