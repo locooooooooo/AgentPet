@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { AgentSnapshot, ConnectorRuntimeSnapshot, DesktopApi } from './types';
+import type { AgentSnapshot, CodexHostSnapshot, ConnectorRuntimeSnapshot, DesktopApi } from './types';
 import { getDesktopApi } from './lib/desktopClient';
 import { projectAgentInstances } from './lib/agentInstanceProjection';
 import NiuMaWorkspace from './components/NiuMaWorkspace';
@@ -11,6 +11,7 @@ export default function App() {
   const api = useMemo<DesktopApi>(() => getDesktopApi(), []);
   const [snapshot, setSnapshot] = useState<AgentSnapshot | null>(null);
   const [connectorRuntimeSnapshot, setConnectorRuntimeSnapshot] = useState<ConnectorRuntimeSnapshot | null>(null);
+  const [codexHostSnapshot, setCodexHostSnapshot] = useState<CodexHostSnapshot | null>(null);
   const [projectionNow, setProjectionNow] = useState(() => Date.now());
   const [error, setError] = useState<string | null>(null);
   const [view, setView] = useState<AppView>('home');
@@ -32,6 +33,38 @@ export default function App() {
     const unsubscribe = api.onSnapshotChanged((nextSnapshot) => {
       setSnapshot(nextSnapshot);
     });
+
+    return () => {
+      mounted = false;
+      unsubscribe();
+    };
+  }, [api]);
+
+  useEffect(() => {
+    let mounted = true;
+    let unsubscribe = () => {};
+
+    api.getCodexHostSnapshot()
+      .then((nextSnapshot) => {
+        if (mounted) {
+          setCodexHostSnapshot(nextSnapshot);
+        }
+      })
+      .catch(() => {
+        if (mounted) {
+          setCodexHostSnapshot(createFailClosedCodexHostSnapshot());
+        }
+      });
+
+    try {
+      unsubscribe = api.onCodexHostSnapshotChanged((nextSnapshot) => {
+        if (mounted) {
+          setCodexHostSnapshot(nextSnapshot);
+        }
+      });
+    } catch {
+      setCodexHostSnapshot(createFailClosedCodexHostSnapshot());
+    }
 
     return () => {
       mounted = false;
@@ -148,6 +181,7 @@ export default function App() {
       <HomePage
         snapshot={snapshot}
         agentTruth={agentTruth}
+        codexHost={codexHostSnapshot ?? createFailClosedCodexHostSnapshot()}
         onEnterCockpit={enterCockpit}
         onFocusAnimal={focusRanchAnimal}
         onOpenSettings={enterCockpit}
@@ -160,10 +194,24 @@ export default function App() {
       api={api}
       snapshot={snapshot}
       agentTruth={agentTruth}
+      codexHost={codexHostSnapshot ?? createFailClosedCodexHostSnapshot()}
       onSnapshot={setSnapshot}
       onReturnHome={returnHome}
     />
   );
+}
+
+function createFailClosedCodexHostSnapshot(): CodexHostSnapshot {
+  return {
+    version: 1,
+    availability: 'unavailable',
+    source: 'browser-fallback',
+    observedAt: new Date().toISOString(),
+    clientRunning: false,
+    activeSessionCount: 0,
+    sessions: [],
+    detail: 'Codex Desktop lifecycle snapshot is unavailable.'
+  };
 }
 
 function createFailClosedRuntimeSnapshot(now: number, reason: string): ConnectorRuntimeSnapshot {

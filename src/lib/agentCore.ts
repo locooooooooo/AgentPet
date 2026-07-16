@@ -1028,6 +1028,31 @@ export function appendSystemMessage(
   return withMessage(snapshot, type, title, content, agentId);
 }
 
+export function signalAgentCompletion(
+  snapshot: AgentSnapshot,
+  agentId: string,
+  content: string,
+  completedAt = new Date().toISOString()
+): AgentSnapshot {
+  const current = snapshot.runtime[agentId] ?? createRuntimeState(agentId, completedAt);
+  return withMessage({
+    ...snapshot,
+    updatedAt: completedAt,
+    runtime: {
+      ...snapshot.runtime,
+      [agentId]: {
+        ...current,
+        status: 'done',
+        quote: '本轮对话完成，产物已经摆上验收台。',
+        bubbleText: 'Codex 对话完成，来验收吧。',
+        bubbleTimer: 6,
+        lastInteractionAt: completedAt,
+        customState: 'done'
+      }
+    }
+  }, 'success', 'Codex 对话已完成', content, agentId);
+}
+
 function withMessage(
   snapshot: AgentSnapshot,
   type: AgentSystemMessage['type'],

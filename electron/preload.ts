@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import type {
   AgentSnapshot,
+  CodexHostSnapshot,
   ConnectorAuthorizationCancelRequest,
   ConnectorAuthorizationCancelResult,
   ConnectorAuthorizationIntent,
@@ -69,6 +70,12 @@ const api = {
     ipcRenderer.on('connectors:runtime-snapshot-changed', listener);
     return () => ipcRenderer.removeListener('connectors:runtime-snapshot-changed', listener);
   },
+  getCodexHostSnapshot: (): Promise<CodexHostSnapshot> => ipcRenderer.invoke('codex:get-host-snapshot'),
+  onCodexHostSnapshotChanged: (callback: (snapshot: CodexHostSnapshot) => void): (() => void) => {
+    const listener = (_event: Electron.IpcRendererEvent, snapshot: CodexHostSnapshot) => callback(snapshot);
+    ipcRenderer.on('codex:host-snapshot-changed', listener);
+    return () => ipcRenderer.removeListener('codex:host-snapshot-changed', listener);
+  },
   ranch: {
     getPrefs: (): Promise<RanchPrefs> => ipcRenderer.invoke('ranch:get-prefs'),
     setPrefs: (patch: RanchPrefsPatch): Promise<RanchPrefs> => ipcRenderer.invoke('ranch:set-prefs', patch),
@@ -82,6 +89,7 @@ const api = {
       ipcRenderer.invoke('ranch:set-interactive-regions', regions),
     requestSystemNotify: (payload: RanchNotifyPayload): Promise<boolean> =>
       ipcRenderer.invoke('ranch:request-notify', payload),
+    requestNotificationSound: (): Promise<boolean> => ipcRenderer.invoke('ranch:request-notify-sound'),
     onPrefsChanged: (callback: (prefs: RanchPrefs) => void): (() => void) => {
       const listener = (_event: Electron.IpcRendererEvent, prefs: RanchPrefs) => callback(prefs);
       ipcRenderer.on('ranch:prefs-changed', listener);

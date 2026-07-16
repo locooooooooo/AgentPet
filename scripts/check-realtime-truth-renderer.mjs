@@ -32,6 +32,33 @@ snapshot.updatedAt = nowIso;
 const configuredAgents = snapshot.agents.map((agent) => ({ id: agent.id, connectorId: agent.id }));
 const api = {};
 
+function codexHostSnapshot({
+  availability = 'unavailable',
+  source = 'browser-fallback',
+  clientRunning = false,
+  activeSessionCount = 0
+} = {}) {
+  return {
+    version: 1,
+    availability,
+    source,
+    observedAt: nowIso,
+    clientRunning,
+    activeSessionCount,
+    sessions: Array.from({ length: activeSessionCount }, (_, index) => ({
+      sessionId: 'desktop-session-' + (index + 1),
+      workspace: 'workspace-' + (index + 1),
+      state: 'running',
+      activeTurnCount: 1,
+      lastEventAt: nowIso,
+      activeStartedAt: nowIso
+    })),
+    detail: 'Lifecycle-only fixture.'
+  };
+}
+
+const browserCodexHost = codexHostSnapshot();
+
 function outputStats() {
   return {
     receivedBytes: 0,
@@ -130,19 +157,20 @@ function plain(markup) {
     .trim();
 }
 
-function renderCockpit(agentTruth) {
+function renderCockpit(agentTruth, codexHost = browserCodexHost) {
   return plain(renderToStaticMarkup(
     <NiuMaWorkspace
       api={api}
       snapshot={snapshot}
       agentTruth={agentTruth}
+      codexHost={codexHost}
       onSnapshot={() => {}}
     />
   ));
 }
 
-function HomeTruthProbe({ agentTruth }) {
-  const data = useHomePageData(snapshot, agentTruth);
+function HomeTruthProbe({ agentTruth, codexHost }) {
+  const data = useHomePageData(snapshot, agentTruth, codexHost);
   return (
     <div>
       {data.metrics.map((metric) => (
@@ -152,8 +180,8 @@ function HomeTruthProbe({ agentTruth }) {
   );
 }
 
-function renderHomeTruth(agentTruth) {
-  return plain(renderToStaticMarkup(<HomeTruthProbe agentTruth={agentTruth} />));
+function renderHomeTruth(agentTruth, codexHost = browserCodexHost) {
+  return plain(renderToStaticMarkup(<HomeTruthProbe agentTruth={agentTruth} codexHost={codexHost} />));
 }
 
 function truthFor(projection) {
@@ -172,13 +200,26 @@ assert.equal(browserProjection.summary.configuredCount, 8);
 assert.equal(browserProjection.summary.onlineSessionCount, 0);
 const browserCockpit = renderCockpit(browserProjection);
 const browserHome = renderHomeTruth(browserProjection);
-assert.match(browserCockpit, /真实在线 Session 0/);
+assert.match(browserCockpit, /在线 Session 0/);
 assert.match(browserCockpit, /Agent runtime · simulated/);
 assert.match(browserCockpit, /unavailable · browser-fallback/);
 assert.match(browserCockpit, /本地牧场表现/);
 assert.match(browserCockpit, /应用快照交互/);
 assert.match(browserHome, /已配置工位:8/);
 assert.match(browserHome, /真实在线 Session:0:unavailable · simulated · browser-fallback/);
+
+const desktopCodexHost = codexHostSnapshot({
+  availability: 'available',
+  source: 'codex-desktop-session-log',
+  clientRunning: true,
+  activeSessionCount: 2
+});
+const desktopHostCockpit = renderCockpit(browserProjection, desktopCodexHost);
+const desktopHostHome = renderHomeTruth(browserProjection, desktopCodexHost);
+assert.match(desktopHostCockpit, /在线 Session 2/);
+assert.match(desktopHostCockpit, /Connector 0 · Codex Desktop 2/);
+assert.match(desktopHostCockpit, /Codex Desktop 已开启 2 活动对话/);
+assert.match(desktopHostHome, /真实在线 Session:2:Codex Desktop 已开启 · 2 个活动对话/);
 
 const freshLastSeen = new Date(now.getTime() - 1_000).toISOString();
 const freshProjection = project(runtimeSnapshot({ state: 'running', lastSeen: freshLastSeen }));
@@ -187,7 +228,7 @@ assert.equal(freshProjection.summary.onlineSessionCount, 1);
 assert.equal(freshTruth.presence, 'busy');
 assert.equal(freshTruth.activity, 'busy');
 const freshCockpit = renderCockpit(freshProjection);
-assert.match(freshCockpit, /真实在线 Session 1/);
+assert.match(freshCockpit, /在线 Session 1/);
 assert.match(freshCockpit, /busy \/ busy/);
 assert.match(freshCockpit, /connector-runtime/);
 assert.match(freshCockpit, /session-codex-1/);
@@ -228,6 +269,7 @@ assert.match(renderCockpit(unknownCapabilitiesProjection), /Capabilities: 未知
 
 console.log('realtime truth renderer check passed.');
 console.log('browser fallback DOM: configured=8, online=0, simulated/unavailable/source labels verified');
+console.log('Codex Desktop lifecycle DOM: host sessions contribute without changing Connector runtime truth');
 console.log('fresh/late/stale/session-lost DOM: KPI, presence/activity, provenance and reason labels verified');
 console.log('capabilities null and local ranch/application snapshot separation: verified');
 `;

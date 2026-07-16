@@ -1,5 +1,6 @@
 import type {
   AgentSnapshot,
+  CodexHostSnapshot,
   ConnectorAuthorizationCancelRequest,
   ConnectorAuthorizationIntent,
   ConnectorGateRequest,
@@ -44,6 +45,10 @@ export function getDesktopApi(): DesktopApi {
   let ranchPrefs = readBrowserRanchPrefs(snapshot.agents[0]?.id ?? 'codex');
   const listeners = new Set<(snapshot: AgentSnapshot) => void>();
   const ranchPrefsListeners = new Set<(prefs: RanchPrefs) => void>();
+  const codexHostListeners = new Set<(snapshot: CodexHostSnapshot) => void>();
+  let codexHostSnapshot = createBrowserCodexHostSnapshot();
+  const hasLocalDevelopmentBridge = window.location.hostname === '127.0.0.1'
+    || window.location.hostname === 'localhost';
 
   function publish(nextSnapshot: AgentSnapshot) {
     snapshot = nextSnapshot;
@@ -89,6 +94,30 @@ export function getDesktopApi(): DesktopApi {
     }
   }, 2500);
 
+  if (hasLocalDevelopmentBridge) {
+    void refreshBrowserCodexHostSnapshot();
+    window.setInterval(() => {
+      void refreshBrowserCodexHostSnapshot();
+    }, 1_500);
+  }
+
+  async function refreshBrowserCodexHostSnapshot() {
+    try {
+      const response = await fetch('/__niuma/codex-host', { cache: 'no-store' });
+      if (!response.ok) {
+        return codexHostSnapshot;
+      }
+      const nextSnapshot = normalizeBrowserCodexHostSnapshot(await response.json());
+      if (JSON.stringify(nextSnapshot) !== JSON.stringify(codexHostSnapshot)) {
+        codexHostSnapshot = nextSnapshot;
+        codexHostListeners.forEach((listener) => listener(codexHostSnapshot));
+      }
+    } catch {
+      // Static browser builds intentionally remain on the fail-closed fallback.
+    }
+    return codexHostSnapshot;
+  }
+
   return {
     getSnapshot: async () => snapshot,
     resetSeed: async () => publish(createSeedSnapshot()),
@@ -131,6 +160,13 @@ export function getDesktopApi(): DesktopApi {
     }),
     getConnectorSessionAudit: async (_sessionId: string): Promise<ConnectorSessionAudit | null> => null,
     onConnectorRuntimeSnapshotChanged: (_callback: (snapshot: ConnectorRuntimeSnapshot) => void) => () => {},
+    getCodexHostSnapshot: async (): Promise<CodexHostSnapshot> => (
+      hasLocalDevelopmentBridge ? refreshBrowserCodexHostSnapshot() : codexHostSnapshot
+    ),
+    onCodexHostSnapshotChanged: (callback: (snapshot: CodexHostSnapshot) => void) => {
+      codexHostListeners.add(callback);
+      return () => codexHostListeners.delete(callback);
+    },
     ranch: {
       getPrefs: async () => ranchPrefs,
       setPrefs: async (patch: RanchPrefsPatch) => updateRanchPrefs(patch),
@@ -158,6 +194,12 @@ export function getDesktopApi(): DesktopApi {
       setMousePassthrough: async (_passthrough: boolean) => {},
       setInteractiveRegions: async (_regions) => {},
       requestSystemNotify: async (_payload: RanchNotifyPayload) => ranchPrefs.notifyPrefs.system,
+      requestNotificationSound: async () => {
+        if (!ranchPrefs.notifyPrefs.sound) {
+          return false;
+        }
+        return playBrowserCompletionSound();
+      },
       onPrefsChanged: (callback: (prefs: RanchPrefs) => void) => {
         ranchPrefsListeners.add(callback);
         return () => ranchPrefsListeners.delete(callback);
@@ -191,7 +233,8 @@ function createBrowserRanchPrefs(selectedAgentId: string): RanchPrefs {
     notifyPrefs: {
       bubble: true,
       system: true,
-      cockpitBadge: true
+      cockpitBadge: true,
+      sound: true
     },
     schemaVersion: 1
   };
@@ -269,10 +312,83 @@ function normalizeBrowserRanchPrefs(value: unknown, selectedAgentId: string): Ra
     notifyPrefs: {
       bubble: boolOr(notifyPrefs.bubble, true),
       system: boolOr(notifyPrefs.system, true),
-      cockpitBadge: boolOr(notifyPrefs.cockpitBadge, true)
+      cockpitBadge: boolOr(notifyPrefs.cockpitBadge, true),
+      sound: boolOr(notifyPrefs.sound, true)
     },
     schemaVersion: 1
   };
+}
+
+function createBrowserCodexHostSnapshot(): CodexHostSnapshot {
+  const observedAt = new Date().toISOString();
+  return {
+    version: 1,
+    availability: 'unavailable',
+    source: 'browser-fallback',
+    observedAt,
+    clientRunning: false,
+    activeSessionCount: 0,
+    sessions: [],
+    detail: 'Codex Desktop lifecycle is unavailable in the static browser fallback.'
+  };
+}
+
+function normalizeBrowserCodexHostSnapshot(value: unknown): CodexHostSnapshot {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    return createBrowserCodexHostSnapshot();
+  }
+  const candidate = value as Partial<CodexHostSnapshot>;
+  if (
+    candidate.version !== 1
+    || (candidate.availability !== 'available' && candidate.availability !== 'unavailable')
+    || (candidate.source !== 'codex-desktop-session-log'
+      && candidate.source !== 'browser-fallback'
+      && candidate.source !== 'unavailable')
+  ) {
+    return createBrowserCodexHostSnapshot();
+  }
+  return {
+    version: 1,
+    availability: candidate.availability,
+    source: candidate.source,
+    observedAt: typeof candidate.observedAt === 'string' ? candidate.observedAt : new Date().toISOString(),
+    clientRunning: candidate.clientRunning === true,
+    activeSessionCount: typeof candidate.activeSessionCount === 'number'
+      ? Math.max(0, Math.floor(candidate.activeSessionCount))
+      : 0,
+    sessions: Array.isArray(candidate.sessions) ? candidate.sessions.slice(0, 8) : [],
+    ...(typeof candidate.lastCompletedAt === 'string' ? { lastCompletedAt: candidate.lastCompletedAt } : {}),
+    ...(typeof candidate.lastCompletionKey === 'string' ? { lastCompletionKey: candidate.lastCompletionKey } : {}),
+    detail: typeof candidate.detail === 'string' ? candidate.detail : ''
+  };
+}
+
+function playBrowserCompletionSound() {
+  try {
+    const AudioContextClass = window.AudioContext
+      ?? (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!AudioContextClass) {
+      return false;
+    }
+    const context = new AudioContextClass();
+    const gain = context.createGain();
+    gain.gain.setValueAtTime(0.0001, context.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.12, context.currentTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.32);
+    gain.connect(context.destination);
+    [659.25, 783.99].forEach((frequency, index) => {
+      const oscillator = context.createOscillator();
+      oscillator.type = 'sine';
+      oscillator.frequency.value = frequency;
+      oscillator.connect(gain);
+      oscillator.start(context.currentTime + index * 0.08);
+      oscillator.stop(context.currentTime + 0.24 + index * 0.08);
+    });
+    window.setTimeout(() => void context.close(), 500);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function numberOr(value: unknown, fallback: number) {

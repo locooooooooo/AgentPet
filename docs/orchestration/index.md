@@ -104,6 +104,7 @@ tracked business cards:
 - session: ⟦tag:v2|session|weekly-requirements-2026-07-07⟧ -> `docs/orchestration/sessions/weekly-requirements-2026-07-07.md`
 - session: ⟦tag:v2|session|weekly-requirements-2026-07-14⟧ -> `docs/orchestration/sessions/weekly-requirements-2026-07-14.md`
 - session: ⟦tag:v2|session|trae-qoder-connector-discovery-2026-07-16⟧ -> `docs/orchestration/sessions/trae-qoder-connector-discovery-2026-07-16.md`
+- session: ⟦tag:v2|session|cockpit-live-session-notification-2026-07-16⟧ -> `docs/orchestration/sessions/cockpit-live-session-notification-2026-07-16.md`
 - session: ⟦tag:v2|session|weekly-closeout-2026-07-11⟧ -> `docs/orchestration/sessions/weekly-closeout-2026-07-11.md`
 - session: ⟦tag:v2|session|m5-five-day-development-2026-07-14⟧ -> `docs/orchestration/sessions/m5-five-day-development-2026-07-14.md`
 - session: ⟦tag:v2|session|homepage-ui-p0-progress⟧ -> `docs/orchestration/sessions/homepage-ui-p0-progress.md`

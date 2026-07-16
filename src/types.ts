@@ -377,6 +377,32 @@ export interface ConnectorRuntimeSnapshot {
   runtime: ConnectorRuntimeEnvelope;
 }
 
+export type CodexHostAvailability = 'available' | 'unavailable';
+export type CodexHostSource = 'codex-desktop-session-log' | 'browser-fallback' | 'unavailable';
+
+export interface CodexHostSessionSummary {
+  sessionId: string;
+  workspace: string;
+  state: 'running' | 'idle';
+  activeTurnCount: number;
+  lastEventAt: string;
+  activeStartedAt?: string;
+  lastCompletedAt?: string;
+}
+
+export interface CodexHostSnapshot {
+  version: 1;
+  availability: CodexHostAvailability;
+  source: CodexHostSource;
+  observedAt: string;
+  clientRunning: boolean;
+  activeSessionCount: number;
+  sessions: CodexHostSessionSummary[];
+  lastCompletedAt?: string;
+  lastCompletionKey?: string;
+  detail: string;
+}
+
 export type ConnectorRuntimeAvailability = 'available' | 'unavailable' | 'recovering' | 'unknown';
 export type ConnectorRuntimeMode = 'real' | 'simulated';
 export type ConnectorRuntimeSource = 'electron-main' | 'browser-fallback' | 'persisted-recovery' | 'unknown';
@@ -505,6 +531,7 @@ export interface RanchPrefs {
     bubble: boolean;
     system: boolean;
     cockpitBadge: boolean;
+    sound: boolean;
   };
   schemaVersion: 1;
 }
@@ -612,6 +639,8 @@ export interface DesktopApi {
   getConnectorRuntimeSnapshot: () => Promise<ConnectorRuntimeSnapshot>;
   getConnectorSessionAudit: (sessionId: string) => Promise<ConnectorSessionAudit | null>;
   onConnectorRuntimeSnapshotChanged: (callback: (snapshot: ConnectorRuntimeSnapshot) => void) => () => void;
+  getCodexHostSnapshot: () => Promise<CodexHostSnapshot>;
+  onCodexHostSnapshotChanged: (callback: (snapshot: CodexHostSnapshot) => void) => () => void;
   ranch: {
     getPrefs: () => Promise<RanchPrefs>;
     setPrefs: (patch: RanchPrefsPatch) => Promise<RanchPrefs>;
@@ -622,6 +651,7 @@ export interface DesktopApi {
     setMousePassthrough: (passthrough: boolean) => Promise<void>;
     setInteractiveRegions: (regions: RanchInteractiveRegion[]) => Promise<void>;
     requestSystemNotify: (payload: RanchNotifyPayload) => Promise<boolean>;
+    requestNotificationSound: () => Promise<boolean>;
     onPrefsChanged: (callback: (prefs: RanchPrefs) => void) => () => void;
   };
   stopTask: (agentId: string, taskId: string) => Promise<AgentSnapshot>;

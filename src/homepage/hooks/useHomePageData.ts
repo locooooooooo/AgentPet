@@ -1,11 +1,16 @@
 import { useMemo } from 'react';
-import type { AgentSnapshot } from '../../types';
+import type { AgentSnapshot, CodexHostSnapshot } from '../../types';
 import type { AgentTruthProjection } from '../../lib/agentInstanceProjection';
+import { getCombinedOnlineSessionCount } from '../../lib/codexHostStatus';
 import { STATE_METAS } from '../../lib/agentCore';
 import { CONNECTOR_POLICY, ORCHESTRATION_STATUS } from '../../lib/orchestrationStatus';
 import type { HomePageAgent, HomePageData, HomePageMetric } from '../types';
 
-export function useHomePageData(snapshot: AgentSnapshot, agentTruth: AgentTruthProjection): HomePageData {
+export function useHomePageData(
+  snapshot: AgentSnapshot,
+  agentTruth: AgentTruthProjection,
+  codexHost: CodexHostSnapshot
+): HomePageData {
   return useMemo(() => {
     const agents: HomePageAgent[] = snapshot.agents.map((agent) => {
       const runtime = snapshot.runtime[agent.id];
@@ -45,6 +50,7 @@ export function useHomePageData(snapshot: AgentSnapshot, agentTruth: AgentTruthP
     ).length;
     const blockedConnectorCount = CONNECTOR_POLICY.connectors.length - acceptedConnectorCount;
     const latestMessage = snapshot.messages[0] ?? null;
+    const onlineSessionCount = getCombinedOnlineSessionCount(agentTruth, codexHost);
 
     const runtimeDetail = [
       agentTruth.runtime.availability,
@@ -65,9 +71,11 @@ export function useHomePageData(snapshot: AgentSnapshot, agentTruth: AgentTruthP
       {
         id: 'online-sessions',
         label: '真实在线 Session',
-        value: `${agentTruth.summary.onlineSessionCount}`,
-        detail: runtimeDetail,
-        tone: agentTruth.summary.onlineSessionCount > 0
+        value: `${onlineSessionCount}`,
+        detail: codexHost.clientRunning
+          ? `Codex Desktop 已开启 · ${codexHost.activeSessionCount} 个活动对话 · ${runtimeDetail}`
+          : runtimeDetail,
+        tone: onlineSessionCount > 0
           ? 'green'
           : agentTruth.runtime.mode === 'simulated' || agentTruth.runtime.availability !== 'available'
             ? 'orange'
@@ -105,14 +113,14 @@ export function useHomePageData(snapshot: AgentSnapshot, agentTruth: AgentTruthP
       connectorCount: CONNECTOR_POLICY.connectors.length,
       acceptedConnectorCount,
       blockedConnectorCount,
-      onlineSessionCount: agentTruth.summary.onlineSessionCount,
+      onlineSessionCount,
       runtimeAvailability: agentTruth.runtime.availability,
       runtimeMode: agentTruth.runtime.mode,
       runtimeSource: agentTruth.runtime.source,
       runtimeObservedAt: agentTruth.runtime.observedAt,
       latestMessage
     };
-  }, [agentTruth, snapshot]);
+  }, [agentTruth, codexHost, snapshot]);
 }
 
 function formatDateTime(value: string) {

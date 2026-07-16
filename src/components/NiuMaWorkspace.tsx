@@ -9,6 +9,8 @@ import {
   Eraser,
   Flame,
   Home,
+  Info,
+  PanelLeftOpen,
   Play,
   RefreshCcw,
   RotateCcw,
@@ -28,6 +30,7 @@ import type {
   AgentSnapshot,
   AgentTask,
   AgentTaskRunner,
+  CodexHostSnapshot,
   ConnectorGateResult,
   DesktopApi,
   NiuMaAction,
@@ -44,6 +47,7 @@ import {
   type ProjectedRuntimeTask
 } from '../lib/agentInstanceProjection';
 import { CONNECTOR_POLICY, ORCHESTRATION_STATUS } from '../lib/orchestrationStatus';
+import { getCodexHostOnlineContribution, getCombinedOnlineSessionCount } from '../lib/codexHostStatus';
 import NiuMaAvatar from './NiuMaAvatar';
 import StatusStrip from './StatusStrip';
 
@@ -51,6 +55,7 @@ interface NiuMaWorkspaceProps {
   api: DesktopApi;
   snapshot: AgentSnapshot;
   agentTruth: AgentTruthProjection;
+  codexHost: CodexHostSnapshot;
   onSnapshot: (snapshot: AgentSnapshot) => void;
   onReturnHome?: () => void;
 }
@@ -58,6 +63,7 @@ interface NiuMaWorkspaceProps {
 type SummaryTone = 'neutral' | 'positive' | 'info' | 'warning' | 'danger';
 type DetailTabId = 'command' | 'queue' | 'logs';
 type GovernanceStateFilter = 'all' | 'active' | 'blocked' | 'standby' | 'summarized';
+type DockStatusId = 'snapshot' | 'sessions' | 'codex-host' | 'governance';
 type CockpitRegionId = 'cockpit-health-region' | 'cockpit-agent-region' | 'cockpit-operator-region' | 'cockpit-governance-region';
 
 const ACTIVE_COCKPIT_TASK_CARD_ID = 'c0-5';
@@ -114,7 +120,7 @@ const cockpitTaskCards = [
   }
 ] as const;
 
-export default function NiuMaWorkspace({ api, snapshot, agentTruth, onSnapshot, onReturnHome }: NiuMaWorkspaceProps) {
+export default function NiuMaWorkspace({ api, snapshot, agentTruth, codexHost, onSnapshot, onReturnHome }: NiuMaWorkspaceProps) {
   const isDesktopRuntime = Boolean(window.niumaDesk);
   const runtimeModeLabel = `Agent runtime · ${agentTruth.runtime.mode}`;
   const runtimeModeDetail = `${agentTruth.runtime.availability} · ${agentTruth.runtime.source}`;
@@ -123,6 +129,12 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, onSnapshot, 
   const [ranchPrefs, setRanchPrefs] = useState<RanchPrefs | null>(null);
   const [ranchSettingsOpen, setRanchSettingsOpen] = useState(false);
   const [cornerPanelOpen, setCornerPanelOpen] = useState(false);
+  const [governancePanelOpen, setGovernancePanelOpen] = useState(false);
+  const [activeDockStatus, setActiveDockStatus] = useState<DockStatusId | null>(null);
+  const [completionToast, setCompletionToast] = useState<string | null>(null);
+  const completionHydratedRef = useRef(false);
+  const lastCompletionKeyRef = useRef<string | null>(null);
+  const completionToastTimerRef = useRef<number | null>(null);
 
   const selectedAgent = snapshot.agents.find((agent) => agent.id === selectedAgentId) ?? snapshot.agents[0];
   const selectedAgentTruth = selectedAgent
@@ -157,6 +169,8 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, onSnapshot, 
     return result ? !result.executable : false;
   }).length;
   const latestMessage = snapshot.messages[0];
+  const codexHostOnlineContribution = getCodexHostOnlineContribution(agentTruth, codexHost);
+  const combinedOnlineSessionCount = getCombinedOnlineSessionCount(agentTruth, codexHost);
 
   // 左侧折叠状态
   const [rolesExpanded, setRolesExpanded] = useState(false);
@@ -232,6 +246,36 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, onSnapshot, 
   }, [api]);
 
   useEffect(() => {
+    const completionKey = codexHost.lastCompletionKey ?? null;
+    if (!completionHydratedRef.current) {
+      completionHydratedRef.current = true;
+      lastCompletionKeyRef.current = completionKey;
+      return;
+    }
+    if (!completionKey || completionKey === lastCompletionKeyRef.current) {
+      return;
+    }
+    lastCompletionKeyRef.current = completionKey;
+    setCompletionToast('Codex 已完成本轮对话，等待验收。');
+    if (!isDesktopRuntime) {
+      void api.ranch.requestNotificationSound();
+    }
+    if (completionToastTimerRef.current !== null) {
+      window.clearTimeout(completionToastTimerRef.current);
+    }
+    completionToastTimerRef.current = window.setTimeout(() => {
+      setCompletionToast(null);
+      completionToastTimerRef.current = null;
+    }, 4_500);
+  }, [api, codexHost.lastCompletionKey, isDesktopRuntime]);
+
+  useEffect(() => () => {
+    if (completionToastTimerRef.current !== null) {
+      window.clearTimeout(completionToastTimerRef.current);
+    }
+  }, []);
+
+  useEffect(() => {
     let mounted = true;
 
     api.ranch.getPrefs()
@@ -295,6 +339,7 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, onSnapshot, 
   function focusCockpitRegion(regionId: CockpitRegionId) {
     if (regionId === 'cockpit-governance-region') {
       setLeftRailOpen(true);
+      setGovernancePanelOpen(true);
     }
     if (regionId === 'cockpit-operator-region') {
       setRightRailOpen(true);
@@ -344,6 +389,59 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, onSnapshot, 
       : gateBlockedCount > 0
         ? `${gateBlockedCount} blocked`
         : 'clear';
+  const dockStatuses = [
+    {
+      id: 'snapshot' as const,
+      label: '本地快照',
+      value: formatDateTime(snapshot.updatedAt),
+      tone: latestMessage?.type ?? 'info',
+      rows: [
+        ['来源', '本应用 AgentSnapshot'],
+        ['最近事件', latestMessage ? `${latestMessage.title} · ${latestMessage.type}` : '暂无事件'],
+        ['含义', '本地工位、任务与牧场状态；不代表外部 Agent 心跳。']
+      ]
+    },
+    {
+      id: 'sessions' as const,
+      label: '在线 Session',
+      value: `${combinedOnlineSessionCount} 在线`,
+      tone: combinedOnlineSessionCount > 0 ? 'success' : 'warning',
+      rows: [
+        ['Connector 受控 Session', `${agentTruth.summary.onlineSessionCount}`],
+        ['Codex Desktop 活动对话', `${codexHostOnlineContribution}`],
+        ['Runtime', `${runtimeModeDetail} · ${formatDateTime(agentTruth.runtime.observedAt)}`],
+        ['判定', '带受控 Session 证据或 Codex Desktop 生命周期 task_started，终态后退出在线计数。']
+      ]
+    },
+    {
+      id: 'codex-host' as const,
+      label: 'Codex Desktop',
+      value: codexHost.clientRunning
+        ? `已开启 · ${codexHost.activeSessionCount} 活动对话`
+        : '未检测到客户端',
+      tone: codexHost.clientRunning ? 'success' : 'neutral',
+      rows: [
+        ['客户端进程', codexHost.clientRunning ? '已开启' : '未检测到'],
+        ['活动对话', `${codexHost.activeSessionCount}`],
+        ['生命周期来源', codexHost.source],
+        ['最近完成', codexHost.lastCompletedAt ? formatDateTime(codexHost.lastCompletedAt) : '尚无完成事件'],
+        ['隐私边界', '只读取会话元数据与开始/完成/中止事件，不读取对话正文。']
+      ]
+    },
+    {
+      id: 'governance' as const,
+      label: '治理登记',
+      value: `${activeLaneCount} active · ${blockedLaneCount} blocked`,
+      tone: blockedLaneCount > 0 ? 'warning' : 'success',
+      rows: [
+        ['监督 / 派工', `${ORCHESTRATION_STATUS.loopState} / ${ORCHESTRATION_STATUS.dispatchState}`],
+        ['角色 / Lanes', `${ORCHESTRATION_STATUS.roles.length} / ${ORCHESTRATION_STATUS.lanes.length}`],
+        ['真源', ORCHESTRATION_STATUS.source],
+        ['当前阻塞', ORCHESTRATION_STATUS.blocker]
+      ]
+    }
+  ];
+  const activeDockDetail = dockStatuses.find((status) => status.id === activeDockStatus) ?? null;
 
   return (
     <div className="workspace-shell">
@@ -391,10 +489,10 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, onSnapshot, 
               tone="info"
             />
             <SummaryTile
-              label="真实在线 Session"
-              value={`${agentTruth.summary.onlineSessionCount}`}
-              detail={`${agentTruth.runtime.availability} · ${agentTruth.runtime.mode} · ${agentTruth.runtime.source} · ${formatDateTime(agentTruth.runtime.observedAt)}`}
-              tone={agentTruth.summary.onlineSessionCount > 0 ? 'positive' : 'neutral'}
+              label="在线 Session"
+              value={`${combinedOnlineSessionCount}`}
+              detail={`Connector ${agentTruth.summary.onlineSessionCount} · Codex Desktop ${codexHostOnlineContribution}`}
+              tone={combinedOnlineSessionCount > 0 ? 'positive' : 'neutral'}
             />
             <SummaryTile
               label="Connector 策略阻塞"
@@ -488,6 +586,13 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, onSnapshot, 
                             notifyPrefs: { cockpitBadge: !ranchPrefs.notifyPrefs.cockpitBadge }
                           })}
                         />
+                        <RanchSettingsChip
+                          label="音效"
+                          active={ranchPrefs.notifyPrefs.sound}
+                          onClick={() => void patchRanchPrefs({
+                            notifyPrefs: { sound: !ranchPrefs.notifyPrefs.sound }
+                          })}
+                        />
                       </div>
                     </RanchSettingsGroup>
                   </>
@@ -517,28 +622,27 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, onSnapshot, 
           </button>
           
           <div className="rail-content">
-            <section className="cockpit-panel rail-summary-panel" aria-label="控制面调度登记">
-              <PanelHeading
-                kicker="Control-plane Registry"
-                title="控制面调度登记"
-              />
+            <section className="cockpit-panel rail-summary-panel governance-summary" aria-label="控制面治理概览">
+              <div className="governance-summary-head">
+                <div>
+                  <span>Control-plane</span>
+                  <strong>治理概览</strong>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setGovernancePanelOpen((open) => !open)}
+                  aria-expanded={governancePanelOpen}
+                  aria-controls="cockpit-governance-region"
+                >
+                  <PanelLeftOpen size={14} aria-hidden="true" />
+                  <span>{governancePanelOpen ? '收起' : '详情'}</span>
+                </button>
+              </div>
 
-              <div className="dispatch-grid">
-                <SummaryTile
-                  label="登记监督状态"
-                  value={ORCHESTRATION_STATUS.loopState}
-                  tone={getToneForState(ORCHESTRATION_STATUS.loopState)}
-                />
-                <SummaryTile
-                  label="登记派工状态"
-                  value={ORCHESTRATION_STATUS.dispatchState}
-                  tone={getToneForState(ORCHESTRATION_STATUS.dispatchState)}
-                />
-                <SummaryTile
-                  label="登记阻塞 Lane"
-                  value={`${blockedLaneCount}`}
-                  tone={blockedLaneCount > 0 ? 'danger' : 'neutral'}
-                />
+              <div className="governance-status-line" aria-label="治理状态摘要">
+                <span><small>监督</small><strong className={getToneForState(ORCHESTRATION_STATUS.loopState)}>{ORCHESTRATION_STATUS.loopState}</strong></span>
+                <span><small>派工</small><strong className={getToneForState(ORCHESTRATION_STATUS.dispatchState)}>{ORCHESTRATION_STATUS.dispatchState}</strong></span>
+                <span><small>阻塞</small><strong className={blockedLaneCount > 0 ? 'danger' : 'neutral'}>{blockedLaneCount}</strong></span>
               </div>
 
               <details className="blocker-disclosure">
@@ -577,7 +681,7 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, onSnapshot, 
               </details>
             </section>
 
-            <section
+            {governancePanelOpen ? <section
               id="cockpit-governance-region"
               className="cockpit-panel orchestration-panel cockpit-region-target"
               aria-label="LPS 控制面角色与 Lane 登记"
@@ -588,6 +692,15 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, onSnapshot, 
                 title="控制面角色分工与监督"
                 meta={`控制面登记 ${ORCHESTRATION_STATUS.roles.length} 角色 / ${ORCHESTRATION_STATUS.lanes.length} Lanes`}
               />
+              <button
+                type="button"
+                className="governance-detail-close"
+                onClick={() => setGovernancePanelOpen(false)}
+                aria-label="关闭治理详情"
+                title="关闭治理详情"
+              >
+                <X size={14} />
+              </button>
               <p>控制面登记（非实时运行探针） · {ORCHESTRATION_STATUS.target}</p>
 
               <div className="governance-tools" role="search" aria-label="搜索与过滤治理登记">
@@ -693,7 +806,7 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, onSnapshot, 
                   </div>
                 </div>
               </div>
-            </section>
+            </section> : null}
           </div>
         </aside>
 
@@ -711,7 +824,7 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, onSnapshot, 
                 meta={selectedAgent ? `${selectedAgent.name} 聚焦中` : '未选中牛马'}
               />
               <div className="board-meta">
-                <span>{agentTruth.summary.onlineSessionCount} 个真实在线 Session · {runningCount} 个应用任务运行中</span>
+                <span>{combinedOnlineSessionCount} 个在线 Session · {runningCount} 个应用任务运行中</span>
               </div>
             </div>
 
@@ -721,6 +834,7 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, onSnapshot, 
                   key={agent.id}
                   agent={agent}
                   runtime={snapshot.runtime[agent.id]}
+                  hostStatus={agent.id === 'codex' ? codexHost : null}
                   selected={agent.id === selectedAgent?.id}
                   onSelect={() => setSelectedAgentId(agent.id)}
                   onRun={() => runTask(agent, undefined, undefined, 'simulated')}
@@ -762,6 +876,7 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, onSnapshot, 
                 truth={selectedAgentTruth}
                 runtimeTask={selectedRuntimeTask}
                 runtimeTruth={agentTruth.runtime}
+                codexHost={selectedAgent.id === 'codex' ? codexHost : null}
                 localRunnerAvailable={isDesktopRuntime}
                 onSnapshot={onSnapshot}
                 onRunTask={runTask}
@@ -837,15 +952,55 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, onSnapshot, 
         </section>
       ) : null}
 
+      {completionToast ? (
+        <aside className="codex-completion-toast" role="status" aria-live="assertive">
+          <Bell size={16} aria-hidden="true" />
+          <div>
+            <strong>Codex 对话完成</strong>
+            <span>{completionToast}</span>
+          </div>
+          <button type="button" onClick={() => setCompletionToast(null)} aria-label="关闭完成提示">
+            <X size={13} />
+          </button>
+        </aside>
+      ) : null}
+
       <footer className="dock cockpit-dock">
-        <div className="dock-item grow">
-          <span>本地快照更新时间</span>
-          <strong>{formatDateTime(snapshot.updatedAt)} · 非外部 Agent 心跳</strong>
-        </div>
-        <div className="dock-item grow" role="status" aria-live="polite">
-          <span>Agent runtime 真值来源</span>
-          <strong>{runtimeModeDetail} · 观测 {formatDateTime(agentTruth.runtime.observedAt)}</strong>
-        </div>
+        {activeDockDetail ? (
+          <section id="cockpit-dock-detail" className="dock-status-detail" aria-label={`${activeDockDetail.label}详细信息`}>
+            <div className="dock-status-detail-head">
+              <div>
+                <span>{activeDockDetail.label}</span>
+                <strong>{activeDockDetail.value}</strong>
+              </div>
+              <button type="button" onClick={() => setActiveDockStatus(null)} aria-label="关闭状态详情">
+                <X size={14} />
+              </button>
+            </div>
+            <dl>
+              {activeDockDetail.rows.map(([label, value]) => (
+                <div key={label}>
+                  <dt>{label}</dt>
+                  <dd>{value}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+        ) : null}
+        {dockStatuses.map((status) => (
+          <button
+            key={status.id}
+            type="button"
+            className={`dock-item grow dock-status-button ${status.tone} ${activeDockStatus === status.id ? 'is-active' : ''}`}
+            onClick={() => setActiveDockStatus((current) => current === status.id ? null : status.id)}
+            aria-expanded={activeDockStatus === status.id}
+            aria-controls="cockpit-dock-detail"
+          >
+            <span>{status.label}</span>
+            <strong>{status.value}</strong>
+            <Info size={13} aria-hidden="true" />
+          </button>
+        ))}
       </footer>
     </div>
   );
@@ -921,6 +1076,7 @@ function RanchSettingsChip({
 interface AgentCardProps {
   agent: AIAgent;
   runtime: NiuMaRuntimeState;
+  hostStatus: CodexHostSnapshot | null;
   selected: boolean;
   onSelect: () => void;
   onRun: () => void;
@@ -928,7 +1084,7 @@ interface AgentCardProps {
   onCycle: (event: ReactMouseEvent) => void;
 }
 
-function AgentCard({ agent, runtime, selected, onSelect, onRun, onAction, onCycle }: AgentCardProps) {
+function AgentCard({ agent, runtime, hostStatus, selected, onSelect, onRun, onAction, onCycle }: AgentCardProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuStyle, setMenuStyle] = useState<CSSProperties | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -998,6 +1154,12 @@ function AgentCard({ agent, runtime, selected, onSelect, onRun, onAction, onCycl
         </div>
 
         <div className="expression-line">本地牧场表现 · {meta.expression}</div>
+        {hostStatus?.clientRunning ? (
+          <div className={`agent-host-status ${hostStatus.activeSessionCount > 0 ? 'is-running' : 'is-idle'}`}>
+            <span>Codex Desktop 已开启</span>
+            <strong>{hostStatus.activeSessionCount} 活动对话</strong>
+          </div>
+        ) : null}
       </button>
 
       <div className="metric-stack">
@@ -1077,6 +1239,7 @@ interface AgentDetailPanelProps {
   truth: ProjectedAgentTruth | null;
   runtimeTask: ProjectedRuntimeTask | null;
   runtimeTruth: AgentTruthProjection['runtime'];
+  codexHost: CodexHostSnapshot | null;
   localRunnerAvailable: boolean;
   onSnapshot: (snapshot: AgentSnapshot) => void;
   onRunTask: (agent: AIAgent, taskName?: string, command?: string, runner?: AgentTaskRunner) => Promise<void>;
@@ -1090,6 +1253,7 @@ function AgentDetailPanel({
   truth,
   runtimeTask,
   runtimeTruth,
+  codexHost,
   localRunnerAvailable,
   onSnapshot,
   onRunTask,
@@ -1141,6 +1305,8 @@ function AgentDetailPanel({
       data-runtime-primary-reason={primaryInstance?.reason ?? ''}
       data-runtime-primary-presence={primaryInstance?.presence ?? ''}
       data-runtime-primary-activity={primaryInstance?.activity ?? ''}
+      data-codex-host-source={codexHost?.source ?? ''}
+      data-codex-host-active-sessions={codexHost?.activeSessionCount ?? 0}
     >
       <div className="detail-identity detail-identity-compact">
         <NiuMaAvatar
@@ -1156,7 +1322,11 @@ function AgentDetailPanel({
             <span>{agent.codename}</span>
           </div>
           <div className="detail-compact-status">
-            <span className={`stage-status ${runtime.status}`}>Session {truth?.presence ?? 'unknown'} · {truth?.activity ?? 'unknown'}</span>
+            <span className={`stage-status ${runtime.status}`}>
+              {codexHost?.clientRunning
+                ? `Codex Desktop · ${codexHost.activeSessionCount > 0 ? `${codexHost.activeSessionCount} running` : 'idle'}`
+                : `Session ${truth?.presence ?? 'unknown'} · ${truth?.activity ?? 'unknown'}`}
+            </span>
             <p className="detail-desc">本地牧场表现：{meta.name} · {agent.description}</p>
           </div>
         </div>
@@ -1165,7 +1335,9 @@ function AgentDetailPanel({
       <details className="detail-more">
         <summary title="展开 Agent 状态与连接详情">
           <span>Session 真值与本地表现详情</span>
-          <small>{truth?.presence ?? 'unknown'} / {truth?.activity ?? 'unknown'}</small>
+          <small>{codexHost?.clientRunning
+            ? `desktop / ${codexHost.activeSessionCount > 0 ? 'running' : 'idle'}`
+            : `${truth?.presence ?? 'unknown'} / ${truth?.activity ?? 'unknown'}`}</small>
         </summary>
         <div className="detail-more-content">
           <div className="quote-box">
@@ -1174,6 +1346,18 @@ function AgentDetailPanel({
           </div>
 
           <div className="detail-metrics-compact">
+            {codexHost ? (
+              <>
+                <div className="metric-item-row">
+                  <span className="metric-label">Codex Desktop:</span>
+                  <span className="metric-value">{codexHost.clientRunning ? '已开启' : '未检测到'} / {codexHost.activeSessionCount} 活动对话</span>
+                </div>
+                <div className="metric-item-row">
+                  <span className="metric-label">Host 来源:</span>
+                  <span className="metric-value">{codexHost.source} · {formatDateTime(codexHost.observedAt)}</span>
+                </div>
+              </>
+            ) : null}
             <div className="metric-item-row">
               <span className="metric-label">Runtime:</span>
               <span className="metric-value">{runtimeTruth.availability} / {runtimeTruth.mode} / {runtimeTruth.source}</span>

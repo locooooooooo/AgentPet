@@ -1,5 +1,5 @@
 import './HomePage.css';
-import type { AgentSnapshot } from '../types';
+import type { AgentSnapshot, CodexHostSnapshot } from '../types';
 import type { AgentTruthProjection } from '../lib/agentInstanceProjection';
 import AnimalOverviewCard from './components/AnimalOverviewCard';
 import CockpitEntryCard from './components/CockpitEntryCard';
@@ -11,13 +11,14 @@ import { useHomePageData } from './hooks/useHomePageData';
 interface HomePageProps {
   snapshot: AgentSnapshot;
   agentTruth: AgentTruthProjection;
+  codexHost: CodexHostSnapshot;
   onEnterCockpit: () => void;
   onFocusAnimal: (agentId: string) => void | Promise<void>;
   onOpenSettings: () => void;
 }
 
-export default function HomePage({ snapshot, agentTruth, onEnterCockpit, onFocusAnimal, onOpenSettings }: HomePageProps) {
-  const data = useHomePageData(snapshot, agentTruth);
+export default function HomePage({ snapshot, agentTruth, codexHost, onEnterCockpit, onFocusAnimal, onOpenSettings }: HomePageProps) {
+  const data = useHomePageData(snapshot, agentTruth, codexHost);
   const isDesktopRuntime = Boolean(window.niumaDesk);
 
   return (

@@ -1,10 +1,11 @@
-import { app, BrowserWindow, Menu, Notification, Tray, dialog, ipcMain, nativeImage, screen, type IpcMainInvokeEvent, type MenuItemConstructorOptions } from 'electron';
+import { app, BrowserWindow, Menu, Notification, Tray, dialog, ipcMain, nativeImage, screen, shell, type IpcMainInvokeEvent, type MenuItemConstructorOptions } from 'electron';
 import { spawn, spawnSync, type ChildProcessWithoutNullStreams } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import type {
   AgentSnapshot,
   AgentTask,
+  CodexHostSnapshot,
   ConnectorAuthorizationCancelRequest,
   ConnectorAuthorizationCancelResult,
   ConnectorAuthorizationIntent,
@@ -51,9 +52,11 @@ import {
   normalizeSnapshot,
   progressNiuMaTick,
   progressRunningTasks,
+  signalAgentCompletion,
   stopTask,
   syncAgentTaskRuntime
 } from '../src/lib/agentCore';
+import { CodexHostMonitor } from './codexHostMonitor';
 
 let mainWindow: BrowserWindow | null = null;
 let ranchWindow: BrowserWindow | null = null;
@@ -62,11 +65,14 @@ let snapshot: AgentSnapshot;
 let ranchPrefs: RanchPrefs;
 let connectorRuntime: ConnectorRuntime;
 let connectorRunAuthorizer: ConnectorRunAuthorizer;
+let codexHostMonitor: CodexHostMonitor;
+let codexHostSnapshot: CodexHostSnapshot;
 let isQuitting = false;
 let shutdownInFlight: Promise<void> | null = null;
 let ranchUnreadCount = 0;
 let ranchMousePassthrough = false;
 let ranchHotzonePoll: NodeJS.Timeout | null = null;
+let codexHostPoll: NodeJS.Timeout | null = null;
 let ranchInteractiveRegions: RanchInteractiveRegion[] = [];
 const runningProcesses = new Map<string, ChildProcessWithoutNullStreams>();
 const connectorProcessProofService = createConnectorProcessProofService();
@@ -93,6 +99,9 @@ const ranchSizeLimits = {
 };
 const mainWindowTitle = '桌面牧场 · 控制舱';
 const runningProgressTimers = new Map<string, NodeJS.Timeout>();
+const notifiedCodexCompletions = new Set<string>();
+let lastCodexHostCompletionKey: string | null = null;
+let connectorCompletionNotificationsReady = false;
 
 function resolveAppPath(relativePath: string) {
   return path.join(app.isPackaged ? app.getAppPath() : process.cwd(), relativePath);
@@ -194,7 +203,8 @@ function createRanchSeedPrefs(): RanchPrefs {
     notifyPrefs: {
       bubble: true,
       system: true,
-      cockpitBadge: true
+      cockpitBadge: true,
+      sound: true
     },
     schemaVersion: 1
   };
@@ -283,7 +293,8 @@ function normalizeRanchPrefs(value: unknown): RanchPrefs {
     notifyPrefs: {
       bubble: boolOr(notifyPrefs.bubble, true),
       system: boolOr(notifyPrefs.system, true),
-      cockpitBadge: boolOr(notifyPrefs.cockpitBadge, true)
+      cockpitBadge: boolOr(notifyPrefs.cockpitBadge, true),
+      sound: boolOr(notifyPrefs.sound, true)
     },
     schemaVersion: 1
   });
@@ -920,7 +931,67 @@ function createConnectorRuntime() {
       BrowserWindow.getAllWindows().forEach((window) => {
         window.webContents.send('connectors:runtime-snapshot-changed', runtimeSnapshot);
       });
+      if (connectorCompletionNotificationsReady) {
+        notifyNewCodexConnectorCompletions(runtimeSnapshot);
+      }
     }
+  });
+}
+
+function notifyNewCodexConnectorCompletions(runtimeSnapshot: ConnectorRuntimeSnapshot) {
+  runtimeSnapshot.tasks.forEach((session) => {
+    if (session.connectorId !== 'codex' || session.state !== 'success' || !session.endedAt) {
+      return;
+    }
+    notifyCodexCompletion(
+      `connector:${session.sessionId}:${session.endedAt}`,
+      `受控任务「${session.taskName}」已完成。`,
+      session.endedAt
+    );
+  });
+}
+
+function notifyCodexCompletion(completionKey: string, content: string, completedAt: string) {
+  if (!completionKey || notifiedCodexCompletions.has(completionKey)) {
+    return;
+  }
+  notifiedCodexCompletions.add(completionKey);
+  while (notifiedCodexCompletions.size > 100) {
+    const oldest = notifiedCodexCompletions.values().next().value;
+    if (typeof oldest !== 'string') {
+      break;
+    }
+    notifiedCodexCompletions.delete(oldest);
+  }
+  publishSnapshot(signalAgentCompletion(snapshot, 'codex', content, completedAt));
+  if (ranchPrefs.notifyPrefs.sound) {
+    shell.beep();
+  }
+}
+
+function refreshCodexHostSnapshot() {
+  const nextSnapshot = codexHostMonitor.getSnapshot();
+  const completionKey = nextSnapshot.lastCompletionKey ?? null;
+  if (
+    lastCodexHostCompletionKey !== null
+    && completionKey
+    && completionKey !== lastCodexHostCompletionKey
+    && nextSnapshot.lastCompletedAt
+  ) {
+    notifyCodexCompletion(
+      `host:${completionKey}`,
+      'Codex Desktop 已完成本轮对话，等待验收。',
+      nextSnapshot.lastCompletedAt
+    );
+  }
+  lastCodexHostCompletionKey = completionKey;
+
+  if (JSON.stringify(nextSnapshot) === JSON.stringify(codexHostSnapshot)) {
+    return;
+  }
+  codexHostSnapshot = nextSnapshot;
+  BrowserWindow.getAllWindows().forEach((window) => {
+    window.webContents.send('codex:host-snapshot-changed', codexHostSnapshot);
   });
 }
 
@@ -1408,6 +1479,14 @@ function registerRanchIpc() {
     notification.show();
     return true;
   });
+
+  ipcMain.handle('ranch:request-notify-sound', () => {
+    if (!ranchPrefs.notifyPrefs.sound) {
+      return false;
+    }
+    shell.beep();
+    return true;
+  });
 }
 
 function registerIpc() {
@@ -1460,6 +1539,8 @@ function registerIpc() {
   ipcMain.handle('connectors:get-runtime-snapshot', (): ConnectorRuntimeSnapshot => (
     connectorRuntime.getSnapshot()
   ));
+
+  ipcMain.handle('codex:get-host-snapshot', (): CodexHostSnapshot => codexHostSnapshot);
 
   ipcMain.handle(
     'connectors:get-session-audit',
@@ -1520,13 +1601,23 @@ function isTrustedConnectorSender(event: IpcMainInvokeEvent) {
 app.whenReady().then(() => {
   snapshot = loadSnapshot();
   ranchPrefs = loadRanchPrefs();
+  codexHostMonitor = new CodexHostMonitor();
+  codexHostSnapshot = codexHostMonitor.getSnapshot();
+  lastCodexHostCompletionKey = codexHostSnapshot.lastCompletionKey ?? null;
   connectorRunAuthorizer = createConnectorRunAuthorizer();
   connectorRuntime = createConnectorRuntime();
+  connectorRuntime.getSnapshot().tasks.forEach((session) => {
+    if (session.connectorId === 'codex' && session.state === 'success' && session.endedAt) {
+      notifiedCodexCompletions.add(`connector:${session.sessionId}:${session.endedAt}`);
+    }
+  });
+  connectorCompletionNotificationsReady = true;
   registerIpc();
   registerRanchIpc();
   createWindow();
   createRanchWindow();
   createTray();
+  codexHostPoll = setInterval(refreshCodexHostSnapshot, 1_000);
 
   setInterval(() => {
     let nextSnapshot = progressRunningTasks(snapshot);
@@ -1566,6 +1657,10 @@ app.on('before-quit', (event) => {
   tray = null;
   runningProgressTimers.forEach((timer) => clearInterval(timer));
   runningProgressTimers.clear();
+  if (codexHostPoll) {
+    clearInterval(codexHostPoll);
+    codexHostPoll = null;
+  }
   runningProcesses.forEach((child) => child.kill());
   runningProcesses.clear();
   shutdownInFlight = (async () => {
