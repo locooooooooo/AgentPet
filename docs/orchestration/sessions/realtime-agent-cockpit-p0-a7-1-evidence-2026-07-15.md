@@ -1,5 +1,12 @@
 # realtime-agent-cockpit P0-A7.1 asynchronous process proof evidence
 
+[长工]#realtime-async-process-proof@v0.1
+⟦tag:v2|task|realtime-agent-cockpit-p0-a7-1-async-process-proof-v0.1⟧
+
+loop state: summarized
+dispatch state: summarized
+status: accepted
+
 Date: 2026-07-15
 
 ## Decision

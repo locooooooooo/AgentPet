@@ -8,9 +8,9 @@ loop state: active
 dispatch state: active
 
 > **计划周期**: 2026-07-14 ~ 2026-07-20 (W28)
-> **当前状态**: active; M5 is closed and pushed; realtime A6/A7 are accepted/pushed, B2 is blocked by synchronous CIM latency, and A7.1/P0-C packets are prepared without execution authorization
+> **当前状态**: active; M5 is closed and pushed; realtime A7.1 `8866305` and B2 are accepted, while P0-C remains authorization-required and unexecuted
 > **激活证据**: 2026-07-11 16:00 +08:00 W27 final closeout 已通过 fresh gates，并将 W27 summarized。
-> **硬边界**: B2 PM overlap p95 `1524ms` > `500ms`; A7.1 runtime/main implementation and P0-C external execution both require new explicit authorization, and Connector machine gates remain unchanged.
+> **硬边界**: A7.1/B2 technical gates pass at PM visible-DOM p95 `7ms`; P0-C external execution still requires a new explicit authorization, and Connector machine gates remain unchanged.
 
 ---
 
@@ -34,9 +34,9 @@ dispatch state: active
 | 优先级 | 候选 | 当前边界 | 激活前置 |
 | --- | --- | --- | --- |
 | P0-1 | M5 v0.2 五日串行实施 | Code-backed complete and pushed through `8df940c`; manual evidence retained as residual risk | No further M5 product action; preserve closeout during W28 buffer |
-| P0-2 | Realtime Agent cockpit execution readiness | B2 lifecycle/DOM passed but PM overlap p95 `1524ms` blocks acceptance | Authorize and accept A7.1 async proof, then rerun B2 at p95 <=500ms |
-| P0-3 | A7.1 asynchronous process proof | decision-ready packet; implementation not authorized | Fresh explicit bounded runtime/main authorization |
-| P0-4 | P0-C Codex controlled dry-run | decision packet prepared; authorization_required_not_eligible | A7.1 + B2 pass + new explicit execution authorization |
+| P0-2 | Realtime Agent cockpit execution readiness | A7.1/B2 accepted at PM visible-DOM p95 `7ms` | Preserve accepted controlled-process boundary |
+| P0-3 | A7.1 asynchronous process proof | accepted/pushed as `8866305` | Complete |
+| P0-4 | P0-C Codex controlled dry-run | decision packet ready; authorization_required | New explicit execution authorization |
 | P0-5 | Transparent ranch full pointer input evidence | capturePage 仅证明可见渲染;完整 pointer input 未 accepted | 明确 observer/automation route,保持 implementation 与 evidence 分离 |
 
 ## 二、W28 P1 候选
@@ -77,8 +77,8 @@ acceptance:
 
 next action:
 - M5 已收口并推送；保留直接 tray/pointer 与 Windows notification visibility 残余风险，不重开产品 lane。
-- A6 `a44abd6` 与 A7 `e2031cd` 已验收推送；B2 因 PM p95 `1524ms` 诚实阻塞。提交/推送 blocker 与 A7.1/P0-C 包后，不派 runtime worker，等待新 A7.1 授权。
+- A7.1 `8866305` 与 B2 已验收推送；提交/推送控制面后不派 runtime worker，等待新的 P0-C 明确执行授权。
 - Protected source、quota recheck 和 pointer evidence 仍需各自 bounded activation。
 
 summary:
-- W28 active; M5 is closed, realtime Agent cockpit is stopped at the proven B2 synchronous-CIM latency blocker, and A7.1/P0-C packets are prepared without implementation or external Agent authorization.
+- W28 active; M5 is closed, realtime A7.1/B2 controlled production readiness is accepted, and P0-C remains unexecuted behind a fresh explicit authorization gate.

@@ -5,7 +5,7 @@
 
 loop state: standby
 dispatch state: standby
-status: authorization_required_not_eligible
+status: authorization_required_ready_for_decision
 
 ## decision
 
@@ -17,8 +17,8 @@ status: authorization_required_not_eligible
 - A6 trusted authorization is accepted/pushed as `a44abd6`.
 - A7 process reattach is accepted/pushed as `e2031cd`.
 - B2 controlled non-Agent production lifecycle, terminal DOM, duplicate protection and cleanup passed.
-- B2 is not accepted because PM independent overlapping-CIM visible-DOM `p95=1524ms` exceeds the `500ms` budget.
-- A7.1 requirements are prepared but implementation remains `authorization_required`.
+- A7.1 asynchronous process proof is accepted/pushed as `8866305` with all identity/failure/cleanup gates green.
+- PM fresh B2 rerun passed six real async-CIM overlaps at visible-DOM `p95=7ms`; CIM worker p95 was `564.852ms` without blocking DOM.
 - External Agent CLI spawn count is `0`.
 
 ## machine-gate snapshot
@@ -28,7 +28,7 @@ status: authorization_required_not_eligible
 - `docs/orchestration/connectors.json` and `status.json` `connectors[]` are unchanged.
 - Executable discovery is not execution readiness and is not authorization.
 
-## prerequisites for a future authorize decision
+## readiness for a future authorize decision
 
 1. A7.1 is explicitly authorized, implemented, independently accepted, committed and pushed.
 2. B2 is rerun through production main/preload/renderer/DOM with at least six overlapping real CIM samples and `p95 <=500ms`.
@@ -36,6 +36,9 @@ status: authorization_required_not_eligible
 4. Runtime/truth/orchestration/Connector-safety/lint/build/diff gates all pass from the final commit candidate.
 5. A new user message explicitly authorizes one Codex-only read-only execution window, cwd, allowed reads, timeout and stop conditions.
 6. Pre-run and post-run workspace hashes/status evidence is defined before execution.
+
+- Preconditions 1-4 and 6 are satisfied by `8866305` plus the PM acceptance evidence.
+- Precondition 5 is intentionally unsatisfied: no new message has authorized P0-C external execution.
 
 ## future controlled envelope
 
@@ -51,7 +54,7 @@ status: authorization_required_not_eligible
 - Running Codex, Trae, Qoder, OpenClaw, Claude, MiniMax or OpenCode.
 - Modifying connector `approvalStatus`, `enabledByDefault`, `command`, cwd or env policy.
 - Treating controlled Node, fixtures, executable discovery or browser fallback as real Agent E2E.
-- Dispatching P0-C while B2 is blocked or without a fresh explicit execution authorization.
+- Dispatching P0-C without a fresh explicit execution authorization.
 
 ## future decision choices
 
@@ -59,8 +62,8 @@ status: authorization_required_not_eligible
 - `HOLD`: keep P0-C standby and all machine gates unchanged.
 - `REJECT`: close the proposed run without changing machine gates.
 
-Current forced choice is `HOLD` because B2 is blocked and A7.1 is not implemented.
+Current forced choice is `HOLD` because the required new P0-C execution authorization has not been given.
 
 ## summary
 
-- The P0-C decision packet is ready, but execution is not eligible or authorized; no external Agent CLI ran and all Connector machine gates remain unchanged.
+- The P0-C decision packet is technically ready, but execution remains unauthorized until a fresh explicit user message; no external Agent CLI ran and all Connector machine gates remain unchanged.

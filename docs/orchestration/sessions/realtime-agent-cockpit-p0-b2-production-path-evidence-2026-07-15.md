@@ -3,9 +3,9 @@
 [长工]#realtime-production-path-e2e@v0.1
 ⟦tag:v2|session|realtime-agent-cockpit-p0-b2-production-path-evidence-2026-07-15⟧
 
-loop state: blocked
-dispatch state: blocked
-status: blocked_by_sync_cim_latency
+loop state: summarized
+dispatch state: summarized
+status: accepted_after_a7_1
 
 ## scope statement
 
@@ -44,7 +44,7 @@ status: blocked_by_sync_cim_latency
 - The earlier `blocked_by_terminal_projection_dom` result was a harness false negative. It required the case-sensitive contiguous substring `Runtime task state: session-lost` in `innerText`, while the label and value are separate elements and CSS renders the label uppercase.
 - The corrected assertion checks `data-runtime-state`, the metric label element and the visible metric value separately. No App state, projection ordering or runtime/main defect was found.
 
-## overlapping CIM latency
+## pre-A7.1 synchronous CIM latency
 
 - Six samples began timing immediately before a real synchronous Windows CIM query. Each tagged snapshot was published only after that query returned, and completion required the tagged `lastSeen` to reach the actual DOM.
 - PM independent visible-DOM samples in collection order: `1524ms`, `1522ms`, `1524ms`, `1521ms`, `1520ms`, `1521ms`.
@@ -53,13 +53,13 @@ status: blocked_by_sync_cim_latency
 - The worker's final-build rerun also exceeded budget (`p95=1542ms`); the PM rerun is the acceptance authority used for classification.
 - The harness emits `B2_OVERLAP_AGGREGATE` before the terminal-loss assertion, so later assertions cannot erase this latency evidence.
 
-## acceptance result
+## pre-A7.1 acceptance result
 
 - Passed: start, running, actual DOM identity, cancel, timeout, renderer reload, app restart reattach through an external controlled seed, terminal `session-lost` DOM convergence, lifecycle uniqueness, subscription uniqueness and cleanup.
 - Passed: duplicate started events `0`, duplicate terminal events `0`, duplicate renderer subscriptions `0`, controlled child residue `0`, external Agent CLI spawn `0`.
 - Not proved: ordinary production-spawn crash survival under forced Electron termination.
 - Blocked: PM independent overlapping-CIM visible-DOM `p95=1524ms` exceeds the `500ms` budget.
-- B2 must not be accepted. The result is `blocked_by_sync_cim_latency`; runtime/main remains outside this lane and requires a separate A7.1 async process-proof packet.
+- At this historical checkpoint B2 was not accepted and was classified `blocked_by_sync_cim_latency`; this blocker is superseded by accepted A7.1 commit `8866305` and the fresh PM rerun below.
 
 ## changed files
 
@@ -85,6 +85,21 @@ status: blocked_by_sync_cim_latency
 - PASS: `git diff --check`.
 - PASS: repository `docs/orchestration/connectors.json` remained byte-for-byte unchanged and `status.json` `connectors[]` remained unchanged under harness hard assertions.
 
-## summary
+## pre-A7.1 summary
 
-- B2's terminal projection is sound, but the PM-independent six-sample production overlap measurement proves synchronous Windows CIM blocks the <=500ms visible-DOM budget. B2 stops honestly at `blocked_by_sync_cim_latency`; no external Agent ran.
+- B2's terminal projection was sound, but synchronous Windows CIM blocked the <=500ms visible-DOM budget before A7.1; no external Agent ran.
+
+## A7.1 PM rerun acceptance
+
+- A7.1 implementation commit: `8866305`.
+- Production main rejects synchronous CIM and uses one asynchronous proof worker per task/session.
+- Six real async-CIM overlaps reached the actual React DOM at `p50=5ms`, `p95=7ms`, `max=7ms` against the `500ms` budget.
+- Real CIM worker duration was `p50=485.346ms`, `p95=564.852ms`, `max=564.852ms`; 6/6 DOM commits completed before worker close.
+- Peak proof workers `1`; proof worker residue `0`.
+- Runtime reached `session-lost` in `5054ms`; terminal DOM, preload delivery and App projection agreed.
+- Duplicate started/terminal/subscription counts were `0/0/0`; controlled child residue `0`; external Agent CLI spawn `0`.
+- PM independently reran connector runtime, A7.1 reattach/failure matrix, B2, truth, Electron latency, orchestration gates, lint, build and diff checks.
+
+## final summary
+
+- B2 is accepted after A7.1. This is controlled non-Agent production-path evidence only; P0-C real Agent E2E remains unexecuted and requires a fresh explicit authorization.

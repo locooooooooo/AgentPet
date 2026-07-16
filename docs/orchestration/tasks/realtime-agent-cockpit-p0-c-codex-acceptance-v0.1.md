@@ -98,6 +98,6 @@ next action:
 evidence:
 ```
 
-当前 callback 应保持：`completed=acceptance plan + 2026-07-15 decision packet`、`incomplete=controlled dry-run`、`blockers=A7.1 acceptance + B2 rerun pass + second authorization`。
+当前 callback 应保持：`completed=acceptance plan + A7.1/B2 technical preconditions + 2026-07-15 decision packet`、`incomplete=controlled dry-run`、`blockers=second explicit execution authorization`。
 
 当前决策真源：`docs/orchestration/sessions/realtime-agent-cockpit-p0-c-authorization-decision-2026-07-15.md`，结论为 `DO NOT AUTHORIZE P0-C NOW`。

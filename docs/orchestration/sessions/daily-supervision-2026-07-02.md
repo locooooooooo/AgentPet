@@ -575,11 +575,11 @@ incomplete:
 - R0-3 Codex controlled dry-run lane is standby: P0 ranch-real-integration-p0 accepted after user decision ② on 2026-07-07; the 2026-07-10 administrator decision moves execution to W28; Codex machine-gate fields (approvalStatus / enabledByDefault / command) remain untouched; trae/qoder remain placeholder; dry-run execution still requires a W28 second execution-window confirmation.
 - Protected cockpit source drift is pending PM disposition activation: the administrator-selected W28 route is active as planning context, but the source lane remains standby until a fresh bounded authorization exists.
 - W27 is summarized, W28 weekly requirements is active, and M5 is `completed_code_backed_with_manual_evidence_waived`; direct tray/pointer and Windows notification visibility remain residual risk, and all M5 product lanes are closed.
-- Realtime Agent cockpit next stage is `b2_blocked_by_sync_cim_latency`: A6/A7 remain accepted/pushed; B2 controlled lifecycle and terminal DOM passed, but PM overlap p95 `1524ms` exceeds `500ms`. A7.1/P0-C packets are prepared, no runtime worker is active, and external Agent execution remains forbidden.
+- Realtime Agent cockpit next stage is `p0_c_authorization_required_after_a7_1_b2_acceptance`: A7.1 `8866305` and B2 are accepted; PM async-CIM visible-DOM p95 is `7ms`. No runtime worker is active and external Agent execution remains forbidden.
 
 blockers:
 - External connector execution remains disabled.
-- Realtime B2 remains blocked until A7.1 is separately authorized, accepted and followed by a passing overlap rerun.
+- P0-C remains blocked only by the missing fresh explicit external execution authorization.
 - Live sub-agent execution remains blocked by the previously recorded service-side `403 DAILY_LIMIT_EXCEEDED` until rechecked.
 - Control-cockpit central 4x2 grid and protected selling-point files remain locked; M4 header settings entry has been completed and accepted.
 - M5 desktop ranch UI convergence is code/browser verified, but it does not clear the transparent Electron pointer-smoke blocker.
@@ -594,7 +594,7 @@ next action:
 - Keep Git manager, `git-repair-agentpet-v0.1`, and `git-staging-review-agentpet-v0.1` on standby for unrelated Git state; use the current narrow authorization only for the declared docs/script closeout.
 - Keep `protected-cockpit-source-drift-v0.1` standby in W28; open a fresh bounded lane before touching the registered protected whitespace.
 - Keep W28 active and preserve summarized `m5-five-day-development-2026-07-14` at `completed_code_backed_with_manual_evidence_waived`; authorize no further M5 product worker and keep residual-risk evidence explicit.
-- Commit/push the B2 blocker evidence and A7.1/P0-C decision packets; keep runtime worker count `0`, await new A7.1 authorization, and preserve unchanged Connector machine-gate fields.
+- Commit/push the A7.1/B2 acceptance control switch; keep runtime worker count `0`, await a new P0-C authorization, and preserve unchanged Connector machine-gate fields.
 - Use `daily-decision-queue-2026-07-02` as the next PM callback surface for standby decisions.
 - Keep `daily-role-accountability-2026-07-02` aligned with role states before closing any daily supervision pass.
 

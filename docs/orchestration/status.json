@@ -2,12 +2,12 @@
   "identity": "[PM]#multi-agent-control@v0.1",
   "loopState": "active",
   "dispatchState": "active",
-  "target": "2026-07-15 realtime Agent cockpit is `b2_blocked_by_sync_cim_latency`: A6/A7 are accepted/pushed; B2 lifecycle and terminal DOM passed but PM overlap p95 1524ms exceeds 500ms. A7.1 and P0-C decision packets are prepared; implementation and external Agent execution remain unauthorized.",
+  "target": "2026-07-15 realtime Agent cockpit is `p0_c_authorization_required_after_a7_1_b2_acceptance`: A7.1 `8866305` and B2 are accepted; PM async-CIM overlap visible-DOM p95 is 7ms. P0-C is ready for a decision but external Agent execution remains unauthorized.",
   "source": "docs/orchestration/index.md",
   "todayPlan": {
     "date": "2026-07-15",
     "session": "docs/orchestration/sessions/realtime-agent-cockpit-next-stage-2026-07-15.md",
-    "selectedRoute": "Close B2 honestly at synchronous-CIM latency, prepare A7.1 and P0-C decision packets, and authorize no runtime or external Agent execution",
+    "selectedRoute": "Accept and push A7.1/B2 controlled production readiness, then hold P0-C for a fresh explicit execution authorization",
     "progress": "docs/orchestration/sessions/realtime-agent-cockpit-next-stage-2026-07-15.md"
   },
   "p0Cards": [
@@ -31,12 +31,12 @@
     },
     {
       "id": "realtime-agent-cockpit-p0",
-      "status": "blocked-sync-cim-latency",
+      "status": "ready-p0-c-authorization",
       "task": "docs/orchestration/tasks/realtime-agent-cockpit-v0.1.md",
       "progress": "docs/orchestration/sessions/realtime-agent-cockpit-next-stage-2026-07-15.md"
     }
   ],
-  "blocker": "Realtime B2 is blocked_by_sync_cim_latency: PM overlapping-CIM visible-DOM p95=1524ms exceeds 500ms; A7.1 implementation is authorization_required and P0-C is not eligible. 外部 connector 仍 disabled；Codex 仅 draft/pending/discovery-only，Trae/Qoder 保持 placeholder/command-empty；live-subagents 仍受 403 DAILY_LIMIT_EXCEEDED 阻塞；protected source 和完整 transparent pointer smoke 保持各自既有边界。",
+  "blocker": "Realtime A7.1/B2 technical gates are accepted, but P0-C still lacks a fresh explicit external execution authorization. 外部 connector 仍 disabled；Codex 仅 draft/pending/discovery-only，Trae/Qoder 保持 placeholder/command-empty；live-subagents 仍受 403 DAILY_LIMIT_EXCEEDED 阻塞；protected source 和完整 transparent pointer smoke 保持各自既有边界。",
   "roles": [
     {
       "id": "pm",
@@ -367,7 +367,7 @@
       "title": "[长工]#realtime-connector-runtime@v0.1",
       "owner": "长工",
       "status": "active",
-      "responsibility": "P0-A A1-A7 is accepted to the controlled-process boundary; B2 is latency-blocked, A7.1 awaits authorization, no runtime worker is active, and external Agent CLI execution remains forbidden.",
+      "responsibility": "P0-A A1-A7.1 and B2 are accepted to the controlled-process boundary; no runtime worker is active, P0-C awaits explicit authorization, and external Agent CLI execution remains forbidden.",
       "tag": "⟦tag:v2|task|realtime-agent-cockpit-p0-a-connector-runtime-v0.1⟧",
       "evidence": "docs/orchestration/tasks/realtime-agent-cockpit-p0-a-connector-runtime-v0.1.md"
     },
@@ -385,7 +385,7 @@
       "title": "[长工]#realtime-process-reattach@v0.1",
       "owner": "长工",
       "status": "summarized",
-      "responsibility": "A7 process fingerprint/restart reattach is accepted and pushed as e2031cd with zero controlled-child residue and explicit synchronous Windows CIM residual risk.",
+      "responsibility": "A7 process fingerprint/restart reattach remains accepted as e2031cd; its synchronous-CIM residual risk is resolved by accepted A7.1 commit 8866305.",
       "tag": "⟦tag:v2|task|realtime-agent-cockpit-p0-a7-process-reattach-v0.1⟧",
       "evidence": "docs/orchestration/tasks/realtime-agent-cockpit-p0-a7-process-reattach-v0.1.md"
     },
@@ -393,8 +393,8 @@
       "id": "realtime-production-path-e2e",
       "title": "[长工]#realtime-production-path-e2e@v0.1",
       "owner": "长工",
-      "status": "blocked",
-      "responsibility": "Preserve passed B2 controlled lifecycle/terminal DOM evidence and the PM p95=1524ms synchronous-CIM blocker; no rerun until A7.1 is accepted.",
+      "status": "summarized",
+      "responsibility": "B2 is accepted after A7.1: PM async-CIM visible-DOM p95=7ms, six of six DOM commits before proof close, and zero child/proof-worker/external-Agent residue.",
       "tag": "⟦tag:v2|task|realtime-agent-cockpit-p0-b2-production-path-e2e-v0.1⟧",
       "evidence": "docs/orchestration/tasks/realtime-agent-cockpit-p0-b2-production-path-e2e-v0.1.md"
     },
@@ -402,10 +402,10 @@
       "id": "realtime-async-process-proof",
       "title": "[长工]#realtime-async-process-proof@v0.1",
       "owner": "长工",
-      "status": "standby",
-      "responsibility": "Decision-ready A7.1 asynchronous Windows process-proof packet; implementation remains authorization_required and no runtime worker is active.",
+      "status": "summarized",
+      "responsibility": "A7.1 asynchronous Windows process proof, failure matrix and cleanup are accepted/pushed as 8866305; no runtime worker is active.",
       "tag": "⟦tag:v2|task|realtime-agent-cockpit-p0-a7-1-async-process-proof-v0.1⟧",
-      "evidence": "docs/orchestration/tasks/realtime-agent-cockpit-p0-a7-1-async-process-proof-v0.1.md"
+      "evidence": "docs/orchestration/sessions/realtime-agent-cockpit-p0-a7-1-evidence-2026-07-15.md"
     },
     {
       "id": "realtime-truth-ui",
@@ -421,7 +421,7 @@
       "title": "[长工]#realtime-requirements-control@v0.1",
       "owner": "长工",
       "status": "active",
-      "responsibility": "Own the realtime serial control: A6/A7 accepted, B2 latency-blocked, A7.1 authorization-required and P0-C not eligible; preserve controlled-process versus real Agent E2E boundaries.",
+      "responsibility": "Own the realtime serial control: A7.1/B2 accepted and P0-C ready for a decision but still authorization-required; preserve controlled-process versus real Agent E2E boundaries.",
       "tag": "⟦tag:v2|session|realtime-agent-cockpit-progress-2026-07-13⟧",
       "evidence": "docs/orchestration/sessions/realtime-agent-cockpit-progress-2026-07-13.md"
     },
@@ -430,7 +430,7 @@
       "title": "[PM]#realtime-cockpit-next-stage@2026-07-15",
       "owner": "主控",
       "status": "active",
-      "responsibility": "Keep B2 honestly blocked at PM p95=1524ms, hold A7.1 implementation and P0-C execution behind fresh authorization, and preserve all Connector machine gates.",
+      "responsibility": "Preserve accepted A7.1/B2 evidence, hold P0-C external execution behind a fresh explicit authorization, and preserve all Connector machine gates.",
       "tag": "⟦tag:v2|session|realtime-agent-cockpit-next-stage-2026-07-15⟧",
       "evidence": "docs/orchestration/sessions/realtime-agent-cockpit-next-stage-2026-07-15.md"
     }
@@ -469,7 +469,7 @@
       "title": "每日计划督办",
       "role": "[PM]#daily-supervision@2026-07-02",
       "state": "active",
-      "nextAction": "监督 realtime next stage `b2_blocked_by_sync_cim_latency`；提交 B2/A7.1/P0-C packets 后保持 runtime worker=0，等待新的 A7.1 authorization，并继续禁止外部 Agent execution。"
+      "nextAction": "监督 realtime next stage `p0_c_authorization_required_after_a7_1_b2_acceptance`；提交 acceptance control 后保持 runtime worker=0，等待新的 P0-C explicit authorization，并继续禁止外部 Agent execution。"
     },
     {
       "id": "codex-evidence-closeout",

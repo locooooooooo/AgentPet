@@ -3,9 +3,9 @@
 [长工]#realtime-async-process-proof@v0.1
 ⟦tag:v2|task|realtime-agent-cockpit-p0-a7-1-async-process-proof-v0.1⟧
 
-loop state: standby
-dispatch state: standby
-status: authorization_required
+loop state: summarized
+dispatch state: summarized
+status: accepted
 priority: P0-A7.1
 
 ## objective
@@ -82,9 +82,11 @@ git diff --check
 
 ## authorization gate
 
-- Current decision: requirements packet prepared, implementation not authorized.
-- A new explicit PM/user message must authorize the exact file fence and one runtime worker.
-- B2 and P0-C remain blocked until A7.1 is independently accepted, committed and pushed.
+- The user explicitly authorized A7.1 and exactly one runtime worker.
+- PM independently accepted the implementation and pushed commit `8866305`.
+- PM A7.1 proof: 19 real Windows CIM samples, p95 `628.309ms`, child/proof-worker residue `0`, external Agent spawn `0`.
+- PM B2 rerun: six async-CIM overlaps, visible-DOM p95 `7ms`, CIM worker p95 `564.852ms`, 6/6 DOM commits before proof close.
+- This acceptance clears the A7.1/B2 technical blocker only; it does not authorize P0-C external execution.
 
 ## callback
 
@@ -101,4 +103,4 @@ next action:
 
 ## summary
 
-- A7.1 is a decision-ready asynchronous process-proof repair packet created from the proven B2 latency blocker; no implementation or external Agent execution is authorized.
+- A7.1 is accepted and pushed as `8866305`; synchronous CIM no longer blocks the production DOM path, while P0-C still requires a fresh explicit execution authorization.

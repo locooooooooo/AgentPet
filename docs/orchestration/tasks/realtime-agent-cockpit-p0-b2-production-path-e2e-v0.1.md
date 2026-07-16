@@ -3,9 +3,9 @@
 [长工]#realtime-production-path-e2e@v0.1
 ⟦tag:v2|task|realtime-agent-cockpit-p0-b2-production-path-e2e-v0.1⟧
 
-loop state: blocked
-dispatch state: blocked
-status: blocked_by_sync_cim_latency
+loop state: summarized
+dispatch state: summarized
+status: accepted_after_a7_1
 priority: P0-B2
 
 ## objective
@@ -42,11 +42,11 @@ priority: P0-B2
 
 ## next action
 
-- Preserve the accepted lifecycle/DOM evidence and the PM-independent overlap result (`p95=1524ms`).
-- Route any runtime/main correction through `realtime-agent-cockpit-p0-a7-1-async-process-proof-v0.1`; this B2 lane does not authorize that implementation.
-- Rerun B2 only after A7.1 is separately authorized, implemented, accepted, committed and pushed.
-- P0-C remains `authorization_required` and is not eligible while B2 is blocked.
+- Preserve the historical pre-A7.1 synchronous-CIM blocker (`p95=1524ms`) and the accepted A7.1 commit `8866305`.
+- PM fresh B2 rerun passed at visible-DOM `p95=7ms` with six real async-CIM overlaps and 6/6 DOM commits before proof close.
+- Duplicate terminal/subscription counts, controlled child residue, proof worker residue and external Agent spawn all remained `0`.
+- P0-C is technically eligible for a decision but remains `authorization_required` until a new explicit user execution authorization.
 
 ## summary
 
-- B2 proved the controlled production lifecycle and terminal DOM, then stopped at `blocked_by_sync_cim_latency`; real Agent E2E remains unexecuted and unauthorized.
+- B2 is accepted after A7.1 asynchronous process proof; the controlled production path passes, while real Agent E2E remains unexecuted and unauthorized.

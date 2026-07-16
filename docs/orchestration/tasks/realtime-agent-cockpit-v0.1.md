@@ -5,7 +5,7 @@
 
 loop state: active
 dispatch state: active
-status: b2_blocked_by_sync_cim_latency
+status: p0_c_authorization_required_after_a7_1_b2_acceptance
 control lane: standby_control
 date: 2026-07-13
 
@@ -33,7 +33,7 @@ date: 2026-07-13
 
 ## current truth
 
-- 本地命令执行看板约 75%；真实多 Agent 实时控制舱仍是受限执行就绪切片：B2 已证明 controlled production lifecycle 与 terminal DOM，但同步 Windows CIM 使 PM overlap p95 达 `1524ms`，因此 B2 未验收，真实 Agent E2E 仍未执行。
+- 本地命令执行看板约 75%；真实多 Agent 实时控制舱已完成 A7.1/B2 受控生产路径：异步 CIM overlap visible-DOM PM p95 `7ms`，但真实 Agent E2E 仍未执行。
 - 当前只定义 Codex/Trae/Qoder 三个 Connector，三者全部 blocked/non-executable。
 - Codex 是 draft/pending/discovery-only；Trae/Qoder 是 intentionally command-empty placeholders。
 - 进入本轮前的本机发现快照：codex/openclaw/claude/minimax 可发现；trae/qoder/opencode 未发现。
@@ -47,11 +47,11 @@ date: 2026-07-13
 | --- | --- | --- | --- |
 | P0-A | `[长工]#realtime-connector-runtime@v0.1` | partial_accepted_blocked_safe_foundation | A1-A5 runtime/fixture/full-gate 通过；production authorizer、真实 reattach 和外部 E2E 未启用 |
 | P0-B | `[长工]#realtime-truth-ui@v0.1` | partial_accepted_renderer_truth_slice | selector + App/Home/Cockpit 接线、fallback 1280/1440/1920 浏览器复核、fresh/stale/lost SSR fixture 和 Electron event p95 通过；真实 E2E 待补 |
-| P0-C | `[长工]#realtime-requirements-control@v0.1` + PM | standby / authorization_required_not_eligible | 决策包已准备；A7.1/B2 未通过且无新执行授权，当前不得执行 |
+| P0-C | `[长工]#realtime-requirements-control@v0.1` + PM | standby / authorization_required_ready_for_decision | A7.1/B2 已通过；仍无新的外部执行授权，当前不得执行 |
 | P0-A6 | `[长工]#realtime-trusted-authorizer@v0.1` | accepted / `a44abd6` | main-owned trusted confirmation；policy remains blocked，external spawn=0 |
 | P0-A7 | `[长工]#realtime-process-reattach@v0.1` | accepted / `e2031cd` | process fingerprint/restart reattach accepted with synchronous-CIM residual risk |
-| P0-B2 | `[长工]#realtime-production-path-e2e@v0.1` | blocked_by_sync_cim_latency | lifecycle/DOM passed; PM overlap p95 `1524ms` > `500ms` |
-| P0-A7.1 | `[长工]#realtime-async-process-proof@v0.1` | standby / authorization_required | async Windows process-proof requirements packet only; no implementation dispatched |
+| P0-B2 | `[长工]#realtime-production-path-e2e@v0.1` | accepted_after_a7_1 | PM async-CIM visible-DOM p95 `7ms`; lifecycle/DOM/cleanup passed |
+| P0-A7.1 | `[长工]#realtime-async-process-proof@v0.1` | accepted / `8866305` | asynchronous Windows process proof, failure matrix and cleanup accepted |
 
 主 control lane 保持 `standby_control`：它只协调 A/B 合同和 C 验收。A/B 的 partial accepted 只代表受限切片已被 PM 验收，不代表 Connector runtime 已可执行。
 
@@ -130,6 +130,6 @@ evidence:
 
 ## next action
 
-- Commit and push B2 evidence plus A7.1/P0-C packets without dispatching another runtime worker.
-- Await a fresh A7.1 authorization; rerun B2 only after A7.1 acceptance.
-- P0-C remains standby/not eligible and still requires A7.1+B2 acceptance plus a new explicit execution authorization.
+- Commit and push the A7.1/B2 acceptance control switch without dispatching another runtime worker.
+- P0-C is technically ready for a decision but remains standby and requires a new explicit execution authorization.
+- Keep Connector machine-gate fields unchanged and do not execute an external Agent CLI from this lane.
