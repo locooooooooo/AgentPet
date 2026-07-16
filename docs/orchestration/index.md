@@ -49,6 +49,7 @@ tracked business cards:
 - task: ⟦tag:v2|task|ranch-real-integration-p0-v0.1⟧ -> `docs/orchestration/tasks/ranch-real-integration-p0-v0.1.md`
 - task: ⟦tag:v2|task|ranch-real-integration-r0-3-dryrun-v0.1⟧ -> `docs/orchestration/tasks/ranch-real-integration-r0-3-dryrun-v0.1.md`
 - task: ⟦tag:v2|task|protected-cockpit-source-drift-v0.1⟧ -> `docs/orchestration/tasks/protected-cockpit-source-drift-v0.1.md`
+- session: ⟦tag:v2|session|protected-cockpit-source-drift-closeout-2026-07-16⟧ -> `docs/orchestration/sessions/protected-cockpit-source-drift-closeout-2026-07-16.md`
 - task: ⟦tag:v2|task|cockpit-refactor-p0-v0.1⟧ -> `docs/orchestration/tasks/cockpit-refactor-p0-v0.1.md`
 - task: ⟦tag:v2|task|cockpit-ui-redesign-v3.1-v0.1⟧ -> `docs/orchestration/tasks/cockpit-ui-redesign-v3.1-v0.1.md`
 - task: ⟦tag:v2|task|cockpit-ui-redesign-v3.2-v0.1⟧ -> `docs/orchestration/tasks/cockpit-ui-redesign-v3.2-v0.1.md`
@@ -158,7 +159,7 @@ current role split:
 - `[监督]#ranch-pointer-smoke-manual-evidence@v0.2`: standby manual evidence package for pointer-smoke callback recording; no pointer input executed yet.
 - `[长工]#homepage-ui-design@v0.1`: summarized HomePage / landing / 启动页 P0 lane; H0-1 design drafts accepted as C · 华丽, H0-2/H0-3 implemented, H0-4 protected-file audit passed in `homepage-ui-p0-c0-6-style-2026-07-07.md`; no edit to `NiuMaAvatar.tsx` / `index.css` / `agentCore.ts` / central 4x2 control-cockpit grid.
 - `[PM]#ranch-real-integration-r0-3-dryrun@v0.1`: standby R0-3 Codex controlled dry-run evidence collection lane; P0 ranch-real-integration-p0 整体 accepted(2026-07-07 拍板 ②),R0-3 段已转交本 lane;Codex approvalStatus/enabledByDefault/command 维持原值,trae/qoder 维持 placeholder;不主动启动 dry-run,等用户二次确认时机。
-- `[PM]#protected-cockpit-source-drift@v0.1`: standby PM disposition lane in W28;administrator selected bounded routing, but no source edit, format repair, acceptance, or rollback is authorized yet.
+- `[PM]#protected-cockpit-source-drift@v0.1`: summarized after the 2026-07-16 fresh audit found no protected-source diff and both targeted/global diff checks passed; no source edit was manufactured.
 - `[PM]#cockpit-ui-redesign-v3.1@v0.1`: summarized accepted visual-refinement lane pushed as `aa4cfa5`; future cockpit changes require a fresh bounded scope, while M5 lifecycle, protected animation/avatar, business logic, and connectors remain untouched.
 - `[PM]#cockpit-ui-redesign-v3.2@v0.1`: standby after accepted/pushed P0; task-first state dedupe, first-screen dispatch, card-action reduction, and conditional Corner Assist passed PM replay after two bounded menu corrections. P1/P2 remain unauthorized.
 - `[长工]#realtime-connector-runtime@v0.1`: A1-A7.1 and B2 are accepted to the controlled-process boundary; no runtime worker is active and external Agent CLI execution remains forbidden.

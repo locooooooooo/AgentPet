@@ -43,7 +43,7 @@ dispatch state: active
 
 | 优先级 | 候选 | 当前边界 |
 | --- | --- | --- |
-| P1-1 | Protected trailing whitespace bounded lane | 仅处理已登记的 protected whitespace;本周不修、不回退、不扩大 source scope |
+| P1-1 | Protected trailing whitespace bounded lane | 2026-07-16 fresh audit found no current drift; closed docs-only with zero source edits |
 | P1-2 | `cockpit-ui-redesign-v3.1` bounded visual refinement | 2026-07-12 管理员已授权 shell/rail/status/operator/dock 视觉优化；不修改 M5 lifecycle、中央卡片业务结构、8 卡 keyframes、`NiuMaAvatar.tsx`、`agentCore.ts` 或 connector machine gate |
 | P1-3 | live-subagents `403 DAILY_LIMIT_EXCEEDED` quota 复查 | 本周不主动复查;W28 仅在安全 route 可用时记录精确结果 |
 | P1-4 | M5 后续子卡串行队列 | 按五日总控在前一卡 callback、PM acceptance、full gates、commit、push、clean worktree 后接续;任何时候最多一个产品 worker |
@@ -72,13 +72,13 @@ acceptance:
 - P0/P1/P2 候选与 2026-07-11 ~ 2026-07-20 滚动排期存在。
 - `docs/orchestration/index.md`, `docs/orchestration/status.json`, and `daily-role-accountability-2026-07-02.md` track this active role。
 - 管理员已将 M5 Day 1 日历门改为 2026-07-11；M5 implementation 仍仅由五日总控、今日 fresh baseline 和逐卡 bounded dispatch 授权。
-- Codex 内部子 agent 是授权 worker 机制;项目 Codex/Trae/Qoder connector、R0-3 dry-run、connector machine-gate edit 和 protected source edit 仍不授权。
+- Codex 内部子 agent 是授权 worker 机制;protected source red point is closed with no current drift, while connector execution and machine-gate edits remain separately gated.
 - `npm.cmd run orchestration:check` passes。
 
 next action:
 - M5 已收口并推送；保留直接 tray/pointer 与 Windows notification visibility 残余风险，不重开产品 lane。
 - A7.1 `8866305` 与 B2 已验收推送；提交/推送控制面后不派 runtime worker，等待新的 P0-C 明确执行授权。
-- Protected source、quota recheck 和 pointer evidence 仍需各自 bounded activation。
+- Protected source is closed with no current drift; quota recheck and pointer evidence still require their own bounded activation.
 
 summary:
 - W28 active; M5 is closed, realtime A7.1/B2 controlled production readiness is accepted, and P0-C remains unexecuted behind a fresh explicit authorization gate.

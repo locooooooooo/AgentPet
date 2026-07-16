@@ -36,7 +36,7 @@
       "progress": "docs/orchestration/sessions/realtime-agent-cockpit-next-stage-2026-07-15.md"
     }
   ],
-  "blocker": "Realtime A7.1/B2 technical gates are accepted, but P0-C still lacks a fresh explicit external execution authorization. 外部 connector 仍 disabled；Codex 仅 draft/pending/discovery-only，Trae/Qoder 保持 placeholder/command-empty；live-subagents 仍受 403 DAILY_LIMIT_EXCEEDED 阻塞；protected source 和完整 transparent pointer smoke 保持各自既有边界。",
+  "blocker": "Realtime A7.1/B2 technical gates are accepted, but P0-C still lacks a fresh explicit external execution authorization. 外部 connector 仍 disabled；Codex 仅 draft/pending/discovery-only，Trae/Qoder 保持 placeholder/command-empty；live-subagents 仍受 403 DAILY_LIMIT_EXCEEDED 阻塞；完整 transparent pointer smoke 保持既有边界。",
   "roles": [
     {
       "id": "pm",
@@ -339,8 +339,8 @@
       "id": "protected-cockpit-source-drift",
       "title": "[PM]#protected-cockpit-source-drift@v0.1",
       "owner": "主控",
-      "status": "standby",
-      "responsibility": "Protected cockpit / selling-point source drift disposition lane; administrator selected option ④, but the W28 source lane remains standby until a fresh bounded authorization exists.",
+      "status": "summarized",
+      "responsibility": "2026-07-16 fresh audit found no current protected-source diff and both targeted/global diff checks pass; closed without manufacturing a source edit.",
       "tag": "⟦tag:v2|task|protected-cockpit-source-drift-v0.1⟧",
       "evidence": "docs/orchestration/tasks/protected-cockpit-source-drift-v0.1.md"
     },
@@ -643,8 +643,8 @@
       "id": "protected-cockpit-source-drift",
       "title": "Protected cockpit source drift disposition",
       "role": "[PM]#protected-cockpit-source-drift@v0.1",
-      "state": "standby",
-      "nextAction": "2026-07-10 administrator selected option ④; keep standby in W28 and open a fresh bounded lane before any protected whitespace/source edit."
+      "state": "summarized",
+      "nextAction": "Closed on 2026-07-16 with no current protected-source diff; reopen only for a new exact-file drift."
     }
   ],
   "connectors": [
