@@ -347,9 +347,8 @@ requireText('daily decision queue task card', dailyDecisionQueueTask, [
   '⟦tag:v2|task|daily-decision-queue-2026-07-02⟧',
   'Standby decision queue.',
   'This queue does not authorize work by itself; each item still requires its own explicit user/PM decision or external condition.',
-  'M4 implementation has been completed and summarized outside this standby queue.',
+  'historical Git repair and M4 implementation are summarized outside this standby queue.',
   'Git staging review package: `docs/orchestration/tasks/git-staging-review-agentpet-v0.1.md`.',
-  '| AgentPet Git repair | `[短工]#git-repair-agentpet@v0.1` | Explicit same-message authorization for local Git metadata repair | Run only `git init -b main` -> `git remote add origin https://github.com/locooooooooo/AgentPet.git` -> `git fetch origin` -> `git status --ignored --short`, then stop | Authorization is absent |',
   '| AgentPet Git state review | `[PM]#git-staging-review-agentpet@v0.1` | PM/user decides how to handle the currently observed valid repo and working-tree/index state | Run read-only Git state review first, then ask for stage/unstage/commit/push/leave-untouched decision | Review decision is absent |',
   '| Connector acceptance | `[PM]#connector-acceptance-review@v0.1` | PM/user accepts, rejects, or revises connector machine gate fields | Update connector metadata only if the decision explicitly says so, then rerun `npm.cmd run orchestration:preflight` and `npm.cmd run orchestration:connector-safety` | No connector decision exists |',
   '| Transparent pointer smoke | `[监督]#ranch-pointer-smoke-manual-evidence@v0.2` | Manual observer or alternate transparent-window capture route is available | Run parent pointer-smoke route and fill evidence table | Capture route is unavailable |',
@@ -358,13 +357,11 @@ requireText('daily decision queue task card', dailyDecisionQueueTask, [
   '| connector-policy | Connector acceptance |',
   '| connector-acceptance-review | Connector acceptance |',
   '| git-manager-agentpet | AgentPet Git state review |',
-  '| git-repair-agentpet | AgentPet Git repair |',
   '| git-staging-review-agentpet | AgentPet Git state review |',
   '| ranch-pointer-smoke | Transparent pointer smoke |',
   '| ranch-pointer-smoke-manual-evidence | Transparent pointer smoke |',
   'session closeout coverage:',
   '| queue item | required closeout evidence |',
-  '| AgentPet Git repair | `AgentPet Git repair` |',
   '| AgentPet Git state review | `git-staging-review-agentpet-v0.1` |',
   '| Connector acceptance | `Connector acceptance review package exists` |',
   '| Transparent pointer smoke | `Ranch pointer-smoke verification and manual evidence packages are standby` |',
@@ -379,7 +376,7 @@ requireText('daily decision queue task card', dailyDecisionQueueTask, [
   'The session closeout coverage table is parseable, every queue item has exactly one required closeout evidence phrase, and every required phrase appears in the parsed `incomplete:`, `blockers:`, or `next action:` closeout sections of `docs/orchestration/sessions/daily-supervision-2026-07-02.md`.',
   'Every decision-bearing `standby` or `blocked` lane in `docs/orchestration/status.json` is covered by the coverage guard.',
   '`npm.cmd run orchestration:report` shows this queue as standby, not active, and prints the coverage guard plus session closeout coverage, including each open lane -> queue item and queue item -> required closeout evidence row.',
-  'Git repair, staging review, unstage, commit, and push remain blocked unless explicitly authorized in a later message.',
+  'Git staging review, unstage, commit, and push remain blocked unless explicitly authorized in a later message; the historical Git repair package remains summarized and non-executable.',
   'Standby daily decision queue; no blocked item executed.'
 ]);
 
@@ -401,7 +398,7 @@ requireText('daily role accountability task card', dailyRoleAccountabilityTask, 
   '| `[长工]#m3-main-bridge@v0.2` | summarized | `docs/orchestration/sessions/ranch-v0.2-2026-07-02.md` | Preserve passed main/preload/types/fallback evidence. |',
   '| `[长工]#m3-ranch-entry@v0.2` | summarized | `docs/orchestration/sessions/ranch-v0.2-2026-07-02.md` | Preserve passed ranch renderer interaction evidence while pointer smoke remains separate. |',
   '| `[长工]#git-manager@AgentPet` | standby | `docs/orchestration/sessions/git-manager-agentpet-2026-07-02.md` | Collect post-push read-only callback; do not run further Git writes without explicit decision. |',
-  '| `[短工]#git-repair-agentpet@v0.1` | standby | `docs/orchestration/tasks/git-repair-agentpet-v0.1.md` | Preserve as historical repair boundary; do not rerun blindly. |',
+  '| `[短工]#git-repair-agentpet@v0.1` | summarized | `docs/orchestration/tasks/git-repair-agentpet-v0.1.md` | Preserve completed repair/import history and never rerun the old repair command list. |',
   '| `[PM]#git-staging-review-agentpet@v0.1` | standby | `docs/orchestration/tasks/git-staging-review-agentpet-v0.1.md` | Wait for a decision on the current valid repo and working-tree/index state. |',
   '| `[长工]#ranch-m4-implementation@v0.2` | summarized | `docs/orchestration/tasks/ranch-m4-implementation-v0.2.md` | Preserve thread `019f227a-8978-7df1-8b3f-738ccdb01b18` callback and PM verification evidence. |',
   '| `[监督]#ranch-pointer-smoke@v0.2` | standby | `docs/orchestration/tasks/ranch-pointer-smoke-v0.2.md` | Retry only when Windows can provide fresh screenshot-bound coordinates; preserve the 2026-07-17 blocked evidence. |',
@@ -426,9 +423,11 @@ requireText('daily role accountability task card', dailyRoleAccountabilityTask, 
 requireText('AgentPet Git repair task card', gitRepairTask, [
   '[短工]#git-repair-agentpet@v0.1',
   '⟦tag:v2|task|git-repair-agentpet-v0.1⟧',
-  'Standby. This is a future repair dispatch package, not an active Git repair lane.',
-  'explicit same-message authorization',
-  'Do not run `git init`, `git remote add`, `git fetch`, staging, commit, push, reset, clean, or file removal from this package until PM/user explicitly authorizes Git repair in the same message.',
+  'loop state: summarized',
+  'dispatch state: summarized',
+  'status: historical_repair_completed',
+  'Summarized historical package; no active Git repair Lane exists.',
+  'Never rerun `git init`, `git remote add`, or `git fetch` from this package against the current valid repository.',
   'git init -b main',
   'git remote add origin https://github.com/locooooooooo/AgentPet.git',
   'git fetch origin',
@@ -437,6 +436,7 @@ requireText('AgentPet Git repair task card', gitRepairTask, [
   'A later PM read-only check observed valid local Git metadata, branch `main`, origin `https://github.com/locooooooooo/AgentPet.git`, `d158cad Initial commit`, and a staged index.',
   'Do not execute this repair package blindly against the current workspace.',
   'Current Git follow-up is tracked by `docs/orchestration/tasks/git-staging-review-agentpet-v0.1.md`.',
+  'The authorized AgentPet import was committed as `fa9e08b Import AgentPet workspace` and pushed to `origin/main`',
   'Stop immediately after status review output is collected.',
   'Do not stage files.',
   'Do not commit.',
@@ -444,7 +444,7 @@ requireText('AgentPet Git repair task card', gitRepairTask, [
   'Do not remove, reset, clean, or overwrite project files.',
   'Do not enable or execute Codex, Trae, Qoder, or any connector.',
   'Do not edit M4/control-cockpit implementation files.',
-  'Standby Git repair dispatch package; no Git repair started.'
+  'Summarized historical Git repair package; authorized import/push completed and rerunning repair commands is prohibited.'
 ]);
 
 requireText('AgentPet Git staging review task card', gitStagingReviewTask, [
@@ -567,18 +567,18 @@ requireText('daily supervision session', dailySupervisionSession, [
   'next action:',
   'evidence:',
   'Transparent ranch window pointer smoke is still not fully automated',
-  'AgentPet Git repair standby package remains a historical boundary',
+  'AgentPet Git state review remains standby behind `git-staging-review-agentpet-v0.1`',
   'git-staging-review-agentpet-v0.1',
   'git-repair-agentpet-v0.1',
   'Connector acceptance review package exists, but connector policy acceptance is waiting for PM/user decision',
   'connector-acceptance-review-v0.1',
   'The historical service-side `403 DAILY_LIMIT_EXCEEDED` is no longer current availability truth',
   'Control-cockpit central 4x2 grid and protected selling-point files remain locked',
-  'AgentPet Git working tree/index state is outside this 2026-07-17 control closeout',
+  'Pre-advance baseline was clean with `HEAD == origin/main == 658efd0`',
   'Keep `ranch-pointer-smoke-v0.2` and `ranch-pointer-smoke-manual-evidence-v0.2` standby.',
   'ranch-pointer-smoke-manual-evidence-v0.2',
   'Keep connector-policy and `connector-acceptance-review-v0.1` on standby',
-  'Keep Git manager, `git-repair-agentpet-v0.1`, and `git-staging-review-agentpet-v0.1` on standby',
+  'Keep Git manager and `git-staging-review-agentpet-v0.1` on standby for future read-only Git-state review',
   'Daily decision queue is standby and does not authorize any queue item by itself.',
   'daily-decision-queue-2026-07-02',
   'Daily role accountability ledger is standby and records state/evidence/action without changing role states.',
@@ -1024,7 +1024,6 @@ if (statusJson) {
     ['connector-policy', 'Connector acceptance'],
     ['connector-acceptance-review', 'Connector acceptance'],
     ['git-manager-agentpet', 'AgentPet Git state review'],
-    ['git-repair-agentpet', 'AgentPet Git repair'],
     ['git-staging-review-agentpet', 'AgentPet Git state review'],
     ['ranch-pointer-smoke', 'Transparent pointer smoke'],
     ['ranch-pointer-smoke-manual-evidence', 'Transparent pointer smoke'],
@@ -1174,8 +1173,8 @@ if (statusJson) {
     if (gitRepairRole.title !== '[短工]#git-repair-agentpet@v0.1') {
       errors.push(`AgentPet Git repair role title mismatch: ${gitRepairRole.title}`);
     }
-    if (gitRepairRole.status !== 'standby') {
-      errors.push(`AgentPet Git repair role must remain standby until repair is authorized: ${gitRepairRole.status}`);
+    if (gitRepairRole.status !== 'summarized') {
+      errors.push(`AgentPet Git repair role must remain summarized after completed import/push: ${gitRepairRole.status}`);
     }
     if (gitRepairRole.evidence !== 'docs/orchestration/tasks/git-repair-agentpet-v0.1.md') {
       errors.push(`AgentPet Git repair evidence mismatch: ${gitRepairRole.evidence}`);
@@ -1185,8 +1184,8 @@ if (statusJson) {
   const gitRepairLane = statusJson.lanes?.find((lane) => lane.id === 'git-repair-agentpet');
   if (!gitRepairLane) {
     errors.push('status.json missing AgentPet Git repair lane');
-  } else if (gitRepairLane.state !== 'standby') {
-    errors.push(`AgentPet Git repair lane must remain standby until repair is authorized: ${gitRepairLane.state}`);
+  } else if (gitRepairLane.state !== 'summarized') {
+    errors.push(`AgentPet Git repair lane must remain summarized after completed import/push: ${gitRepairLane.state}`);
   }
 
   const gitStagingReviewRole = statusJson.roles?.find((role) => role.id === 'git-staging-review-agentpet');

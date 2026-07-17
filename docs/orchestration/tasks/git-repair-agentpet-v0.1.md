@@ -3,13 +3,17 @@
 [短工]#git-repair-agentpet@v0.1
 ⟦tag:v2|task|git-repair-agentpet-v0.1⟧
 
-objective:
-- Prepare the minimal Git metadata repair lane for `E:\多agent牛马` -> `https://github.com/locooooooooo/AgentPet.git` without running it before explicit same-message authorization.
-- Keep the existing AgentPet Git manager long-worker as the owning diagnosis source.
+loop state: summarized
+dispatch state: summarized
+status: historical_repair_completed
 
-dispatch state:
-- Standby. This is a future repair dispatch package, not an active Git repair lane.
-- Do not run `git init`, `git remote add`, `git fetch`, staging, commit, push, reset, clean, or file removal from this package until PM/user explicitly authorizes Git repair in the same message.
+objective:
+- Preserve the historical Git metadata repair boundary and its original safety constraints.
+- Record that the authorized import/push completed and that this repair package is no longer executable against the current repository.
+
+dispatch boundary:
+- Summarized historical package; no active Git repair Lane exists.
+- Never rerun `git init`, `git remote add`, or `git fetch` from this package against the current valid repository.
 
 truth sources:
 - Git manager session: `docs/orchestration/sessions/git-manager-agentpet-2026-07-02.md`.
@@ -26,8 +30,9 @@ live-state update:
 - A later PM read-only check observed valid local Git metadata, branch `main`, origin `https://github.com/locooooooooo/AgentPet.git`, `d158cad Initial commit`, and a staged index.
 - Do not execute this repair package blindly against the current workspace.
 - Current Git follow-up is tracked by `docs/orchestration/tasks/git-staging-review-agentpet-v0.1.md`.
+- The authorized AgentPet import was committed as `fa9e08b Import AgentPet workspace` and pushed to `origin/main`; subsequent control-plane work has continued on the valid repository.
 
-future write scope:
+historical proposed write scope:
 - Repair local Git metadata only:
   - `git init -b main`
   - `git remote add origin https://github.com/locooooooooo/AgentPet.git`
@@ -44,7 +49,7 @@ forbidden scope:
 - Do not enable or execute Codex, Trae, Qoder, or any connector.
 - Do not edit M4/control-cockpit implementation files.
 
-repair acceptance:
+historical repair acceptance:
 - Explicit same-message user authorization is present before any Git write command runs.
 - Callback lists each Git command executed, exit code, and important output.
 - Callback confirms local `.git` is valid enough for `git status --ignored --short`.
@@ -53,13 +58,12 @@ repair acceptance:
 - If any command fails, the callback records the exact command, exit code, and stderr, then stops without fallback mutation.
 
 blockers:
-- Git repair is not authorized yet.
-- Local Git metadata is invalid until the repair lane runs.
-- Remote has no first commit, so push/first-commit decisions remain a separate future authorization.
+- None for this historical package; the repair/import path is completed.
+- Any current Git-state decision belongs to `git-staging-review-agentpet-v0.1`, not this repair task.
 
 next action:
-- Wait for PM/user explicit Git repair authorization.
-- On authorization, execute only the future write scope and stop for staging review.
+- Preserve summarized evidence and do not execute the historical command list.
+- Use a fresh read-only staging review before any future Git-state decision.
 
 summary:
-- Standby Git repair dispatch package; no Git repair started.
+- Summarized historical Git repair package; authorized import/push completed and rerunning repair commands is prohibited.

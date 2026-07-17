@@ -566,7 +566,7 @@ completed:
 incomplete:
 - M5 ranch verification cards are summarized and the ranch body now matches v0.3's simple three-level UI direction, but real transparent-window pointer smoke is still not accepted.
 - Transparent ranch window pointer smoke is still not fully automated; Windows MCP Snapshot and Electron `webContents.capturePage()` now provide capture evidence, but full click-through, double-click, right-click, drag, and dock pointer evidence is still not automated or accepted.
-- AgentPet Git repair standby package remains a historical boundary; no AgentPet Git lane was opened in the 2026-07-17 W28 control closeout, and any future action remains behind `git-staging-review-agentpet-v0.1`.
+- AgentPet Git state review remains standby behind `git-staging-review-agentpet-v0.1`; the historical repair package is summarized after the authorized import/push and is not an open Lane.
 - Connector acceptance review package exists, but connector policy acceptance is waiting for PM/user decision; no execution binding should be dispatched before that.
 - Ranch pointer-smoke verification and manual evidence packages are standby; the capture route now exists, but a direct pointer-input observer/automation route is still required before acceptance.
 - Homepage UI long-worker dispatch package exists, thread `mvs_237b464ebc78403d953b9ab93b398ab8` has delivered H0-1 design drafts, user selected C gorgeous, and H0-2/H0-3/H0-4 are accepted with evidence `docs/orchestration/sessions/homepage-ui-p0-c0-6-style-2026-07-07.md`; PM commit `18451ba` has been pushed to `origin/main`.
@@ -576,7 +576,7 @@ incomplete:
 - Protected cockpit source drift is closed as `closed_no_current_drift`; the 2026-07-16 audit found no protected-source diff and made no source edit.
 - W27 is summarized, W28 weekly requirements is active, and M5 is `completed_code_backed_with_manual_evidence_waived`; direct tray/pointer and Windows notification visibility remain residual risk, and all M5 product lanes are closed.
 - Realtime Agent cockpit next stage is `p0_c_authorization_required_after_a7_1_b2_acceptance`: A7.1 `8866305` and B2 are accepted; PM async-CIM visible-DOM p95 is `7ms`. No runtime worker is active and external Agent execution remains forbidden.
-- 2026-07-17 control refresh aligned the current target and today plan to `c21a60b`, summarized stale no-worker realtime roles, accepted v3.2 P1 `51d5501` and P2 `0dfaadf` after independent replay, and archived the blocked transparent-pointer evidence without a product-code edit.
+- 2026-07-17 control refresh aligned the current target and today plan through control commit `658efd0`, summarized stale no-worker realtime roles, accepted v3.2 P1 `51d5501` and P2 `0dfaadf` after independent replay, and archived the blocked transparent-pointer evidence without a product-code edit.
 
 blockers:
 - External connector execution remains disabled.
@@ -584,7 +584,7 @@ blockers:
 - The historical service-side `403 DAILY_LIMIT_EXCEEDED` is no longer current availability truth: bounded in-app short workers launched successfully on 2026-07-17. External Connectors remain disabled separately.
 - Control-cockpit central 4x2 grid and protected selling-point files remain locked; M4 header settings entry has been completed and accepted.
 - M5 desktop ranch UI convergence is code/browser verified, but it does not clear the transparent Electron pointer-smoke blocker.
-- AgentPet Git working tree/index state is outside this 2026-07-17 control closeout; the current allowed diff is `docs/orchestration/**` plus the tightly related `scripts/check-orchestration.mjs` truth assertion, while AgentPet writes, reset, clean and force push remain prohibited.
+- Pre-advance baseline was clean with `HEAD == origin/main == 658efd0`; this 2026-07-17 advance is limited to `docs/orchestration/**` plus the tightly related `scripts/check-orchestration.mjs` truth assertions, while unrelated source, Connector machine gates, reset, clean and force push remain prohibited.
 
 next action:
 - Keep PM and Supervisor active for drift checks and Git post-push callback collection.
@@ -592,7 +592,7 @@ next action:
 - Keep `ranch-window-v0.1`, `ranch-status-script-v0.1`, and `ranch-personality-v0.1` summarized as M5 evidence cards after ranch UI convergence; future direct desktop replay must open a fresh bounded smoke lane.
 - Keep `ranch-pointer-smoke-v0.2` and `ranch-pointer-smoke-manual-evidence-v0.2` standby. The 2026-07-17 Computer Use run enumerated both windows but screenshot binding failed with `SetIsBorderRequired failed (0x80004002)`, so full pointer input remains unaccepted.
 - Keep connector-policy and `connector-acceptance-review-v0.1` on standby until PM/user accepts or revises machine gate fields.
-- Keep Git manager, `git-repair-agentpet-v0.1`, and `git-staging-review-agentpet-v0.1` on standby for unrelated Git state; use the current narrow authorization only for the declared docs/script closeout.
+- Keep Git manager and `git-staging-review-agentpet-v0.1` on standby for future read-only Git-state review; preserve `git-repair-agentpet-v0.1` as summarized historical evidence and never rerun its repair commands.
 - Preserve `protected-cockpit-source-drift-v0.1` as summarized/closed; reopen only for a new exact-file drift.
 - Keep W28 active and preserve summarized `m5-five-day-development-2026-07-14` at `completed_code_backed_with_manual_evidence_waived`; authorize no further M5 product worker and keep residual-risk evidence explicit.
 - Preserve pushed A7.1/B2 control commit `74d8f50`; keep runtime worker count `0`, await a new P0-C authorization, and preserve unchanged Connector machine-gate fields.
@@ -1092,3 +1092,13 @@ pm.cmd run build pass; git diff --check only on the 11 protected-source whitespa
   - PM full static gates passed after the callback, but direct close -> hide -> tray summon and tray exit -> cleanup remained unaccepted. Windows automation located the Electron windows but returned `SetIsBorderRequired failed: 不支持此接口 (0x80004002)` for the transparent ranch state; PM stopped input instead of using stale coordinates or capture/CDP as tray evidence.
   - The Day 1 delivery remains uncommitted in `electron/main.ts`, `ranch-window-v0.2-progress.md`, and `ranch-window-v0.2-acceptance-2026-07-11.md`. M5 is now `blocked_day1_acceptance`; reaching the Day 2 calendar date does not satisfy the missing acceptance/commit/push gate.
   - R0-3 dry-run, project Codex/Trae/Qoder connectors, connector machine gate, protected source, live-subagent quota, cockpit redesign, and separate pointer-evidence lanes remain unchanged and excluded.
+
+- [2026-07-17 13:06 +08:00] control truth projection and W28 closeout readiness supervision:
+  - Re-read `docs/orchestration/index.md`, `docs/orchestration/status.json`, the 2026-07-17 daily plan, W28 weekly requirements, decision queue, accountability ledger and the current Git baseline before accepting the control-only advance.
+  - Pre-advance baseline was `HEAD == origin/main == 658efd0` with a clean worktree. The visible control-cockpit replay then passed at 2560x1257: four of 46 roles and two of 30 Lanes were active, v3.2 P1/P2 and live Session evidence projected as accepted/summarized, the pointer blocker projected as Windows screenshot/input binding, horizontal overflow was absent, and console warnings/errors were zero.
+  - Pointer execution remains unaccepted: both Electron windows and static gates passed, but Computer Use could not obtain fresh screenshot-bound coordinates because `SetIsBorderRequired failed (0x80004002)`. No click-through, double-click, right-click, drag or dock result is inferred.
+  - W28 closeout readiness is now frozen as a serial control route: create a non-complete closeout template on 2026-07-18, run one read-only pre-closeout audit on 2026-07-19, and finalize only after the real 2026-07-20 time gate.
+  - Historical `git-repair-agentpet-v0.1` and `ranch-m5-requirements-v0.2` are summarized because the authorized AgentPet import/push and M5 closeout `8df940c` already completed. Git staging review, pointer evidence, R0-3 and Connector decisions remain separate standby items.
+  - Final bounded gates passed: orchestration check with 112 referenced cards, report, preflight, Connector safety, realtime truth check, lint, build and `git diff --check`.
+  - No product worker, external Connector spawn, P0-C authorization, R0-3 execution, Trae/Qoder invocation, pointer input, product-source edit or Connector machine-gate edit was opened by this supervision pass.
+  - `weekly-closeout-2026-07-20.md` must not be created on 2026-07-17; the next control action remains waiting for the 2026-07-18 template gate after this bounded truth update is verified, committed and pushed.

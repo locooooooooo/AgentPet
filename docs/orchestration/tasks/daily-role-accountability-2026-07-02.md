@@ -36,14 +36,14 @@ role ledger:
 | `[长工]#m3-main-bridge@v0.2` | summarized | `docs/orchestration/sessions/ranch-v0.2-2026-07-02.md` | Preserve passed main/preload/types/fallback evidence. |
 | `[长工]#m3-ranch-entry@v0.2` | summarized | `docs/orchestration/sessions/ranch-v0.2-2026-07-02.md` | Preserve passed ranch renderer interaction evidence while pointer smoke remains separate. |
 | `[长工]#git-manager@AgentPet` | standby | `docs/orchestration/sessions/git-manager-agentpet-2026-07-02.md` | Collect post-push read-only callback; do not run further Git writes without explicit decision. |
-| `[短工]#git-repair-agentpet@v0.1` | standby | `docs/orchestration/tasks/git-repair-agentpet-v0.1.md` | Preserve as historical repair boundary; do not rerun blindly. |
+| `[短工]#git-repair-agentpet@v0.1` | summarized | `docs/orchestration/tasks/git-repair-agentpet-v0.1.md` | Preserve completed repair/import history and never rerun the old repair command list. |
 | `[PM]#git-staging-review-agentpet@v0.1` | standby | `docs/orchestration/tasks/git-staging-review-agentpet-v0.1.md` | Wait for a decision on the current valid repo and working-tree/index state. |
 | `[PM]#ranch-m4-requirements@v0.2` | summarized | `docs/orchestration/tasks/ranch-m4-requirements-v0.2.md` | Keep requirements readiness linked to the accepted M4 implementation evidence. |
 | `[长工]#ranch-m4-implementation@v0.2` | summarized | `docs/orchestration/tasks/ranch-m4-implementation-v0.2.md` | Preserve thread `019f227a-8978-7df1-8b3f-738ccdb01b18` callback and PM verification evidence. |
 | `[监督]#ranch-window@v0.1` | summarized | `docs/orchestration/tasks/ranch-window-v0.1.md` | Preserve the M5 window + ranch 3-level UI evidence summary and leave direct transparent pointer smoke to the existing standby packages. |
 | `[监督]#ranch-status-script@v0.1` | summarized | `docs/orchestration/tasks/ranch-status-script-v0.1.md` | Preserve the M5 animal/status/single-toast evidence summary without overstating direct OS-toast replay. |
 | `[监督]#ranch-personality@v0.1` | summarized | `docs/orchestration/tasks/ranch-personality-v0.1.md` | Preserve the M5 personality/settings linkage summary and reopen direct replay only through a fresh bounded smoke lane. |
-| `[短工]#ranch-m5-requirements@v0.2` | standby | `docs/orchestration/tasks/ranch-m5-requirements-v0.2.md` | Preserve the selected W28 serial route with `ranch-window-v0.2` first; do not dispatch implementation in W27. |
+| `[短工]#ranch-m5-requirements@v0.2` | summarized | `docs/orchestration/tasks/ranch-m5-requirements-v0.2.md` | Preserve historical readiness evidence superseded by M5 closeout `8df940c`; do not reopen child cards. |
 | `[监督]#ranch-pointer-smoke@v0.2` | standby | `docs/orchestration/tasks/ranch-pointer-smoke-v0.2.md` | Retry only when Windows can provide fresh screenshot-bound coordinates; preserve the 2026-07-17 blocked evidence. |
 | `[监督]#ranch-pointer-smoke-manual-evidence@v0.2` | standby | `docs/orchestration/tasks/ranch-pointer-smoke-manual-evidence-v0.2.md` | Keep full click-through, double-click, right-click, drag, and dock rows pending until directly observed. |
 | `[监督]#multi-agent-control@v0.1` live-subagents lane | summarized | `docs/orchestration/status.json` | Preserve the successful 2026-07-17 bounded in-app dispatch result; do not infer external Connector availability. |
@@ -98,4 +98,4 @@ next action:
 summary:
 - Standby accountability ledger; records accepted M4 long-worker delivery and keeps other blocked/standby roles bounded.
 - Summarized M5 verification cards are also tracked here as evidence-only rows without reopening active implementation lanes.
-- 2026-07-07 adds W27 weekly-requirements lane (active) and homepage-ui-design long-worker lane (summarized; H0-1/H0-2/H0-3/H0-4 accepted, commit/push not run).
+- Historical W27 is summarized; homepage H0-1/H0-2/H0-3/H0-4 plus density follow-up are accepted/pushed through `7cdb1fe`.

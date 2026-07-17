@@ -110,6 +110,9 @@ tracked business cards:
 - session: ⟦tag:v2|session|cockpit-live-session-notification-2026-07-16⟧ -> `docs/orchestration/sessions/cockpit-live-session-notification-2026-07-16.md`
 - session: ⟦tag:v2|session|daily-plan-2026-07-17⟧ -> `docs/orchestration/sessions/daily-plan-2026-07-17.md`
 - session: ⟦tag:v2|session|ranch-pointer-smoke-2026-07-17⟧ -> `docs/orchestration/sessions/ranch-pointer-smoke-2026-07-17.md`
+- session: ⟦tag:v2|session|control-truth-projection-2026-07-17⟧ -> `docs/orchestration/sessions/control-truth-projection-2026-07-17.md`
+- session: ⟦tag:v2|session|w28-closeout-readiness-2026-07-17⟧ -> `docs/orchestration/sessions/w28-closeout-readiness-2026-07-17.md`
+- session: ⟦tag:v2|session|homepage-layout-density-2026-07-16⟧ -> `docs/orchestration/sessions/homepage-layout-density-2026-07-16.md`
 - session: ⟦tag:v2|session|weekly-closeout-2026-07-11⟧ -> `docs/orchestration/sessions/weekly-closeout-2026-07-11.md`
 - session: ⟦tag:v2|session|m5-five-day-development-2026-07-14⟧ -> `docs/orchestration/sessions/m5-five-day-development-2026-07-14.md`
 - session: ⟦tag:v2|session|homepage-ui-p0-progress⟧ -> `docs/orchestration/sessions/homepage-ui-p0-progress.md`
@@ -132,7 +135,7 @@ dispatch gate:
 - Supervisor owns drift detection, blocker surfacing, and minimum correction.
 
 current target:
-- 2026-07-17 control truth is aligned to c21a60b; v3.2 P1/P2 are independently accepted, the transparent pointer capture blocker is recorded, and P0-C plus production Connectors remain disabled without fresh authorization.
+- 2026-07-17 visible control truth is accepted after 658efd0; W28 closeout readiness is locked for the 2026-07-18 through 2026-07-20 serial time gates, with no implementation worker or external execution authorization.
 
 current role split:
 - `[PM]#multi-agent-control@v0.1`: maintain this index, dispatch bounded lanes, collect callbacks, write acceptance.
@@ -152,14 +155,14 @@ current role split:
 - `[长工]#m3-main-bridge@v0.2`: summarized M3 owner for main/preload/types/browser fallback.
 - `[长工]#m3-ranch-entry@v0.2`: summarized M3 owner for ranch renderer interactions.
 - `[长工]#git-manager@AgentPet`: standby Git-management owner for `https://github.com/locooooooooo/AgentPet.git`; thread `019f20fc-9b77-74f3-aa3d-ba8348cdec1c` supplied the historical diagnosis and then, after explicit user authorization, completed `fa9e08b Import AgentPet workspace` pushed to `origin/main`; PM has requested a post-push read-only callback.
-- `[短工]#git-repair-agentpet@v0.1`: standby historical Git repair dispatch package; do not rerun `git init`, remote add, fetch, staging, commit, or push before explicit same-message authorization.
+- `[短工]#git-repair-agentpet@v0.1`: summarized historical Git repair boundary; the authorized import/push already completed, so this package must never rerun `git init`, remote add, or fetch against the current repository.
 - `[PM]#git-staging-review-agentpet@v0.1`: standby review package for the currently observed valid Git repo and working-tree/index state; no stage, unstage, commit, push, reset, clean, or file removal before explicit decision.
 - `[PM]#ranch-m4-requirements@v0.2`: summarized docs-only requirements readiness for M4 rename/control-cockpit linkage.
 - `[长工]#ranch-m4-implementation@v0.2`: summarized M4 implementation long-worker; thread `019f227a-8978-7df1-8b3f-738ccdb01b18` completed rename/header settings scope and PM verified lint/build/orchestration/browser smoke.
 - `[监督]#ranch-window@v0.1`: summarized M5 window evidence for FR-001/005/008/009/011 plus ranch 3-level UI convergence; manual transparent pointer smoke remains delegated to the standby verification packages.
 - `[监督]#ranch-status-script@v0.1`: summarized M5 animal/status/single-toast notification evidence for FR-002/003/004/006 without reopening connector state.
 - `[监督]#ranch-personality@v0.1`: summarized M5 personality and control-cockpit prefs-linkage evidence for FR-007 and notifyPrefs.
-- `[短工]#ranch-m5-requirements@v0.2`: standby docs-only M5 requirements readiness lane; main card plus five child cards are created, but no M5 implementation or long-worker dispatch is authorized.
+- `[短工]#ranch-m5-requirements@v0.2`: summarized historical readiness package superseded by completed M5 closeout `8df940c`; no child implementation card is reopened.
 - `[PM]#m5-longworker-dispatch@v0.1`: summarized bounded dispatch package; all five M5 child cards are closed and no further product worker is authorized.
 - `[PM]#m5-five-day-development@2026-07-14`: summarized five-day serial control card with status `completed_code_backed_with_manual_evidence_waived`; direct tray/pointer and Windows notification observations remain residual risk.
 - `[监督]#ranch-pointer-smoke@v0.2`: standby after the 2026-07-17 evidence run; windows and gates passed, while real coordinate input remained blocked by `SetIsBorderRequired failed (0x80004002)` and the missing screenshot-bound input state.
@@ -182,6 +185,8 @@ current role split:
 - `[PM]#weekly-requirements@2026-07-14`: active W28 planner; tracks the administrator-authorized M5 rolling schedule beginning 2026-07-11 while preserving per-card serial gates.
 - `[PM]#daily-plan@2026-07-17`: active control owner for current truth sync, v3.2 P1/P2 acceptance, pointer evidence and closeout.
 - `[PM]#cockpit-live-session-notification@2026-07-16`: summarized completed/pushed live Codex Desktop Session, Dock detail, completion bubble and sound evidence at `c21a60b`.
+- `[监督]#control-truth-projection@2026-07-17`: summarized accepted visible projection of the 2026-07-17 target, roles, Lanes and blockers.
+- `[PM]#w28-closeout-readiness@2026-07-17`: summarized readiness route for the 7-18 template, 7-19 pre-closeout audit and real 7-20 closeout time gate.
 - `[PM]#daily-plan@2026-07-09`: summarized 2026-07-09 daily plan;B②/C short-worker/D 今天/E1 evidence is retained as history.
 - `[PM]#daily-plan@2026-07-10`: summarized 2026-07-10 daily plan;administrator decisions and W28/closeout preparation are retained as history.
 
@@ -207,3 +212,4 @@ next action:
 - Keep `docs/orchestration/tasks/daily-role-accountability-2026-07-02.md` aligned with role states before closing any daily supervision pass.
 - M5 Day 5B correction `115c621` and final closeout `8df940c` are pushed to `origin/main`; preserve the residual-risk record and keep all M5 product lanes closed.
 - Keep M5 product dispatch closed. Direct tray/pointer and Windows notification visibility may only reopen through fresh bounded evidence lanes.
+- Follow `w28-closeout-readiness-2026-07-17.md`: create the closeout template on 7-18, run read-only pre-closeout on 7-19, and finalize only after the real 7-20 time gate.

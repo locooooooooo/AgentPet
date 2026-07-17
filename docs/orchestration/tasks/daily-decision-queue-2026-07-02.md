@@ -5,9 +5,9 @@
 
 objective:
 - Consolidate today's remaining standby and blocked decisions into one PM-facing queue.
-- Keep every role's next action executable without silently starting Git repair, staging review writes, connector execution, or pointer input; M4 implementation has been completed and summarized outside this standby queue.
+- Keep every role's next action executable without silently starting staging review writes, connector execution, or pointer input; historical Git repair and M4 implementation are summarized outside this standby queue.
 - Keep summarized M5 ranch verification cards and the ranch-only UI convergence pass as evidence inputs to existing ranch follow-up items instead of reopening new decision-bearing lanes.
-- Keep protected cockpit / selling-point source drift visible as a PM disposition item before any accept, format-only repair, rollback, or bounded implementation lane.
+- Preserve protected cockpit drift as closed history; reopen only for a new exact-file drift.
 
 dispatch state:
 - Standby decision queue.
@@ -17,7 +17,7 @@ truth sources:
 - Current board: `docs/orchestration/status.json`.
 - Current index: `docs/orchestration/index.md`.
 - Daily supervision session: `docs/orchestration/sessions/daily-supervision-2026-07-02.md`.
-- Git repair package: `docs/orchestration/tasks/git-repair-agentpet-v0.1.md`.
+- Historical Git repair package: `docs/orchestration/tasks/git-repair-agentpet-v0.1.md`.
 - Git staging review package: `docs/orchestration/tasks/git-staging-review-agentpet-v0.1.md`.
 - Connector acceptance package: `docs/orchestration/tasks/connector-acceptance-review-v0.1.md`.
 - M4 implementation package: `docs/orchestration/tasks/ranch-m4-implementation-v0.2.md`.
@@ -29,7 +29,6 @@ truth sources:
 decision queue:
 | queue item | current owner | required decision or condition | allowed first action after decision | must remain blocked until |
 | --- | --- | --- | --- | --- |
-| AgentPet Git repair | `[短工]#git-repair-agentpet@v0.1` | Explicit same-message authorization for local Git metadata repair | Run only `git init -b main` -> `git remote add origin https://github.com/locooooooooo/AgentPet.git` -> `git fetch origin` -> `git status --ignored --short`, then stop | Authorization is absent |
 | AgentPet Git state review | `[PM]#git-staging-review-agentpet@v0.1` | PM/user decides how to handle the currently observed valid repo and working-tree/index state | Run read-only Git state review first, then ask for stage/unstage/commit/push/leave-untouched decision | Review decision is absent |
 | Connector acceptance | `[PM]#connector-acceptance-review@v0.1` | PM/user accepts, rejects, or revises connector machine gate fields | Update connector metadata only if the decision explicitly says so, then rerun `npm.cmd run orchestration:preflight` and `npm.cmd run orchestration:connector-safety` | No connector decision exists |
 | Transparent pointer smoke | `[监督]#ranch-pointer-smoke-manual-evidence@v0.2` | Manual observer or alternate transparent-window capture route is available | Run parent pointer-smoke route and fill evidence table | Capture route is unavailable |
@@ -41,7 +40,6 @@ coverage guard:
 | connector-policy | Connector acceptance |
 | connector-acceptance-review | Connector acceptance |
 | git-manager-agentpet | AgentPet Git state review |
-| git-repair-agentpet | AgentPet Git repair |
 | git-staging-review-agentpet | AgentPet Git state review |
 | ranch-pointer-smoke | Transparent pointer smoke |
 | ranch-pointer-smoke-manual-evidence | Transparent pointer smoke |
@@ -50,7 +48,6 @@ coverage guard:
 session closeout coverage:
 | queue item | required closeout evidence |
 | --- | --- |
-| AgentPet Git repair | `AgentPet Git repair` |
 | AgentPet Git state review | `git-staging-review-agentpet-v0.1` |
 | Connector acceptance | `Connector acceptance review package exists` |
 | Transparent pointer smoke | `Ranch pointer-smoke verification and manual evidence packages are standby` |
@@ -62,6 +59,7 @@ session closeout coverage:
 - 2026-07-09 user approved PM default B②/C short-worker/D 今天/E1. B② keeps R0-3 deferred with the controlled dry-run lane on standby; the separate dry-run execution window is still not authorized. D completed capture-route investigation only: Electron `webContents.capturePage()` evidence exists, but full pointer input remains pending.
 - 2026-07-10 administrator decision overlay routed protected cockpit source drift to W28; the 2026-07-16 fresh audit found no current drift and removed that resolved item from the open queue. M5 and R0-3 retain their recorded boundaries.
 - 2026-07-17 bounded in-app short-worker dispatch succeeded. The historical `403 DAILY_LIMIT_EXCEEDED` is retained in history but removed from this current decision queue; external Connector execution remains a separate blocked policy.
+- 2026-07-17 W28 readiness audit confirmed the authorized AgentPet import/push is complete; `git-repair-agentpet` is summarized and removed from the open queue. Only the separate Git state review remains standby.
 - Any new `standby` or `blocked` lane in `docs/orchestration/status.json` must be added to this guard or explicitly exempted in `scripts/check-orchestration.mjs`.
 
 non-goals:
@@ -83,7 +81,7 @@ acceptance:
 - `npm.cmd run orchestration:check` passes.
 - `npm.cmd run orchestration:report` shows this queue as standby, not active, and prints the coverage guard plus session closeout coverage, including each open lane -> queue item and queue item -> required closeout evidence row.
 - Connector config remains no accepted/no enabled.
-- Git repair, staging review, unstage, commit, and push remain blocked unless explicitly authorized in a later message.
+- Git staging review, unstage, commit, and push remain blocked unless explicitly authorized in a later message; the historical Git repair package remains summarized and non-executable.
 
 next action:
 - Use this queue as the PM callback surface for the next user decision.

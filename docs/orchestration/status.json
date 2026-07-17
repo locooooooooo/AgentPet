@@ -2,7 +2,7 @@
   "identity": "[PM]#multi-agent-control@v0.1",
   "loopState": "active",
   "dispatchState": "active",
-  "target": "2026-07-17 control truth is aligned to c21a60b; v3.2 P1/P2 are independently accepted, the transparent pointer capture blocker is recorded, and P0-C plus production Connectors remain disabled without fresh authorization.",
+  "target": "2026-07-17 visible control truth is accepted after 658efd0; W28 closeout readiness is locked for the 2026-07-18 through 2026-07-20 serial time gates, with no implementation worker or external execution authorization.",
   "source": "docs/orchestration/index.md",
   "todayPlan": {
     "date": "2026-07-17",
@@ -106,7 +106,7 @@
       "title": "[PM]#daily-decision-queue@2026-07-02",
       "owner": "主控",
       "status": "standby",
-      "responsibility": "汇总 Git repair/staging review、connector acceptance、pointer smoke 与 R0-3 授权待决条件；live-subagent 历史 quota 项已由 2026-07-17 bounded dispatch 刷新。",
+      "responsibility": "汇总 Git staging review、connector acceptance、pointer smoke 与 R0-3 授权待决条件；历史 Git repair 已 summarized，live-subagent 历史 quota 项已由 2026-07-17 bounded dispatch 刷新。",
       "tag": "⟦tag:v2|task|daily-decision-queue-2026-07-02⟧",
       "evidence": "docs/orchestration/tasks/daily-decision-queue-2026-07-02.md"
     },
@@ -177,8 +177,8 @@
       "id": "git-repair-agentpet",
       "title": "[短工]#git-repair-agentpet@v0.1",
       "owner": "短工",
-      "status": "standby",
-      "responsibility": "AgentPet Git 元数据最小修复派工包作为历史边界保留；未获同消息授权前不执行 git init/remote/fetch/stage/commit/push。",
+      "status": "summarized",
+      "responsibility": "Historical repair package summarized after the authorized import/push completed; never rerun git init/remote add/fetch against the current valid repository.",
       "tag": "⟦tag:v2|task|git-repair-agentpet-v0.1⟧",
       "evidence": "docs/orchestration/tasks/git-repair-agentpet-v0.1.md"
     },
@@ -240,8 +240,8 @@
       "id": "ranch-m5-requirements",
       "title": "[短工]#ranch-m5-requirements@v0.2",
       "owner": "短工",
-      "status": "standby",
-      "responsibility": "Docs-only M5 v0.2 requirements readiness lane; main card plus five child cards are created, but no implementation or long-worker dispatch is authorized.",
+      "status": "summarized",
+      "responsibility": "Historical M5 readiness package superseded by completed code-backed M5 closeout 8df940c; no child implementation card is reopened.",
       "tag": "⟦tag:v2|task|ranch-m5-requirements-v0.2⟧",
       "evidence": "docs/orchestration/tasks/ranch-m5-requirements-v0.2.md"
     },
@@ -577,8 +577,8 @@
       "id": "git-repair-agentpet",
       "title": "AgentPet Git repair dispatch",
       "role": "[短工]#git-repair-agentpet@v0.1",
-      "state": "standby",
-      "nextAction": "作为历史 repair 边界保留；当前不要盲跑 git init/remote add/fetch/status，先走 staging review 决策。"
+      "state": "summarized",
+      "nextAction": "Preserve as historical repair evidence only; the current valid repository must use the separate staging-review decision route and never rerun repair commands."
     },
     {
       "id": "git-staging-review-agentpet",

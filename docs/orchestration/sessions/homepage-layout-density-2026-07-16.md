@@ -1,5 +1,11 @@
 # Homepage layout density evidence - 2026-07-16
 
+[长工]#homepage-ui-design@v0.1
+⟦tag:v2|session|homepage-layout-density-2026-07-16⟧
+
+loop state: summarized
+dispatch state: summarized
+
 ## Goal
 
 - Compress the homepage hero so the configured workstation matrix is visible sooner.

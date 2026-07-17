@@ -71,6 +71,9 @@ dispatch state: active
 | 2026-07-14 onward | Realtime A6 -> A7 -> B2 blocker -> A7.1 authorization/implementation -> B2 rerun，严格串行 |
 | 2026-07-16 ~ 2026-07-20 | W28 buffer、P0-C 决策包与周 closeout 准备 |
 | 2026-07-17 | Sync truth, independently review v3.2 P1/P2, archive blocked pointer evidence, and keep external execution gates closed |
+| 2026-07-18 | Create a non-complete `weekly-closeout-2026-07-20.md` template and classify unresolved items as carry-over/non-blocking |
+| 2026-07-19 | Run one read-only pre-closeout audit plus fresh full gates; freeze owners, prerequisites and evidence |
+| 2026-07-20 | After the real time gate, finalize W28, summarize the weekly role/session, commit/push control truth and prove clean parity |
 
 acceptance:
 - 本卡已在真实 W27 closeout 后切换为 `active`。
@@ -85,6 +88,7 @@ next action:
 - A7.1 `8866305` 与 B2 已验收推送；提交/推送控制面后不派 runtime worker，等待新的 P0-C 明确执行授权。
 - Protected source is closed with no current drift; in-app worker availability was refreshed successfully, while pointer input remains blocked by the Windows screenshot/input binding route.
 - Preserve independently accepted v3.2 P1/P2 evidence; do not open another visual phase without a new bounded scope.
+- Follow `w28-closeout-readiness-2026-07-17.md`; do not create or finalize the 7-20 closeout card before its scheduled gate.
 - Keep Trae draft/pending/disabled until Models is configured and a new read-only smoke is authorized; keep Qoder disabled/rejected until a headless API exists.
 
 summary:

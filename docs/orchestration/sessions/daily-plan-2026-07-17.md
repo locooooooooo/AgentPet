@@ -29,15 +29,19 @@ status: active_supervision_after_control_closeout
 | 2 | `[监督]#ranch-pointer-smoke@2026-07-17` | Real Electron pointer evidence only; no implementation edits | completed_with_blockers | `ranch-pointer-smoke-2026-07-17.md` |
 | 3 | `[监督]#cockpit-ui-redesign-v3.2-acceptance@2026-07-17` | Independent read-only P1/P2 browser replay | summarized / accepted | `cockpit-ui-redesign-v3.2-p1-p2-acceptance-2026-07-17.md` |
 | 4 | `[PM]#daily-plan@2026-07-17` | Control-plane truth sync, acceptance and closeout | active supervision | This card, `index.md`, `status.json`, W28 truth and final gates |
+| 5 | `[监督]#control-truth-projection@2026-07-17` | Read-only visible status projection replay | summarized / accepted | `control-truth-projection-2026-07-17.md` |
+| 6 | `[监督]#w28-closeout-readiness@2026-07-17` | Read-only W28 closeout readiness audit | summarized / ready | `w28-closeout-readiness-2026-07-17.md` |
 
 ## completed
 
 - Confirmed that the old `403 DAILY_LIMIT_EXCEEDED` wording is not current availability truth: two bounded in-app short workers were dispatched successfully in this run.
-- Confirmed v3.2 P1 `51d5501` and P2 `0dfaadf` are implemented and pushed, but their progress cards still require independent PM acceptance.
+- At dispatch, v3.2 P1 `51d5501` and P2 `0dfaadf` were implemented/pushed and pending review; the later independent replay accepted both.
 - Confirmed protected cockpit source drift is closed with no current drift.
 - Confirmed Trae/Qoder discovery and the live Codex Desktop Session/completion-notification feature are completed and pushed.
 - Ran a fresh transparent Electron ranch pointer lane. Static gates and both windows passed, but the coordinate-input route remained blocked by the Windows capture failure recorded in the evidence card.
 - Accepted v3.2 P1 `51d5501` and P2 `0dfaadf` after independent viewport, governance, keyboard, Portal, state, CSSOM, console and full-gate replay.
+- Accepted the visible control-truth projection after `658efd0`: four active roles, two active Lanes, correct standby/summarized entries, pointer blocker, no horizontal overflow and zero console warnings/errors.
+- Locked the W28 7-18/7-19/7-20 closeout route and Definition of Done without creating the time-gated closeout card early.
 
 ## current blockers
 
@@ -71,9 +75,13 @@ status: active_supervision_after_control_closeout
 - `npm.cmd run lint`: passed.
 - `npm.cmd run build`: passed.
 - `git diff --check`: passed.
+- First control closeout commit `658efd0` was pushed; local `HEAD`, `origin/main` and remote main matched with a clean worktree before this readiness advance.
 
 ## next action
 
 - Keep W28 in buffer/closeout mode with no implementation worker active.
+- On 2026-07-18, create the non-complete weekly closeout template; do not do this early on 2026-07-17.
+- On 2026-07-19, run one read-only pre-closeout audit and freeze carry-over evidence.
+- Finalize W28 only after the real 2026-07-20 closeout time gate.
 - Keep pointer evidence standby until a working screenshot-bound coordinate route exists.
 - Keep P0-C and every production Connector behind their explicit authorization gates.

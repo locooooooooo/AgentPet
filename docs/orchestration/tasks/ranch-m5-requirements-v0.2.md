@@ -3,9 +3,9 @@
 [短工]#ranch-m5-requirements@v0.2
 ⟦tag:v2|task|ranch-m5-requirements-v0.2⟧
 
-loop state: standby
-dispatch state: standby
-status: standby
+loop state: summarized
+dispatch state: summarized
+status: superseded_by_completed_m5_closeout
 
 date: 2026-07-09
 decision: C=short-worker approved by user in PM-direct route.
@@ -49,9 +49,8 @@ acceptance:
 - `npm.cmd run orchestration:check` passes.
 
 next action:
-- Keep all five cards standby through W27 closeout.
-- After W27 is summarized and W28 is active, keep all five cards standby until their calendar/dependency gate; on 2026-07-14 PM dispatches only `[长工]#ranch-window@v0.2` through the bounded package.
-- Continue strictly through `ranch-status-script` -> `ranch-personality` -> `ranch-fence-pointer` -> `ranch-system-notify`; every next card waits for callback, PM acceptance, full gates, commit, push, and a clean worktree.
+- Preserve this card as historical readiness evidence superseded by completed M5 closeout `8df940c`.
+- Do not reopen any child implementation card without a new user requirement and bounded task.
 
 summary:
-- Docs-only M5 v0.2 readiness lane; five-day serial route and dependency gates are selected for W28, but no implementation or connector execution started.
+- Summarized historical M5 readiness package; the five-day implementation completed and no product worker remains authorized.
