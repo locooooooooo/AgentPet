@@ -566,37 +566,39 @@ completed:
 incomplete:
 - M5 ranch verification cards are summarized and the ranch body now matches v0.3's simple three-level UI direction, but real transparent-window pointer smoke is still not accepted.
 - Transparent ranch window pointer smoke is still not fully automated; Windows MCP Snapshot and Electron `webContents.capturePage()` now provide capture evidence, but full click-through, double-click, right-click, drag, and dock pointer evidence is still not automated or accepted.
-- AgentPet Git repair standby package remains as a historical boundary; the current W27 closeout pass is limited to declared `docs/orchestration/**` state files, while unrelated Git decisions remain behind `git-staging-review-agentpet-v0.1`.
+- AgentPet Git repair standby package remains a historical boundary; no AgentPet Git lane was opened in the 2026-07-17 W28 control closeout, and any future action remains behind `git-staging-review-agentpet-v0.1`.
 - Connector acceptance review package exists, but connector policy acceptance is waiting for PM/user decision; no execution binding should be dispatched before that.
 - Ranch pointer-smoke verification and manual evidence packages are standby; the capture route now exists, but a direct pointer-input observer/automation route is still required before acceptance.
 - Homepage UI long-worker dispatch package exists, thread `mvs_237b464ebc78403d953b9ab93b398ab8` has delivered H0-1 design drafts, user selected C gorgeous, and H0-2/H0-3/H0-4 are accepted with evidence `docs/orchestration/sessions/homepage-ui-p0-c0-6-style-2026-07-07.md`; PM commit `18451ba` has been pushed to `origin/main`.
 - Daily decision queue is standby and does not authorize any queue item by itself.
 - Daily role accountability ledger is standby and records state/evidence/action without changing role states.
 - R0-3 Codex controlled dry-run lane is standby: P0 ranch-real-integration-p0 accepted after user decision ② on 2026-07-07; Codex machine-gate fields remain untouched; current Connector truth is Trae `draft/pending/enabled=false` behind Models configuration and Qoder `disabled/rejected/enabled=false` with an empty command; dry-run execution still requires a second confirmation.
-- Protected cockpit source drift is pending PM disposition activation: the administrator-selected W28 route is active as planning context, but the source lane remains standby until a fresh bounded authorization exists.
+- Protected cockpit source drift is closed as `closed_no_current_drift`; the 2026-07-16 audit found no protected-source diff and made no source edit.
 - W27 is summarized, W28 weekly requirements is active, and M5 is `completed_code_backed_with_manual_evidence_waived`; direct tray/pointer and Windows notification visibility remain residual risk, and all M5 product lanes are closed.
 - Realtime Agent cockpit next stage is `p0_c_authorization_required_after_a7_1_b2_acceptance`: A7.1 `8866305` and B2 are accepted; PM async-CIM visible-DOM p95 is `7ms`. No runtime worker is active and external Agent execution remains forbidden.
+- 2026-07-17 control refresh aligned the current target and today plan to `c21a60b`, summarized stale no-worker realtime roles, accepted v3.2 P1 `51d5501` and P2 `0dfaadf` after independent replay, and archived the blocked transparent-pointer evidence without a product-code edit.
 
 blockers:
 - External connector execution remains disabled.
 - P0-C remains blocked only by the missing fresh explicit external execution authorization.
-- Live sub-agent execution remains blocked by the previously recorded service-side `403 DAILY_LIMIT_EXCEEDED` until rechecked.
+- The historical service-side `403 DAILY_LIMIT_EXCEEDED` is no longer current availability truth: bounded in-app short workers launched successfully on 2026-07-17. External Connectors remain disabled separately.
 - Control-cockpit central 4x2 grid and protected selling-point files remain locked; M4 header settings entry has been completed and accepted.
 - M5 desktop ranch UI convergence is code/browser verified, but it does not clear the transparent Electron pointer-smoke blocker.
-- AgentPet Git working tree/index state is post-push and has PM docs/script/log drift; for the current W27 closeout, that drift is limited to declared `docs/orchestration/**` state files pending PM commit/push, while reset, clean, force push, and unrelated path inclusion remain prohibited.
+- AgentPet Git working tree/index state is outside this 2026-07-17 control closeout; the current allowed diff is `docs/orchestration/**` plus the tightly related `scripts/check-orchestration.mjs` truth assertion, while AgentPet writes, reset, clean and force push remain prohibited.
 
 next action:
 - Keep PM and Supervisor active for drift checks and Git post-push callback collection.
 - Preserve accepted M4 evidence from thread `019f227a-8978-7df1-8b3f-738ccdb01b18`; future ranch/control-cockpit work must open a new bounded lane.
 - Keep `ranch-window-v0.1`, `ranch-status-script-v0.1`, and `ranch-personality-v0.1` summarized as M5 evidence cards after ranch UI convergence; future direct desktop replay must open a fresh bounded smoke lane.
-- Keep `ranch-pointer-smoke-v0.2` and `ranch-pointer-smoke-manual-evidence-v0.2` standby until a manual or alternate transparent-window capture route is available. Capture routes now exist, but the lanes remain standby until full pointer input can be directly observed; capture-only evidence does not clear acceptance.
+- Keep `ranch-pointer-smoke-v0.2` and `ranch-pointer-smoke-manual-evidence-v0.2` standby. The 2026-07-17 Computer Use run enumerated both windows but screenshot binding failed with `SetIsBorderRequired failed (0x80004002)`, so full pointer input remains unaccepted.
 - Keep connector-policy and `connector-acceptance-review-v0.1` on standby until PM/user accepts or revises machine gate fields.
 - Keep Git manager, `git-repair-agentpet-v0.1`, and `git-staging-review-agentpet-v0.1` on standby for unrelated Git state; use the current narrow authorization only for the declared docs/script closeout.
-- Keep `protected-cockpit-source-drift-v0.1` standby in W28; open a fresh bounded lane before touching the registered protected whitespace.
+- Preserve `protected-cockpit-source-drift-v0.1` as summarized/closed; reopen only for a new exact-file drift.
 - Keep W28 active and preserve summarized `m5-five-day-development-2026-07-14` at `completed_code_backed_with_manual_evidence_waived`; authorize no further M5 product worker and keep residual-risk evidence explicit.
-- Commit/push the A7.1/B2 acceptance control switch; keep runtime worker count `0`, await a new P0-C authorization, and preserve unchanged Connector machine-gate fields.
+- Preserve pushed A7.1/B2 control commit `74d8f50`; keep runtime worker count `0`, await a new P0-C authorization, and preserve unchanged Connector machine-gate fields.
 - Use `daily-decision-queue-2026-07-02` as the next PM callback surface for standby decisions.
 - Keep `daily-role-accountability-2026-07-02` aligned with role states before closing any daily supervision pass.
+- Preserve the 2026-07-17 v3.2 acceptance and pointer evidence cards; no current implementation worker remains active.
 
 evidence:
 - `docs/orchestration/index.md`

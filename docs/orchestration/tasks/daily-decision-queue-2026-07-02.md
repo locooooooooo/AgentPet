@@ -33,7 +33,6 @@ decision queue:
 | AgentPet Git state review | `[PM]#git-staging-review-agentpet@v0.1` | PM/user decides how to handle the currently observed valid repo and working-tree/index state | Run read-only Git state review first, then ask for stage/unstage/commit/push/leave-untouched decision | Review decision is absent |
 | Connector acceptance | `[PM]#connector-acceptance-review@v0.1` | PM/user accepts, rejects, or revises connector machine gate fields | Update connector metadata only if the decision explicitly says so, then rerun `npm.cmd run orchestration:preflight` and `npm.cmd run orchestration:connector-safety` | No connector decision exists |
 | Transparent pointer smoke | `[监督]#ranch-pointer-smoke-manual-evidence@v0.2` | Manual observer or alternate transparent-window capture route is available | Run parent pointer-smoke route and fill evidence table | Capture route is unavailable |
-| Live sub-agent quota | `[监督]#multi-agent-control@v0.1` | Service-side `403 DAILY_LIMIT_EXCEEDED` can be rechecked without treating connectors as available | Recheck quota state and record exact result | Recheck route is unavailable |
 | R0-3 Codex dry-run authorization | `[PM]#ranch-real-integration-r0-3-dryrun@v0.1` | PM/user authorizes the controlled dry-run execution window | Run a single `codex --output-format json --quiet "<prompt>"` in an isolated cwd, exit 0, archive evidence to `docs/orchestration/sessions/codex-dryrun-2026-07-XX.{json,png,md}`; Codex machine-gate fields remain untouched | Authorization is absent |
 
 coverage guard:
@@ -41,7 +40,6 @@ coverage guard:
 | --- | --- |
 | connector-policy | Connector acceptance |
 | connector-acceptance-review | Connector acceptance |
-| live-subagents | Live sub-agent quota |
 | git-manager-agentpet | AgentPet Git state review |
 | git-repair-agentpet | AgentPet Git repair |
 | git-staging-review-agentpet | AgentPet Git state review |
@@ -56,14 +54,14 @@ session closeout coverage:
 | AgentPet Git state review | `git-staging-review-agentpet-v0.1` |
 | Connector acceptance | `Connector acceptance review package exists` |
 | Transparent pointer smoke | `Ranch pointer-smoke verification and manual evidence packages are standby` |
-| Live sub-agent quota | `403 DAILY_LIMIT_EXCEEDED` |
 | R0-3 Codex dry-run authorization | `R0-3 Codex controlled dry-run lane is standby` |
 
 - `daily-decision-queue` and `daily-role-accountability` are supervision artifacts; they remain standby but are not decision-bearing queue items.
 - Summarized M5 ranch verification cards (`ranch-window-v0.1`, `ranch-status-script-v0.1`, `ranch-personality-v0.1`) plus the ranch 3-level UI convergence evidence feed existing ranch follow-up items and do not create new decision-bearing lanes.
 - `ranch-window-v0.1` is the current residual-risk summary for the existing transparent pointer-smoke queue item; 2026-07-07 adds a Windows MCP Snapshot capture route, but full pointer input evidence is still pending.
 - 2026-07-09 user approved PM default B②/C short-worker/D 今天/E1. B② keeps R0-3 deferred with the controlled dry-run lane on standby; the separate dry-run execution window is still not authorized. D completed capture-route investigation only: Electron `webContents.capturePage()` evidence exists, but full pointer input remains pending.
-- 2026-07-10 administrator decision overlay routed protected cockpit source drift to W28; the 2026-07-16 fresh audit found no current drift and removed that resolved item from the open queue. M5, live-subagent quota, and R0-3 retain their recorded boundaries.
+- 2026-07-10 administrator decision overlay routed protected cockpit source drift to W28; the 2026-07-16 fresh audit found no current drift and removed that resolved item from the open queue. M5 and R0-3 retain their recorded boundaries.
+- 2026-07-17 bounded in-app short-worker dispatch succeeded. The historical `403 DAILY_LIMIT_EXCEEDED` is retained in history but removed from this current decision queue; external Connector execution remains a separate blocked policy.
 - Any new `standby` or `blocked` lane in `docs/orchestration/status.json` must be added to this guard or explicitly exempted in `scripts/check-orchestration.mjs`.
 
 non-goals:

@@ -2,13 +2,13 @@
   "identity": "[PM]#multi-agent-control@v0.1",
   "loopState": "active",
   "dispatchState": "active",
-  "target": "2026-07-15 realtime Agent cockpit is `p0_c_authorization_required_after_a7_1_b2_acceptance`: A7.1 `8866305` and B2 are accepted; PM async-CIM overlap visible-DOM p95 is 7ms. P0-C is ready for a decision but external Agent execution remains unauthorized.",
+  "target": "2026-07-17 control truth is aligned to c21a60b; v3.2 P1/P2 are independently accepted, the transparent pointer capture blocker is recorded, and P0-C plus production Connectors remain disabled without fresh authorization.",
   "source": "docs/orchestration/index.md",
   "todayPlan": {
-    "date": "2026-07-15",
-    "session": "docs/orchestration/sessions/realtime-agent-cockpit-next-stage-2026-07-15.md",
-    "selectedRoute": "Accept and push A7.1/B2 controlled production readiness, then hold P0-C for a fresh explicit execution authorization",
-    "progress": "docs/orchestration/sessions/realtime-agent-cockpit-next-stage-2026-07-15.md"
+    "date": "2026-07-17",
+    "session": "docs/orchestration/sessions/daily-plan-2026-07-17.md",
+    "selectedRoute": "Sync current control truth, independently review v3.2 P1/P2, record pointer evidence without implementation edits, and hold all external execution gates",
+    "progress": "docs/orchestration/sessions/daily-plan-2026-07-17.md"
   },
   "p0Cards": [
     {
@@ -33,10 +33,10 @@
       "id": "realtime-agent-cockpit-p0",
       "status": "ready-p0-c-authorization",
       "task": "docs/orchestration/tasks/realtime-agent-cockpit-v0.1.md",
-      "progress": "docs/orchestration/sessions/realtime-agent-cockpit-next-stage-2026-07-15.md"
+      "progress": "docs/orchestration/sessions/daily-plan-2026-07-17.md"
     }
   ],
-  "blocker": "Realtime A7.1/B2 technical gates are accepted, but P0-C still lacks a fresh explicit external execution authorization. 外部 connector 仍 disabled；Codex 仅 draft/pending/discovery-only；Trae 为 draft/pending/enabled=false 且仍受 Models 配置阻塞；Qoder 为 disabled/rejected/enabled=false 且 command-empty；live-subagents 仍受 403 DAILY_LIMIT_EXCEEDED 阻塞；完整 transparent pointer smoke 保持既有边界。",
+  "blocker": "P0-C still lacks a fresh explicit external execution authorization. 外部 connector 仍 disabled；Codex 仅 draft/pending/discovery-only；Trae 为 draft/pending/enabled=false 且仍受 Models 配置与 fresh smoke authorization 阻塞；Qoder 为 disabled/rejected/enabled=false 且缺 headless API；transparent pointer input 受 Windows screenshot/input binding `SetIsBorderRequired failed (0x80004002)` 阻塞。",
   "roles": [
     {
       "id": "pm",
@@ -106,7 +106,7 @@
       "title": "[PM]#daily-decision-queue@2026-07-02",
       "owner": "主控",
       "status": "standby",
-      "responsibility": "汇总今日 Git repair/staging review、connector acceptance、pointer smoke、live-subagent quota 的待决条件；M4 已完成收口，不再作为待决项。",
+      "responsibility": "汇总 Git repair/staging review、connector acceptance、pointer smoke 与 R0-3 授权待决条件；live-subagent 历史 quota 项已由 2026-07-17 bounded dispatch 刷新。",
       "tag": "⟦tag:v2|task|daily-decision-queue-2026-07-02⟧",
       "evidence": "docs/orchestration/tasks/daily-decision-queue-2026-07-02.md"
     },
@@ -250,7 +250,7 @@
       "title": "[监督]#ranch-pointer-smoke@v0.2",
       "owner": "监督",
       "status": "standby",
-      "responsibility": "透明 Electron 牧场 pointer-smoke 验证包；Windows MCP Snapshot 与 Electron capturePage 捕获路线已识别，完整指针输入验收仍待执行，不改实现。",
+      "responsibility": "2026-07-17 evidence run passed gates and window enumeration but real coordinate input was blocked by SetIsBorderRequired failed; keep implementation unchanged and retry only with a direct screenshot-bound route.",
       "tag": "⟦tag:v2|task|ranch-pointer-smoke-v0.2⟧",
       "evidence": "docs/orchestration/tasks/ranch-pointer-smoke-v0.2.md"
     },
@@ -259,7 +259,7 @@
       "title": "[监督]#ranch-pointer-smoke-manual-evidence@v0.2",
       "owner": "监督",
       "status": "standby",
-      "responsibility": "透明 Electron 牧场 pointer-smoke 手工证据记录包；替代捕获路线已识别，但未执行 click/right-click/drag 输入、不改实现。",
+      "responsibility": "2026-07-17 recorded click-through, double-click, right-click, drag and dock as blocked by the Windows capture/input precondition; Lane-owned processes were cleaned and no implementation edit occurred.",
       "tag": "⟦tag:v2|task|ranch-pointer-smoke-manual-evidence-v0.2⟧",
       "evidence": "docs/orchestration/tasks/ranch-pointer-smoke-manual-evidence-v0.2.md"
     },
@@ -276,10 +276,10 @@
       "id": "cockpit-ui-redesign-v3-2",
       "title": "[PM]#cockpit-ui-redesign-v3.2@v0.1",
       "owner": "主控",
-      "status": "standby",
-      "responsibility": "P0 accepted/pushed after PM replay: global state is deduplicated, 1280x720 dispatch is first-screen, card actions use a corrected accessible portal, and Corner Assist is conditional. P1/P2 remain unauthorized.",
+      "status": "summarized",
+      "responsibility": "P0 plus independently replayed P1 51d5501 and P2 0dfaadf are accepted/pushed; active reduced-motion profile and natural error-toast replay remain non-blocking evidence residuals.",
       "tag": "⟦tag:v2|task|cockpit-ui-redesign-v3.2-v0.1⟧",
-      "evidence": "docs/orchestration/tasks/cockpit-ui-redesign-v3.2-v0.1.md"
+      "evidence": "docs/orchestration/sessions/cockpit-ui-redesign-v3.2-p1-p2-acceptance-2026-07-17.md"
     },
     {
       "id": "homepage-ui-design",
@@ -304,7 +304,7 @@
       "title": "[PM]#weekly-requirements@2026-07-14",
       "owner": "主控",
       "status": "active",
-      "responsibility": "Maintain active W28 requirements; M5 five-day development is code-backed complete with manual tray/pointer/Windows notification evidence explicitly waived as residual risk.",
+      "responsibility": "Maintain W28 buffer/closeout truth: M5 and v3.2 P1/P2 are closed, pointer input is capture-blocked, and P0-C remains authorization-required.",
       "tag": "⟦tag:v2|session|weekly-requirements-2026-07-14⟧",
       "evidence": "docs/orchestration/sessions/weekly-requirements-2026-07-14.md"
     },
@@ -366,7 +366,7 @@
       "id": "realtime-connector-runtime",
       "title": "[长工]#realtime-connector-runtime@v0.1",
       "owner": "长工",
-      "status": "active",
+      "status": "standby",
       "responsibility": "P0-A A1-A7.1 and B2 are accepted to the controlled-process boundary; no runtime worker is active, P0-C awaits explicit authorization, and external Agent CLI execution remains forbidden.",
       "tag": "⟦tag:v2|task|realtime-agent-cockpit-p0-a-connector-runtime-v0.1⟧",
       "evidence": "docs/orchestration/tasks/realtime-agent-cockpit-p0-a-connector-runtime-v0.1.md"
@@ -411,7 +411,7 @@
       "id": "realtime-truth-ui",
       "title": "[长工]#realtime-truth-ui@v0.1",
       "owner": "长工",
-      "status": "active",
+      "status": "standby",
       "responsibility": "P0-B selector plus renderer truth slice is PM-verified: configured is distinct from online, simulation/unavailable/source/session/lastSeen/capabilities are explicit, App/Home/Cockpit consume one projection, SSR fresh/late/stale/session-lost DOM checks pass, 1280/1440/1920 browser fallback viewports pass, and Electron event propagation p95 is 0.421ms across 200 samples. Real E2E remains incomplete; this role does not own runtime or connector policy.",
       "tag": "⟦tag:v2|task|realtime-agent-cockpit-p0-b-data-truth-v0.1⟧",
       "evidence": "docs/orchestration/tasks/realtime-agent-cockpit-p0-b-data-truth-v0.1.md"
@@ -420,7 +420,7 @@
       "id": "realtime-requirements-control",
       "title": "[长工]#realtime-requirements-control@v0.1",
       "owner": "长工",
-      "status": "active",
+      "status": "summarized",
       "responsibility": "Own the realtime serial control: A7.1/B2 accepted and P0-C ready for a decision but still authorization-required; preserve controlled-process versus real Agent E2E boundaries.",
       "tag": "⟦tag:v2|session|realtime-agent-cockpit-progress-2026-07-13⟧",
       "evidence": "docs/orchestration/sessions/realtime-agent-cockpit-progress-2026-07-13.md"
@@ -429,10 +429,28 @@
       "id": "realtime-cockpit-next-stage",
       "title": "[PM]#realtime-cockpit-next-stage@2026-07-15",
       "owner": "主控",
-      "status": "active",
-      "responsibility": "Preserve accepted A7.1/B2 evidence, hold P0-C external execution behind a fresh explicit authorization, and preserve all Connector machine gates.",
+      "status": "summarized",
+      "responsibility": "Historical 2026-07-15 control session; A7.1/B2 switch is pushed as 74d8f50 and P0-C remains behind fresh explicit authorization under the current daily plan.",
       "tag": "⟦tag:v2|session|realtime-agent-cockpit-next-stage-2026-07-15⟧",
       "evidence": "docs/orchestration/sessions/realtime-agent-cockpit-next-stage-2026-07-15.md"
+    },
+    {
+      "id": "cockpit-live-session-notification",
+      "title": "[PM]#cockpit-live-session-notification@2026-07-16",
+      "owner": "主控",
+      "status": "summarized",
+      "responsibility": "Live Codex Desktop Session count, four Dock details, completion bubble and notification sound are completed/pushed as c21a60b with lifecycle-only monitoring.",
+      "tag": "⟦tag:v2|session|cockpit-live-session-notification-2026-07-16⟧",
+      "evidence": "docs/orchestration/sessions/cockpit-live-session-notification-2026-07-16.md"
+    },
+    {
+      "id": "daily-plan-2026-07-17",
+      "title": "[PM]#daily-plan@2026-07-17",
+      "owner": "主控",
+      "status": "active",
+      "responsibility": "Preserve the completed 2026-07-17 truth sync, accepted v3.2 P1/P2, pointer blocker evidence and active PM supervision.",
+      "tag": "⟦tag:v2|session|daily-plan-2026-07-17⟧",
+      "evidence": "docs/orchestration/sessions/daily-plan-2026-07-17.md"
     }
   ],
   "lanes": [
@@ -469,7 +487,7 @@
       "title": "每日计划督办",
       "role": "[PM]#daily-supervision@2026-07-02",
       "state": "active",
-      "nextAction": "监督 realtime next stage `p0_c_authorization_required_after_a7_1_b2_acceptance`；提交 acceptance control 后保持 runtime worker=0，等待新的 P0-C explicit authorization，并继续禁止外部 Agent execution。"
+      "nextAction": "Preserve the 2026-07-17 control closeout, keep runtime worker=0, wait for fresh P0-C authorization, and continue to prohibit external Agent execution."
     },
     {
       "id": "codex-evidence-closeout",
@@ -497,7 +515,7 @@
       "title": "Daily standby decision queue",
       "role": "[PM]#daily-decision-queue@2026-07-02",
       "state": "standby",
-      "nextAction": "作为下一次 PM 回调面；等待 Git log ignore/staging review、connector acceptance、pointer smoke 或 live-subagent quota 的明确决策/条件；M4 已收口为 summarized。"
+      "nextAction": "作为下一次 PM 回调面；等待 Git state review、Connector acceptance、working pointer route 或 R0-3 authorization 的明确决策/条件。"
     },
     {
       "id": "daily-role-accountability",
@@ -510,8 +528,8 @@
       "id": "live-subagents",
       "title": "实时子 agent 协同",
       "role": "[监督]#multi-agent-control@v0.1",
-      "state": "blocked",
-      "nextAction": "已进入 W28，但仅在安全 quota recheck route 可用时记录 service-side 403 DAILY_LIMIT_EXCEEDED 精确结果；不要把外部 connector 当成可用执行资源。"
+      "state": "summarized",
+      "nextAction": "2026-07-17 bounded in-app short-worker dispatch succeeded, so the historical 403 is not current availability truth; future dispatch remains explicit and does not make external Connectors executable."
     },
     {
       "id": "ranch-m1-m2-correction",
@@ -609,14 +627,14 @@
       "title": "Transparent ranch pointer smoke",
       "role": "[监督]#ranch-pointer-smoke@v0.2",
       "state": "standby",
-      "nextAction": "Windows MCP Snapshot 与 Electron webContents.capturePage 已可观察透明 ranch 渲染且未触发 SetIsBorderRequired failed；等待完整 pointer input 验收窗口，执行时同步填写 manual evidence 包。"
+      "nextAction": "2026-07-17 Computer Use enumerated both windows but screenshot binding failed with SetIsBorderRequired failed (0x80004002); retry only when a route can provide fresh screenshot-bound coordinates."
     },
     {
       "id": "ranch-pointer-smoke-manual-evidence",
       "title": "Transparent ranch pointer smoke manual evidence",
       "role": "[监督]#ranch-pointer-smoke-manual-evidence@v0.2",
       "state": "standby",
-      "nextAction": "capturePage 替代捕获路线已通过并归档；完整 click-through / double-click / right-click / drag / dock 证据未跑前保持 pending evidence。"
+      "nextAction": "Keep the 2026-07-17 blocked rows explicit; do not mark click-through, double-click, right-click, drag or dock accepted until directly observed through a working coordinate-input route."
     },
     {
       "id": "homepage-ui-design",
@@ -630,7 +648,7 @@
       "title": "W28 weekly requirements planning",
       "role": "[PM]#weekly-requirements@2026-07-14",
       "state": "active",
-      "nextAction": "Keep W28 active and aligned with the M5 five-day control card; today, after fresh gates and PM push, dispatch the single authorized ranch-window worker."
+      "nextAction": "Keep W28 in buffer/closeout mode: M5 and v3.2 P1/P2 are closed, pointer evidence is capture-blocked, and P0-C remains authorization-required."
     },
     {
       "id": "ranch-real-integration-r0-3-dryrun",

@@ -6,7 +6,7 @@
 loop state: summarized
 dispatch state: summarized
 
-status: ready_for_pm_review
+status: accepted_pushed_2026_07_17
 scope: P1 only
 baseline: `a6bae41`
 
@@ -52,9 +52,14 @@ baseline: `a6bae41`
 
 ## residual validation
 
-- PM should independently replay 1440x900 and wide-screen no-overflow screenshots.
-- PM should independently replay the selected-card P0 portal menu after the P1 commit; P1 did not modify its component or CSS rules.
+- PM independently replayed 1440x900 and wide-screen no-overflow on 2026-07-17; both passed.
+- PM independently replayed the selected-card Portal after the P1 commit; five actions remained readable and selection stayed on Codex.
 - Electron clipboard permission behavior remains an acceptance replay item; browser copy and clipboard contents passed.
+
+## PM closeout
+
+- Accepted on 2026-07-17 with evidence in `cockpit-ui-redesign-v3.2-p1-p2-acceptance-2026-07-17.md`.
+- Do not reopen P1 implementation from this progress card.
 
 ## boundaries preserved
 

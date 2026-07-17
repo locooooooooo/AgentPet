@@ -353,12 +353,10 @@ requireText('daily decision queue task card', dailyDecisionQueueTask, [
   '| AgentPet Git state review | `[PM]#git-staging-review-agentpet@v0.1` | PM/user decides how to handle the currently observed valid repo and working-tree/index state | Run read-only Git state review first, then ask for stage/unstage/commit/push/leave-untouched decision | Review decision is absent |',
   '| Connector acceptance | `[PM]#connector-acceptance-review@v0.1` | PM/user accepts, rejects, or revises connector machine gate fields | Update connector metadata only if the decision explicitly says so, then rerun `npm.cmd run orchestration:preflight` and `npm.cmd run orchestration:connector-safety` | No connector decision exists |',
   '| Transparent pointer smoke | `[监督]#ranch-pointer-smoke-manual-evidence@v0.2` | Manual observer or alternate transparent-window capture route is available | Run parent pointer-smoke route and fill evidence table | Capture route is unavailable |',
-  '| Live sub-agent quota | `[监督]#multi-agent-control@v0.1` | Service-side `403 DAILY_LIMIT_EXCEEDED` can be rechecked without treating connectors as available | Recheck quota state and record exact result | Recheck route is unavailable |',
   'coverage guard:',
   '| open status lane | queue coverage |',
   '| connector-policy | Connector acceptance |',
   '| connector-acceptance-review | Connector acceptance |',
-  '| live-subagents | Live sub-agent quota |',
   '| git-manager-agentpet | AgentPet Git state review |',
   '| git-repair-agentpet | AgentPet Git repair |',
   '| git-staging-review-agentpet | AgentPet Git state review |',
@@ -370,7 +368,6 @@ requireText('daily decision queue task card', dailyDecisionQueueTask, [
   '| AgentPet Git state review | `git-staging-review-agentpet-v0.1` |',
   '| Connector acceptance | `Connector acceptance review package exists` |',
   '| Transparent pointer smoke | `Ranch pointer-smoke verification and manual evidence packages are standby` |',
-  '| Live sub-agent quota | `403 DAILY_LIMIT_EXCEEDED` |',
   '`daily-decision-queue` and `daily-role-accountability` are supervision artifacts',
   'Any new `standby` or `blocked` lane in `docs/orchestration/status.json` must be added to this guard or explicitly exempted in `scripts/check-orchestration.mjs`.',
   'Do not repair Git, stage, commit, push, reset, clean, or remove files.',
@@ -395,7 +392,7 @@ requireText('daily role accountability task card', dailyRoleAccountabilityTask, 
   '| `[监督]#multi-agent-control@v0.1` | active | `docs/orchestration/roles/supervisor.md`, `scripts/check-orchestration.mjs` | Keep drift checks strict and preserve blocked/standby boundaries. |',
   '| `[短工]#connector-policy@v0.1` | standby | `docs/orchestration/tasks/connector-policy-v0.1.md` | Wait for connector machine-gate acceptance or revision. |',
   '| `[PM]#connector-acceptance-review@v0.1` | standby | `docs/orchestration/tasks/connector-acceptance-review-v0.1.md` | Keep no accepted/no enabled/no execution until a decision exists. |',
-  '| `[PM]#daily-supervision@2026-07-02` daily-supervision lane | active | `docs/orchestration/sessions/daily-supervision-2026-07-02.md` | Keep PM supervision active while collecting Git callbacks and preserving accepted M4 evidence. |',
+  '| `[PM]#daily-supervision@2026-07-02` daily-supervision lane | active | `docs/orchestration/sessions/daily-supervision-2026-07-02.md` | Preserve the 2026-07-17 closeout, current blockers and no-worker boundary. |',
   '| `[PM]#daily-decision-queue@2026-07-02` | standby | `docs/orchestration/tasks/daily-decision-queue-2026-07-02.md` | Use as the next PM callback surface for blocked decisions. |',
   '| `[PM]#daily-role-accountability@2026-07-02` | standby | `docs/orchestration/tasks/daily-role-accountability-2026-07-02.md` | Keep this ledger aligned with every `status.json` role. |',
   '| `[长工]#ranch-m1-m2-correction@v0.2` | summarized | `docs/orchestration/sessions/ranch-v0.2-2026-07-02.md` | Preserve accepted M1/M2 correction evidence; do not reopen implementation. |',
@@ -407,8 +404,10 @@ requireText('daily role accountability task card', dailyRoleAccountabilityTask, 
   '| `[短工]#git-repair-agentpet@v0.1` | standby | `docs/orchestration/tasks/git-repair-agentpet-v0.1.md` | Preserve as historical repair boundary; do not rerun blindly. |',
   '| `[PM]#git-staging-review-agentpet@v0.1` | standby | `docs/orchestration/tasks/git-staging-review-agentpet-v0.1.md` | Wait for a decision on the current valid repo and working-tree/index state. |',
   '| `[长工]#ranch-m4-implementation@v0.2` | summarized | `docs/orchestration/tasks/ranch-m4-implementation-v0.2.md` | Preserve thread `019f227a-8978-7df1-8b3f-738ccdb01b18` callback and PM verification evidence. |',
-  '| `[监督]#ranch-pointer-smoke@v0.2` | standby | `docs/orchestration/tasks/ranch-pointer-smoke-v0.2.md` | Wait for a transparent-window capture route. |',
-  '| `[监督]#multi-agent-control@v0.1` live-subagents lane | blocked | `docs/orchestration/status.json` | Recheck `403 DAILY_LIMIT_EXCEEDED` only when a safe route exists. |',
+  '| `[监督]#ranch-pointer-smoke@v0.2` | standby | `docs/orchestration/tasks/ranch-pointer-smoke-v0.2.md` | Retry only when Windows can provide fresh screenshot-bound coordinates; preserve the 2026-07-17 blocked evidence. |',
+  '| `[监督]#multi-agent-control@v0.1` live-subagents lane | summarized | `docs/orchestration/status.json` | Preserve the successful 2026-07-17 bounded in-app dispatch result; do not infer external Connector availability. |',
+  '| `[PM]#cockpit-live-session-notification@2026-07-16` | summarized | `docs/orchestration/sessions/cockpit-live-session-notification-2026-07-16.md` | Preserve completed/pushed `c21a60b` live Session, Dock detail, bubble and sound evidence. |',
+  '| `[PM]#daily-plan@2026-07-17` | active | `docs/orchestration/sessions/daily-plan-2026-07-17.md` | Own current truth sync, v3.2 acceptance, pointer blocker evidence and final closeout. |',
   'Every role ledger `current state` matches the corresponding `docs/orchestration/status.json` role status.',
   'Every role ledger row resolves to either a tracked `docs/orchestration/status.json` role title or a real `docs/orchestration/status.json` lane responsibility label, each parsed state matches that source, and each row has a non-empty accountability action.',
   'Every non-summarized `docs/orchestration/status.json` lane is covered by either its tracked role owner or a lane-specific role ledger row.',
@@ -568,15 +567,15 @@ requireText('daily supervision session', dailySupervisionSession, [
   'next action:',
   'evidence:',
   'Transparent ranch window pointer smoke is still not fully automated',
-  'AgentPet Git repair standby package remains as a historical boundary',
+  'AgentPet Git repair standby package remains a historical boundary',
   'git-staging-review-agentpet-v0.1',
   'git-repair-agentpet-v0.1',
   'Connector acceptance review package exists, but connector policy acceptance is waiting for PM/user decision',
   'connector-acceptance-review-v0.1',
-  'Live sub-agent execution remains blocked by the previously recorded service-side `403 DAILY_LIMIT_EXCEEDED`',
+  'The historical service-side `403 DAILY_LIMIT_EXCEEDED` is no longer current availability truth',
   'Control-cockpit central 4x2 grid and protected selling-point files remain locked',
-  'AgentPet Git working tree/index state is post-push and has PM docs/script/log drift',
-  'Keep `ranch-pointer-smoke-v0.2` and `ranch-pointer-smoke-manual-evidence-v0.2` standby until a manual or alternate transparent-window capture route is available.',
+  'AgentPet Git working tree/index state is outside this 2026-07-17 control closeout',
+  'Keep `ranch-pointer-smoke-v0.2` and `ranch-pointer-smoke-manual-evidence-v0.2` standby.',
   'ranch-pointer-smoke-manual-evidence-v0.2',
   'Keep connector-policy and `connector-acceptance-review-v0.1` on standby',
   'Keep Git manager, `git-repair-agentpet-v0.1`, and `git-staging-review-agentpet-v0.1` on standby',
@@ -1024,7 +1023,6 @@ if (statusJson) {
   const openDecisionLaneCoverage = new Map([
     ['connector-policy', 'Connector acceptance'],
     ['connector-acceptance-review', 'Connector acceptance'],
-    ['live-subagents', 'Live sub-agent quota'],
     ['git-manager-agentpet', 'AgentPet Git state review'],
     ['git-repair-agentpet', 'AgentPet Git repair'],
     ['git-staging-review-agentpet', 'AgentPet Git state review'],
@@ -1285,7 +1283,11 @@ if (statusJson) {
   if (statusJson.target && !index.includes(statusJson.target)) {
     errors.push('status.json target is not present in docs/orchestration/index.md current target');
   }
-  if (index.includes('403 DAILY_LIMIT_EXCEEDED') && !statusJson.blocker.includes('403 DAILY_LIMIT_EXCEEDED')) {
+  const indexBlockerSection = index.split('\nblockers:')[1]?.split('\nnext action:')[0] ?? '';
+  const indexHasCurrentQuotaBlocker = indexBlockerSection
+    .split(/\r?\n/)
+    .some((line) => line.includes('403 DAILY_LIMIT_EXCEEDED') && !line.includes('not current availability truth'));
+  if (indexHasCurrentQuotaBlocker && !statusJson.blocker.includes('403 DAILY_LIMIT_EXCEEDED')) {
     errors.push('status.json blocker must include live-subagent 403 DAILY_LIMIT_EXCEEDED when index lists it');
   }
 

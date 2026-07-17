@@ -3,8 +3,8 @@
 [PM]#realtime-cockpit-next-stage@2026-07-15
 ⟦tag:v2|session|realtime-agent-cockpit-next-stage-2026-07-15⟧
 
-loop state: active
-dispatch state: active
+loop state: summarized
+dispatch state: summarized
 status: p0_c_authorization_required_after_a7_1_b2_acceptance
 
 ## goal
@@ -60,7 +60,7 @@ status: p0_c_authorization_required_after_a7_1_b2_acceptance
 
 ## next action
 
-- Commit and push the A7.1/B2 acceptance control switch.
+- Preserve the already-pushed A7.1/B2 acceptance control commit `74d8f50`.
 - Keep P0-C at `authorization_required` until a new message explicitly authorizes the controlled Codex-only execution envelope.
 - Do not execute any external Agent CLI or change Connector machine gates from this session.
 

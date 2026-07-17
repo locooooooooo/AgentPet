@@ -3,8 +3,8 @@
 ⟦tag:v2|session|cockpit-ui-redesign-v3.2-acceptance-2026-07-13⟧
 
 [PM]#cockpit-ui-redesign-v3.2@v0.1
-loop state: standby
-dispatch state: standby
+loop state: summarized
+dispatch state: summarized
 
 task: `[长工]#cockpit-ui-redesign-v3.2@v0.1`
 scope: P0 only

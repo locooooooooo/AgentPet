@@ -8,7 +8,7 @@ loop state: active
 dispatch state: active
 
 > **计划周期**: 2026-07-14 ~ 2026-07-20 (W28)
-> **当前状态**: active; M5 is closed and pushed; realtime A7.1/B2 are accepted; bounded Trae/Qoder discovery is recorded, while every production Connector remains disabled
+> **当前状态**: active buffer/closeout; M5 is closed and pushed; realtime A7.1/B2 are accepted; v3.2 P1/P2 and live Codex Session notification are pushed; every production Connector remains disabled
 > **激活证据**: 2026-07-11 16:00 +08:00 W27 final closeout 已通过 fresh gates，并将 W27 summarized。
 > **硬边界**: A7.1/B2 technical gates pass at PM visible-DOM p95 `7ms`; P0-C external execution still requires a new explicit authorization, and Connector machine gates remain unchanged.
 
@@ -28,6 +28,9 @@ dispatch state: active
 - 2026-07-14 administrator override: `跳过验收，继续推进进度`。缺失的 tray replay 保留为 residual risk，不伪写为通过；Day 1 correction 可在自动门禁后 commit/push，并放行同一 ranch-window worker 继续 Day 2。
 - Pre-edit baseline: `HEAD == origin/main == b17c717`; 80-card orchestration check、report、preflight、connector-safety、lint、build 全绿。
 - W27 遗留项保持分离：M5 serial implementation、direct pointer evidence、R0-3 execution-window confirmation、protected bounded disposition、quota recheck；没有任何一项因 W28 激活被自动接受。
+- 2026-07-17 truth refresh: `HEAD == origin/main == c21a60b` at dispatch; bounded in-app short workers launched successfully, so the historical `403 DAILY_LIMIT_EXCEEDED` is no longer current availability truth. This does not authorize external Connectors.
+- 2026-07-17 pointer evidence: gates and both Electron windows passed, but Computer Use screenshots failed with `SetIsBorderRequired failed (0x80004002)`; click-through, double-click, right-click, drag and dock remain blocked rather than accepted.
+- v3.2 P1 `51d5501` and P2 `0dfaadf` are independently accepted/pushed; `c21a60b` live Codex Desktop Session count plus completion bubble/sound is completed and summarized.
 
 ## 一、W28 P0 候选
 
@@ -44,9 +47,9 @@ dispatch state: active
 | 优先级 | 候选 | 当前边界 |
 | --- | --- | --- |
 | P1-1 | Protected trailing whitespace bounded lane | 2026-07-16 fresh audit found no current drift; closed docs-only with zero source edits |
-| P1-2 | `cockpit-ui-redesign-v3.1` bounded visual refinement | 2026-07-12 管理员已授权 shell/rail/status/operator/dock 视觉优化；不修改 M5 lifecycle、中央卡片业务结构、8 卡 keyframes、`NiuMaAvatar.tsx`、`agentCore.ts` 或 connector machine gate |
-| P1-3 | live-subagents `403 DAILY_LIMIT_EXCEEDED` quota 复查 | 本周不主动复查;W28 仅在安全 route 可用时记录精确结果 |
-| P1-4 | M5 后续子卡串行队列 | 按五日总控在前一卡 callback、PM acceptance、full gates、commit、push、clean worktree 后接续;任何时候最多一个产品 worker |
+| P1-2 | `cockpit-ui-redesign-v3.2` P1/P2 acceptance | Independently accepted on 2026-07-17; no new visual phase authorized |
+| P1-3 | live-subagents availability | 2026-07-17 bounded in-app dispatch succeeded; historical 403 retained as history only, not a current blocker |
+| P1-4 | M5 后续子卡串行队列 | M5 is closed; no further product worker is authorized during W28 buffer |
 | P1-5 | Trae/Qoder Connector discovery | Trae adapter implemented but blocked by `Models is required`; Qoder rejected because no headless Agent API exists; production spawn remains 0 |
 
 ## 三、W28 P2 候选
@@ -67,6 +70,7 @@ dispatch state: active
 | 2026-07-15 | Day 5:先派 `[短工]#ranch-fence-pointer@v0.2`;直接 pointer evidence accepted/pushed 后才派 `[短工]#ranch-system-notify@v0.2` |
 | 2026-07-14 onward | Realtime A6 -> A7 -> B2 blocker -> A7.1 authorization/implementation -> B2 rerun，严格串行 |
 | 2026-07-16 ~ 2026-07-20 | W28 buffer、P0-C 决策包与周 closeout 准备 |
+| 2026-07-17 | Sync truth, independently review v3.2 P1/P2, archive blocked pointer evidence, and keep external execution gates closed |
 
 acceptance:
 - 本卡已在真实 W27 closeout 后切换为 `active`。
@@ -79,7 +83,8 @@ acceptance:
 next action:
 - M5 已收口并推送；保留直接 tray/pointer 与 Windows notification visibility 残余风险，不重开产品 lane。
 - A7.1 `8866305` 与 B2 已验收推送；提交/推送控制面后不派 runtime worker，等待新的 P0-C 明确执行授权。
-- Protected source is closed with no current drift; quota recheck and pointer evidence still require their own bounded activation.
+- Protected source is closed with no current drift; in-app worker availability was refreshed successfully, while pointer input remains blocked by the Windows screenshot/input binding route.
+- Preserve independently accepted v3.2 P1/P2 evidence; do not open another visual phase without a new bounded scope.
 - Keep Trae draft/pending/disabled until Models is configured and a new read-only smoke is authorized; keep Qoder disabled/rejected until a headless API exists.
 
 summary:

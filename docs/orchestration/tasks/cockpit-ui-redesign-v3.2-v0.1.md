@@ -3,9 +3,9 @@
 [PM]#cockpit-ui-redesign-v3.2@v0.1
 ⟦tag:v2|task|cockpit-ui-redesign-v3.2-v0.1⟧
 
-loop state: standby
-dispatch state: standby
-status: p0_accepted_pushed
+loop state: summarized
+dispatch state: summarized
+status: p0_p1_p2_accepted_pushed
 
 date: 2026-07-13
 source: `docs/控制舱UI体验诊断与v3.2开工方案-2026-07-13.md`
@@ -174,8 +174,9 @@ evidence:
 ## next action
 
 - P0 已完成 PM 独立视觉/交互验收并推送；保留本卡为后续增量边界。
-- P1/P2 未获授权，不自动派工；需要新的管理员决定和独立文件围栏。
+- P1 `51d5501` 与 P2 `0dfaadf` 已在 2026-07-17 独立 PM 回放中验收通过。
+- 保留 active reduced-motion profile 与自然 error-toast replay 为非阻塞残余证据；不因此开启新视觉阶段。
 
 ## summary
 
-- v3.2 P0 accepted/pushed；任务优先、信息去重、动作收敛与 Corner Assist 条件显示已落地，P1/P2 保持未启动。
+- v3.2 P0/P1/P2 accepted and pushed；后续变化必须开启新的 bounded scope。

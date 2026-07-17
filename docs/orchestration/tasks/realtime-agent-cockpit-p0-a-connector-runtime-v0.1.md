@@ -3,8 +3,8 @@
 [长工]#realtime-connector-runtime@v0.1
 ⟦tag:v2|task|realtime-agent-cockpit-p0-a-connector-runtime-v0.1⟧
 
-loop state: active
-dispatch state: active
+loop state: standby
+dispatch state: standby
 status: partial_accepted_blocked_safe_foundation
 acceptance: partial_accepted
 date: 2026-07-13

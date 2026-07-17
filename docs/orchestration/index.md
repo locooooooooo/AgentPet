@@ -55,6 +55,9 @@ tracked business cards:
 - task: ⟦tag:v2|task|cockpit-ui-redesign-v3.2-v0.1⟧ -> `docs/orchestration/tasks/cockpit-ui-redesign-v3.2-v0.1.md`
 - session: ⟦tag:v2|session|cockpit-ui-redesign-v3.2-progress⟧ -> `docs/orchestration/sessions/cockpit-ui-redesign-v3.2-progress.md`
 - session: ⟦tag:v2|session|cockpit-ui-redesign-v3.2-acceptance-2026-07-13⟧ -> `docs/orchestration/sessions/cockpit-ui-redesign-v3.2-acceptance-2026-07-13.md`
+- session: ⟦tag:v2|session|cockpit-ui-redesign-v3.2-p1-progress-2026-07-16⟧ -> `docs/orchestration/sessions/cockpit-ui-redesign-v3.2-p1-progress-2026-07-16.md`
+- session: ⟦tag:v2|session|cockpit-ui-redesign-v3.2-p2-progress-2026-07-16⟧ -> `docs/orchestration/sessions/cockpit-ui-redesign-v3.2-p2-progress-2026-07-16.md`
+- session: ⟦tag:v2|session|cockpit-ui-redesign-v3.2-p1-p2-acceptance-2026-07-17⟧ -> `docs/orchestration/sessions/cockpit-ui-redesign-v3.2-p1-p2-acceptance-2026-07-17.md`
 - task: ⟦tag:v2|task|realtime-agent-cockpit-v0.1⟧ -> `docs/orchestration/tasks/realtime-agent-cockpit-v0.1.md`
 - task: ⟦tag:v2|task|realtime-agent-cockpit-p0-a-connector-runtime-v0.1⟧ -> `docs/orchestration/tasks/realtime-agent-cockpit-p0-a-connector-runtime-v0.1.md`
 - task: ⟦tag:v2|task|realtime-agent-cockpit-p0-b-data-truth-v0.1⟧ -> `docs/orchestration/tasks/realtime-agent-cockpit-p0-b-data-truth-v0.1.md`
@@ -105,6 +108,8 @@ tracked business cards:
 - session: ⟦tag:v2|session|weekly-requirements-2026-07-14⟧ -> `docs/orchestration/sessions/weekly-requirements-2026-07-14.md`
 - session: ⟦tag:v2|session|trae-qoder-connector-discovery-2026-07-16⟧ -> `docs/orchestration/sessions/trae-qoder-connector-discovery-2026-07-16.md`
 - session: ⟦tag:v2|session|cockpit-live-session-notification-2026-07-16⟧ -> `docs/orchestration/sessions/cockpit-live-session-notification-2026-07-16.md`
+- session: ⟦tag:v2|session|daily-plan-2026-07-17⟧ -> `docs/orchestration/sessions/daily-plan-2026-07-17.md`
+- session: ⟦tag:v2|session|ranch-pointer-smoke-2026-07-17⟧ -> `docs/orchestration/sessions/ranch-pointer-smoke-2026-07-17.md`
 - session: ⟦tag:v2|session|weekly-closeout-2026-07-11⟧ -> `docs/orchestration/sessions/weekly-closeout-2026-07-11.md`
 - session: ⟦tag:v2|session|m5-five-day-development-2026-07-14⟧ -> `docs/orchestration/sessions/m5-five-day-development-2026-07-14.md`
 - session: ⟦tag:v2|session|homepage-ui-p0-progress⟧ -> `docs/orchestration/sessions/homepage-ui-p0-progress.md`
@@ -127,7 +132,7 @@ dispatch gate:
 - Supervisor owns drift detection, blocker surfacing, and minimum correction.
 
 current target:
-- 2026-07-15 realtime Agent cockpit is `p0_c_authorization_required_after_a7_1_b2_acceptance`: A7.1 `8866305` and B2 are accepted; PM async-CIM overlap visible-DOM p95 is 7ms. P0-C is ready for a decision but external Agent execution remains unauthorized.
+- 2026-07-17 control truth is aligned to c21a60b; v3.2 P1/P2 are independently accepted, the transparent pointer capture blocker is recorded, and P0-C plus production Connectors remain disabled without fresh authorization.
 
 current role split:
 - `[PM]#multi-agent-control@v0.1`: maintain this index, dispatch bounded lanes, collect callbacks, write acceptance.
@@ -139,7 +144,7 @@ current role split:
 - `[短工]#runtime-dispatch-cards@v0.1`: control-card setup for blocked-safe connector runtime implementation lanes.
 - `[短工]#runtime-blocked-path-closeout@v0.1`: close accepted blocked-path lanes and hold before execution binding.
 - `[短工]#codex-evidence-closeout@v0.1`: record Codex evidence result and keep acceptance pending.
-- `[PM]#daily-decision-queue@2026-07-02`: standby PM queue for Git staging/log decisions, connector acceptance, pointer smoke route, and live-subagent quota decisions; M4 dispatch has completed and is summarized.
+- `[PM]#daily-decision-queue@2026-07-02`: standby PM queue for Git staging/log decisions, connector acceptance, pointer smoke route, and R0-3 authorization; the historical live-subagent quota item was resolved by fresh 2026-07-17 bounded dispatch.
 - `[PM]#daily-role-accountability@2026-07-02`: standby ledger mapping each role to state, evidence, and accountability action.
 - `[长工]#ranch-m1-m2-correction@v0.2`: corrected ranch M1/M2 drift; accepted for M3 entry after code/build/browser/Electron prefs evidence.
 - `[长工]#ranch-m3-plan@v0.2`: read-only M3 plan complete; superseded by two active M3 implementation owners.
@@ -157,36 +162,38 @@ current role split:
 - `[短工]#ranch-m5-requirements@v0.2`: standby docs-only M5 requirements readiness lane; main card plus five child cards are created, but no M5 implementation or long-worker dispatch is authorized.
 - `[PM]#m5-longworker-dispatch@v0.1`: summarized bounded dispatch package; all five M5 child cards are closed and no further product worker is authorized.
 - `[PM]#m5-five-day-development@2026-07-14`: summarized five-day serial control card with status `completed_code_backed_with_manual_evidence_waived`; direct tray/pointer and Windows notification observations remain residual risk.
-- `[监督]#ranch-pointer-smoke@v0.2`: standby verification package for transparent ranch pointer smoke; no implementation edit.
-- `[监督]#ranch-pointer-smoke-manual-evidence@v0.2`: standby manual evidence package for pointer-smoke callback recording; no pointer input executed yet.
+- `[监督]#ranch-pointer-smoke@v0.2`: standby after the 2026-07-17 evidence run; windows and gates passed, while real coordinate input remained blocked by `SetIsBorderRequired failed (0x80004002)` and the missing screenshot-bound input state.
+- `[监督]#ranch-pointer-smoke-manual-evidence@v0.2`: standby evidence package; the 2026-07-17 run recorded click-through, double-click, right-click, drag and dock as blocked rather than passed, with Lane-owned processes cleaned.
 - `[长工]#homepage-ui-design@v0.1`: summarized HomePage / landing / 启动页 P0 lane; H0-1 design drafts accepted as C · 华丽, H0-2/H0-3 implemented, H0-4 protected-file audit passed in `homepage-ui-p0-c0-6-style-2026-07-07.md`; no edit to `NiuMaAvatar.tsx` / `index.css` / `agentCore.ts` / central 4x2 control-cockpit grid.
 - `[PM]#ranch-real-integration-r0-3-dryrun@v0.1`: standby R0-3 Codex controlled dry-run evidence lane; Codex machine fields stay unchanged, Trae stays draft/pending/disabled behind Models configuration, and Qoder stays disabled/rejected/command-empty; no dry-run starts without a second confirmation.
 - `[PM]#protected-cockpit-source-drift@v0.1`: summarized after the 2026-07-16 fresh audit found no protected-source diff and both targeted/global diff checks passed; no source edit was manufactured.
 - `[PM]#cockpit-ui-redesign-v3.1@v0.1`: summarized accepted visual-refinement lane pushed as `aa4cfa5`; future cockpit changes require a fresh bounded scope, while M5 lifecycle, protected animation/avatar, business logic, and connectors remain untouched.
-- `[PM]#cockpit-ui-redesign-v3.2@v0.1`: standby after accepted/pushed P0; task-first state dedupe, first-screen dispatch, card-action reduction, and conditional Corner Assist passed PM replay after two bounded menu corrections. P1/P2 remain unauthorized.
-- `[长工]#realtime-connector-runtime@v0.1`: A1-A7.1 and B2 are accepted to the controlled-process boundary; no runtime worker is active and external Agent CLI execution remains forbidden.
+- `[PM]#cockpit-ui-redesign-v3.2@v0.1`: summarized; P0 and independently replayed P1 `51d5501` / P2 `0dfaadf` are accepted/pushed, with reduced-motion active-profile and natural error-toast replay retained as non-blocking residual evidence.
+- `[长工]#realtime-connector-runtime@v0.1`: standby after A1-A7.1/B2 controlled-process acceptance; no runtime worker is active and external Agent CLI execution remains forbidden.
 - `[长工]#realtime-trusted-authorizer@v0.1`: summarized A6 owner; main-owned intent-bound single-use grants passed all negative paths, production policy remains blocked and external spawn stayed 0.
-- `[长工]#realtime-process-reattach@v0.1`: summarized A7 owner; commit `e2031cd` proves process fingerprint/restart recovery and 10-second fail-closed behavior, with synchronous Windows CIM blocking retained as B2 residual risk.
+- `[长工]#realtime-process-reattach@v0.1`: summarized A7 owner; commit `e2031cd` proves process fingerprint/restart recovery and 10-second fail-closed behavior, and A7.1 `8866305` resolves the historical synchronous-CIM UI latency risk.
 - `[长工]#realtime-production-path-e2e@v0.1`: summarized B2 owner; PM fresh async-CIM overlap passed at visible-DOM p95 `7ms` with child/proof-worker residue `0`.
 - `[长工]#realtime-async-process-proof@v0.1`: summarized A7.1 owner; asynchronous identity proof and failure matrix are accepted/pushed as `8866305`.
-- `[长工]#realtime-truth-ui@v0.1`: partial-accepted after selector plus App/Home/Cockpit truth wiring, 1280/1440/1920 browser fallback replay, renderer SSR fresh/late/stale/session-lost fixture and Electron event p95; configured/online/simulated/source/session semantics are separated, while real E2E remains pending.
-- `[长工]#realtime-requirements-control@v0.1`: active docs/control owner; A7.1/B2 are accepted and P0-C is ready for a decision but still authorization-required. Controlled local process evidence remains distinct from real Agent E2E.
+- `[长工]#realtime-truth-ui@v0.1`: standby after partial acceptance of selector plus App/Home/Cockpit truth wiring, viewport replay, renderer SSR fixtures and Electron event latency; real E2E remains gated by P0-C.
+- `[长工]#realtime-requirements-control@v0.1`: summarized historical control owner; A7.1/B2 are accepted and P0-C remains authorization-required under the current PM plan.
 - `[PM]#realtime-cockpit-next-stage@2026-07-14`: summarized historical A7 authorization session.
-- `[PM]#realtime-cockpit-next-stage@2026-07-15`: active P0-C authorization control session; A7.1/B2 are accepted and no external Agent execution is authorized yet.
+- `[PM]#realtime-cockpit-next-stage@2026-07-15`: summarized historical P0-C authorization control session; A7.1/B2 control commit `74d8f50` is already pushed.
 - `[PM]#weekly-requirements@2026-07-07`: summarized W27 (2026-07-07~2026-07-13) weekly-requirements history; final closeout is recorded in `weekly-closeout-2026-07-11.md`.
 - `[PM]#weekly-requirements@2026-07-14`: active W28 planner; tracks the administrator-authorized M5 rolling schedule beginning 2026-07-11 while preserving per-card serial gates.
+- `[PM]#daily-plan@2026-07-17`: active control owner for current truth sync, v3.2 P1/P2 acceptance, pointer evidence and closeout.
+- `[PM]#cockpit-live-session-notification@2026-07-16`: summarized completed/pushed live Codex Desktop Session, Dock detail, completion bubble and sound evidence at `c21a60b`.
 - `[PM]#daily-plan@2026-07-09`: summarized 2026-07-09 daily plan;B②/C short-worker/D 今天/E1 evidence is retained as history.
 - `[PM]#daily-plan@2026-07-10`: summarized 2026-07-10 daily plan;administrator decisions and W28/closeout preparation are retained as history.
 
 blockers:
 - External connector execution remains disabled; Codex is draft/pending/discovery-only, Trae is draft/pending with `Models is required`, and Qoder is rejected/disabled because no independent headless Agent API exists.
 - Real-time cockpit A6/A7.1, renderer truth and B2 controlled production slices are accepted only to the trusted/controlled-process boundary. P0-C real Agent E2E is still unexecuted; configured seeds, CLI discovery, controlled Node processes and simulated ticks must not be reported as online Agent sessions.
-- Treat service-side `403 DAILY_LIMIT_EXCEEDED` as a live sub-agent blocker until a quota recheck path is available; today's Codex app long-worker threads were used only as explicit user-authorized role sessions.
+- The historical service-side `403 DAILY_LIMIT_EXCEEDED` is not current availability truth: bounded in-app short workers were dispatched successfully on 2026-07-17. This does not enable any external Connector.
 - Control-cockpit central 4x2 grid and protected selling-point files remain locked; M4 header settings entry has been completed and accepted.
-- Transparent Electron ranch pointer smoke now has an additional Electron `webContents.capturePage()` evidence route that captured `ranch.html` without `SetIsBorderRequired failed`; full click-through / double-click / right-click / drag / dock evidence is still pending.
+- Transparent Electron ranch pointer smoke remains incomplete: the 2026-07-17 Computer Use route enumerated both windows and eight animals, but screenshots failed with `SetIsBorderRequired failed (0x80004002)`, so safe coordinate input and direct click/drag/dock observation were blocked.
 
 next action:
-- Commit and push the A7.1/B2 acceptance control switch; keep the runtime worker count at zero.
+- Preserve pushed A7.1/B2 control commit `74d8f50`; keep the runtime worker count at zero.
 - Keep P0-C at `authorization_required_ready_for_decision` until a fresh explicit Codex execution authorization exists.
 - Do not execute or enable any external Agent Connector from this control closeout.
 - Keep M3 code gates accepted as passed after `lint`, `build`, and `orchestration:check`; use the identified Windows MCP Snapshot route only as capture evidence until full transparent-window pointer input is observed.
@@ -194,7 +201,7 @@ next action:
 - Keep AgentPet Git log ignore / staging decisions behind explicit user confirmation. **2026-07-07 Git log ignore = ① 推 main 即可 已落档**(不引 pre-commit / pre-push hook,backup 为每周 manual 巡检);lane `git-staging-review-agentpet` 仍 standby 等待 PM/user 决定是否处理当前 Git state。The historical repair package is `docs/orchestration/tasks/git-repair-agentpet-v0.1.md`; the current Git state review package is `docs/orchestration/tasks/git-staging-review-agentpet-v0.1.md` and remains standby.
 - Preserve the accepted M4 evidence from thread `019f227a-8978-7df1-8b3f-738ccdb01b18`; future ranch work must open a new bounded lane.
 - Keep `ranch-window-v0.1`, `ranch-status-script-v0.1`, and `ranch-personality-v0.1` summarized as M5 evidence cards; do not treat them as fresh active implementation lanes.
-- Keep ranch pointer-smoke verification and `ranch-pointer-smoke-manual-evidence-v0.2` standby for full pointer input; capture-only evidence is archived, but click-through / double-click / right-click / drag / dock are not accepted yet.
+- Keep ranch pointer-smoke verification and `ranch-pointer-smoke-manual-evidence-v0.2` standby until a Windows route can create a screenshot-bound coordinate state; the 2026-07-17 blocked evidence is archived and no implementation defect was proved.
 - Keep Codex and Trae `draft/pending/enabled=false`; keep Qoder `disabled/rejected/enabled=false` and command-empty.
 - Use `docs/orchestration/tasks/daily-decision-queue-2026-07-02.md` as the next PM callback surface for standby decisions.
 - Keep `docs/orchestration/tasks/daily-role-accountability-2026-07-02.md` aligned with role states before closing any daily supervision pass.

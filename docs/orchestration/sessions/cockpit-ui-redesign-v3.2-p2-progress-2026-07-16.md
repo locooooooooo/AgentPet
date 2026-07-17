@@ -6,7 +6,7 @@
 loop state: summarized
 dispatch state: summarized
 
-status: ready_for_pm_review
+status: accepted_pushed_2026_07_17
 scope: P2 only
 baseline: `7cdb1fe`
 
@@ -78,8 +78,7 @@ baseline: `7cdb1fe`
 
 ## next action
 
-- PM independently review the three desktop viewport rows, the 125%/150% equivalent-width rows, Portal selection stability, Corner/Dock gap, and focus evidence.
-- If accepted, stage only `src/index.css` and this P2 progress document for the P2 commit.
+- PM independently replayed the desktop, DPI-equivalent, Portal, Corner/Dock and focus rows on 2026-07-17; P2 is accepted with evidence in `cockpit-ui-redesign-v3.2-p1-p2-acceptance-2026-07-17.md`.
 - Keep reduced-motion active-profile and natural error-toast replay as explicit residual evidence; do not open P3 or change business logic to satisfy them.
 
 ## evidence

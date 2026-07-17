@@ -3,8 +3,8 @@
 [长工]#realtime-truth-ui@v0.1
 ⟦tag:v2|task|realtime-agent-cockpit-p0-b-data-truth-v0.1⟧
 
-loop state: active
-dispatch state: active
+loop state: standby
+dispatch state: standby
 status: partial_accepted_renderer_truth_slice
 acceptance: partial_accepted
 date: 2026-07-13

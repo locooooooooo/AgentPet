@@ -3,8 +3,8 @@
 ⟦tag:v2|session|realtime-agent-cockpit-progress-2026-07-13⟧
 
 [长工]#realtime-requirements-control@v0.1
-loop state: active
-dispatch state: active
+loop state: summarized
+dispatch state: summarized
 status: partial_acceptance_waiting_electron_e2e
 
 ## current truth
