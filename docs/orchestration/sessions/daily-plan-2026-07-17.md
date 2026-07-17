@@ -36,6 +36,7 @@ status: active_supervision_after_control_closeout
 | 9 | `[短工]#realtime-p1-scheduler-intake@v0.1` | Requirements, exact file fence and fixtures | summarized / accepted | `realtime-p1-scheduler-intake-v0.1.md` |
 | 10 | `[PM]#weekly-requirements@2026-07-21` | Next-stage requirements truth | active early / DDL 2026-07-17 | `weekly-requirements-2026-07-21.md` |
 | 11 | `[长工]#realtime-p1-scheduler-core@v0.1` | Local scheduler implementation only | summarized / accepted and pushed `ccedb15` | `realtime-p1-scheduler-core-v0.1.md` |
+| 12 | `[短工]#realtime-p1-scheduler-configurable-concurrency@v0.1` | Runtime-internal configurable-concurrency intake only | active docs-only / product worker `0` | `realtime-p1-scheduler-configurable-concurrency-v0.1.md` |
 
 ## completed
 
@@ -98,6 +99,7 @@ status: active_supervision_after_control_closeout
 
 - Keep W28 summarized and the completed five-day board closed; no product worker remains active.
 - Preserve S-01 through S-16, R-01 through R-03 and selective-integration evidence at `ccedb15`.
-- Use a new bounded task for future scheduler features and keep all external Agent/Connector gates closed.
+- Independently review the new configurable-concurrency intake, C-01 through C-12 and its three-file candidate fence; do not start implementation before the control baseline is pushed.
+- Keep priority, starvation protection, cancellation DAG and Connector quotas outside the active intake, and keep all external Agent/Connector gates closed.
 - Keep pointer evidence standby until a working screenshot-bound coordinate route exists.
 - Keep P0-C and every production Connector behind their explicit authorization gates.

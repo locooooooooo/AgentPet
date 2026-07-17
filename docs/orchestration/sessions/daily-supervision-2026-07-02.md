@@ -1138,3 +1138,9 @@ pm.cmd run build pass; git diff --check only on the 11 protected-source whitespa
   - Final counters: max global active/same-Agent/reserved `1/1/1`; external Agent spawn `0`; duplicate terminal `0`; residual process/timer `0/0`; policy-drift and unconfirmed-close extra spawns `0`.
   - PM full gates and isolated staged-snapshot gates passed. One isolated Windows CIM reattach run hit a 5-second timeout, followed by two consecutive isolated passes; this was recorded as environment timing noise rather than hidden.
   - Selective integration committed only five scheduler-owned files. Concurrent account-quota hunks in `src/types.ts` and all Electron/UI/Vite/user-document changes remained unstaged. Implementation `ccedb15` is pushed with remote parity and no scheduler worker remains active.
+
+- [2026-07-17] scheduler P1 configurable-concurrency intake start:
+  - The administrator directed PM to start advancing the plan. PM selected exactly one tracked P1 gap after `ccedb15`: runtime-internal configurable global concurrency.
+  - `realtime-p1-scheduler-configurable-concurrency-v0.1.md` freezes default `1`, accepted range `1..4`, same-Agent limit `1`, recovery/unconfirmed-close reservation rules and deterministic C-01 through C-12.
+  - This transition is docs-only. Product worker count remains `0`, external Agent spawn remains `0`, and no Connector machine gate changed.
+  - The future candidate fence excludes dirty `src/types.ts` account-quota hunks and every Electron/preload/Desktop API/UI/Hub/DockView/sound file. Independent review and a pushed control baseline are required before one short code worker may start.

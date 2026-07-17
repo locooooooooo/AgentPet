@@ -2,12 +2,12 @@
   "identity": "[PM]#multi-agent-control@v0.1",
   "loopState": "active",
   "dispatchState": "active",
-  "target": "Preserve the completed same-day five-day board at ccedb15: W28 is closed, next-stage requirements remain active, the local scheduler-core slice is accepted/pushed, and external execution plus machine gates stay closed.",
+  "target": "Advance exactly one scheduler P1 gap after `ccedb15`: independently review the runtime-internal configurable-concurrency intake while product worker count and external Agent spawn remain `0`.",
   "source": "docs/orchestration/index.md",
   "todayPlan": {
     "date": "2026-07-17",
     "session": "docs/orchestration/sessions/daily-plan-2026-07-17.md",
-    "selectedRoute": "Preserve the accepted same-day closeout and scheduler delivery while keeping all external execution and carry-over gates explicit",
+    "selectedRoute": "Start a docs-only configurable-concurrency intake, then admit no code worker before independent review and a pushed control baseline",
     "progress": "docs/orchestration/sessions/daily-plan-2026-07-17.md"
   },
   "p0Cards": [
@@ -496,6 +496,15 @@
       "responsibility": "Local scheduler-core is accepted/pushed as ccedb15 after S-01 through S-16, R-01 through R-03, independent review, selective types integration and isolated staged-snapshot validation; external Agent spawn stayed zero.",
       "tag": "⟦tag:v2|task|realtime-p1-scheduler-core-v0.1⟧",
       "evidence": "docs/orchestration/tasks/realtime-p1-scheduler-core-v0.1.md"
+    },
+    {
+      "id": "realtime-p1-scheduler-configurable-concurrency",
+      "title": "[短工]#realtime-p1-scheduler-configurable-concurrency@v0.1",
+      "owner": "短工",
+      "status": "active",
+      "responsibility": "Freeze and independently review an internal immutable maxGlobalActive 1..4 contract and C-01 through C-12; product worker count and external Agent spawn remain zero.",
+      "tag": "⟦tag:v2|task|realtime-p1-scheduler-configurable-concurrency-v0.1⟧",
+      "evidence": "docs/orchestration/tasks/realtime-p1-scheduler-configurable-concurrency-v0.1.md"
     }
   ],
   "lanes": [
@@ -693,7 +702,7 @@
       "title": "Next-stage weekly requirements planning",
       "role": "[PM]#weekly-requirements@2026-07-21",
       "state": "active",
-      "nextAction": "Preserve accepted scheduler commit ccedb15 and keep configurable concurrency, priority, starvation protection, cancellation DAG and Connector quotas outside the completed slice."
+      "nextAction": "Review the active configurable-concurrency intake and C-01 through C-12; keep product worker count zero until the control baseline is accepted and pushed."
     },
     {
       "id": "ranch-real-integration-r0-3-dryrun",
