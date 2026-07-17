@@ -2,7 +2,7 @@
   "identity": "[PM]#multi-agent-control@v0.1",
   "loopState": "active",
   "dispatchState": "active",
-  "target": "2026-07-17 visible control truth is accepted after 658efd0; W28 closeout readiness is locked for the 2026-07-18 through 2026-07-20 serial time gates, with no implementation worker or external execution authorization.",
+  "target": "2026-07-18 through 2026-07-22 five-day control is locked at 0e66ba9: W28 closes first, then P1 scheduler intake; no product worker starts before time and phase gates, and no external execution authorization is inferred.",
   "source": "docs/orchestration/index.md",
   "todayPlan": {
     "date": "2026-07-17",
@@ -451,6 +451,15 @@
       "responsibility": "Preserve the completed 2026-07-17 truth sync, accepted v3.2 P1/P2, pointer blocker evidence and active PM supervision.",
       "tag": "⟦tag:v2|session|daily-plan-2026-07-17⟧",
       "evidence": "docs/orchestration/sessions/daily-plan-2026-07-17.md"
+    },
+    {
+      "id": "next-five-day-development-2026-07-18",
+      "title": "[PM]#next-five-day-development@2026-07-18",
+      "owner": "主控",
+      "status": "standby",
+      "responsibility": "Hold the 2026-07-18 through 2026-07-22 serial control: close W28 first, prepare P1 scheduler intake, and keep Day 5 implementation behind the P0-C or explicit phase-waiver gate.",
+      "tag": "⟦tag:v2|session|next-five-day-development-2026-07-18⟧",
+      "evidence": "docs/orchestration/sessions/next-five-day-development-2026-07-18.md"
     }
   ],
   "lanes": [

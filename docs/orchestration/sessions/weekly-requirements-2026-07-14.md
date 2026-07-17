@@ -74,6 +74,8 @@ dispatch state: active
 | 2026-07-18 | Create a non-complete `weekly-closeout-2026-07-20.md` template and classify unresolved items as carry-over/non-blocking |
 | 2026-07-19 | Run one read-only pre-closeout audit plus fresh full gates; freeze owners, prerequisites and evidence |
 | 2026-07-20 | After the real time gate, finalize W28, summarize the weekly role/session, commit/push control truth and prove clean parity |
+| 2026-07-21 | After W28 closeout, create the docs-only P1 scheduler intake and freeze exact contract/file/failure boundaries |
+| 2026-07-22 | Dispatch at most one scheduler-core worker only if the intake is accepted and the P0-C/phase-waiver gate is satisfied; otherwise record `waiting_phase_gate` |
 
 acceptance:
 - 本卡已在真实 W27 closeout 后切换为 `active`。
@@ -89,6 +91,7 @@ next action:
 - Protected source is closed with no current drift; in-app worker availability was refreshed successfully, while pointer input remains blocked by the Windows screenshot/input binding route.
 - Preserve independently accepted v3.2 P1/P2 evidence; do not open another visual phase without a new bounded scope.
 - Follow `w28-closeout-readiness-2026-07-17.md`; do not create or finalize the 7-20 closeout card before its scheduled gate.
+- Hand off to `next-five-day-development-2026-07-18.md`; do not treat its conditional Day 5 row as current implementation authorization.
 - Keep Trae draft/pending/disabled until Models is configured and a new read-only smoke is authorized; keep Qoder disabled/rejected until a headless API exists.
 
 summary:

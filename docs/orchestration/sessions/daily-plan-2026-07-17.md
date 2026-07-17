@@ -31,6 +31,7 @@ status: active_supervision_after_control_closeout
 | 4 | `[PM]#daily-plan@2026-07-17` | Control-plane truth sync, acceptance and closeout | active supervision | This card, `index.md`, `status.json`, W28 truth and final gates |
 | 5 | `[监督]#control-truth-projection@2026-07-17` | Read-only visible status projection replay | summarized / accepted | `control-truth-projection-2026-07-17.md` |
 | 6 | `[监督]#w28-closeout-readiness@2026-07-17` | Read-only W28 closeout readiness audit | summarized / ready | `w28-closeout-readiness-2026-07-17.md` |
+| 7 | `[PM]#next-five-day-development@2026-07-18` | Five-day serial control and future scheduler admission | standby / waiting Day 1 | `next-five-day-development-2026-07-18.md` |
 
 ## completed
 
@@ -42,6 +43,7 @@ status: active_supervision_after_control_closeout
 - Accepted v3.2 P1 `51d5501` and P2 `0dfaadf` after independent viewport, governance, keyboard, Portal, state, CSSOM, console and full-gate replay.
 - Accepted the visible control-truth projection after `658efd0`: four active roles, two active Lanes, correct standby/summarized entries, pointer blocker, no horizontal overflow and zero console warnings/errors.
 - Locked the W28 7-18/7-19/7-20 closeout route and Definition of Done without creating the time-gated closeout card early.
+- Locked the 7-18 through 7-22 five-day serial plan: W28 closeout first, scheduler intake second, and Day 5 implementation only after its explicit phase gate.
 
 ## current blockers
 
@@ -83,5 +85,6 @@ status: active_supervision_after_control_closeout
 - On 2026-07-18, create the non-complete weekly closeout template; do not do this early on 2026-07-17.
 - On 2026-07-19, run one read-only pre-closeout audit and freeze carry-over evidence.
 - Finalize W28 only after the real 2026-07-20 closeout time gate.
+- After W28 closes, create the docs-only scheduler intake on 2026-07-21; keep 2026-07-22 implementation at `waiting_phase_gate` unless its recorded prerequisites are met.
 - Keep pointer evidence standby until a working screenshot-bound coordinate route exists.
 - Keep P0-C and every production Connector behind their explicit authorization gates.
