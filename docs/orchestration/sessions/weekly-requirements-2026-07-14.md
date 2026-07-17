@@ -31,6 +31,7 @@ dispatch state: active
 - 2026-07-17 truth refresh: `HEAD == origin/main == c21a60b` at dispatch; bounded in-app short workers launched successfully, so the historical `403 DAILY_LIMIT_EXCEEDED` is no longer current availability truth. This does not authorize external Connectors.
 - 2026-07-17 pointer evidence: gates and both Electron windows passed, but Computer Use screenshots failed with `SetIsBorderRequired failed (0x80004002)`; click-through, double-click, right-click, drag and dock remain blocked rather than accepted.
 - v3.2 P1 `51d5501` and P2 `0dfaadf` are independently accepted/pushed; `c21a60b` live Codex Desktop Session count plus completion bubble/sound is completed and summarized.
+- 2026-07-17 administrator date-gate waiver: the non-complete W28 closeout template and docs-only P1 scheduler intake were prepared early. This does not finalize W28, waive P0-C/phase gates or authorize any external Agent execution.
 
 ## 一、W28 P0 候选
 
@@ -71,10 +72,10 @@ dispatch state: active
 | 2026-07-14 onward | Realtime A6 -> A7 -> B2 blocker -> A7.1 authorization/implementation -> B2 rerun，严格串行 |
 | 2026-07-16 ~ 2026-07-20 | W28 buffer、P0-C 决策包与周 closeout 准备 |
 | 2026-07-17 | Sync truth, independently review v3.2 P1/P2, archive blocked pointer evidence, and keep external execution gates closed |
-| 2026-07-18 | Create a non-complete `weekly-closeout-2026-07-20.md` template and classify unresolved items as carry-over/non-blocking |
+| 2026-07-18 | Non-complete `weekly-closeout-2026-07-20.md` template was prepared early on 7-17 under the date-gate waiver; preserve it as standby and non-final |
 | 2026-07-19 | Run one read-only pre-closeout audit plus fresh full gates; freeze owners, prerequisites and evidence |
 | 2026-07-20 | After the real time gate, finalize W28, summarize the weekly role/session, commit/push control truth and prove clean parity |
-| 2026-07-21 | After W28 closeout, create the docs-only P1 scheduler intake and freeze exact contract/file/failure boundaries |
+| 2026-07-21 | Docs-only P1 scheduler intake was prepared early on 7-17 under the date-gate waiver; preserve `ready_waiting_phase_gate` and the exact contract/file/failure boundaries |
 | 2026-07-22 | Dispatch at most one scheduler-core worker only if the intake is accepted and the P0-C/phase-waiver gate is satisfied; otherwise record `waiting_phase_gate` |
 
 acceptance:
@@ -84,14 +85,15 @@ acceptance:
 - 管理员已将 M5 Day 1 日历门改为 2026-07-11；M5 implementation 仍仅由五日总控、今日 fresh baseline 和逐卡 bounded dispatch 授权。
 - Codex 内部子 agent 是授权 worker 机制;protected source red point is closed with no current drift, while connector execution and machine-gate edits remain separately gated.
 - `npm.cmd run orchestration:check` passes。
+- The early W28 template has zero checked acceptance items, and the scheduler intake changes no product code or Connector machine gate.
 
 next action:
 - M5 已收口并推送；保留直接 tray/pointer 与 Windows notification visibility 残余风险，不重开产品 lane。
 - A7.1 `8866305` 与 B2 已验收推送；提交/推送控制面后不派 runtime worker，等待新的 P0-C 明确执行授权。
 - Protected source is closed with no current drift; in-app worker availability was refreshed successfully, while pointer input remains blocked by the Windows screenshot/input binding route.
 - Preserve independently accepted v3.2 P1/P2 evidence; do not open another visual phase without a new bounded scope.
-- Follow `w28-closeout-readiness-2026-07-17.md`; do not create or finalize the 7-20 closeout card before its scheduled gate.
-- Hand off to `next-five-day-development-2026-07-18.md`; do not treat its conditional Day 5 row as current implementation authorization.
+- Preserve `weekly-closeout-2026-07-20.md` as a non-complete template; do not finalize it before fresh evidence and the real final gate.
+- Preserve `realtime-p1-scheduler-intake-v0.1.md` as requirements-only; do not treat its conditional Day 5 route as current implementation authorization.
 - Keep Trae draft/pending/disabled until Models is configured and a new read-only smoke is authorized; keep Qoder disabled/rejected until a headless API exists.
 
 summary:

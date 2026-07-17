@@ -5,10 +5,11 @@
 
 loop state: standby
 dispatch state: standby
-status: standby_waiting_day1_time_gate
+status: standby_requirements_prepared_under_time_waiver
 
 > **Control window**: 2026-07-18 through 2026-07-22
 > **Authorized input**: On 2026-07-17 the administrator requested that the following five-day development plan be advanced.
+> **Date-gate waiver**: On 2026-07-17 the administrator explicitly authorized early preparation of later requirements. Day 1 template and Day 4 intake artifacts may therefore exist early.
 > **Interpretation boundary**: This authorizes the manager to establish and supervise the serial plan. It does not authorize P0-C, R0-3, external Agent CLI execution, Connector machine-gate changes, pointer input, or a product worker before its recorded gate.
 
 ## single goal
@@ -27,10 +28,10 @@ status: standby_waiting_day1_time_gate
 
 | Day | Date | Only allowed lane | Intended outcome | Start gate | Planned exit state |
 | --- | --- | --- | --- | --- | --- |
-| 1 | 2026-07-18 | PM control plane | Create a non-complete `weekly-closeout-2026-07-20.md` template; classify every unresolved item as carry-over/non-blocking | Actual 2026-07-18 date; clean baseline; no product worker | template_ready_waiting_precloseout |
+| 1 | 2026-07-18 | PM control plane | Create a non-complete `weekly-closeout-2026-07-20.md` template; classify every unresolved item as carry-over/non-blocking | Date gate waived on 7-17 for requirements preparation only; no product worker | template_ready_waiting_precloseout_under_time_waiver |
 | 2 | 2026-07-19 | Supervisor read-only audit | Run fresh full gates; freeze carry-over owner, prerequisite and evidence; freeze W29 candidate ordering | Day 1 template exists and is not complete | precloseout_verified_waiting_time_gate |
 | 3 | 2026-07-20 | PM W28 closeout | After the real time gate, finalize W28, summarize its weekly role/session, publish control truth and prove clean parity | Actual closeout time; Day 2 evidence complete | w28_closed_w29_control_ready |
-| 4 | 2026-07-21 | Future `[短工]#realtime-p1-scheduler-intake@v0.1` docs-only lane | Write the bounded scheduler contract, file fence, fixtures, failure matrix and rollback surface; do not implement or spawn | W28 closeout pushed; W29 truth active; no product worker; clean baseline | intake_ready_waiting_phase_gate |
+| 4 | 2026-07-21 | `[短工]#realtime-p1-scheduler-intake@v0.1` docs-only lane | Write the bounded scheduler contract, file fence, fixtures, failure matrix and rollback surface; do not implement or spawn | Date gate waived on 7-17 for requirements preparation only; no product worker | ready_waiting_phase_gate_under_time_waiver |
 | 5 | 2026-07-22 | Future `[短工]#realtime-p1-scheduler-core@v0.1` single worker | Implement only the accepted local scheduler core and deterministic fixtures, with external spawn count fixed at zero | Day 4 intake accepted/pushed; P0-C accepted or administrator explicitly waives the phase gate; one-worker slot free | accepted/pushed or truthful waiting_phase_gate |
 
 ## Day 4 intake contract
@@ -88,8 +89,8 @@ git diff --check
 
 | Long worker | Scope | Result | Key evidence | Changed files |
 | --- | --- | --- | --- | --- |
-| `/root/w28_day1_prep_audit` | Read-only Day 1 closeout-template preparation | completed | Froze 10 template sections, seven carry-over rows, exact owner/prerequisite/evidence fields and all forbidden premature completion fields | none |
-| `/root/scheduler_intake_gap_audit` | Read-only Day 4/5 scheduler gap and file-fence audit | completed | Confirmed current runtime launches immediately after authorization and lacks queue/dependency contracts; froze the minimal contract, file fence and deterministic fixtures | none |
+| `/root/w28_day1_prep_audit` | Day 1 closeout-template preparation under the date-gate waiver | completed | Created a non-complete template with 18 unchecked items and seven carry-over rows; no final evidence was filled | `docs/orchestration/sessions/weekly-closeout-2026-07-20.md` |
+| `/root/scheduler_intake_gap_audit` | Day 4 scheduler requirements under the date-gate waiver | completed | Created the requirements-only contract, exact four-file future fence and S-01 through S-16 fixtures | `docs/orchestration/tasks/realtime-p1-scheduler-intake-v0.1.md` |
 
 PM supervision attempted a third independent gate thread, but the task hit the current agent thread limit. PM did not call that attempt completed; instead PM directly reran orchestration check/report/preflight/Connector safety and verified the clean control state.
 
@@ -101,23 +102,23 @@ The scheduler worker froze the future Day 5 candidate scope to `src/types.ts`, `
 
 completed:
 - The five dates, serial order, admission rules, conditional Day 5 branch and protected boundaries are recorded.
-- Registration gates passed with 113 referenced cards: orchestration check/report/preflight/Connector safety, realtime truth check, lint, build and `git diff --check`.
-- Two pre-gate long workers were dispatched and returned bounded read-only preparation callbacks with no file changes; their evidence is frozen above without activating future-day work.
+- Date-waiver artifacts pass the recurring gate set with 115 referenced cards: orchestration check/report/preflight/Connector safety, realtime truth check, lint, build and `git diff --check`.
+- Two bounded long workers first returned read-only gap callbacks, then created the two declared docs-only artifacts after the administrator's date-gate waiver; no product implementation was activated.
 
 incomplete:
-- Day 1 cannot start before the actual 2026-07-18 time gate.
-- The W28 closeout card does not yet exist by design.
+- Day 1 requirements preparation is complete under the date-gate waiver; the pre-closeout evidence and final closeout remain incomplete.
+- Day 4 requirements preparation is complete under the date-gate waiver; scheduler-core implementation has not started.
 - P0-C is not accepted, so Day 5 product implementation is not currently admissible.
 
 blockers:
-- Time gate: 2026-07-18 for Day 1 and 2026-07-20 for W28 closeout.
+- Final time gate: 2026-07-20 for W28 closeout; the requirement-preparation date gates are waived, not the final evidence gate.
 - Phase gate: P0-C acceptance or a new explicit administrator waiver before scheduler-core implementation.
 - Existing Pointer, Trae and Qoder prerequisites remain separate and do not block the control plan.
 
 next action:
-- Keep this card standby and wait for the actual 2026-07-18 Day 1 gate.
-- On Day 1 create only the non-complete W28 closeout template; do not dispatch a product worker.
+- Keep this card standby with both requirements artifacts prepared and no product worker active.
+- Next run fresh pre-closeout evidence without pre-filling final W28 completion fields.
 - Reuse the collected template and scheduler-intake packages; do not rerun the audits unless their baseline or prerequisites change.
 
 summary:
-- Standby five-day serial control plan; W28 closes first, scheduler intake follows, and implementation remains conditional on the recorded phase gate.
+- Standby five-day serial control plan with Day 1/Day 4 requirements prepared early; W28 final closeout and scheduler implementation remain conditional on their recorded gates.

@@ -10,7 +10,7 @@ status: active_supervision_after_control_closeout
 
 ## single goal
 
-- Restore the 2026-07-17 control plane to current repository truth and close only acceptance gaps that can be directly verified without reopening completed product implementation.
+- Restore the 2026-07-17 control plane to current repository truth, then prepare later requirements under the administrator's date-gate waiver without reopening completed product implementation or waiving evidence and phase gates.
 
 ## confirmed baseline
 
@@ -31,7 +31,9 @@ status: active_supervision_after_control_closeout
 | 4 | `[PM]#daily-plan@2026-07-17` | Control-plane truth sync, acceptance and closeout | active supervision | This card, `index.md`, `status.json`, W28 truth and final gates |
 | 5 | `[监督]#control-truth-projection@2026-07-17` | Read-only visible status projection replay | summarized / accepted | `control-truth-projection-2026-07-17.md` |
 | 6 | `[监督]#w28-closeout-readiness@2026-07-17` | Read-only W28 closeout readiness audit | summarized / ready | `w28-closeout-readiness-2026-07-17.md` |
-| 7 | `[PM]#next-five-day-development@2026-07-18` | Five-day serial control and future scheduler admission | standby / waiting Day 1 | `next-five-day-development-2026-07-18.md` |
+| 7 | `[PM]#next-five-day-development@2026-07-18` | Five-day serial control and future scheduler admission | standby / requirements prepared under date waiver | `next-five-day-development-2026-07-18.md` |
+| 8 | `[PM]#weekly-closeout@2026-07-20` | Non-complete closeout template only | standby / template ready under date waiver | `weekly-closeout-2026-07-20.md` |
+| 9 | `[短工]#realtime-p1-scheduler-intake@v0.1` | Requirements, exact file fence and fixtures only | standby / ready waiting phase gate | `realtime-p1-scheduler-intake-v0.1.md` |
 
 ## completed
 
@@ -44,7 +46,8 @@ status: active_supervision_after_control_closeout
 - Accepted the visible control-truth projection after `658efd0`: four active roles, two active Lanes, correct standby/summarized entries, pointer blocker, no horizontal overflow and zero console warnings/errors.
 - Locked the W28 7-18/7-19/7-20 closeout route and Definition of Done without creating the time-gated closeout card early.
 - Locked the 7-18 through 7-22 five-day serial plan: W28 closeout first, scheduler intake second, and Day 5 implementation only after its explicit phase gate.
-- Dispatched two bounded read-only long workers for W28 template preparation and scheduler intake-gap analysis; both returned callbacks with `changed files: none`, while a third gate thread hit the thread limit and was replaced by direct PM verification.
+- Dispatched two bounded read-only long workers for W28 template preparation and scheduler intake-gap analysis; both first returned evidence-only callbacks, while a third gate thread hit the thread limit and was replaced by direct PM verification.
+- After the administrator explicitly waived later date gates, the same two bounded workers created the non-complete W28 template and the requirements-only scheduler intake. No product source, Connector machine gate or external Agent was touched.
 
 ## current blockers
 
@@ -52,6 +55,7 @@ status: active_supervision_after_control_closeout
 - Trae requires non-secret Models configuration, a successful model response and a new smoke authorization.
 - Qoder requires an independent headless Agent API before reconsideration.
 - Full transparent Electron pointer input remains blocked because the current Windows capture route cannot produce the screenshot state required for safe coordinate input.
+- W28 final closeout still requires fresh pre-closeout evidence and the real 2026-07-20 final gate; scheduler implementation still requires P0-C acceptance or a new explicit phase waiver.
 
 ## non-goals
 
@@ -79,13 +83,14 @@ status: active_supervision_after_control_closeout
 - `npm.cmd run build`: passed.
 - `git diff --check`: passed.
 - First control closeout commit `658efd0` was pushed; local `HEAD`, `origin/main` and remote main matched with a clean worktree before this readiness advance.
+- Date-waiver requirements verification: `orchestration:check` passed with 115 referenced cards; report, preflight, Connector safety, realtime truth check, lint and build all passed; external Agent CLI execution remained zero.
 
 ## next action
 
 - Keep W28 in buffer/closeout mode with no implementation worker active.
-- On 2026-07-18, create the non-complete weekly closeout template; do not do this early on 2026-07-17.
+- Preserve the early-created weekly closeout template as non-complete; do not fill final evidence before its real closeout gate.
 - On 2026-07-19, run one read-only pre-closeout audit and freeze carry-over evidence.
 - Finalize W28 only after the real 2026-07-20 closeout time gate.
-- After W28 closes, create the docs-only scheduler intake on 2026-07-21; keep 2026-07-22 implementation at `waiting_phase_gate` unless its recorded prerequisites are met.
+- Preserve the early-created scheduler intake as requirements-only and `ready_waiting_phase_gate`; keep implementation unopened unless its recorded phase prerequisite is met.
 - Keep pointer evidence standby until a working screenshot-bound coordinate route exists.
 - Keep P0-C and every production Connector behind their explicit authorization gates.

@@ -2,12 +2,12 @@
   "identity": "[PM]#multi-agent-control@v0.1",
   "loopState": "active",
   "dispatchState": "active",
-  "target": "2026-07-18 through 2026-07-22 five-day control is locked at 0e66ba9: W28 closes first, then P1 scheduler intake; no product worker starts before time and phase gates, and no external execution authorization is inferred.",
+  "target": "Under the administrator's 2026-07-17 date-gate waiver, prepare the non-complete W28 closeout template and P1 scheduler requirements early; keep final W28 closeout, scheduler implementation, external execution and machine gates unopened.",
   "source": "docs/orchestration/index.md",
   "todayPlan": {
     "date": "2026-07-17",
     "session": "docs/orchestration/sessions/daily-plan-2026-07-17.md",
-    "selectedRoute": "Sync current control truth, independently review v3.2 P1/P2, record pointer evidence without implementation edits, and hold all external execution gates",
+    "selectedRoute": "Prepare later requirements under the date-gate waiver while preserving final-closeout, phase, external-execution and machine gates",
     "progress": "docs/orchestration/sessions/daily-plan-2026-07-17.md"
   },
   "p0Cards": [
@@ -457,9 +457,27 @@
       "title": "[PM]#next-five-day-development@2026-07-18",
       "owner": "主控",
       "status": "standby",
-      "responsibility": "Pre-gate W28-template and scheduler-gap long-worker callbacks are collected; keep the 2026-07-18 through 2026-07-22 serial control standby and Day 5 behind the P0-C or explicit phase-waiver gate.",
+      "responsibility": "Day 1 template and Day 4 scheduler requirements were prepared early under the administrator's date-gate waiver; keep final W28 closeout and Day 5 implementation behind their unchanged gates.",
       "tag": "⟦tag:v2|session|next-five-day-development-2026-07-18⟧",
       "evidence": "docs/orchestration/sessions/next-five-day-development-2026-07-18.md"
+    },
+    {
+      "id": "weekly-closeout-2026-07-20",
+      "title": "[PM]#weekly-closeout@2026-07-20",
+      "owner": "主控",
+      "status": "standby",
+      "responsibility": "Preserve the W28 closeout card as a non-complete template prepared under the date-gate waiver; final timestamps, checks, hashes, commit, push and parity remain unset.",
+      "tag": "⟦tag:v2|session|weekly-closeout-2026-07-20⟧",
+      "evidence": "docs/orchestration/sessions/weekly-closeout-2026-07-20.md"
+    },
+    {
+      "id": "realtime-p1-scheduler-intake",
+      "title": "[短工]#realtime-p1-scheduler-intake@v0.1",
+      "owner": "短工",
+      "status": "standby",
+      "responsibility": "Requirements-only scheduler intake is prepared under the date-gate waiver and remains ready_waiting_phase_gate; no scheduler code or external Agent execution is authorized.",
+      "tag": "⟦tag:v2|task|realtime-p1-scheduler-intake-v0.1⟧",
+      "evidence": "docs/orchestration/tasks/realtime-p1-scheduler-intake-v0.1.md"
     }
   ],
   "lanes": [
@@ -657,7 +675,7 @@
       "title": "W28 weekly requirements planning",
       "role": "[PM]#weekly-requirements@2026-07-14",
       "state": "active",
-      "nextAction": "Keep W28 in buffer/closeout mode: M5 and v3.2 P1/P2 are closed, pointer evidence is capture-blocked, and P0-C remains authorization-required."
+      "nextAction": "Keep W28 in buffer/closeout mode with the non-complete closeout template prepared under the date waiver; final closeout still waits for fresh evidence and the real 2026-07-20 gate."
     },
     {
       "id": "ranch-real-integration-r0-3-dryrun",
