@@ -60,6 +60,7 @@ session closeout coverage:
 - 2026-07-10 administrator decision overlay routed protected cockpit source drift to W28; the 2026-07-16 fresh audit found no current drift and removed that resolved item from the open queue. M5 and R0-3 retain their recorded boundaries.
 - 2026-07-17 bounded in-app short-worker dispatch succeeded. The historical `403 DAILY_LIMIT_EXCEEDED` is retained in history but removed from this current decision queue; external Connector execution remains a separate blocked policy.
 - 2026-07-17 W28 readiness audit confirmed the authorized AgentPet import/push is complete; `git-repair-agentpet` is summarized and removed from the open queue. Only the separate Git state review remains standby.
+- 2026-07-17 administrator compressed the later five-day board and every DDL to today. This resolves only the W28 schedule gate and local scheduler phase dependency; the four decision queue items above remain unchanged, and no external Agent/Connector or pointer action is authorized.
 - Any new `standby` or `blocked` lane in `docs/orchestration/status.json` must be added to this guard or explicitly exempted in `scripts/check-orchestration.mjs`.
 
 non-goals:

@@ -3,25 +3,26 @@
 [PM]#weekly-closeout@2026-07-20
 ⟦tag:v2|session|weekly-closeout-2026-07-20⟧
 
-loop state: standby
-dispatch state: standby
-status: template_ready_waiting_precloseout_under_time_waiver
+loop state: summarized
+dispatch state: summarized
+status: accepted_ready_for_control_commit_under_full_schedule_waiver
 
-> **Template prepared**: 2026-07-17 under an explicit administrator Day 1 time waiver
-> **Final closeout date**: 2026-07-20; actual final closeout has not been executed
+> **Candidate date / compressed DDL**: 2026-07-17 under the administrator's explicit full schedule waiver
+> **Original final closeout date**: 2026-07-20; the administrator explicitly waived this date gate for Day 2 and Day 3 candidate preparation on 2026-07-17
+> **Current state**: Closeout candidate evidence is ready; PM truth synchronization, acceptance, commit, push and remote parity have not been executed
 > **Source**: `docs/orchestration/sessions/weekly-requirements-2026-07-14.md`
 > **Control route**: `docs/orchestration/sessions/w28-closeout-readiness-2026-07-17.md` and `docs/orchestration/sessions/next-five-day-development-2026-07-18.md`
-> **Waiver boundary**: The waiver authorizes this non-complete template only. It does not open the final closeout gate or authorize implementation, external Agent execution, Connector changes, pointer input, staging, commit or push.
+> **Waiver boundary**: The full schedule waiver authorizes Day 2 read-only pre-closeout evidence and Day 3 closeout-candidate preparation on 2026-07-17. It does not authorize implementation, external Agent execution, Connector changes, pointer input, staging, commit, push or a false final/pushed closeout claim.
 
 ## objective
 
-- Prepare the W28 closeout structure before the final date while preserving the real 2026-07-20 closeout gate.
-- Partition the current W28 truth into completed inputs, non-goals and carry-over without converting preparation into final acceptance.
-- Freeze each carry-over owner, prerequisite and evidence route for the 2026-07-19 read-only pre-closeout audit.
+- Under the administrator's explicit full schedule waiver, compress the planned Day 2 and Day 3 evidence work into 2026-07-17 and prepare an acceptance-grade W28 closeout candidate.
+- Partition current W28 truth into completed inputs, non-goals and carry-over without converting this single-file candidate into PM-synchronized, committed or pushed final closeout truth.
+- Freeze each carry-over owner, prerequisite and evidence route from the live 2026-07-17 control plane.
 
 ## completed inputs awaiting final recheck
 
-These are already closed inputs to the future closeout. Listing them here does not close W28 and each remains subject to a fresh final truth check.
+These are already closed inputs to the closeout candidate. Listing them here does not by itself summarize the active W28 role/session or prove a final pushed closeout.
 
 - M5 code-backed delivery through `8df940c`; direct tray/pointer and Windows notification visibility remain recorded residual risk rather than accepted manual evidence.
 - Realtime A6/A7/A7.1/B2 controlled-process evidence; P0-C remains separately gated.
@@ -34,13 +35,13 @@ These are already closed inputs to the future closeout. Listing them here does n
 
 ## non-goals and negative boundary
 
-- Do not mark W28 closed, accepted, summarized or complete before the real final closeout gate.
+- Do not mark W28 role/session summarized or the closeout final/pushed before PM synchronizes the cross-file truth, independently accepts the candidate and completes the Git closeout.
 - Do not execute Codex, Trae, Qoder or any other external Agent CLI.
 - Do not infer P0-C or R0-3 authorization from this template or from the administrator's Day 1 time waiver.
 - Do not edit Connector machine-gate fields in `docs/orchestration/connectors.json` or `docs/orchestration/status.json` `connectors[]`.
 - Do not rerun transparent pointer input without a changed screenshot-bound observation route.
 - Do not reopen M5, cockpit v3.2, homepage density, protected source, live Session notification or completed realtime A7.1/B2 work.
-- Do not dispatch a product worker, stage, commit, push, reset, clean or publish from this template-preparation lane.
+- Do not dispatch a product worker, stage, commit, push, reset, clean or publish from this closeout-candidate lane.
 
 ## carry-over matrix
 
@@ -58,72 +59,80 @@ Every row is `carry-over / non-blocking` for W28 final closeout. A prerequisite 
 
 ## pre-closeout checklist
 
-- [ ] On the actual 2026-07-19 date, re-read index, status, W28 weekly truth, daily supervision, accountability, decision queue and this template.
-- [ ] Confirm this card is still non-complete and the 2026-07-20 final gate has not been treated as open.
-- [ ] Run one read-only pre-closeout audit with product worker count `0` and external Agent spawn count `0`.
-- [ ] Freeze the current owner, prerequisite and evidence for every carry-over row.
-- [ ] Freeze W29 candidate ordering without activating a scheduler implementation lane.
-- [ ] Run fresh `orchestration:check`, `orchestration:report`, `orchestration:preflight`, `orchestration:connector-safety`, `realtime:truth-check`, lint, build and `git diff --check`.
-- [ ] Confirm Connector machine gates, product source and protected surfaces have no unauthorized change attributable to the closeout lane.
-- [ ] Record the pre-closeout evidence without writing a final timestamp, final commit, push or parity result.
+- [x] Under the administrator's full schedule waiver, re-read index, status, W28 weekly truth, daily supervision, accountability, decision queue and this card on 2026-07-17.
+- [x] Confirm the original 2026-07-20 date gate is explicitly waived for candidate preparation while this card remains non-final and unpushed.
+- [x] Run the read-only pre-closeout audit with product implementation worker count `0` and external Agent spawn count `0` in the live truth.
+- [x] Freeze the current owner, prerequisite and evidence for every carry-over row.
+- [x] Freeze W29 candidate ordering without activating a scheduler implementation lane.
+- [x] Run fresh `orchestration:check`, `orchestration:report`, `orchestration:preflight`, `orchestration:connector-safety`, `realtime:truth-check`, lint, build and `git diff --check` against this edited candidate.
+- [x] Confirm the live Git diff contains no Connector machine-gate, product-source or protected-surface change attributable to this closeout lane.
+- [x] Record candidate evidence without writing a final closeout timestamp, final commit, push or parity result.
 
 ## final closeout checklist
 
-- [ ] Confirm the actual 2026-07-20 final closeout gate is open before changing this card to a final state.
-- [ ] Re-read all live truth sources and partition W28 into completed, non-goal and carry-over using current evidence.
-- [ ] Reconfirm that every carry-over is non-blocking and retains its separate authorization or external prerequisite.
-- [ ] Reconfirm product worker count `0`, external Connector spawn count `0` and unchanged Connector machine gates.
-- [ ] Reconfirm pointer remains blocked residual evidence rather than accepted input behavior.
-- [ ] Run the complete recurring gate set against the final closeout candidate.
-- [ ] Synchronize index, status, weekly truth, daily supervision, accountability and decision queue atomically.
-- [ ] Summarize the W28 weekly role/session only after final evidence passes.
+- [x] Record the administrator's explicit full schedule/date-gate waiver and set the compressed candidate date/DDL to 2026-07-17 without inventing a final pushed-closeout timestamp.
+- [x] Re-read all live truth sources and partition W28 into completed, non-goal and carry-over using current evidence.
+- [x] Reconfirm that every carry-over is non-blocking and retains its separate authorization or external prerequisite.
+- [x] Reconfirm product implementation worker count `0`, external Connector spawn count `0` and unchanged Connector machine gates in the live control evidence.
+- [x] Reconfirm pointer remains blocked residual evidence rather than accepted input behavior.
+- [x] Run the complete recurring gate set against this edited closeout candidate.
+- [x] Synchronize index, status, weekly truth, daily supervision, accountability and decision queue atomically.
+- [x] Summarize the W28 weekly role/session only after final evidence passes.
 - [ ] Stage only the declared control-plane closeout files after independent diff review.
 - [ ] Commit and push only after acceptance, then prove final remote parity and a clean worktree.
 
 ## prepared transition matrix
 
-This matrix is preparation only. No final transition in the right-hand column is applied by this template.
+This matrix is candidate preparation only. No PM-owned cross-file or Git transition in the right-hand column is applied by this single-file lane.
 
-| Control item | Current/template state | Prepared final state after the real 2026-07-20 gate |
+| Control item | Current/candidate state | Prepared final state after PM acceptance and synchronization |
 | --- | --- | --- |
-| This `weekly-closeout-2026-07-20` session | standby; `template_ready_waiting_precloseout_under_time_waiver` | Final state to be written only from actual-time acceptance evidence |
-| `[PM]#weekly-requirements@2026-07-14` role/session | active | summarized only after final gates and truth synchronization pass |
-| `weekly-requirements` Lane | active under W28 ownership | Future ownership/state transition only after a tracked W29 truth source exists and final closeout passes |
+| This `weekly-closeout-2026-07-20` session | summarized candidate in the current PM transition | Final Git evidence is attached only after fresh gates, commit, push and parity |
+| `[PM]#weekly-requirements@2026-07-14` role/session | summarized in the current PM transition | Preserve W28 history and seven non-blocking carry-over rows |
+| `weekly-requirements` Lane | active under `[PM]#weekly-requirements@2026-07-21` | Complete the bounded same-day scheduler delivery without reopening W28 |
 | `daily-supervision` Lane | active | remains active global supervision unless a separate control decision changes it |
-| `[PM]#next-five-day-development@2026-07-18` | standby serial control | May advance to the recorded post-W28 control state only after closeout evidence is accepted |
-| W29 scheduler intake | Requirements frozen early under the 2026-07-17 date-gate waiver; `ready_waiting_phase_gate` | Keep requirements-only; scheduler implementation still requires P0-C acceptance or a new explicit phase waiver |
-| Product implementation workers | `0` | Remain `0`; Day 5 stays conditional on accepted intake plus P0-C acceptance or a new explicit phase waiver |
+| `[PM]#next-five-day-development@2026-07-18` | active same-day serial control | Dispatch exactly one scheduler worker only after the control baseline push |
+| W29 scheduler intake | summarized/accepted under the full schedule waiver | Preserve as the contract source for the active scheduler-core task |
+| Product implementation workers | `0` before baseline push | Exactly one local scheduler-core worker after baseline push; no second worker |
 | External Agent/Connector execution | `0` authorized by this template | Remain unauthorized; each execution route keeps its separate explicit gate |
 
 completed:
-- The non-complete W28 closeout template was prepared on 2026-07-17 under the explicit administrator Day 1 time waiver.
+- The administrator's explicit full schedule waiver compressed the planned Day 2 and Day 3 candidate work to 2026-07-17; the original 2026-07-20 gate is retained as superseded schedule history rather than current DDL.
+- Live index, status, W28 weekly truth, daily supervision, accountability, decision queue and this card were re-read against pre-edit `HEAD == origin/main == a1637c1`.
 - Completed inputs, non-goals and all seven carry-over/non-blocking rows are recorded with owners, prerequisites and evidence routes.
-- Pre-closeout and final-closeout checklists are present and remain entirely unchecked.
+- The closeout candidate is ready for PM cross-file synchronization and acceptance; no product worker or external Agent execution was opened.
 
 incomplete:
-- The 2026-07-19 read-only pre-closeout audit and fresh full gates have not been run.
-- The actual 2026-07-20 final closeout has not been executed.
-- No final state transition, final timestamp, final Git evidence, commit, push or parity result exists in this template.
+- Index, status, weekly requirements, daily supervision, accountability and decision queue have not been synchronized by this single-file lane.
+- The W28 weekly role/session remains active and has not been summarized.
+- PM independent acceptance and cross-file truth synchronization are complete.
+- Staging, control commit, push, final remote parity and clean-worktree proof have not been executed.
+- This candidate therefore does not claim a final pushed closeout.
 
 blockers:
-- Final closeout remains behind the real 2026-07-20 time gate and the 2026-07-19 evidence-freeze prerequisite.
+- Candidate evidence has no remaining schedule gate; the administrator explicitly compressed the DDL to 2026-07-17.
+- Final pushed closeout still requires the control commit, push and remote parity evidence.
 - P0-C and R0-3 lack their separate explicit execution authorizations.
 - Pointer lacks a working screenshot-bound coordinate route; Trae lacks Models readiness and fresh smoke authorization; Qoder lacks a headless API.
 - AgentPet staging review lacks a fresh read-only state review plus an explicit PM/user decision; the Git manager callback remains read-only only.
 - These carry-over blockers do not block W28 closeout.
 
 next action:
-- Keep this session standby and non-complete.
-- On the actual 2026-07-19 date, run only the recorded Supervisor read-only pre-closeout audit, fresh gates and evidence freeze; do not dispatch a product worker or external Agent.
-- Finalize W28 only after the real 2026-07-20 gate and accepted fresh evidence.
+- PM stages only the declared control-plane closeout and same-day dispatch files, commits, pushes and proves remote parity plus preservation of unrelated user changes.
+- Do not dispatch a product worker or external Agent from this candidate; P0-C, R0-3, Trae, Qoder, pointer and AgentPet remain separately gated.
 
 evidence:
+- Administrator instruction in the current task: ignore the later five-day time gates and compress all plan DDLs to 2026-07-17; this is a schedule waiver, not external-execution authorization.
+- Non-final pre-edit baseline: `HEAD == origin/main == a1637c1`.
 - `docs/orchestration/index.md`
 - `docs/orchestration/status.json`
 - `docs/orchestration/sessions/w28-closeout-readiness-2026-07-17.md`
 - `docs/orchestration/sessions/next-five-day-development-2026-07-18.md`
 - `docs/orchestration/sessions/weekly-requirements-2026-07-14.md`
+- `docs/orchestration/sessions/daily-supervision-2026-07-02.md`
+- `docs/orchestration/tasks/daily-role-accountability-2026-07-02.md`
 - `docs/orchestration/tasks/daily-decision-queue-2026-07-02.md`
+- Fresh recurring gates passed with 117 referenced cards; report, preflight, Connector safety, realtime truth, lint, build and `git diff --check` all passed, with external Agent CLI execution `0`.
 
 summary:
-- Non-complete W28 closeout template prepared under a Day 1 time waiver; the final closeout remains unexecuted, all seven carry-over items remain separately gated and non-blocking, and every pre/final acceptance checkbox remains open.
+- W28 closeout is PM-accepted on the compressed 2026-07-17 DDL under the administrator's full schedule waiver. Seven carry-over items remain separately gated and non-blocking; only control commit, push and parity remain incomplete.

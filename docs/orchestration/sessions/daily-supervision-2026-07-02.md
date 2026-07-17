@@ -1125,3 +1125,11 @@ pm.cmd run build pass; git diff --check only on the 11 protected-source whitespa
   - Unchanged gates: W28 final closeout still requires fresh evidence and the real 2026-07-20 gate; scheduler-core still requires P0-C acceptance or a new explicit phase waiver; external Agent CLI, R0-3, pointer input and Connector machine-gate changes remain unauthorized.
   - PM will synchronize only declared `docs/orchestration/**` truth files, preserve unrelated `README.md` and `docs/牛马状态回执音效规范-v0.1.md`, run the complete recurring gates, then commit/push only the orchestration scope.
   - Verification passed after truth synchronization: orchestration check reported 115 referenced cards; report, preflight, Connector safety, realtime truth check, lint, build and `git diff --check` all passed; external Agent CLI execution remained zero.
+
+- [2026-07-17] compressed five-day DDL and local scheduler phase-waiver supervision:
+  - The administrator explicitly set the entire later five-day development plan and every DDL to 2026-07-17. PM interprets this as authority to complete W28 closeout early and use the intake's explicit phase-waiver branch for one local scheduler-core worker.
+  - W28 keeps seven carry-over items as non-blocking; P0-C, R0-3, Trae, Qoder, pointer evidence and AgentPet decisions remain separately gated.
+  - Next-stage requirements are activated early in `weekly-requirements-2026-07-21.md`; scheduler implementation is bounded by `realtime-p1-scheduler-core-v0.1.md` to `src/types.ts`, `src/lib/connectorRuntime.ts`, one scheduler fixture and one evidence card.
+  - The same-day waiver does not authorize external Agent CLI execution, Connector machine-gate changes, UI/ranch/protected-cockpit work or a second product worker.
+  - Next action: run fresh control gates, commit/push the closeout and dispatch baseline, then start exactly one scheduler-core worker and independently accept its evidence today.
+  - Fresh dispatch-baseline gates passed with 117 referenced cards: orchestration check/report/preflight/Connector safety, realtime truth, lint, build and `git diff --check`; no external Agent CLI was executed and no product source changed before dispatch.

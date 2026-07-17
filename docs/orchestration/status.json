@@ -2,12 +2,12 @@
   "identity": "[PM]#multi-agent-control@v0.1",
   "loopState": "active",
   "dispatchState": "active",
-  "target": "Under the administrator's 2026-07-17 date-gate waiver, prepare the non-complete W28 closeout template and P1 scheduler requirements early; keep final W28 closeout, scheduler implementation, external execution and machine gates unopened.",
+  "target": "Complete the entire original 2026-07-18 through 2026-07-22 board on the administrator's compressed 2026-07-17 DDL: close W28, activate the next requirements truth and deliver one local scheduler-core slice; external execution and machine gates stay closed.",
   "source": "docs/orchestration/index.md",
   "todayPlan": {
     "date": "2026-07-17",
     "session": "docs/orchestration/sessions/daily-plan-2026-07-17.md",
-    "selectedRoute": "Prepare later requirements under the date-gate waiver while preserving final-closeout, phase, external-execution and machine gates",
+    "selectedRoute": "Same-day serial closeout, next-stage requirements activation and one local scheduler-core delivery under the explicit full schedule and phase waiver",
     "progress": "docs/orchestration/sessions/daily-plan-2026-07-17.md"
   },
   "p0Cards": [
@@ -303,8 +303,8 @@
       "id": "weekly-requirements-w28",
       "title": "[PM]#weekly-requirements@2026-07-14",
       "owner": "主控",
-      "status": "active",
-      "responsibility": "Maintain W28 buffer/closeout truth: M5 and v3.2 P1/P2 are closed, pointer input is capture-blocked, and P0-C remains authorization-required.",
+      "status": "summarized",
+      "responsibility": "W28 is summarized early under the administrator's full schedule waiver; seven carry-over items remain non-blocking and separately gated.",
       "tag": "⟦tag:v2|session|weekly-requirements-2026-07-14⟧",
       "evidence": "docs/orchestration/sessions/weekly-requirements-2026-07-14.md"
     },
@@ -456,8 +456,8 @@
       "id": "next-five-day-development-2026-07-18",
       "title": "[PM]#next-five-day-development@2026-07-18",
       "owner": "主控",
-      "status": "standby",
-      "responsibility": "Day 1 template and Day 4 scheduler requirements were prepared early under the administrator's date-gate waiver; keep final W28 closeout and Day 5 implementation behind their unchanged gates.",
+      "status": "active",
+      "responsibility": "Own the serial same-day board: all original 2026-07-18 through 2026-07-22 DDLs are compressed to 2026-07-17; closeout baseline must be pushed before the single scheduler worker starts.",
       "tag": "⟦tag:v2|session|next-five-day-development-2026-07-18⟧",
       "evidence": "docs/orchestration/sessions/next-five-day-development-2026-07-18.md"
     },
@@ -465,8 +465,8 @@
       "id": "weekly-closeout-2026-07-20",
       "title": "[PM]#weekly-closeout@2026-07-20",
       "owner": "主控",
-      "status": "standby",
-      "responsibility": "Preserve the W28 closeout card as a non-complete template prepared under the date-gate waiver; final timestamps, checks, hashes, commit, push and parity remain unset.",
+      "status": "summarized",
+      "responsibility": "W28 closeout candidate is accepted into the current PM transition under the full schedule waiver; seven carry-over rows remain non-blocking and final Git proof belongs to this control commit.",
       "tag": "⟦tag:v2|session|weekly-closeout-2026-07-20⟧",
       "evidence": "docs/orchestration/sessions/weekly-closeout-2026-07-20.md"
     },
@@ -474,10 +474,28 @@
       "id": "realtime-p1-scheduler-intake",
       "title": "[短工]#realtime-p1-scheduler-intake@v0.1",
       "owner": "短工",
-      "status": "standby",
-      "responsibility": "Requirements-only scheduler intake is prepared under the date-gate waiver and remains ready_waiting_phase_gate; no scheduler code or external Agent execution is authorized.",
+      "status": "summarized",
+      "responsibility": "Scheduler requirements are accepted; the administrator's same-day DDL instruction waives only the local scheduler phase dependency and authorizes no external Agent execution.",
       "tag": "⟦tag:v2|task|realtime-p1-scheduler-intake-v0.1⟧",
       "evidence": "docs/orchestration/tasks/realtime-p1-scheduler-intake-v0.1.md"
+    },
+    {
+      "id": "weekly-requirements-next",
+      "title": "[PM]#weekly-requirements@2026-07-21",
+      "owner": "主控",
+      "status": "active",
+      "responsibility": "Own the next-stage local scheduler delivery, activated early with the entire five-day board due on 2026-07-17 and every external execution gate closed.",
+      "tag": "⟦tag:v2|session|weekly-requirements-2026-07-21⟧",
+      "evidence": "docs/orchestration/sessions/weekly-requirements-2026-07-21.md"
+    },
+    {
+      "id": "realtime-p1-scheduler-core",
+      "title": "[长工]#realtime-p1-scheduler-core@v0.1",
+      "owner": "长工",
+      "status": "active",
+      "responsibility": "Implement one local/fixture scheduler-core slice within the exact four-file fence; S-01 through S-16 and external Agent CLI spawn zero are mandatory.",
+      "tag": "⟦tag:v2|task|realtime-p1-scheduler-core-v0.1⟧",
+      "evidence": "docs/orchestration/tasks/realtime-p1-scheduler-core-v0.1.md"
     }
   ],
   "lanes": [
@@ -514,7 +532,7 @@
       "title": "每日计划督办",
       "role": "[PM]#daily-supervision@2026-07-02",
       "state": "active",
-      "nextAction": "Preserve the 2026-07-17 control closeout, keep runtime worker=0, wait for fresh P0-C authorization, and continue to prohibit external Agent execution."
+      "nextAction": "Supervise the compressed same-day board, keep exactly one local scheduler worker active after baseline push, and continue to prohibit external Agent execution."
     },
     {
       "id": "codex-evidence-closeout",
@@ -672,10 +690,10 @@
     },
     {
       "id": "weekly-requirements",
-      "title": "W28 weekly requirements planning",
-      "role": "[PM]#weekly-requirements@2026-07-14",
+      "title": "Next-stage weekly requirements planning",
+      "role": "[PM]#weekly-requirements@2026-07-21",
       "state": "active",
-      "nextAction": "Keep W28 in buffer/closeout mode with the non-complete closeout template prepared under the date waiver; final closeout still waits for fresh evidence and the real 2026-07-20 gate."
+      "nextAction": "Complete the bounded local scheduler-core slice on the compressed 2026-07-17 DDL, then publish independent PM acceptance or the exact failed fixture."
     },
     {
       "id": "ranch-real-integration-r0-3-dryrun",

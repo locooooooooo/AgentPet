@@ -10,7 +10,7 @@ status: active_supervision_after_control_closeout
 
 ## single goal
 
-- Restore the 2026-07-17 control plane to current repository truth, then prepare later requirements under the administrator's date-gate waiver without reopening completed product implementation or waiving evidence and phase gates.
+- Complete the entire original later five-day board on 2026-07-17: close W28, activate the next requirements truth, dispatch one local scheduler-core worker and publish independent acceptance without opening external execution gates.
 
 ## confirmed baseline
 
@@ -31,9 +31,11 @@ status: active_supervision_after_control_closeout
 | 4 | `[PM]#daily-plan@2026-07-17` | Control-plane truth sync, acceptance and closeout | active supervision | This card, `index.md`, `status.json`, W28 truth and final gates |
 | 5 | `[监督]#control-truth-projection@2026-07-17` | Read-only visible status projection replay | summarized / accepted | `control-truth-projection-2026-07-17.md` |
 | 6 | `[监督]#w28-closeout-readiness@2026-07-17` | Read-only W28 closeout readiness audit | summarized / ready | `w28-closeout-readiness-2026-07-17.md` |
-| 7 | `[PM]#next-five-day-development@2026-07-18` | Five-day serial control and future scheduler admission | standby / requirements prepared under date waiver | `next-five-day-development-2026-07-18.md` |
-| 8 | `[PM]#weekly-closeout@2026-07-20` | Non-complete closeout template only | standby / template ready under date waiver | `weekly-closeout-2026-07-20.md` |
-| 9 | `[短工]#realtime-p1-scheduler-intake@v0.1` | Requirements, exact file fence and fixtures only | standby / ready waiting phase gate | `realtime-p1-scheduler-intake-v0.1.md` |
+| 7 | `[PM]#next-five-day-development@2026-07-18` | Compressed same-day serial control | active / all DDLs 2026-07-17 | `next-five-day-development-2026-07-18.md` |
+| 8 | `[PM]#weekly-closeout@2026-07-20` | W28 closeout under full schedule waiver | summarized in current PM transition | `weekly-closeout-2026-07-20.md` |
+| 9 | `[短工]#realtime-p1-scheduler-intake@v0.1` | Requirements, exact file fence and fixtures | summarized / accepted | `realtime-p1-scheduler-intake-v0.1.md` |
+| 10 | `[PM]#weekly-requirements@2026-07-21` | Next-stage requirements truth | active early / DDL 2026-07-17 | `weekly-requirements-2026-07-21.md` |
+| 11 | `[长工]#realtime-p1-scheduler-core@v0.1` | Local scheduler implementation only | active after control baseline push | `realtime-p1-scheduler-core-v0.1.md` |
 
 ## completed
 
@@ -48,6 +50,8 @@ status: active_supervision_after_control_closeout
 - Locked the 7-18 through 7-22 five-day serial plan: W28 closeout first, scheduler intake second, and Day 5 implementation only after its explicit phase gate.
 - Dispatched two bounded read-only long workers for W28 template preparation and scheduler intake-gap analysis; both first returned evidence-only callbacks, while a third gate thread hit the thread limit and was replaced by direct PM verification.
 - After the administrator explicitly waived later date gates, the same two bounded workers created the non-complete W28 template and the requirements-only scheduler intake. No product source, Connector machine gate or external Agent was touched.
+- The administrator then set the entire later five-day plan and every DDL to 2026-07-17. PM records this as the explicit W28 closeout-date and local scheduler phase waiver, without authorizing P0-C or external Agent execution.
+- W28 closeout candidate, next-stage weekly requirements and the exact scheduler-core task card are synchronized for a serial dispatch baseline.
 
 ## current blockers
 
@@ -55,7 +59,7 @@ status: active_supervision_after_control_closeout
 - Trae requires non-secret Models configuration, a successful model response and a new smoke authorization.
 - Qoder requires an independent headless Agent API before reconsideration.
 - Full transparent Electron pointer input remains blocked because the current Windows capture route cannot produce the screenshot state required for safe coordinate input.
-- W28 final closeout still requires fresh pre-closeout evidence and the real 2026-07-20 final gate; scheduler implementation still requires P0-C acceptance or a new explicit phase waiver.
+- W28/scheduler schedule gates are waived; fresh gates, exact diff review, scheduler fixtures and Git publication remain mandatory evidence gates.
 
 ## non-goals
 
@@ -63,6 +67,7 @@ status: active_supervision_after_control_closeout
 - No Connector machine-gate change.
 - No M5, protected-source, cockpit feature or ranch implementation reopening.
 - No product-code edit from the PM control lane.
+- No second product worker and no scheduler expansion beyond the accepted four-file fence.
 
 ## acceptance
 
@@ -84,13 +89,13 @@ status: active_supervision_after_control_closeout
 - `git diff --check`: passed.
 - First control closeout commit `658efd0` was pushed; local `HEAD`, `origin/main` and remote main matched with a clean worktree before this readiness advance.
 - Date-waiver requirements verification: `orchestration:check` passed with 115 referenced cards; report, preflight, Connector safety, realtime truth check, lint and build all passed; external Agent CLI execution remained zero.
+- Compressed same-day dispatch baseline: `orchestration:check` passed with 117 referenced cards; report, preflight, Connector safety, realtime truth, lint, build and `git diff --check` passed; external Agent CLI execution remained zero and no product source changed before dispatch.
 
 ## next action
 
 - Keep W28 in buffer/closeout mode with no implementation worker active.
-- Preserve the early-created weekly closeout template as non-complete; do not fill final evidence before its real closeout gate.
-- On 2026-07-19, run one read-only pre-closeout audit and freeze carry-over evidence.
-- Finalize W28 only after the real 2026-07-20 closeout time gate.
-- Preserve the early-created scheduler intake as requirements-only and `ready_waiting_phase_gate`; keep implementation unopened unless its recorded phase prerequisite is met.
+- Run fresh PM closeout gates, commit/push the W28-to-next-stage transition and prove remote parity.
+- Dispatch exactly one local scheduler-core worker after that clean baseline.
+- Independently verify S-01 through S-16 and all legacy gates, then accept/push or record the exact failed fixture today.
 - Keep pointer evidence standby until a working screenshot-bound coordinate route exists.
 - Keep P0-C and every production Connector behind their explicit authorization gates.

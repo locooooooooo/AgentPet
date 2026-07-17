@@ -3,9 +3,9 @@
 [短工]#realtime-p1-scheduler-intake@v0.1
 ⟦tag:v2|task|realtime-p1-scheduler-intake-v0.1⟧
 
-loop state: standby
-dispatch state: standby
-status: ready_waiting_phase_gate_under_time_waiver
+loop state: summarized
+dispatch state: summarized
+status: accepted_requirements_phase_waived_for_local_scheduler_core_2026-07-17
 date: 2026-07-17
 priority: P1-intake
 
@@ -13,8 +13,8 @@ priority: P1-intake
 
 - 管理员已明确豁免 Day 4 的日期门，仅授权提前冻结后续需求。
 - 本卡是 docs-only intake，不授权产品实现、外部 Agent CLI、Connector machine-gate 修改或 P0-C controlled dry-run。
-- scheduler-core 实现仍须等待 P0-C accepted，或管理员在新的明确消息中单独豁免 phase gate。
-- 日期门豁免不是 phase waiver，也不是 Codex、Trae、Qoder 或其他外部 Agent 的执行授权。
+- 管理员最新消息将后续五日计划及全部 DDL 压缩到 2026-07-17；PM 将其登记为本地 scheduler-core 所需的明确 phase waiver。
+- phase waiver 仅授权 local/fixture scheduler-core，不是 P0-C、Codex、Trae、Qoder 或其他外部 Agent 的执行授权。
 
 ## objective
 
@@ -78,7 +78,7 @@ allowed:
 - `src/types.ts`
 - `src/lib/connectorRuntime.ts`
 - `scripts/check-connector-scheduler.mjs`，仅用于 scheduler deterministic fixtures
-- `docs/orchestration/sessions/realtime-p1-scheduler-core-evidence-2026-07-22.md`，仅记录 callback 与验收证据
+- `docs/orchestration/sessions/realtime-p1-scheduler-core-evidence-2026-07-17.md`，仅记录 callback 与验收证据
 
 forbidden:
 
@@ -141,7 +141,7 @@ git diff --check
 
 ## failure and rollback
 
-- P0-C 未 accepted 且没有新的显式 phase waiver：保持 `ready_waiting_phase_gate_under_time_waiver`，不得派代码工人。
+- 若管理员撤回当前明确 phase waiver 或工作范围不再 local/fixture-only：停止 scheduler-core，不得转向外部 Agent 执行。
 - 任一 fixture 失败：保持 implementation incomplete，不得写 accepted，也不得用 build/lint 代替行为证据。
 - 发现第二个 active process、旧 attempt 未退出即 retry、queued task 发生 spawn 或依赖被静默忽略：立即停止本 lane，清理受控 fixture，并记录 task/session/PID/event 证据。
 - 需要修改禁止文件：停止并向 PM 提交精确 expansion request，不先行实现。
@@ -164,6 +164,6 @@ callback 必须列出 S-01 至 S-16 结果、最大并发计数、fake/controlle
 
 ## current decision
 
-- docs-only Day 4 intake 已在日期门豁免下准备。
-- scheduler-core 实现仍为 `waiting_phase_gate`。
-- 在 P0-C accepted 或管理员新的明确 phase waiver 之前，不得修改产品代码、创建代码 worker 或执行外部 Agent CLI。
+- docs-only Day 4 intake 已由 PM 接受并总结。
+- 管理员已将全部五日 DDL 定为 2026-07-17，明确满足 local scheduler-core 的 phase-waiver 分支。
+- `[长工]#realtime-p1-scheduler-core@v0.1` 可在独立控制面提交推送后按四文件围栏串行启动；外部 Agent CLI 继续禁止。

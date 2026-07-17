@@ -63,6 +63,7 @@ tracked business cards:
 - task: ⟦tag:v2|task|realtime-agent-cockpit-p0-b-data-truth-v0.1⟧ -> `docs/orchestration/tasks/realtime-agent-cockpit-p0-b-data-truth-v0.1.md`
 - task: ⟦tag:v2|task|realtime-agent-cockpit-p0-c-codex-acceptance-v0.1⟧ -> `docs/orchestration/tasks/realtime-agent-cockpit-p0-c-codex-acceptance-v0.1.md`
 - task: ⟦tag:v2|task|realtime-p1-scheduler-intake-v0.1⟧ -> `docs/orchestration/tasks/realtime-p1-scheduler-intake-v0.1.md`
+- task: ⟦tag:v2|task|realtime-p1-scheduler-core-v0.1⟧ -> `docs/orchestration/tasks/realtime-p1-scheduler-core-v0.1.md`
 - task: ⟦tag:v2|task|realtime-agent-cockpit-p0-a6-trusted-authorizer-v0.1⟧ -> `docs/orchestration/tasks/realtime-agent-cockpit-p0-a6-trusted-authorizer-v0.1.md`
 - task: ⟦tag:v2|task|realtime-agent-cockpit-p0-a7-process-reattach-v0.1⟧ -> `docs/orchestration/tasks/realtime-agent-cockpit-p0-a7-process-reattach-v0.1.md`
 - task: ⟦tag:v2|task|realtime-agent-cockpit-p0-b2-production-path-e2e-v0.1⟧ -> `docs/orchestration/tasks/realtime-agent-cockpit-p0-b2-production-path-e2e-v0.1.md`
@@ -107,6 +108,7 @@ tracked business cards:
 - session: ⟦tag:v2|session|ranch-smoke-desktop-exe-2026-07-06⟧ -> `docs/orchestration/sessions/ranch-smoke-desktop-exe-2026-07-06.md`
 - session: ⟦tag:v2|session|weekly-requirements-2026-07-07⟧ -> `docs/orchestration/sessions/weekly-requirements-2026-07-07.md`
 - session: ⟦tag:v2|session|weekly-requirements-2026-07-14⟧ -> `docs/orchestration/sessions/weekly-requirements-2026-07-14.md`
+- session: ⟦tag:v2|session|weekly-requirements-2026-07-21⟧ -> `docs/orchestration/sessions/weekly-requirements-2026-07-21.md`
 - session: ⟦tag:v2|session|trae-qoder-connector-discovery-2026-07-16⟧ -> `docs/orchestration/sessions/trae-qoder-connector-discovery-2026-07-16.md`
 - session: ⟦tag:v2|session|cockpit-live-session-notification-2026-07-16⟧ -> `docs/orchestration/sessions/cockpit-live-session-notification-2026-07-16.md`
 - session: ⟦tag:v2|session|daily-plan-2026-07-17⟧ -> `docs/orchestration/sessions/daily-plan-2026-07-17.md`
@@ -138,7 +140,7 @@ dispatch gate:
 - Supervisor owns drift detection, blocker surfacing, and minimum correction.
 
 current target:
-- Under the administrator's 2026-07-17 date-gate waiver, prepare the non-complete W28 closeout template and P1 scheduler requirements early; keep final W28 closeout, scheduler implementation, external execution and machine gates unopened.
+- Complete the entire original 2026-07-18 through 2026-07-22 board on the administrator's compressed 2026-07-17 DDL: close W28, activate the next requirements truth and deliver one local scheduler-core slice; external execution and machine gates stay closed.
 
 current role split:
 - `[PM]#multi-agent-control@v0.1`: maintain this index, dispatch bounded lanes, collect callbacks, write acceptance.
@@ -185,14 +187,16 @@ current role split:
 - `[PM]#realtime-cockpit-next-stage@2026-07-14`: summarized historical A7 authorization session.
 - `[PM]#realtime-cockpit-next-stage@2026-07-15`: summarized historical P0-C authorization control session; A7.1/B2 control commit `74d8f50` is already pushed.
 - `[PM]#weekly-requirements@2026-07-07`: summarized W27 (2026-07-07~2026-07-13) weekly-requirements history; final closeout is recorded in `weekly-closeout-2026-07-11.md`.
-- `[PM]#weekly-requirements@2026-07-14`: active W28 planner; tracks the administrator-authorized M5 rolling schedule beginning 2026-07-11 while preserving per-card serial gates.
+- `[PM]#weekly-requirements@2026-07-14`: summarized W28 planner after early closeout under the administrator's full schedule waiver; seven carry-over items remain non-blocking.
+- `[PM]#weekly-requirements@2026-07-21`: active next-stage requirements truth, activated early with every original five-day DDL compressed to 2026-07-17.
 - `[PM]#daily-plan@2026-07-17`: active control owner for current truth sync, v3.2 P1/P2 acceptance, pointer evidence and closeout.
 - `[PM]#cockpit-live-session-notification@2026-07-16`: summarized completed/pushed live Codex Desktop Session, Dock detail, completion bubble and sound evidence at `c21a60b`.
 - `[监督]#control-truth-projection@2026-07-17`: summarized accepted visible projection of the 2026-07-17 target, roles, Lanes and blockers.
 - `[PM]#w28-closeout-readiness@2026-07-17`: summarized readiness route for the 7-18 template, 7-19 pre-closeout audit and real 7-20 closeout time gate.
-- `[PM]#next-five-day-development@2026-07-18`: standby serial control with Day 1 template and Day 4 requirements prepared early under the date-gate waiver; final closeout and scheduler implementation remain unopened.
-- `[PM]#weekly-closeout@2026-07-20`: standby non-complete W28 closeout template; all pre-closeout and final-closeout evidence remains unchecked.
-- `[短工]#realtime-p1-scheduler-intake@v0.1`: standby accepted intake artifact with status `ready_waiting_phase_gate_under_time_waiver`; it authorizes no product code or external Agent execution.
+- `[PM]#next-five-day-development@2026-07-18`: active serial control with all five original dates compressed to DDL 2026-07-17; scheduler-core follows only after the closeout control baseline is pushed.
+- `[PM]#weekly-closeout@2026-07-20`: summarized W28 closeout candidate under the explicit full schedule waiver; final Git evidence is owned by the current PM transition.
+- `[短工]#realtime-p1-scheduler-intake@v0.1`: summarized accepted requirements; the administrator's same-day DDL instruction satisfies the local scheduler phase-waiver branch only.
+- `[长工]#realtime-p1-scheduler-core@v0.1`: active single-worker lane for the exact four-file local scheduler scope with external Agent CLI spawn fixed at `0`.
 - `[PM]#daily-plan@2026-07-09`: summarized 2026-07-09 daily plan;B②/C short-worker/D 今天/E1 evidence is retained as history.
 - `[PM]#daily-plan@2026-07-10`: summarized 2026-07-10 daily plan;administrator decisions and W28/closeout preparation are retained as history.
 
@@ -218,5 +222,5 @@ next action:
 - Keep `docs/orchestration/tasks/daily-role-accountability-2026-07-02.md` aligned with role states before closing any daily supervision pass.
 - M5 Day 5B correction `115c621` and final closeout `8df940c` are pushed to `origin/main`; preserve the residual-risk record and keep all M5 product lanes closed.
 - Keep M5 product dispatch closed. Direct tray/pointer and Windows notification visibility may only reopen through fresh bounded evidence lanes.
-- Preserve `weekly-closeout-2026-07-20.md` as a non-complete template prepared under the date-gate waiver; run fresh pre-closeout evidence before finalizing only after the real 7-20 closeout gate.
-- Preserve `realtime-p1-scheduler-intake-v0.1.md` as requirements-only and `ready_waiting_phase_gate`; do not dispatch scheduler-core unless P0-C is accepted or a new explicit phase waiver exists.
+- Publish the W28 closeout / W29 activation / scheduler-core dispatch baseline, then dispatch exactly one bounded scheduler worker today.
+- Accept only after S-01 through S-16, existing runtime/reattach/truth/orchestration gates, exact diff review and external Agent CLI spawn `0`; preserve all seven carry-over blockers separately.

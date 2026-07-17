@@ -4,11 +4,11 @@
 ⟦tag:v2|session|weekly-requirements-2026-07-14⟧
 ⟦tag:v2|session|weekly-requirements-w28⟧
 
-loop state: active
-dispatch state: active
+loop state: summarized
+dispatch state: summarized
 
 > **计划周期**: 2026-07-14 ~ 2026-07-20 (W28)
-> **当前状态**: active buffer/closeout; M5 is closed and pushed; realtime A7.1/B2 are accepted; v3.2 P1/P2 and live Codex Session notification are pushed; every production Connector remains disabled
+> **当前状态**: summarized under the administrator's full schedule waiver on 2026-07-17; seven carry-over items remain non-blocking and separately gated
 > **激活证据**: 2026-07-11 16:00 +08:00 W27 final closeout 已通过 fresh gates，并将 W27 summarized。
 > **硬边界**: A7.1/B2 technical gates pass at PM visible-DOM p95 `7ms`; P0-C external execution still requires a new explicit authorization, and Connector machine gates remain unchanged.
 
@@ -32,6 +32,7 @@ dispatch state: active
 - 2026-07-17 pointer evidence: gates and both Electron windows passed, but Computer Use screenshots failed with `SetIsBorderRequired failed (0x80004002)`; click-through, double-click, right-click, drag and dock remain blocked rather than accepted.
 - v3.2 P1 `51d5501` and P2 `0dfaadf` are independently accepted/pushed; `c21a60b` live Codex Desktop Session count plus completion bubble/sound is completed and summarized.
 - 2026-07-17 administrator date-gate waiver: the non-complete W28 closeout template and docs-only P1 scheduler intake were prepared early. This does not finalize W28, waive P0-C/phase gates or authorize any external Agent execution.
+- 2026-07-17 full schedule/DDL decision: the administrator then compressed the entire later five-day board to today. W28 closes early through `weekly-closeout-2026-07-20.md`; the local scheduler phase dependency is waived, while P0-C and every external execution gate remain closed.
 
 ## 一、W28 P0 候选
 
@@ -95,6 +96,7 @@ next action:
 - Preserve `weekly-closeout-2026-07-20.md` as a non-complete template; do not finalize it before fresh evidence and the real final gate.
 - Preserve `realtime-p1-scheduler-intake-v0.1.md` as requirements-only; do not treat its conditional Day 5 route as current implementation authorization.
 - Keep Trae draft/pending/disabled until Models is configured and a new read-only smoke is authorized; keep Qoder disabled/rejected until a headless API exists.
+- Current weekly ownership transfers to `weekly-requirements-2026-07-21.md`, activated early with DDL 2026-07-17 for the bounded local scheduler slice.
 
 summary:
-- W28 active; M5 is closed, realtime A7.1/B2 controlled production readiness is accepted, and P0-C remains unexecuted behind a fresh explicit authorization gate.
+- W28 summarized early under the administrator's full schedule waiver; completed inputs remain accepted, seven carry-over items remain non-blocking, and P0-C remains unexecuted behind a fresh explicit authorization gate.
