@@ -5,7 +5,7 @@
 
 loop state: active
 dispatch state: active
-status: active_docs_only_intake_waiting_independent_review
+status: accepted_dispatch_ready_after_independent_review
 date: 2026-07-17
 ddl: 2026-07-17
 
@@ -41,6 +41,7 @@ Freeze the smallest runtime-internal configurable global-concurrency contract on
 - Same-Agent active concurrency remains fixed at `1`, independent of the global value.
 - Unconfirmed process close retains its slot. A `session-lost` label alone is not exit evidence and cannot release admission.
 - Each in-flight recovery proof reserves one global slot. No queued task may spawn into a slot still owned by recovery evidence.
+- A recovering or reattached Session also reserves its Agent identity. Spare global capacity may admit a different Agent, but never another task for the recovering/reattached Agent before confirmed close or explicit proof failure/timeout releases that identity.
 - A restored snapshot already above the configured limit must fail closed: start no new process until proof/close handling reduces reservations to the configured limit. The runtime must not kill or silently forget restored processes merely to satisfy a counter.
 
 ### deterministic ordering
@@ -85,17 +86,17 @@ A future implementation may be dispatched only after independent PM acceptance a
 | ID | Fixture | Required result |
 | --- | --- | --- |
 | C-01 | Setting absent | Existing global `1` behavior and S-01 through S-16/R-01 through R-03 remain unchanged |
-| C-02 | `maxGlobalActive=2`, two independent Agents | Exactly two processes may become active; maximum active/reserved is `2` |
+| C-02 | `maxGlobalActive=2/3/4`, matching independent Agents | Each legal value is accepted and exactly fills its configured capacity; maximum active/reserved equals the tested limit |
 | C-03 | Limit `2`, same Agent twice plus another Agent | Same-Agent maximum remains `1`; independent Agent may use the second slot |
-| C-04 | Limit `2`, three independent ready tasks | Third remains queued until one confirmed close releases a slot |
+| C-04 | Limits `2/3/4`, one more independent task than capacity | Extra task remains queued; one confirmed close releases exactly one refill without oversubscription |
 | C-05 | Equal `queuedAt` with two available slots | Selection is stable by `taskId` across repeated runs |
 | C-06 | Dependency waiting/blocked under spare capacity | Dependency rules win; no premature spawn |
 | C-07 | One unconfirmed close under limit `2` | Reservation remains occupied; only genuinely free capacity may be used |
-| C-08 | Two recovery proofs under limit `2` | Both reserve capacity; queued spawn remains `0` until proof/close or fail-closed release |
-| C-09 | Restored reservations exceed configured limit | No new spawn until reservations are at or below limit; no silent process forgetting |
+| C-08 | Limit `2`, one recovering Agent plus same-Agent and different-Agent queued tasks; then two recovering Agents | The different Agent uses spare capacity, same-Agent spawn remains `0`, and two recovery reservations fill capacity until proof/close or explicit fail/timeout release |
+| C-09 | Limit `2`, three restored active taskIds | Initial reserved may be `3` but new spawn is `0`; every taskId retains proof/close observation, a terminal label alone does not release reservation, and refill occurs only after confirmed close or explicit proof fail/timeout reduces reservations below `2` |
 | C-10 | Retry with spare global capacity | Independent Agent may run; retry still cannot overlap its previous process or same Agent |
-| C-11 | Invalid values | Construction fails before Session/process/timer/audit side effects |
-| C-12 | Dispose and external guard | No post-dispose spawn, residue `0`, duplicate terminal `0`, external Agent spawn `0` |
+| C-11 | Missing value plus `0`, negative, fractional, `NaN`, `Infinity` and `>4` | Missing uses `1`; every invalid value rejects construction with load/publish/persist/timer/process/Session/audit side-effect counts all `0` |
+| C-12 | Limit `2`, duplicate/same-tick close, synchronous publish/spawn callback and repeated dispose | Peak active/reserved never exceeds `2`; no post-dispose spawn, residue `0`, duplicate terminal `0`, external Agent spawn `0` |
 
 ## implementation admission
 
@@ -120,7 +121,7 @@ npm.cmd run build
 git diff --check
 ```
 
-Acceptance requires per-fixture C-01 through C-12 results, maximum active/same-Agent/reserved counters for limits `1` and `2`, invalid-construction side-effect counters, external spawn `0`, duplicate terminal `0`, residual process/timer `0/0` and an exact diff list.
+Acceptance requires per-fixture C-01 through C-12 results; maximum active/reserved counters for limits `1`, `2`, `3` and `4`; maximum same-Agent active/reserved `1`; invalid-construction side-effect counters; and exact taskId-by-taskId over-cap recovery release evidence. An over-cap restored snapshot may initially reserve more than the configured limit, but new spawn must remain `0` until confirmed close or explicit proof fail/timeout makes capacity available. External spawn must remain `0`, duplicate terminal `0`, residual process/timer `0/0`, and the callback must include an exact diff list.
 
 ## worker callback
 
@@ -137,4 +138,6 @@ changed files:
 
 - The administrator's `开始推进计划` instruction starts this docs-only intake under the active weekly requirements truth.
 - Product worker count remains `0`; no implementation or external execution has started.
-- Next transition is independent PM review of the contract and current three-file candidate fence. Only an accepted/pushed control baseline may authorize one short implementation worker.
+- First independent review rejected dispatch with three P1 gaps and one P2: recovering Agent identity/spare-capacity behavior, legal `3/4`, over-cap taskId release evidence and re-entrant close coverage were underspecified. The contract now makes each observable and keeps the same three-file fence.
+- Second independent review returned `dispatch-ready PASS`: all first-review findings are observable in C-02/C-04/C-08/C-09/C-11/C-12, and the three-file fence remains sufficient.
+- PM accepts the intake for dispatch. The accepted control baseline must be committed/pushed before exactly one short implementation worker starts.

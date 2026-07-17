@@ -2,12 +2,12 @@
   "identity": "[PM]#multi-agent-control@v0.1",
   "loopState": "active",
   "dispatchState": "active",
-  "target": "Advance exactly one scheduler P1 gap after `ccedb15`: independently review the runtime-internal configurable-concurrency intake while product worker count and external Agent spawn remain `0`.",
+  "target": "Advance exactly one scheduler P1 gap after `ccedb15`: publish the accepted configurable-concurrency dispatch baseline, then run one three-file short worker while external Agent spawn remains `0`.",
   "source": "docs/orchestration/index.md",
   "todayPlan": {
     "date": "2026-07-17",
     "session": "docs/orchestration/sessions/daily-plan-2026-07-17.md",
-    "selectedRoute": "Start a docs-only configurable-concurrency intake, then admit no code worker before independent review and a pushed control baseline",
+    "selectedRoute": "Publish the independently accepted configurable-concurrency contract, then dispatch one three-file short implementation worker",
     "progress": "docs/orchestration/sessions/daily-plan-2026-07-17.md"
   },
   "p0Cards": [
@@ -502,7 +502,7 @@
       "title": "[短工]#realtime-p1-scheduler-configurable-concurrency@v0.1",
       "owner": "短工",
       "status": "active",
-      "responsibility": "Freeze and independently review an internal immutable maxGlobalActive 1..4 contract and C-01 through C-12; product worker count and external Agent spawn remain zero.",
+      "responsibility": "Accepted/dispatch-ready after two independent reviews: implement immutable maxGlobalActive 1..4 and C-01 through C-12 only inside the three-file fence; external Agent spawn remains zero.",
       "tag": "⟦tag:v2|task|realtime-p1-scheduler-configurable-concurrency-v0.1⟧",
       "evidence": "docs/orchestration/tasks/realtime-p1-scheduler-configurable-concurrency-v0.1.md"
     }
@@ -702,7 +702,7 @@
       "title": "Next-stage weekly requirements planning",
       "role": "[PM]#weekly-requirements@2026-07-21",
       "state": "active",
-      "nextAction": "Review the active configurable-concurrency intake and C-01 through C-12; keep product worker count zero until the control baseline is accepted and pushed."
+      "nextAction": "Push the accepted configurable-concurrency control baseline, then run exactly one three-file short worker and independently review its callback."
     },
     {
       "id": "ranch-real-integration-r0-3-dryrun",

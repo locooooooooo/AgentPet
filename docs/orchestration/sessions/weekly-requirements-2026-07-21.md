@@ -5,7 +5,7 @@
 
 loop state: active
 dispatch state: active
-status: active_configurable_concurrency_intake
+status: active_configurable_concurrency_dispatch_ready
 
 > **Original planning window**: 2026-07-21 through 2026-07-27
 > **Compressed activation and DDL**: 2026-07-17
@@ -46,7 +46,7 @@ status: active_configurable_concurrency_intake
 ## incomplete after this slice
 
 - P0-C real Codex Agent E2E remains authorization-required and unexecuted.
-- Configurable concurrency has entered docs-only intake at `realtime-p1-scheduler-configurable-concurrency-v0.1.md`; C-01 through C-12 and the exact candidate fence still require independent acceptance before implementation.
+- Configurable concurrency intake at `realtime-p1-scheduler-configurable-concurrency-v0.1.md` is independently accepted/dispatch-ready; implementation remains pending the pushed control baseline and one serial short worker.
 - Priority, starvation protection, recursive cancellation DAG and per-Connector quotas remain future P1 work.
 - Trae Models readiness, Qoder headless API, pointer evidence and AgentPet review remain separate carry-over items.
 
@@ -54,7 +54,7 @@ status: active_configurable_concurrency_intake
 
 - Single gap: runtime-internal immutable `maxGlobalActive` with default `1` and accepted range `1..4`.
 - Same-Agent active limit remains `1`; unconfirmed close and recovery proof continue to reserve slots.
-- Current intake changes docs only. Product worker count is `0`, external Agent spawn is `0`, and no machine gate changes.
+- Intake and two independent reviews changed docs only. Product worker count is `0` until the accepted baseline is pushed; external Agent spawn is `0`, and no machine gate changes.
 - Future candidate fence is `src/lib/connectorRuntime.ts`, `scripts/check-connector-scheduler.mjs` and one evidence session. Dirty `src/types.ts` account-quota hunks remain excluded.
 - Priority, aging/starvation, cancellation DAG, Connector quota, Electron/preload/UI and dynamic reconfiguration are non-goals.
 
@@ -78,7 +78,7 @@ Everything else is forbidden unless the worker stops and PM explicitly expands t
 - PM independently reviews the diff and does not infer real Agent E2E from controlled local fixtures.
 
 next action:
-- Independently review the active configurable-concurrency contract and C-01 through C-12, then push the accepted control baseline before admitting exactly one short code worker.
+- Commit/push the accepted configurable-concurrency contract, then admit exactly one short code worker and independently review C-01 through C-12 evidence.
 
 summary:
 - Next-stage requirements remain active in buffer mode after the same-day local scheduler slice was accepted/pushed at `ccedb15`; every external execution gate remains closed.

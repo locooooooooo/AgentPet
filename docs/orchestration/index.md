@@ -142,7 +142,7 @@ dispatch gate:
 - Supervisor owns drift detection, blocker surfacing, and minimum correction.
 
 current target:
-- Advance exactly one scheduler P1 gap after `ccedb15`: independently review the runtime-internal configurable-concurrency intake while product worker count and external Agent spawn remain `0`.
+- Advance exactly one scheduler P1 gap after `ccedb15`: publish the accepted configurable-concurrency dispatch baseline, then run one three-file short worker while external Agent spawn remains `0`.
 
 current role split:
 - `[PM]#multi-agent-control@v0.1`: maintain this index, dispatch bounded lanes, collect callbacks, write acceptance.
@@ -199,7 +199,7 @@ current role split:
 - `[PM]#weekly-closeout@2026-07-20`: summarized completed/pushed W28 closeout under the explicit full schedule waiver, with seven carry-over rows preserved as non-blocking.
 - `[短工]#realtime-p1-scheduler-intake@v0.1`: summarized accepted requirements; the administrator's same-day DDL instruction satisfies the local scheduler phase-waiver branch only.
 - `[长工]#realtime-p1-scheduler-core@v0.1`: summarized accepted/pushed local scheduler slice at `ccedb15`; S-01 through S-16 and R-01 through R-03 pass, max global/same-Agent/reserved are `1/1/1`, and external Agent spawn is `0`.
-- `[短工]#realtime-p1-scheduler-configurable-concurrency@v0.1`: active docs-only intake for an immutable runtime limit `1..4`; no product worker is active, `src/types.ts` stays excluded, and C-01 through C-12 await independent review.
+- `[短工]#realtime-p1-scheduler-configurable-concurrency@v0.1`: accepted/dispatch-ready after two independent reviews; runtime limit `1..4`, C-01 through C-12 and the three-file fence are frozen, while `src/types.ts` remains excluded.
 - `[PM]#daily-plan@2026-07-09`: summarized 2026-07-09 daily plan;B②/C short-worker/D 今天/E1 evidence is retained as history.
 - `[PM]#daily-plan@2026-07-10`: summarized 2026-07-10 daily plan;administrator decisions and W28/closeout preparation are retained as history.
 
@@ -226,5 +226,5 @@ next action:
 - M5 Day 5B correction `115c621` and final closeout `8df940c` are pushed to `origin/main`; preserve the residual-risk record and keep all M5 product lanes closed.
 - Keep M5 product dispatch closed. Direct tray/pointer and Windows notification visibility may only reopen through fresh bounded evidence lanes.
 - Preserve accepted scheduler commit `ccedb15`, its five-file selective integration and S/R regression evidence; no scheduler worker remains active.
-- Independently review `realtime-p1-scheduler-configurable-concurrency-v0.1`; only an accepted and pushed three-file fence may admit one short implementation worker.
+- Commit/push the accepted configurable-concurrency control baseline, then dispatch exactly one short implementation worker inside the three-file fence.
 - Keep priority, starvation protection, cancellation DAG and Connector quotas outside this intake; preserve all seven W28 carry-over blockers separately.
