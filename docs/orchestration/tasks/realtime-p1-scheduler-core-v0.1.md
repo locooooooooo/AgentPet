@@ -5,7 +5,7 @@
 
 loop state: active
 dispatch state: active
-status: active_ready_same_day_ddl_under_explicit_phase_waiver
+status: active_ready_after_exact_legacy_fixture_fence_expansion
 date: 2026-07-17
 ddl: 2026-07-17
 
@@ -24,15 +24,22 @@ ddl: 2026-07-17
 - `src/types.ts`
 - `src/lib/connectorRuntime.ts`
 - `scripts/check-connector-scheduler.mjs`
+- `scripts/check-connector-runtime.mjs`，仅修改 `selectorHarness` / `tieHarness` 的 legacy concurrent fixture；其他 runtime 安全断言必须保留
 - `docs/orchestration/sessions/realtime-p1-scheduler-core-evidence-2026-07-17.md`
 
 ## forbidden files and actions
 
-- No `electron/**`, `src/lib/desktopClient.ts`, `src/lib/agentCore.ts`, `src/components/**`, `src/homepage/**`, `src/index.css`, `src/ranch/**`, `icon/**`, `package.json` or other script.
+- No `electron/**`, `src/lib/desktopClient.ts`, `src/lib/agentCore.ts`, `src/components/**`, `src/homepage/**`, `src/index.css`, `src/ranch/**`, `icon/**`, `package.json` or any script other than the two explicitly allowed verification scripts.
 - No `docs/orchestration/connectors.json` machine-gate edit or `docs/orchestration/status.json` `connectors[]` edit.
 - No `README.md` or `docs/牛马状态回执音效规范-v0.1.md` edit.
 - No external Agent CLI, stage, commit, push, reset, clean or force-push.
 - If implementation requires main/preload/Desktop API/UI changes, stop and return an exact fence-expansion request.
+
+## accepted fence expansion
+
+- The worker stopped before editing because legacy fixtures at `scripts/check-connector-runtime.mjs:754-777` explicitly spawned two simultaneous tasks for the same Agent and accessed `processes[1]`.
+- PM independently confirmed that those fixtures conflict with fixed global concurrency `1` and same-Agent single-active admission.
+- The worker may replace only those selector/tie fixtures with serial-terminal and queued deterministic semantics. It must not weaken redaction, termination, retry, recovery, policy, authorization or external-spawn assertions elsewhere in the script.
 
 ## required behavior
 

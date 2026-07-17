@@ -56,9 +56,10 @@ Allowed only:
 - `src/types.ts`
 - `src/lib/connectorRuntime.ts`
 - `scripts/check-connector-scheduler.mjs`
+- `scripts/check-connector-runtime.mjs` only for the legacy `selectorHarness` / `tieHarness` concurrency conflict confirmed by PM
 - `docs/orchestration/sessions/realtime-p1-scheduler-core-evidence-2026-07-17.md`
 
-Everything else is forbidden unless the worker stops and PM explicitly expands the fence. In particular: no `electron/**`, UI/CSS, ranch, protected cockpit, package/config, Connector machine-gate, `README.md`, audio-spec, external Agent CLI or Git write.
+Everything else is forbidden unless the worker stops and PM explicitly expands the fence. The runtime script expansion may not weaken unrelated safety assertions. In particular: no `electron/**`, UI/CSS, ranch, protected cockpit, package/config, Connector machine-gate, `README.md`, audio-spec, external Agent CLI or Git write.
 
 ## acceptance
 

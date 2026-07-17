@@ -493,7 +493,7 @@
       "title": "[长工]#realtime-p1-scheduler-core@v0.1",
       "owner": "长工",
       "status": "active",
-      "responsibility": "Implement one local/fixture scheduler-core slice within the exact four-file fence; S-01 through S-16 and external Agent CLI spawn zero are mandatory.",
+      "responsibility": "Implement one local/fixture scheduler-core slice within the exact expanded five-file fence; runtime-script edits are limited to two confirmed legacy concurrent fixtures, S-01 through S-16 are mandatory and external Agent CLI spawn stays zero.",
       "tag": "⟦tag:v2|task|realtime-p1-scheduler-core-v0.1⟧",
       "evidence": "docs/orchestration/tasks/realtime-p1-scheduler-core-v0.1.md"
     }

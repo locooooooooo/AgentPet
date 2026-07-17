@@ -52,6 +52,7 @@ status: active_supervision_after_control_closeout
 - After the administrator explicitly waived later date gates, the same two bounded workers created the non-complete W28 template and the requirements-only scheduler intake. No product source, Connector machine gate or external Agent was touched.
 - The administrator then set the entire later five-day plan and every DDL to 2026-07-17. PM records this as the explicit W28 closeout-date and local scheduler phase waiver, without authorizing P0-C or external Agent execution.
 - W28 closeout candidate, next-stage weekly requirements and the exact scheduler-core task card are synchronized for a serial dispatch baseline.
+- The scheduler worker stopped before editing on a real legacy-fixture conflict. PM verified `scripts/check-connector-runtime.mjs:754-777` requires same-Agent double active/spawn and authorized only that script's two conflicting selector/tie fixtures as an exact fence expansion.
 
 ## current blockers
 

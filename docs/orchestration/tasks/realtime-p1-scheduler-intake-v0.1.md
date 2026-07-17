@@ -78,6 +78,7 @@ allowed:
 - `src/types.ts`
 - `src/lib/connectorRuntime.ts`
 - `scripts/check-connector-scheduler.mjs`，仅用于 scheduler deterministic fixtures
+- `scripts/check-connector-runtime.mjs`，仅允许改写原 `selectorHarness` / `tieHarness` 的同 Agent 并发 fixture，使其与 global concurrency `1` 和 same-Agent single-active 合同一致；不得删除其他 runtime 安全断言
 - `docs/orchestration/sessions/realtime-p1-scheduler-core-evidence-2026-07-17.md`，仅记录 callback 与验收证据
 
 forbidden:
@@ -91,7 +92,7 @@ forbidden:
 - `src/ranch/**`
 - `icon/**`
 - `package.json`
-- 除新建 `scripts/check-connector-scheduler.mjs` 外的 `scripts/**`
+- 除新建 `scripts/check-connector-scheduler.mjs` 和定点修改 `scripts/check-connector-runtime.mjs` 冲突 fixture 外的 `scripts/**`
 - `docs/orchestration/connectors.json` 的任何 machine-gate 字段
 - `docs/orchestration/status.json` 的 `connectors[]`
 - `README.md`
@@ -166,4 +167,5 @@ callback 必须列出 S-01 至 S-16 结果、最大并发计数、fake/controlle
 
 - docs-only Day 4 intake 已由 PM 接受并总结。
 - 管理员已将全部五日 DDL 定为 2026-07-17，明确满足 local scheduler-core 的 phase-waiver 分支。
-- `[长工]#realtime-p1-scheduler-core@v0.1` 可在独立控制面提交推送后按四文件围栏串行启动；外部 Agent CLI 继续禁止。
+- PM 定点复核发现 `scripts/check-connector-runtime.mjs:754-777` 仍要求同 Agent 双 active/spawn，与新合同不可同时成立；围栏扩为五个文件（两个源码、两个脚本、一张实现证据），仅允许重写这两组 legacy fixture。
+- `[长工]#realtime-p1-scheduler-core@v0.1` 可在围栏扩展提交推送后串行恢复；外部 Agent CLI 继续禁止。

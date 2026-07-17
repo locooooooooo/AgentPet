@@ -196,7 +196,7 @@ current role split:
 - `[PM]#next-five-day-development@2026-07-18`: active serial control with all five original dates compressed to DDL 2026-07-17; scheduler-core follows only after the closeout control baseline is pushed.
 - `[PM]#weekly-closeout@2026-07-20`: summarized W28 closeout candidate under the explicit full schedule waiver; final Git evidence is owned by the current PM transition.
 - `[短工]#realtime-p1-scheduler-intake@v0.1`: summarized accepted requirements; the administrator's same-day DDL instruction satisfies the local scheduler phase-waiver branch only.
-- `[长工]#realtime-p1-scheduler-core@v0.1`: active single-worker lane for the exact four-file local scheduler scope with external Agent CLI spawn fixed at `0`.
+- `[长工]#realtime-p1-scheduler-core@v0.1`: active single-worker lane for the exact expanded five-file local scheduler scope; `scripts/check-connector-runtime.mjs` is limited to two confirmed legacy concurrent fixtures and external Agent CLI spawn stays `0`.
 - `[PM]#daily-plan@2026-07-09`: summarized 2026-07-09 daily plan;B②/C short-worker/D 今天/E1 evidence is retained as history.
 - `[PM]#daily-plan@2026-07-10`: summarized 2026-07-10 daily plan;administrator decisions and W28/closeout preparation are retained as history.
 

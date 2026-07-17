@@ -100,6 +100,8 @@ The W28 worker froze these seven carry-over items as non-blocking: P0-C, R0-3, T
 
 The scheduler worker froze the future Day 5 candidate scope to `src/types.ts`, `src/lib/connectorRuntime.ts`, a new `scripts/check-connector-scheduler.mjs` and one scheduler evidence session. `electron/**`, preload/desktopClient, UI/CSS, ranch, protected cockpit, other scripts, package/config and external Agent execution remain forbidden.
 
+After dispatch, the worker correctly stopped on a legacy-fixture conflict: `scripts/check-connector-runtime.mjs:754-777` required two simultaneous same-Agent processes, which contradicts the accepted single-active contract. PM verified the exact conflict and expanded the fence only for those two selector/tie fixtures; all other runtime safety assertions remain mandatory.
+
 ## current checkpoint
 
 completed:
