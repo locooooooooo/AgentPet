@@ -44,6 +44,7 @@ status: active_supervision_after_control_closeout
 - Accepted the visible control-truth projection after `658efd0`: four active roles, two active Lanes, correct standby/summarized entries, pointer blocker, no horizontal overflow and zero console warnings/errors.
 - Locked the W28 7-18/7-19/7-20 closeout route and Definition of Done without creating the time-gated closeout card early.
 - Locked the 7-18 through 7-22 five-day serial plan: W28 closeout first, scheduler intake second, and Day 5 implementation only after its explicit phase gate.
+- Dispatched two bounded read-only long workers for W28 template preparation and scheduler intake-gap analysis; both returned callbacks with `changed files: none`, while a third gate thread hit the thread limit and was replaced by direct PM verification.
 
 ## current blockers
 

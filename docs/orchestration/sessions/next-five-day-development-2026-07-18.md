@@ -84,11 +84,25 @@ git diff --check
 - Product worker concurrency never exceeds one; external Agent spawn remains zero unless a separate explicit authorization is granted and accepted outside this plan.
 - Every control transition is synchronized across index, status, weekly truth, daily supervision and accountability, then committed/pushed with `HEAD == origin/main`.
 
+## 2026-07-17 pre-gate long-worker callbacks
+
+| Long worker | Scope | Result | Key evidence | Changed files |
+| --- | --- | --- | --- | --- |
+| `/root/w28_day1_prep_audit` | Read-only Day 1 closeout-template preparation | completed | Froze 10 template sections, seven carry-over rows, exact owner/prerequisite/evidence fields and all forbidden premature completion fields | none |
+| `/root/scheduler_intake_gap_audit` | Read-only Day 4/5 scheduler gap and file-fence audit | completed | Confirmed current runtime launches immediately after authorization and lacks queue/dependency contracts; froze the minimal contract, file fence and deterministic fixtures | none |
+
+PM supervision attempted a third independent gate thread, but the task hit the current agent thread limit. PM did not call that attempt completed; instead PM directly reran orchestration check/report/preflight/Connector safety and verified the clean control state.
+
+The W28 worker froze these seven carry-over items as non-blocking: P0-C, R0-3, Trae, Qoder, transparent pointer, AgentPet staging review and AgentPet Git-manager callback. Their prerequisites remain unchanged.
+
+The scheduler worker froze the future Day 5 candidate scope to `src/types.ts`, `src/lib/connectorRuntime.ts`, a new `scripts/check-connector-scheduler.mjs` and one scheduler evidence session. `electron/**`, preload/desktopClient, UI/CSS, ranch, protected cockpit, other scripts, package/config and external Agent execution remain forbidden.
+
 ## current checkpoint
 
 completed:
 - The five dates, serial order, admission rules, conditional Day 5 branch and protected boundaries are recorded.
 - Registration gates passed with 113 referenced cards: orchestration check/report/preflight/Connector safety, realtime truth check, lint, build and `git diff --check`.
+- Two pre-gate long workers were dispatched and returned bounded read-only preparation callbacks with no file changes; their evidence is frozen above without activating future-day work.
 
 incomplete:
 - Day 1 cannot start before the actual 2026-07-18 time gate.
@@ -103,6 +117,7 @@ blockers:
 next action:
 - Keep this card standby and wait for the actual 2026-07-18 Day 1 gate.
 - On Day 1 create only the non-complete W28 closeout template; do not dispatch a product worker.
+- Reuse the collected template and scheduler-intake packages; do not rerun the audits unless their baseline or prerequisites change.
 
 summary:
 - Standby five-day serial control plan; W28 closes first, scheduler intake follows, and implementation remains conditional on the recorded phase gate.

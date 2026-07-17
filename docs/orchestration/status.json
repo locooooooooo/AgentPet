@@ -457,7 +457,7 @@
       "title": "[PM]#next-five-day-development@2026-07-18",
       "owner": "主控",
       "status": "standby",
-      "responsibility": "Hold the 2026-07-18 through 2026-07-22 serial control: close W28 first, prepare P1 scheduler intake, and keep Day 5 implementation behind the P0-C or explicit phase-waiver gate.",
+      "responsibility": "Pre-gate W28-template and scheduler-gap long-worker callbacks are collected; keep the 2026-07-18 through 2026-07-22 serial control standby and Day 5 behind the P0-C or explicit phase-waiver gate.",
       "tag": "⟦tag:v2|session|next-five-day-development-2026-07-18⟧",
       "evidence": "docs/orchestration/sessions/next-five-day-development-2026-07-18.md"
     }

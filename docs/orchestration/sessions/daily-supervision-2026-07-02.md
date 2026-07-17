@@ -1110,3 +1110,10 @@ pm.cmd run build pass; git diff --check only on the 11 protected-source whitespa
   - Baseline at intake was `HEAD == origin/main == 0e66ba9` with a clean worktree, zero product worker and unchanged Connector machine gates.
   - Registration gates passed with 113 referenced cards: orchestration check/report/preflight/Connector safety, realtime truth check, lint, build and `git diff --check`; no source or Connector-config diff exists.
   - Current action is `waiting for 2026-07-18 time gate`; no future-day completion, W28 closeout, scheduler task card or product implementation is manufactured on 2026-07-17.
+
+- [2026-07-17 13:44 +08:00] long-worker督办与回调收口:
+  - Dispatched `/root/w28_day1_prep_audit` and `/root/scheduler_intake_gap_audit` as bounded read-only long workers. Both completed and reported `changed files: none`; neither executed an external Agent CLI or Git write.
+  - The W28 worker froze the 7-18 non-complete template structure, seven non-blocking carry-over rows and forbidden premature completion fields. The template itself remains absent on 7-17 by design.
+  - The scheduler worker confirmed the current runtime launches immediately after authorization and still lacks global single-concurrency queueing, dependency-blocked state, queued cancellation and separate queue-wait timing. It froze the future minimal contract, exact candidate file fence and deterministic fixtures without implementing them.
+  - A third independent supervision thread could not start because the current task hit its agent thread limit. PM recorded the failed dispatch attempt rather than calling it complete, then directly reran orchestration check/report/preflight/Connector safety; all passed with 113 referenced cards and a clean worktree.
+  - Long-worker preparation is accepted as current-day execution evidence, but it does not open Day 1, create the W28 closeout card, waive P0-C, activate Day 4/5 or authorize a product worker.

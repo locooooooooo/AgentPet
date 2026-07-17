@@ -188,7 +188,7 @@ current role split:
 - `[PM]#cockpit-live-session-notification@2026-07-16`: summarized completed/pushed live Codex Desktop Session, Dock detail, completion bubble and sound evidence at `c21a60b`.
 - `[监督]#control-truth-projection@2026-07-17`: summarized accepted visible projection of the 2026-07-17 target, roles, Lanes and blockers.
 - `[PM]#w28-closeout-readiness@2026-07-17`: summarized readiness route for the 7-18 template, 7-19 pre-closeout audit and real 7-20 closeout time gate.
-- `[PM]#next-five-day-development@2026-07-18`: standby serial control for W28 closeout, W29 scheduler intake and a phase-gated single scheduler-core worker.
+- `[PM]#next-five-day-development@2026-07-18`: standby serial control; W28-template and scheduler-gap long-worker callbacks are collected, while Day 1 and the phase-gated scheduler worker remain unopened.
 - `[PM]#daily-plan@2026-07-09`: summarized 2026-07-09 daily plan;B②/C short-worker/D 今天/E1 evidence is retained as history.
 - `[PM]#daily-plan@2026-07-10`: summarized 2026-07-10 daily plan;administrator decisions and W28/closeout preparation are retained as history.
 
