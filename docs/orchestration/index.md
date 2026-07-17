@@ -117,6 +117,7 @@ tracked business cards:
 - session: ⟦tag:v2|session|w28-closeout-readiness-2026-07-17⟧ -> `docs/orchestration/sessions/w28-closeout-readiness-2026-07-17.md`
 - session: ⟦tag:v2|session|next-five-day-development-2026-07-18⟧ -> `docs/orchestration/sessions/next-five-day-development-2026-07-18.md`
 - session: ⟦tag:v2|session|weekly-closeout-2026-07-20⟧ -> `docs/orchestration/sessions/weekly-closeout-2026-07-20.md`
+- session: ⟦tag:v2|session|realtime-p1-scheduler-core-evidence-2026-07-17⟧ -> `docs/orchestration/sessions/realtime-p1-scheduler-core-evidence-2026-07-17.md`
 - session: ⟦tag:v2|session|homepage-layout-density-2026-07-16⟧ -> `docs/orchestration/sessions/homepage-layout-density-2026-07-16.md`
 - session: ⟦tag:v2|session|weekly-closeout-2026-07-11⟧ -> `docs/orchestration/sessions/weekly-closeout-2026-07-11.md`
 - session: ⟦tag:v2|session|m5-five-day-development-2026-07-14⟧ -> `docs/orchestration/sessions/m5-five-day-development-2026-07-14.md`
@@ -140,7 +141,7 @@ dispatch gate:
 - Supervisor owns drift detection, blocker surfacing, and minimum correction.
 
 current target:
-- Complete the entire original 2026-07-18 through 2026-07-22 board on the administrator's compressed 2026-07-17 DDL: close W28, activate the next requirements truth and deliver one local scheduler-core slice; external execution and machine gates stay closed.
+- Preserve the completed same-day five-day board at ccedb15: W28 is closed, next-stage requirements remain active, the local scheduler-core slice is accepted/pushed, and external execution plus machine gates stay closed.
 
 current role split:
 - `[PM]#multi-agent-control@v0.1`: maintain this index, dispatch bounded lanes, collect callbacks, write acceptance.
@@ -193,10 +194,10 @@ current role split:
 - `[PM]#cockpit-live-session-notification@2026-07-16`: summarized completed/pushed live Codex Desktop Session, Dock detail, completion bubble and sound evidence at `c21a60b`.
 - `[监督]#control-truth-projection@2026-07-17`: summarized accepted visible projection of the 2026-07-17 target, roles, Lanes and blockers.
 - `[PM]#w28-closeout-readiness@2026-07-17`: summarized readiness route for the 7-18 template, 7-19 pre-closeout audit and real 7-20 closeout time gate.
-- `[PM]#next-five-day-development@2026-07-18`: active serial control with all five original dates compressed to DDL 2026-07-17; scheduler-core follows only after the closeout control baseline is pushed.
-- `[PM]#weekly-closeout@2026-07-20`: summarized W28 closeout candidate under the explicit full schedule waiver; final Git evidence is owned by the current PM transition.
+- `[PM]#next-five-day-development@2026-07-18`: summarized completed same-day serial control; all five original dates were delivered on the compressed 2026-07-17 DDL through `ccedb15`.
+- `[PM]#weekly-closeout@2026-07-20`: summarized completed/pushed W28 closeout under the explicit full schedule waiver, with seven carry-over rows preserved as non-blocking.
 - `[短工]#realtime-p1-scheduler-intake@v0.1`: summarized accepted requirements; the administrator's same-day DDL instruction satisfies the local scheduler phase-waiver branch only.
-- `[长工]#realtime-p1-scheduler-core@v0.1`: active single-worker lane for the exact expanded five-file local scheduler scope; `scripts/check-connector-runtime.mjs` is limited to two confirmed legacy concurrent fixtures and external Agent CLI spawn stays `0`.
+- `[长工]#realtime-p1-scheduler-core@v0.1`: summarized accepted/pushed local scheduler slice at `ccedb15`; S-01 through S-16 and R-01 through R-03 pass, max global/same-Agent/reserved are `1/1/1`, and external Agent spawn is `0`.
 - `[PM]#daily-plan@2026-07-09`: summarized 2026-07-09 daily plan;B②/C short-worker/D 今天/E1 evidence is retained as history.
 - `[PM]#daily-plan@2026-07-10`: summarized 2026-07-10 daily plan;administrator decisions and W28/closeout preparation are retained as history.
 
@@ -222,5 +223,5 @@ next action:
 - Keep `docs/orchestration/tasks/daily-role-accountability-2026-07-02.md` aligned with role states before closing any daily supervision pass.
 - M5 Day 5B correction `115c621` and final closeout `8df940c` are pushed to `origin/main`; preserve the residual-risk record and keep all M5 product lanes closed.
 - Keep M5 product dispatch closed. Direct tray/pointer and Windows notification visibility may only reopen through fresh bounded evidence lanes.
-- Publish the W28 closeout / W29 activation / scheduler-core dispatch baseline, then dispatch exactly one bounded scheduler worker today.
-- Accept only after S-01 through S-16, existing runtime/reattach/truth/orchestration gates, exact diff review and external Agent CLI spawn `0`; preserve all seven carry-over blockers separately.
+- Preserve accepted scheduler commit `ccedb15`, its five-file selective integration and S/R regression evidence; no scheduler worker remains active.
+- Keep configurable concurrency, priority, starvation protection, cancellation DAG and Connector quotas outside this completed minimum slice; preserve all seven W28 carry-over blockers separately.

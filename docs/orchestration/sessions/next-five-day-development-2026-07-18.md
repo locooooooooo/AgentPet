@@ -3,9 +3,9 @@
 [PM]#next-five-day-development@2026-07-18
 ⟦tag:v2|session|next-five-day-development-2026-07-18⟧
 
-loop state: active
-dispatch state: active
-status: active_same_day_scheduler_delivery_under_full_schedule_and_phase_waiver
+loop state: summarized
+dispatch state: summarized
+status: completed_accepted_pushed_same_day_ccedb15
 
 > **Original control window**: 2026-07-18 through 2026-07-22
 > **Compressed control window and DDL**: 2026-07-17 for all five rows
@@ -32,9 +32,9 @@ status: active_same_day_scheduler_delivery_under_full_schedule_and_phase_waiver
 | --- | --- | --- | --- | --- | --- |
 | 1 | 2026-07-18 | 2026-07-17 | PM control plane | Prepare the non-complete W28 closeout template and seven carry-over rows | completed under waiver |
 | 2 | 2026-07-19 | 2026-07-17 | Supervisor read-only audit | Freeze carry-over owner/prerequisite/evidence and prepare a closeout candidate | completed; fresh PM gates pending |
-| 3 | 2026-07-20 | 2026-07-17 | PM W28 closeout | Summarize W28, activate the next weekly truth and publish the control transition | active in current control commit |
+| 3 | 2026-07-20 | 2026-07-17 | PM W28 closeout | Summarize W28, activate the next weekly truth and publish the control transition | completed/pushed at `e11b1ce` |
 | 4 | 2026-07-21 | 2026-07-17 | `[短工]#realtime-p1-scheduler-intake@v0.1` docs-only lane | Freeze contract, file fence, fixtures, failure matrix and rollback | accepted/summarized |
-| 5 | 2026-07-22 | 2026-07-17 | `[长工]#realtime-p1-scheduler-core@v0.1` single worker | Implement the accepted local scheduler core with external spawn fixed at zero | active after control baseline push |
+| 5 | 2026-07-22 | 2026-07-17 | `[长工]#realtime-p1-scheduler-core@v0.1` single worker | Implement the accepted local scheduler core with external spawn fixed at zero | accepted/pushed at `ccedb15` |
 
 ## Day 4 intake contract
 
@@ -109,19 +109,20 @@ completed:
 - Date-waiver artifacts pass the recurring gate set with 115 referenced cards: orchestration check/report/preflight/Connector safety, realtime truth check, lint, build and `git diff --check`.
 - Two bounded long workers first returned read-only gap callbacks, then created the two declared docs-only artifacts after the administrator's date-gate waiver; no product implementation was activated.
 - The compressed closeout/next-stage/scheduler dispatch baseline passed the full recurring gates with 117 referenced cards and external Agent CLI execution `0`.
+- Scheduler S-01 through S-16 and independent-review R-01 through R-03 pass; max global/same-Agent/reserved=`1/1/1`, external spawn=`0`, duplicate terminal=`0`, residue process/timer=`0/0`.
+- Selective five-file implementation commit `ccedb15` is pushed with remote parity; concurrent quota/Electron/UI/Vite/user-document changes were excluded.
 
 incomplete:
-- PM fresh gates, closeout control commit/push and remote parity remain to complete Day 3.
-- Scheduler-core implementation and S-01 through S-16 acceptance remain to complete Day 5.
+- Configurable concurrency, priority, starvation protection, cancellation DAG and cross-Connector quotas remain outside this minimum board.
 
 blockers:
 - No schedule or local scheduler phase blocker remains after the administrator set all five DDLs to 2026-07-17.
-- Evidence gates remain mandatory: failed fixtures, forbidden-file needs or control drift still block acceptance.
+- P0-C, R0-3, Trae, Qoder, pointer and AgentPet prerequisites remain separate carry-over blockers and were not changed by this board.
 - Existing Pointer, Trae and Qoder prerequisites remain separate and do not block the control plan.
 
 next action:
-- Run fresh PM closeout gates, publish the control transition, then dispatch exactly one scheduler-core worker today.
-- Collect S-01 through S-16 callback evidence, independently accept or reject, and publish final parity before ending the same-day board.
+- Preserve accepted commits `e11b1ce`, `42b6385` and `ccedb15`; no product worker remains active.
+- Open a new bounded task for any future scheduler expansion instead of reopening this completed board.
 
 summary:
-- Active same-day serial board: all original five-day DDLs are 2026-07-17, W28 closeout is in PM acceptance and one local scheduler-core worker follows after the control baseline push.
+- Completed same-day serial board: all original five-day DDLs were met on 2026-07-17, W28 is closed and the bounded local scheduler-core is accepted/pushed at `ccedb15`.

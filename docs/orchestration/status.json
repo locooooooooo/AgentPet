@@ -2,12 +2,12 @@
   "identity": "[PM]#multi-agent-control@v0.1",
   "loopState": "active",
   "dispatchState": "active",
-  "target": "Complete the entire original 2026-07-18 through 2026-07-22 board on the administrator's compressed 2026-07-17 DDL: close W28, activate the next requirements truth and deliver one local scheduler-core slice; external execution and machine gates stay closed.",
+  "target": "Preserve the completed same-day five-day board at ccedb15: W28 is closed, next-stage requirements remain active, the local scheduler-core slice is accepted/pushed, and external execution plus machine gates stay closed.",
   "source": "docs/orchestration/index.md",
   "todayPlan": {
     "date": "2026-07-17",
     "session": "docs/orchestration/sessions/daily-plan-2026-07-17.md",
-    "selectedRoute": "Same-day serial closeout, next-stage requirements activation and one local scheduler-core delivery under the explicit full schedule and phase waiver",
+    "selectedRoute": "Preserve the accepted same-day closeout and scheduler delivery while keeping all external execution and carry-over gates explicit",
     "progress": "docs/orchestration/sessions/daily-plan-2026-07-17.md"
   },
   "p0Cards": [
@@ -456,8 +456,8 @@
       "id": "next-five-day-development-2026-07-18",
       "title": "[PM]#next-five-day-development@2026-07-18",
       "owner": "主控",
-      "status": "active",
-      "responsibility": "Own the serial same-day board: all original 2026-07-18 through 2026-07-22 DDLs are compressed to 2026-07-17; closeout baseline must be pushed before the single scheduler worker starts.",
+      "status": "summarized",
+      "responsibility": "The compressed five-day board completed on 2026-07-17: W28 closeout, next-stage requirements, scheduler intake and local scheduler-core acceptance/push are preserved through ccedb15.",
       "tag": "⟦tag:v2|session|next-five-day-development-2026-07-18⟧",
       "evidence": "docs/orchestration/sessions/next-five-day-development-2026-07-18.md"
     },
@@ -466,7 +466,7 @@
       "title": "[PM]#weekly-closeout@2026-07-20",
       "owner": "主控",
       "status": "summarized",
-      "responsibility": "W28 closeout candidate is accepted into the current PM transition under the full schedule waiver; seven carry-over rows remain non-blocking and final Git proof belongs to this control commit.",
+      "responsibility": "W28 closeout is completed/pushed under the full schedule waiver; control baseline e11b1ce and scheduler delivery ccedb15 are remote, while seven carry-over rows remain non-blocking.",
       "tag": "⟦tag:v2|session|weekly-closeout-2026-07-20⟧",
       "evidence": "docs/orchestration/sessions/weekly-closeout-2026-07-20.md"
     },
@@ -484,7 +484,7 @@
       "title": "[PM]#weekly-requirements@2026-07-21",
       "owner": "主控",
       "status": "active",
-      "responsibility": "Own the next-stage local scheduler delivery, activated early with the entire five-day board due on 2026-07-17 and every external execution gate closed.",
+      "responsibility": "Own next-stage buffer truth after accepted scheduler commit ccedb15; preserve incomplete future P1 features and every external execution gate.",
       "tag": "⟦tag:v2|session|weekly-requirements-2026-07-21⟧",
       "evidence": "docs/orchestration/sessions/weekly-requirements-2026-07-21.md"
     },
@@ -492,8 +492,8 @@
       "id": "realtime-p1-scheduler-core",
       "title": "[长工]#realtime-p1-scheduler-core@v0.1",
       "owner": "长工",
-      "status": "active",
-      "responsibility": "Implement one local/fixture scheduler-core slice within the exact expanded five-file fence; runtime-script edits are limited to two confirmed legacy concurrent fixtures, S-01 through S-16 are mandatory and external Agent CLI spawn stays zero.",
+      "status": "summarized",
+      "responsibility": "Local scheduler-core is accepted/pushed as ccedb15 after S-01 through S-16, R-01 through R-03, independent review, selective types integration and isolated staged-snapshot validation; external Agent spawn stayed zero.",
       "tag": "⟦tag:v2|task|realtime-p1-scheduler-core-v0.1⟧",
       "evidence": "docs/orchestration/tasks/realtime-p1-scheduler-core-v0.1.md"
     }
@@ -532,7 +532,7 @@
       "title": "每日计划督办",
       "role": "[PM]#daily-supervision@2026-07-02",
       "state": "active",
-      "nextAction": "Supervise the compressed same-day board, keep exactly one local scheduler worker active after baseline push, and continue to prohibit external Agent execution."
+      "nextAction": "Preserve accepted same-day scheduler evidence, keep product worker count zero, and continue to prohibit external Agent execution."
     },
     {
       "id": "codex-evidence-closeout",
@@ -693,7 +693,7 @@
       "title": "Next-stage weekly requirements planning",
       "role": "[PM]#weekly-requirements@2026-07-21",
       "state": "active",
-      "nextAction": "Complete the bounded local scheduler-core slice on the compressed 2026-07-17 DDL, then publish independent PM acceptance or the exact failed fixture."
+      "nextAction": "Preserve accepted scheduler commit ccedb15 and keep configurable concurrency, priority, starvation protection, cancellation DAG and Connector quotas outside the completed slice."
     },
     {
       "id": "ranch-real-integration-r0-3-dryrun",

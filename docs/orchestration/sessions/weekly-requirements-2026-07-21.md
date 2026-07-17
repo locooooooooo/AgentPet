@@ -19,7 +19,7 @@ status: active_early_under_full_schedule_and_phase_waiver
 ## accepted inputs
 
 - W28 closeout candidate and seven non-blocking carry-over rows are frozen in `weekly-closeout-2026-07-20.md` under the administrator's full schedule waiver.
-- Scheduler requirements, exact future file fence and S-01 through S-16 fixtures are accepted in `realtime-p1-scheduler-intake-v0.1.md`.
+- Scheduler requirements, exact file fence and S-01 through S-16 fixtures were accepted in `realtime-p1-scheduler-intake-v0.1.md`; implementation plus R-01 through R-03 are accepted/pushed at `ccedb15`.
 - Baseline before this transition is `HEAD == origin/main == a1637c1` with only unrelated user-owned `README.md` and `docs/牛马状态回执音效规范-v0.1.md` changes present.
 - Current product implementation worker count is `0`; external Agent CLI spawn count is `0`.
 
@@ -30,8 +30,8 @@ status: active_early_under_full_schedule_and_phase_waiver
 | 1 | W28 pre-closeout and carry-over freeze | `[监督]#w28-closeout-readiness@2026-07-17` | 2026-07-17 | Closeout candidate, seven non-blocking rows, fresh gates |
 | 2 | W28 final control transition | `[PM]#weekly-closeout@2026-07-20` | 2026-07-17 | W28 summarized, next weekly truth active, pushed parity |
 | 3 | Scheduler requirements acceptance | `[短工]#realtime-p1-scheduler-intake@v0.1` | 2026-07-17 | Exact contract, file fence, failure matrix and S-01 through S-16 |
-| 4 | Scheduler-core implementation | `[长工]#realtime-p1-scheduler-core@v0.1` | 2026-07-17 | Bounded callback, S-01 through S-16, max concurrency evidence, external spawn `0` |
-| 5 | PM acceptance and publication | `[PM]#multi-agent-control@v0.1` | 2026-07-17 | Full recurring gates, exact diff review, commit, push and remote parity |
+| 4 | Scheduler-core implementation | `[长工]#realtime-p1-scheduler-core@v0.1` | 2026-07-17 | Accepted S-01 through S-16 plus R-01 through R-03; `ccedb15` |
+| 5 | PM acceptance and publication | `[PM]#multi-agent-control@v0.1` | 2026-07-17 | Full recurring gates, selective integration, commit, push and remote parity complete |
 
 ## P0 requirement
 
@@ -69,7 +69,7 @@ Everything else is forbidden unless the worker stops and PM explicitly expands t
 - PM independently reviews the diff and does not infer real Agent E2E from controlled local fixtures.
 
 next action:
-- Publish the same-day control baseline, dispatch exactly one scheduler-core worker, collect its callback and perform independent PM acceptance today.
+- Preserve the accepted minimum scheduler slice at `ccedb15`; future configurable concurrency, priority, starvation protection, cancellation DAG or quota work requires a new bounded card.
 
 summary:
-- Next-stage requirements are active early under the administrator's full schedule and phase waiver; one local scheduler-core slice is due today while every external execution gate remains closed.
+- Next-stage requirements remain active in buffer mode after the same-day local scheduler slice was accepted/pushed at `ccedb15`; every external execution gate remains closed.

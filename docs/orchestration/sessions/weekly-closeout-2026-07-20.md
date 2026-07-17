@@ -5,11 +5,11 @@
 
 loop state: summarized
 dispatch state: summarized
-status: accepted_ready_for_control_commit_under_full_schedule_waiver
+status: completed_pushed_under_full_schedule_waiver
 
 > **Candidate date / compressed DDL**: 2026-07-17 under the administrator's explicit full schedule waiver
 > **Original final closeout date**: 2026-07-20; the administrator explicitly waived this date gate for Day 2 and Day 3 candidate preparation on 2026-07-17
-> **Current state**: Closeout candidate evidence is ready; PM truth synchronization, acceptance, commit, push and remote parity have not been executed
+> **Current state**: W28 closeout completed and pushed under the full schedule waiver; seven carry-over rows remain non-blocking
 > **Source**: `docs/orchestration/sessions/weekly-requirements-2026-07-14.md`
 > **Control route**: `docs/orchestration/sessions/w28-closeout-readiness-2026-07-17.md` and `docs/orchestration/sessions/next-five-day-development-2026-07-18.md`
 > **Waiver boundary**: The full schedule waiver authorizes Day 2 read-only pre-closeout evidence and Day 3 closeout-candidate preparation on 2026-07-17. It does not authorize implementation, external Agent execution, Connector changes, pointer input, staging, commit, push or a false final/pushed closeout claim.
@@ -78,8 +78,8 @@ Every row is `carry-over / non-blocking` for W28 final closeout. A prerequisite 
 - [x] Run the complete recurring gate set against this edited closeout candidate.
 - [x] Synchronize index, status, weekly truth, daily supervision, accountability and decision queue atomically.
 - [x] Summarize the W28 weekly role/session only after final evidence passes.
-- [ ] Stage only the declared control-plane closeout files after independent diff review.
-- [ ] Commit and push only after acceptance, then prove final remote parity and a clean worktree.
+- [x] Stage only the declared control-plane closeout files after independent diff review.
+- [x] Commit and push only after acceptance, then prove final remote parity while preserving unrelated user-owned worktree changes.
 
 ## prepared transition matrix
 
@@ -103,23 +103,19 @@ completed:
 - The closeout candidate is ready for PM cross-file synchronization and acceptance; no product worker or external Agent execution was opened.
 
 incomplete:
-- Index, status, weekly requirements, daily supervision, accountability and decision queue have not been synchronized by this single-file lane.
-- The W28 weekly role/session remains active and has not been summarized.
-- PM independent acceptance and cross-file truth synchronization are complete.
-- Staging, control commit, push, final remote parity and clean-worktree proof have not been executed.
-- This candidate therefore does not claim a final pushed closeout.
+- No W28 closeout action remains incomplete; seven carry-over rows remain separately gated by design.
 
 blockers:
 - Candidate evidence has no remaining schedule gate; the administrator explicitly compressed the DDL to 2026-07-17.
-- Final pushed closeout still requires the control commit, push and remote parity evidence.
+- Control transition `e11b1ce` and scheduler delivery `ccedb15` are pushed with remote parity.
 - P0-C and R0-3 lack their separate explicit execution authorizations.
 - Pointer lacks a working screenshot-bound coordinate route; Trae lacks Models readiness and fresh smoke authorization; Qoder lacks a headless API.
 - AgentPet staging review lacks a fresh read-only state review plus an explicit PM/user decision; the Git manager callback remains read-only only.
 - These carry-over blockers do not block W28 closeout.
 
 next action:
-- PM stages only the declared control-plane closeout and same-day dispatch files, commits, pushes and proves remote parity plus preservation of unrelated user changes.
-- Do not dispatch a product worker or external Agent from this candidate; P0-C, R0-3, Trae, Qoder, pointer and AgentPet remain separately gated.
+- Preserve W28 as summarized and keep P0-C, R0-3, Trae, Qoder, pointer and AgentPet separately gated.
+- Do not reopen this closeout for future scheduler expansion; use the active next-stage weekly truth and a new bounded task.
 
 evidence:
 - Administrator instruction in the current task: ignore the later five-day time gates and compress all plan DDLs to 2026-07-17; this is a schedule waiver, not external-execution authorization.
@@ -133,6 +129,9 @@ evidence:
 - `docs/orchestration/tasks/daily-role-accountability-2026-07-02.md`
 - `docs/orchestration/tasks/daily-decision-queue-2026-07-02.md`
 - Fresh recurring gates passed with 117 referenced cards; report, preflight, Connector safety, realtime truth, lint, build and `git diff --check` all passed, with external Agent CLI execution `0`.
+- Closeout/next-stage control commit: `e11b1ce`, pushed to remote main.
+- Exact scheduler fixture-fence expansion: `42b6385`, pushed to remote main.
+- Accepted scheduler implementation: `ccedb15`, selectively integrated and pushed with `HEAD == origin/main == remote main`.
 
 summary:
-- W28 closeout is PM-accepted on the compressed 2026-07-17 DDL under the administrator's full schedule waiver. Seven carry-over items remain separately gated and non-blocking; only control commit, push and parity remain incomplete.
+- W28 closeout completed/pushed on the compressed 2026-07-17 DDL under the administrator's full schedule waiver. Seven carry-over items remain separately gated and non-blocking.

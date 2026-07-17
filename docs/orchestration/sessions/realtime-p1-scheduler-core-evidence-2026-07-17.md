@@ -5,7 +5,7 @@
 
 loop state: summarized
 dispatch state: summarized
-status: pm_accepted_ready_for_scheduler_commit
+status: accepted_pushed_ccedb15
 date: 2026-07-17
 baseline control commit: `42b6385`
 
@@ -164,7 +164,6 @@ completed:
 - Runtime, reattach, realtime truth, orchestration, Connector safety, lint, build and whitespace regression gates.
 
 incomplete:
-- Scheduler commit, push and remote parity.
 - Configurable concurrency, priority, starvation prevention, DAG cancellation and cross-Connector quotas remain outside this minimum slice.
 
 blockers:
@@ -172,4 +171,4 @@ blockers:
 - Global worktree cleanliness cannot be attributed to this Lane while concurrent out-of-fence lanes remain dirty; scheduler-owned index changes are restricted to the five-file fence above.
 
 next action:
-- Commit and push only the selectively staged scheduler index, prove remote parity, then synchronize the orchestration roles to summarized/accepted without absorbing concurrent Lane changes.
+- Preserve `ccedb15` as the accepted minimum scheduler slice; any future scheduler feature must open a new bounded task and keep external execution separately gated.

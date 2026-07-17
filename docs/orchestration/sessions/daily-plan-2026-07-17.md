@@ -31,11 +31,11 @@ status: active_supervision_after_control_closeout
 | 4 | `[PM]#daily-plan@2026-07-17` | Control-plane truth sync, acceptance and closeout | active supervision | This card, `index.md`, `status.json`, W28 truth and final gates |
 | 5 | `[监督]#control-truth-projection@2026-07-17` | Read-only visible status projection replay | summarized / accepted | `control-truth-projection-2026-07-17.md` |
 | 6 | `[监督]#w28-closeout-readiness@2026-07-17` | Read-only W28 closeout readiness audit | summarized / ready | `w28-closeout-readiness-2026-07-17.md` |
-| 7 | `[PM]#next-five-day-development@2026-07-18` | Compressed same-day serial control | active / all DDLs 2026-07-17 | `next-five-day-development-2026-07-18.md` |
-| 8 | `[PM]#weekly-closeout@2026-07-20` | W28 closeout under full schedule waiver | summarized in current PM transition | `weekly-closeout-2026-07-20.md` |
+| 7 | `[PM]#next-five-day-development@2026-07-18` | Compressed same-day serial control | summarized / completed at `ccedb15` | `next-five-day-development-2026-07-18.md` |
+| 8 | `[PM]#weekly-closeout@2026-07-20` | W28 closeout under full schedule waiver | summarized / completed and pushed | `weekly-closeout-2026-07-20.md` |
 | 9 | `[短工]#realtime-p1-scheduler-intake@v0.1` | Requirements, exact file fence and fixtures | summarized / accepted | `realtime-p1-scheduler-intake-v0.1.md` |
 | 10 | `[PM]#weekly-requirements@2026-07-21` | Next-stage requirements truth | active early / DDL 2026-07-17 | `weekly-requirements-2026-07-21.md` |
-| 11 | `[长工]#realtime-p1-scheduler-core@v0.1` | Local scheduler implementation only | active after control baseline push | `realtime-p1-scheduler-core-v0.1.md` |
+| 11 | `[长工]#realtime-p1-scheduler-core@v0.1` | Local scheduler implementation only | summarized / accepted and pushed `ccedb15` | `realtime-p1-scheduler-core-v0.1.md` |
 
 ## completed
 
@@ -53,6 +53,8 @@ status: active_supervision_after_control_closeout
 - The administrator then set the entire later five-day plan and every DDL to 2026-07-17. PM records this as the explicit W28 closeout-date and local scheduler phase waiver, without authorizing P0-C or external Agent execution.
 - W28 closeout candidate, next-stage weekly requirements and the exact scheduler-core task card are synchronized for a serial dispatch baseline.
 - The scheduler worker stopped before editing on a real legacy-fixture conflict. PM verified `scripts/check-connector-runtime.mjs:754-777` requires same-Agent double active/spawn and authorized only that script's two conflicting selector/tie fixtures as an exact fence expansion.
+- Scheduler delivery passed S-01 through S-16; independent review then found three P1 interleavings, which were reproduced and closed by R-01 through R-03 before acceptance.
+- PM selectively integrated only the five scheduler files, excluding concurrent account-quota hunks from `src/types.ts`; implementation commit `ccedb15` is pushed with remote parity.
 
 ## current blockers
 
@@ -94,9 +96,8 @@ status: active_supervision_after_control_closeout
 
 ## next action
 
-- Keep W28 in buffer/closeout mode with no implementation worker active.
-- Run fresh PM closeout gates, commit/push the W28-to-next-stage transition and prove remote parity.
-- Dispatch exactly one local scheduler-core worker after that clean baseline.
-- Independently verify S-01 through S-16 and all legacy gates, then accept/push or record the exact failed fixture today.
+- Keep W28 summarized and the completed five-day board closed; no product worker remains active.
+- Preserve S-01 through S-16, R-01 through R-03 and selective-integration evidence at `ccedb15`.
+- Use a new bounded task for future scheduler features and keep all external Agent/Connector gates closed.
 - Keep pointer evidence standby until a working screenshot-bound coordinate route exists.
 - Keep P0-C and every production Connector behind their explicit authorization gates.

@@ -3,9 +3,9 @@
 [长工]#realtime-p1-scheduler-core@v0.1
 ⟦tag:v2|task|realtime-p1-scheduler-core-v0.1⟧
 
-loop state: active
-dispatch state: active
-status: active_ready_after_exact_legacy_fixture_fence_expansion
+loop state: summarized
+dispatch state: summarized
+status: accepted_pushed_ccedb15
 date: 2026-07-17
 ddl: 2026-07-17
 
@@ -93,3 +93,12 @@ changed files:
 ```
 
 The callback must list S-01 through S-16 individually, all required counters, every command result and the exact diff file list.
+
+## PM acceptance
+
+- Accepted and pushed as `ccedb15` on 2026-07-17.
+- S-01 through S-16 and independent-review regressions R-01 through R-03 pass.
+- Final counters: max global active `1`, max same-Agent active `1`, max global reserved `1`, external Agent spawn `0`, duplicate terminal `0`, residual process/timer `0/0`.
+- Independent review initially rejected three P1 gaps, then confirmed all three closed with no blocking findings.
+- Selective `src/types.ts` integration excluded concurrent account-quota hunks; only the five scheduler-owned files were committed.
+- Remote parity: `HEAD == origin/main == remote main == ccedb15` after the implementation push.
