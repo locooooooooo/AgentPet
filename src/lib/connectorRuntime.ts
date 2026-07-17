@@ -70,6 +70,7 @@ const ACTIVE_STATES = new Set<ConnectorRuntimeState>([
 const NON_RETRYABLE_FAILURES = new Set<ConnectorFailureKind>([
   'timeout',
   'cancelled',
+  'dependency-blocked',
   'policy-blocked',
   'permission-denied'
 ]);
@@ -417,7 +418,8 @@ interface TerminationIntent {
 interface ActiveExecution {
   taskId: string;
   process: ConnectorRuntimeProcess;
-  timeoutTimer: NodeJS.Timeout;
+  timeoutMs: number;
+  timeoutTimer?: NodeJS.Timeout;
   terminationTimer?: NodeJS.Timeout;
   terminationFinalTimer?: NodeJS.Timeout;
   outputFlushTimer?: NodeJS.Timeout;
@@ -444,6 +446,16 @@ interface ActiveExecution {
 type PrepareResult =
   | { prepared: true; execution: PreparedExecution }
   | { prepared: false; blockedReasons: ConnectorRuntimeBlockedReason[] };
+
+type ConnectorDependencyBlockedReason = Extract<
+  ConnectorRuntimeBlockedReason,
+  'dependency-cycle' | 'dependency-failed' | 'dependency-invalid' | 'dependency-not-found'
+>;
+
+interface DependencyBlock {
+  reason: ConnectorDependencyBlockedReason;
+  dependencyTaskId?: string;
+}
 
 export function selectDirectConnectorExecutable(
   candidates: string[],
@@ -986,6 +998,7 @@ export function sanitizeRuntimeSnapshotForPersistence(
     updatedAt: snapshot.updatedAt,
     tasks: snapshot.tasks.map((session) => ({
       ...session,
+      dependsOn: [...session.dependsOn],
       capabilities: session.capabilities ? [...session.capabilities] : null,
       output: { ...session.output },
       processFingerprint: session.processFingerprint ? { ...session.processFingerprint } : undefined,
@@ -1023,6 +1036,7 @@ export class ConnectorRuntime {
   private snapshot: ConnectorRuntimeSnapshot;
   private eventSequence = 0;
   private disposed = false;
+  private scheduling = false;
 
   constructor(private readonly dependencies: ConnectorRuntimeDependencies) {
     this.now = dependencies.now ?? (() => new Date());
@@ -1099,6 +1113,10 @@ export class ConnectorRuntime {
       attempt: session.attempt,
       maxAttempts: session.maxAttempts,
       startedAt: session.startedAt,
+      queuedAt: session.queuedAt,
+      processStartedAt: session.processStartedAt,
+      queueWaitMs: session.queueWaitMs,
+      dependsOn: [...session.dependsOn],
       endedAt: session.endedAt,
       failureKind: session.failureKind,
       processFingerprint: session.processFingerprint ? { ...session.processFingerprint } : undefined,
@@ -1117,6 +1135,7 @@ export class ConnectorRuntime {
     const retryPolicy = normalizeRetryPolicy(request.retry);
     const taskId = `connector-task-${this.createId()}`;
     const sessionId = `connector-session-${this.createId()}`;
+    const createdAt = this.now().toISOString();
     this.sensitivePrompts.set(taskId, request.prompt);
     this.replaceSession({
       taskId,
@@ -1128,8 +1147,10 @@ export class ConnectorRuntime {
       source: 'runtime-spawn',
       capabilities: null,
       capabilitySource: 'unknown',
-      state: 'starting',
-      startedAt: this.now().toISOString(),
+      state: 'queued',
+      startedAt: createdAt,
+      queuedAt: createdAt,
+      dependsOn: [...(request.dependsOn ?? [])],
       attempt: 0,
       maxAttempts: retryPolicy.maxRetries + 1,
       retryPolicy,
@@ -1151,11 +1172,11 @@ export class ConnectorRuntime {
       return blockedResult(request.connectorId, reasons, taskId, sessionId);
     }
 
-    const prepared = this.prepareExecution(request);
-    if (!prepared.prepared) {
-      this.blockSession(taskId, prepared.blockedReasons);
+    const admissionBlockedReasons = this.validateAdmission(request);
+    if (admissionBlockedReasons.length > 0) {
+      this.blockSession(taskId, admissionBlockedReasons);
       this.sensitivePrompts.delete(taskId);
-      return blockedResult(request.connectorId, prepared.blockedReasons, taskId, sessionId);
+      return blockedResult(request.connectorId, admissionBlockedReasons, taskId, sessionId);
     }
 
     const plan: ExecutionPlan = {
@@ -1166,8 +1187,15 @@ export class ConnectorRuntime {
       budgetStartedAtMs: this.now().getTime(),
       attempt: 0
     };
+    const dependencyBlock = this.validateDependencies(taskId, request.dependsOn ?? []);
+    if (dependencyBlock) {
+      this.blockDependencySession(taskId, dependencyBlock.reason, dependencyBlock.dependencyTaskId);
+      this.sensitivePrompts.delete(taskId);
+      return blockedResult(request.connectorId, [dependencyBlock.reason], taskId, sessionId);
+    }
     this.plans.set(taskId, plan);
-    this.launchAttempt(plan, prepared.execution);
+    this.enqueuePlan(plan, createdAt, 'Task entered the scheduler queue.');
+    this.schedule();
     return {
       status: 'accepted',
       connectorId: request.connectorId,
@@ -1197,6 +1225,21 @@ export class ConnectorRuntime {
         status: this.active.get(request.taskId) === execution ? 'stopping' : 'stopped',
         taskId: request.taskId
       };
+    }
+
+    const queued = this.snapshot.tasks.find((session) => (
+      session.taskId === request.taskId && session.state === 'queued'
+    ));
+    if (queued) {
+      this.plans.delete(request.taskId);
+      this.finishSession(request.taskId, 'stopped', {
+        eventKind: 'scheduler',
+        message: 'Queued Connector session was cancelled before spawn.',
+        failureKind: 'cancelled',
+        payload: { schedulerDecision: 'queued-cancel', spawnCount: 0 }
+      });
+      this.sensitivePrompts.delete(request.taskId);
+      return { status: 'stopped', taskId: request.taskId };
     }
 
     const retryTimer = this.retryTimers.get(request.taskId);
@@ -1237,7 +1280,11 @@ export class ConnectorRuntime {
         allowRetry: false
       });
     });
-    const inactiveTaskIds = new Set([...this.retryTimers.keys(), ...this.recoveryTimers.keys()]);
+    const inactiveTaskIds = new Set([
+      ...this.retryTimers.keys(),
+      ...this.recoveryTimers.keys(),
+      ...this.snapshot.tasks.filter((session) => session.state === 'queued').map((session) => session.taskId)
+    ]);
     inactiveTaskIds.forEach((taskId) => this.stop({ taskId }));
   }
 
@@ -1272,6 +1319,185 @@ export class ConnectorRuntime {
     } catch {
       return { authorized: false, blockedReason: 'authorization-invalid' };
     }
+  }
+
+  private validateDependencies(taskId: string, dependsOn: string[]): DependencyBlock | null {
+    if (dependsOn.length > MAX_RUNTIME_SESSIONS || new Set(dependsOn).size !== dependsOn.length) {
+      return { reason: 'dependency-invalid' };
+    }
+    for (const dependencyTaskId of dependsOn) {
+      if (dependencyTaskId === taskId) {
+        return { reason: 'dependency-cycle', dependencyTaskId };
+      }
+      if (!this.snapshot.tasks.some((session) => session.taskId === dependencyTaskId)) {
+        return { reason: 'dependency-not-found', dependencyTaskId };
+      }
+      if (this.dependencyReaches(dependencyTaskId, taskId, new Set())) {
+        return { reason: 'dependency-cycle', dependencyTaskId };
+      }
+    }
+    return null;
+  }
+
+  private dependencyReaches(currentTaskId: string, targetTaskId: string, visited: Set<string>): boolean {
+    if (currentTaskId === targetTaskId) {
+      return true;
+    }
+    if (visited.has(currentTaskId)) {
+      return false;
+    }
+    visited.add(currentTaskId);
+    const current = this.snapshot.tasks.find((session) => session.taskId === currentTaskId);
+    return current?.dependsOn.some((dependencyTaskId) => (
+      this.dependencyReaches(dependencyTaskId, targetTaskId, visited)
+    )) ?? false;
+  }
+
+  private enqueuePlan(plan: ExecutionPlan, queuedAt: string, message: string) {
+    this.updateSession(plan.taskId, (session) => ({
+      ...session,
+      state: 'queued',
+      queuedAt,
+      processStartedAt: undefined,
+      queueWaitMs: undefined,
+      timeoutAt: undefined,
+      pid: undefined,
+      processFingerprint: undefined,
+      termination: undefined,
+      liveness: createUnknownLiveness(this.heartbeatStaleAfterMs),
+      events: appendEvent(session.events, this.createEvent(
+        'scheduler',
+        message,
+        { dependsOn: session.dependsOn, queuedAt },
+        'task-queued'
+      ))
+    }));
+  }
+
+  private schedule() {
+    if (this.disposed || this.scheduling) {
+      return;
+    }
+    this.scheduling = true;
+    try {
+      while (!this.disposed) {
+        const queued = this.snapshot.tasks
+          .filter((session) => session.state === 'queued' && this.plans.has(session.taskId))
+          .sort(compareQueuedSessions);
+        queued.forEach((session) => {
+          const dependency = this.evaluateDependencies(session);
+          if (dependency.status !== 'blocked') {
+            return;
+          }
+          this.plans.delete(session.taskId);
+          this.blockDependencySession(session.taskId, 'dependency-failed', dependency.dependencyTaskId);
+          this.sensitivePrompts.delete(session.taskId);
+        });
+
+        if (this.active.size >= 1 || this.hasRecoveryReservation()) {
+          break;
+        }
+        const activeAgentIds = new Set([...this.active.keys()].map((taskId) => (
+          this.snapshot.tasks.find((session) => session.taskId === taskId)?.agentId
+        )).filter((agentId): agentId is string => typeof agentId === 'string'));
+        const next = this.snapshot.tasks
+          .filter((session) => session.state === 'queued' && this.plans.has(session.taskId))
+          .sort(compareQueuedSessions)
+          .find((session) => (
+            !activeAgentIds.has(session.agentId) && this.evaluateDependencies(session).status === 'ready'
+          ));
+        if (!next) {
+          break;
+        }
+        const plan = this.plans.get(next.taskId);
+        if (!plan) {
+          continue;
+        }
+        this.updateSession(plan.taskId, (session) => ({
+          ...session,
+          events: appendEvent(session.events, this.createEvent(
+            'scheduler',
+            'Scheduler dequeued the task into the single global slot.',
+            { queuedAt: session.queuedAt, globalConcurrency: 1 },
+            'task-dequeued'
+          ))
+        }));
+        this.launchAttempt(plan);
+        if (this.active.size >= 1) {
+          break;
+        }
+      }
+    } finally {
+      this.scheduling = false;
+    }
+  }
+
+  private evaluateDependencies(session: ConnectorSession):
+    | { status: 'ready' }
+    | { status: 'waiting' }
+    | { status: 'blocked'; dependencyTaskId: string } {
+    for (const dependencyTaskId of session.dependsOn) {
+      const dependency = this.snapshot.tasks.find((candidate) => candidate.taskId === dependencyTaskId);
+      if (!dependency || isTerminalRuntimeState(dependency.state) && dependency.state !== 'success') {
+        return { status: 'blocked', dependencyTaskId };
+      }
+      if (dependency.state !== 'success') {
+        return { status: 'waiting' };
+      }
+    }
+    return { status: 'ready' };
+  }
+
+  private hasRecoveryReservation() {
+    return this.snapshot.tasks.some((session) => session.state === 'recovering');
+  }
+
+  private blockDependencySession(
+    taskId: string,
+    reason: ConnectorDependencyBlockedReason,
+    dependencyTaskId?: string
+  ) {
+    this.updateSession(taskId, (session) => ({
+      ...session,
+      events: appendEvent(session.events, this.createEvent(
+        'scheduler',
+        'Dependency evaluation blocked the queued task.',
+        { blockedReason: reason, dependencyTaskId },
+        'dependency-blocked'
+      ))
+    }));
+    this.finishSession(taskId, 'dependency-blocked', {
+      eventKind: 'scheduler',
+      message: 'Scheduler blocked the task because its dependency contract failed closed.',
+      failureKind: 'dependency-blocked',
+      payload: { blockedReason: reason, dependencyTaskId, spawnCount: 0 }
+    });
+  }
+
+  private validateAdmission(request: ConnectorRunRequest): ConnectorRuntimeBlockedReason[] {
+    const policy = this.dependencies.loadPolicy();
+    if (!policy) {
+      return ['policy-unavailable'];
+    }
+    const evaluation = evaluateConnectorPolicyGate(
+      policy,
+      {
+        connectorId: request.connectorId,
+        requestedBy: request.requestedBy,
+        confirmationAccepted: true
+      },
+      () => true
+    );
+    if (!evaluation.result.executable) {
+      return evaluation.result.blockedReasons;
+    }
+    if (!createConnectorInvocation(request.connectorId, evaluation.result.args, request.prompt)) {
+      return ['adapter-unsupported'];
+    }
+    if (evaluation.result.cwdPolicy !== 'workspace-root') {
+      return ['cwd-policy-invalid'];
+    }
+    return [];
   }
 
   private prepareExecution(request: ConnectorRunRequest): PrepareResult {
@@ -1320,10 +1546,8 @@ export class ConnectorRuntime {
     };
   }
 
-  private launchAttempt(plan: ExecutionPlan, preparedExecution?: PreparedExecution) {
-    const prepared = preparedExecution
-      ? { prepared: true as const, execution: preparedExecution }
-      : this.prepareExecution(plan.request);
+  private launchAttempt(plan: ExecutionPlan) {
+    const prepared = this.prepareExecution(plan.request);
     if (!prepared.prepared) {
       this.blockSession(plan.taskId, prepared.blockedReasons);
       this.plans.delete(plan.taskId);
@@ -1338,7 +1562,9 @@ export class ConnectorRuntime {
       attempt: plan.attempt,
       pid: undefined,
       processFingerprint: undefined,
-      timeoutAt: new Date(this.now().getTime() + prepared.execution.timeoutMs).toISOString(),
+      timeoutAt: undefined,
+      processStartedAt: undefined,
+      queueWaitMs: undefined,
       failureKind: undefined,
       termination: undefined,
       capabilities: prepared.execution.capabilities ? [...prepared.execution.capabilities] : null,
@@ -1392,6 +1618,7 @@ export class ConnectorRuntime {
     const execution = {} as ActiveExecution;
     execution.taskId = taskId;
     execution.process = child;
+    execution.timeoutMs = timeoutMs;
     execution.plan = plan;
     execution.fingerprintContext = fingerprintContext;
     execution.spawnConfirmed = spawnConfirmed;
@@ -1405,7 +1632,7 @@ export class ConnectorRuntime {
     execution.onStdout = (chunk) => this.queueOutput(execution, 'stdout', chunk);
     execution.onStderr = (chunk) => this.queueOutput(execution, 'stderr', chunk);
     execution.onError = (error) => {
-      if (this.active.get(taskId) !== execution || execution.termination) {
+      if (this.active.get(execution.taskId) !== execution || execution.termination) {
         return;
       }
       const failure = this.classifyFailure(createProcessError(error));
@@ -1421,22 +1648,9 @@ export class ConnectorRuntime {
     execution.onIdentityLost = () => {
       execution.identityLost = true;
     };
-    execution.timeoutTimer = this.setTimer(() => {
-      if (this.active.get(taskId) !== execution || execution.termination) {
-        return;
-      }
-      this.clearTimer(execution.timeoutTimer);
-      this.requestTermination(execution, {
-        desiredState: 'timed-out',
-        reason: 'timeout',
-        failure: {
-          kind: 'timeout',
-          message: `Connector process exceeded its ${timeoutMs}ms timeout.`,
-          retryable: false
-        },
-        allowRetry: false
-      });
-    }, timeoutMs);
+    if (spawnConfirmed) {
+      this.startExecutionTimeout(execution);
+    }
 
     child.stdout.on('data', execution.onStdout);
     child.stderr.on('data', execution.onStderr);
@@ -1448,11 +1662,44 @@ export class ConnectorRuntime {
     return execution;
   }
 
+  private startExecutionTimeout(execution: ActiveExecution) {
+    if (execution.timeoutTimer) {
+      return;
+    }
+    execution.timeoutTimer = this.setTimer(() => {
+      if (this.active.get(execution.taskId) !== execution || execution.termination) {
+        return;
+      }
+      if (execution.timeoutTimer) {
+        this.clearTimer(execution.timeoutTimer);
+        execution.timeoutTimer = undefined;
+      }
+      this.requestTermination(execution, {
+        desiredState: 'timed-out',
+        reason: 'timeout',
+        failure: {
+          kind: 'timeout',
+          message: `Connector process exceeded its ${execution.timeoutMs}ms timeout.`,
+          retryable: false
+        },
+        allowRetry: false
+      });
+    }, execution.timeoutMs);
+  }
+
   private confirmSpawn(execution: ActiveExecution) {
     if (this.active.get(execution.taskId) !== execution || execution.spawnConfirmed) {
       return;
     }
     execution.spawnConfirmed = true;
+    const processStartedAt = this.now().toISOString();
+    this.updateSession(execution.taskId, (session) => ({
+      ...session,
+      processStartedAt,
+      queueWaitMs: Math.max(0, Date.parse(processStartedAt) - Date.parse(session.queuedAt ?? session.startedAt)),
+      timeoutAt: new Date(Date.parse(processStartedAt) + execution.timeoutMs).toISOString()
+    }));
+    this.startExecutionTimeout(execution);
     if (execution.termination) {
       return;
     }
@@ -1607,6 +1854,7 @@ export class ConnectorRuntime {
     this.flushBufferedOutput(execution);
     this.cleanupExecution(execution);
     this.active.delete(execution.taskId);
+    this.recordSlotReleased(execution.taskId);
 
     if (execution.identityLost) {
       this.plans.delete(execution.taskId);
@@ -1706,7 +1954,10 @@ export class ConnectorRuntime {
       return;
     }
     execution.termination = intent;
-    this.clearTimer(execution.timeoutTimer);
+    if (execution.timeoutTimer) {
+      this.clearTimer(execution.timeoutTimer);
+      execution.timeoutTimer = undefined;
+    }
     const requestedAt = this.now().toISOString();
     this.updateSession(execution.taskId, (session) => ({
       ...session,
@@ -1871,6 +2122,8 @@ export class ConnectorRuntime {
     if (!intent) {
       return;
     }
+    const currentSession = this.snapshot.tasks.find((session) => session.taskId === execution.taskId);
+    const alreadyTerminal = Boolean(currentSession && hasLifecycle(currentSession, 'session-terminal'));
     this.updateSession(execution.taskId, (session) => ({
       ...session,
       termination: session.termination ? { ...session.termination, exitConfirmed: true } : session.termination
@@ -1880,7 +2133,7 @@ export class ConnectorRuntime {
       exitCode: code ?? intent.failure.exitCode,
       signal: signal ?? intent.failure.signal
     };
-    if (intent.allowRetry && execution.plan) {
+    if (!alreadyTerminal && intent.allowRetry && execution.plan) {
       this.handleFailure(execution.plan, confirmedFailure);
       return;
     }
@@ -1893,6 +2146,7 @@ export class ConnectorRuntime {
       signal
     });
     this.sensitivePrompts.delete(execution.taskId);
+    this.schedule();
   }
 
   private abandonTermination(execution: ActiveExecution, message: string) {
@@ -1900,15 +2154,56 @@ export class ConnectorRuntime {
       return;
     }
     this.flushBufferedOutput(execution);
-    this.cleanupExecution(execution);
-    this.active.delete(execution.taskId);
+    this.retainCloseObservation(execution);
     this.plans.delete(execution.taskId);
+    execution.plan = undefined;
     this.finishSession(execution.taskId, 'session-lost', {
       eventKind: 'error',
       message,
       failureKind: execution.termination?.failure.kind
     });
     this.sensitivePrompts.delete(execution.taskId);
+  }
+
+  private retainCloseObservation(execution: ActiveExecution) {
+    if (execution.timeoutTimer) {
+      this.clearTimer(execution.timeoutTimer);
+      execution.timeoutTimer = undefined;
+    }
+    if (execution.terminationTimer) {
+      this.clearTimer(execution.terminationTimer);
+      execution.terminationTimer = undefined;
+    }
+    if (execution.terminationFinalTimer) {
+      this.clearTimer(execution.terminationFinalTimer);
+      execution.terminationFinalTimer = undefined;
+    }
+    if (execution.outputFlushTimer) {
+      this.clearTimer(execution.outputFlushTimer);
+      execution.outputFlushTimer = undefined;
+    }
+    execution.process.stdout.off('data', execution.onStdout);
+    execution.process.stderr.off('data', execution.onStderr);
+    execution.process.off('spawn', execution.onSpawn);
+    execution.process.off('heartbeat', execution.onHeartbeat);
+    execution.process.off('identity-lost', execution.onIdentityLost);
+  }
+
+  private recordSlotReleased(taskId: string) {
+    this.updateSessionInternal(taskId, (session) => {
+      if (hasLifecycle(session, 'slot-released')) {
+        return session;
+      }
+      return {
+        ...session,
+        events: appendEvent(session.events, this.createEvent(
+          'scheduler',
+          'Connector process released the single global scheduler slot.',
+          { globalConcurrency: 1 },
+          'slot-released'
+        ))
+      };
+    });
   }
 
   private handleFailure(plan: ExecutionPlan, failure: ConnectorFailureDecision) {
@@ -1962,18 +2257,33 @@ export class ConnectorRuntime {
       }
       this.clearTimer(timer);
       this.retryTimers.delete(plan.taskId);
+      const queuedAt = this.now().toISOString();
       this.updateSession(plan.taskId, (session) => ({
         ...session,
-        events: appendEvent(session.events, this.createEvent(
-          'retry',
-          'Retry backoff elapsed.',
-          undefined,
-          'retry-started'
-        ))
+        state: 'queued',
+        queuedAt,
+        processStartedAt: undefined,
+        queueWaitMs: undefined,
+        timeoutAt: undefined,
+        events: appendEvent(
+          appendEvent(session.events, this.createEvent(
+            'retry',
+            'Retry backoff elapsed.',
+            undefined,
+            'retry-started'
+          )),
+          this.createEvent(
+            'scheduler',
+            'Retry entered the scheduler queue after backoff.',
+            { queuedAt },
+            'task-queued'
+          )
+        )
       }));
-      this.launchAttempt(plan);
+      this.schedule();
     }, delayMs);
     this.retryTimers.set(plan.taskId, timer);
+    this.schedule();
   }
 
   private classifyFailure(failure: ConnectorFailureDecision): ConnectorFailureDecision {
@@ -2164,11 +2474,29 @@ export class ConnectorRuntime {
   }
 
   private recoverPersistedSessions() {
-    const recoverable = this.snapshot.tasks.filter((session) => ACTIVE_STATES.has(session.state));
-    if (recoverable.length === 0) {
+    const abandonedQueued = this.snapshot.tasks.filter((session) => session.state === 'queued');
+    abandonedQueued.forEach((session) => {
+      this.finishSession(session.taskId, 'session-lost', {
+        eventKind: 'recovery',
+        message: 'Persisted queued task could not be reconstructed without its redacted request.',
+        payload: { recoveryDecision: 'queued-fail-closed' }
+      });
+    });
+    const recoverable = this.snapshot.tasks
+      .filter((session) => ACTIVE_STATES.has(session.state))
+      .sort(compareQueuedSessions);
+    recoverable.slice(1).forEach((session) => {
+      this.finishSession(session.taskId, 'session-lost', {
+        eventKind: 'recovery',
+        message: 'Persisted active task exceeded the single global recovery slot.',
+        payload: { recoveryDecision: 'global-concurrency-fail-closed' }
+      });
+    });
+    const admitted = recoverable.slice(0, 1);
+    if (admitted.length === 0) {
       return;
     }
-    recoverable.forEach((session) => {
+    admitted.forEach((session) => {
       this.updateSessionInternal(session.taskId, (current) => ({
         ...current,
         source: 'restart-recovery',
@@ -2337,7 +2665,7 @@ export class ConnectorRuntime {
 
   private finishSession(
     taskId: string,
-    state: Exclude<ConnectorRuntimeState, 'starting' | 'running' | 'stopping' | 'retrying' | 'recovering' | 'reattached'>,
+    state: Exclude<ConnectorRuntimeState, 'queued' | 'starting' | 'running' | 'stopping' | 'retrying' | 'recovering' | 'reattached'>,
     details: {
       exitCode?: number | null;
       signal?: string | null;
@@ -2370,6 +2698,7 @@ export class ConnectorRuntime {
         'session-terminal'
       ))
     }));
+    this.schedule();
   }
 
   private createEvent(
@@ -2396,7 +2725,10 @@ export class ConnectorRuntime {
   }
 
   private cleanupExecution(execution: ActiveExecution) {
-    this.clearTimer(execution.timeoutTimer);
+    if (execution.timeoutTimer) {
+      this.clearTimer(execution.timeoutTimer);
+      execution.timeoutTimer = undefined;
+    }
     if (execution.terminationTimer) {
       this.clearTimer(execution.terminationTimer);
       execution.terminationTimer = undefined;
@@ -2564,10 +2896,12 @@ function normalizeRunRequest(input: unknown): ConnectorRunRequest | null {
   const agentId = normalizeIdentifier(input.agentId);
   const taskName = normalizeText(input.taskName, MAX_TASK_NAME_LENGTH);
   const prompt = normalizeText(input.prompt, MAX_PROMPT_LENGTH);
+  const dependsOn = normalizeDependencies(input.dependsOn);
   const requestedBy = input.requestedBy === 'default-action' || input.requestedBy === 'explicit-user-action'
     ? input.requestedBy
     : null;
-  if (!connectorId || !agentId || !taskName || !prompt || !requestedBy) {
+  if (!connectorId || !agentId || !taskName || !prompt || !requestedBy
+    || input.dependsOn !== undefined && !dependsOn) {
     return null;
   }
   return {
@@ -2575,6 +2909,7 @@ function normalizeRunRequest(input: unknown): ConnectorRunRequest | null {
     agentId,
     taskName,
     prompt,
+    dependsOn,
     requestedBy,
     authorizationGrant: normalizeIdentifier(input.authorizationGrant) ?? undefined,
     retry: isRecord(input.retry) ? {
@@ -2593,7 +2928,9 @@ export function normalizeConnectorRunIntent(input: unknown): ConnectorAuthorizat
   const agentId = normalizeIdentifier(input.agentId);
   const taskName = normalizeText(input.taskName, MAX_TASK_NAME_LENGTH);
   const prompt = normalizeText(input.prompt, MAX_PROMPT_LENGTH);
-  if (!connectorId || !agentId || !taskName || !prompt) {
+  const dependsOn = normalizeDependencies(input.dependsOn);
+  if (!connectorId || !agentId || !taskName || !prompt
+    || input.dependsOn !== undefined && !dependsOn) {
     return null;
   }
   const retry = normalizeRetryPolicy(isRecord(input.retry) ? {
@@ -2606,8 +2943,22 @@ export function normalizeConnectorRunIntent(input: unknown): ConnectorAuthorizat
     agentId,
     taskName,
     prompt,
+    dependsOn,
     retry
   };
+}
+
+function normalizeDependencies(value: unknown): string[] | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+  if (!Array.isArray(value) || value.length > MAX_RUNTIME_SESSIONS) {
+    return undefined;
+  }
+  const dependencies = value.map((item) => normalizeIdentifier(item));
+  return dependencies.every((item): item is string => typeof item === 'string')
+    ? dependencies
+    : undefined;
 }
 
 function normalizeRetryPolicy(input: ConnectorRetryPolicyInput | undefined): ConnectorRetryPolicy {
@@ -2684,6 +3035,7 @@ function createRunIntentKey(intent: ConnectorAuthorizationIntent) {
     agentId: intent.agentId,
     taskName: intent.taskName,
     prompt: intent.prompt,
+    dependsOn: intent.dependsOn ?? [],
     retry: normalizeRetryPolicy(intent.retry)
   });
 }
@@ -2735,6 +3087,24 @@ function compareSessionsForInstance(left: ConnectorSession, right: ConnectorSess
   }
   const timeDifference = Date.parse(right.startedAt) - Date.parse(left.startedAt);
   return timeDifference !== 0 ? timeDifference : left.sessionId.localeCompare(right.sessionId);
+}
+
+function compareQueuedSessions(left: ConnectorSession, right: ConnectorSession) {
+  const queuedDifference = Date.parse(left.queuedAt ?? left.startedAt) - Date.parse(right.queuedAt ?? right.startedAt);
+  return queuedDifference !== 0 ? queuedDifference : left.taskId.localeCompare(right.taskId);
+}
+
+function isTerminalRuntimeState(state: ConnectorRuntimeState) {
+  return [
+    'success',
+    'error',
+    'stopped',
+    'timed-out',
+    'dependency-blocked',
+    'policy-blocked',
+    'permission-denied',
+    'session-lost'
+  ].includes(state);
 }
 
 function sessionInstanceScore(session: ConnectorSession) {
@@ -2879,6 +3249,7 @@ function truncateUtf8(value: string, maxBytes: number) {
 function cloneSessionWithFreshness(session: ConnectorSession, now: Date): ConnectorSession {
   return {
     ...session,
+    dependsOn: [...session.dependsOn],
     capabilities: session.capabilities ? [...session.capabilities] : null,
     processFingerprint: session.processFingerprint ? { ...session.processFingerprint } : undefined,
     retryPolicy: { ...session.retryPolicy },
@@ -2964,6 +3335,12 @@ function normalizePersistedSession(
     capabilitySource: isCapabilitySource(value.capabilitySource) ? value.capabilitySource : 'unknown',
     state,
     startedAt,
+    queuedAt: normalizeIsoDate(value.queuedAt) ?? undefined,
+    processStartedAt: normalizeIsoDate(value.processStartedAt) ?? undefined,
+    queueWaitMs: numberOrUndefined(value.queueWaitMs) === undefined
+      ? undefined
+      : Math.max(0, Number(value.queueWaitMs)),
+    dependsOn: normalizeDependencies(value.dependsOn) ?? [],
     endedAt: normalizeIsoDate(value.endedAt) ?? undefined,
     pid: numberOrUndefined(value.pid),
     processFingerprint: normalizeProcessFingerprint(value.processFingerprint, now),
@@ -3271,20 +3648,21 @@ function readTaskId(input: unknown) {
 
 function isRuntimeState(value: unknown): value is ConnectorRuntimeState {
   return typeof value === 'string' && [
-    'starting', 'running', 'stopping', 'retrying', 'recovering', 'reattached', 'success', 'error',
-    'stopped', 'timed-out', 'policy-blocked', 'permission-denied', 'session-lost'
+    'queued', 'starting', 'running', 'stopping', 'retrying', 'recovering', 'reattached', 'success', 'error',
+    'stopped', 'timed-out', 'dependency-blocked', 'policy-blocked', 'permission-denied', 'session-lost'
   ].includes(value);
 }
 
 function isEventKind(value: unknown): value is ConnectorRuntimeEventKind {
   return typeof value === 'string' && [
-    'lifecycle', 'stdout', 'stderr', 'error', 'timeout', 'retry', 'heartbeat', 'recovery', 'policy'
+    'lifecycle', 'scheduler', 'stdout', 'stderr', 'error', 'timeout', 'retry', 'heartbeat', 'recovery', 'policy'
   ].includes(value);
 }
 
 function isLifecycleSubtype(value: unknown): value is ConnectorLifecycleSubtype {
   return typeof value === 'string' && [
-    'session-created', 'spawn-requested', 'session-started', 'attempt-started', 'stopping-requested',
+    'session-created', 'task-queued', 'task-dequeued', 'slot-released', 'dependency-blocked',
+    'spawn-requested', 'session-started', 'attempt-started', 'stopping-requested',
     'termination-escalated', 'retry-scheduled', 'retry-started', 'recovery-started',
     'recovery-reattached', 'output-truncated', 'session-terminal'
   ].includes(value);
@@ -3292,7 +3670,7 @@ function isLifecycleSubtype(value: unknown): value is ConnectorLifecycleSubtype 
 
 function isFailureKind(value: unknown): value is ConnectorFailureKind {
   return typeof value === 'string' && [
-    'exit-code', 'process-error', 'timeout', 'cancelled', 'policy-blocked', 'permission-denied'
+    'exit-code', 'process-error', 'timeout', 'cancelled', 'dependency-blocked', 'policy-blocked', 'permission-denied'
   ].includes(value);
 }
 

@@ -30,6 +30,10 @@ export type ConnectorRuntimeBlockedReason = ConnectorBlockedReason
   | 'authorization-invalid'
   | 'authorization-policy-drift'
   | 'authorization-replayed'
+  | 'dependency-cycle'
+  | 'dependency-failed'
+  | 'dependency-invalid'
+  | 'dependency-not-found'
   | 'request-invalid'
   | 'runtime-unavailable';
 
@@ -124,6 +128,7 @@ export interface ConnectorAuthorizationIntent {
   connectorId: string;
   taskName: string;
   prompt: string;
+  dependsOn?: string[];
   retry?: ConnectorRetryPolicyInput;
 }
 
@@ -196,6 +201,7 @@ export type ConnectorStopResult =
     };
 
 export type ConnectorRuntimeState =
+  | 'queued'
   | 'starting'
   | 'running'
   | 'stopping'
@@ -206,12 +212,14 @@ export type ConnectorRuntimeState =
   | 'error'
   | 'stopped'
   | 'timed-out'
+  | 'dependency-blocked'
   | 'policy-blocked'
   | 'permission-denied'
   | 'session-lost';
 
 export type ConnectorRuntimeEventKind =
   | 'lifecycle'
+  | 'scheduler'
   | 'stdout'
   | 'stderr'
   | 'error'
@@ -223,6 +231,10 @@ export type ConnectorRuntimeEventKind =
 
 export type ConnectorLifecycleSubtype =
   | 'session-created'
+  | 'task-queued'
+  | 'task-dequeued'
+  | 'slot-released'
+  | 'dependency-blocked'
   | 'spawn-requested'
   | 'session-started'
   | 'attempt-started'
@@ -240,6 +252,7 @@ export type ConnectorFailureKind =
   | 'process-error'
   | 'timeout'
   | 'cancelled'
+  | 'dependency-blocked'
   | 'policy-blocked'
   | 'permission-denied';
 
@@ -333,6 +346,10 @@ export interface ConnectorSession {
   capabilitySource: ConnectorCapabilitySource;
   state: ConnectorRuntimeState;
   startedAt: string;
+  queuedAt?: string;
+  processStartedAt?: string;
+  queueWaitMs?: number;
+  dependsOn: string[];
   endedAt?: string;
   pid?: number;
   processFingerprint?: ConnectorProcessFingerprint;
@@ -361,6 +378,10 @@ export interface ConnectorSessionAudit {
   attempt: number;
   maxAttempts: number;
   startedAt: string;
+  queuedAt?: string;
+  processStartedAt?: string;
+  queueWaitMs?: number;
+  dependsOn: string[];
   endedAt?: string;
   failureKind?: ConnectorFailureKind;
   processFingerprint?: ConnectorProcessFingerprint;

@@ -751,30 +751,45 @@ assert(!JSON.stringify(outputHarness.runtime.getSnapshot()).includes('burst-secr
 outputHarness.processes[0].close(0, null);
 assert(outputHarness.persisted.at(-1).tasks[0].state === 'success', 'terminal session must persist');
 
-// Active/fresh session wins over a newer terminal session; log updates do not reorder tasks.
+// Active/fresh session wins over a newer queued session; terminal release starts the queued task.
 const selectorHarness = createHarness(readyPolicy());
 const activeAccepted = selectorHarness.runtime.start({ ...request, taskName: 'active session' });
 selectorHarness.processes[0].confirmSpawn();
 const terminalAccepted = selectorHarness.runtime.start({ ...request, taskName: 'newer terminal session' });
-selectorHarness.processes[1].confirmSpawn();
-selectorHarness.processes[1].close(0, null);
+assert(selectorHarness.processes.length === 1, 'same-Agent second session must remain queued without spawning');
 let selectorSnapshot = selectorHarness.runtime.getSnapshot();
-assert(selectorSnapshot.instances[0].sessionId === activeAccepted.sessionId, 'active fresh session must beat newer terminal session');
+assert(selectorSnapshot.tasks.find((session) => session.sessionId === terminalAccepted.sessionId)?.state === 'queued', 'same-Agent second session must expose queued truth');
+assert(selectorSnapshot.instances[0].sessionId === activeAccepted.sessionId, 'active fresh session must beat newer queued session');
 const orderBeforeLog = selectorSnapshot.tasks.map((session) => session.taskId).join(',');
 selectorHarness.processes[0].stdout.emit('data', 'selector log\n');
 fireTimer(liveTimers(selectorHarness, 50)[0]);
 selectorSnapshot = selectorHarness.runtime.getSnapshot();
 assert(selectorSnapshot.tasks.map((session) => session.taskId).join(',') === orderBeforeLog, 'log events must not reorder session list');
 assert(selectorSnapshot.instances[0].sessionId === activeAccepted.sessionId, 'selector must remain stable after log update');
+selectorHarness.processes[0].close(0, null);
+assert(selectorHarness.processes.length === 2, 'terminal release must admit exactly one queued session');
+selectorHarness.processes[1].confirmSpawn();
+selectorHarness.processes[1].close(0, null);
 assert(selectorHarness.runtime.getSessionAudit(terminalAccepted.sessionId)?.state === 'success', 'terminal comparison audit must remain queryable');
 
 const tieHarness = createHarness(readyPolicy());
-const tieA = tieHarness.runtime.start({ ...request, taskName: 'tie A' });
+const tieBlocker = tieHarness.runtime.start({ ...request, agentId: 'blocker', taskName: 'tie blocker' });
 tieHarness.processes[0].confirmSpawn();
+const tieA = tieHarness.runtime.start({ ...request, taskName: 'tie A' });
 const tieB = tieHarness.runtime.start({ ...request, taskName: 'tie B' });
+assert(tieHarness.processes.length === 1, 'equal-time queued sessions must not bypass the active global slot');
+const expectedTieTask = [tieA.taskId, tieB.taskId].sort()[0];
+const expectedTieSession = expectedTieTask === tieA.taskId ? tieA.sessionId : tieB.sessionId;
+tieHarness.processes[0].close(0, null);
+assert(tieHarness.runtime.getSessionAudit(tieBlocker.sessionId)?.state === 'success', 'tie blocker must close truthfully');
+assert(tieHarness.processes.length === 2, 'slot release must admit one equal-time queued session');
+assert(tieHarness.runtime.getSnapshot().tasks.find((session) => session.taskId === expectedTieTask)?.state === 'starting', 'equal queuedAt sessions need deterministic taskId ordering');
 tieHarness.processes[1].confirmSpawn();
-const expectedTieSession = [tieA.sessionId, tieB.sessionId].sort()[0];
-assert(tieHarness.runtime.getSnapshot().instances[0].sessionId === expectedTieSession, 'equal active sessions need deterministic sessionId tie-break');
+assert(tieHarness.runtime.getSnapshot().instances.find((instance) => instance.agentId === request.agentId)?.sessionId === expectedTieSession, 'deterministically admitted session must own the Agent instance');
+tieHarness.processes[1].close(0, null);
+assert(tieHarness.processes.length === 3, 'second equal-time queued session must wait for the first terminal');
+tieHarness.processes[2].confirmSpawn();
+tieHarness.processes[2].close(0, null);
 
 // Persistence redaction, recovery proof, session-lost, and corrupt fallback remain covered.
 const persistedActiveSnapshot = structuredClone(selectorHarness.persisted.findLast((snapshot) => (
@@ -926,7 +941,7 @@ assert(corruptHarness.runtime.getSnapshot().tasks.length === 0, 'corrupt persist
 const throwingHarness = createHarness(readyPolicy(), { persistedSnapshot: new Error('fixture corruption') });
 assert(throwingHarness.runtime.getSnapshot().tasks.length === 0, 'persistence read failure must not crash');
 
-// Dispose cleans active process/listeners/timers without claiming exit confirmation.
+// Dispose keeps close/error observation and the active reservation until exit confirmation.
 const disposeHarness = createHarness(readyPolicy());
 disposeHarness.runtime.start(request);
 disposeHarness.processes[0].confirmSpawn();
@@ -942,10 +957,17 @@ for (const timer of [...liveTimers(disposeHarness)]) {
 }
 const disposedSession = disposeHarness.runtime.getSnapshot().tasks[0];
 assert(disposeHarness.processes[0].killCount === 1, 'dispose must issue exactly one bounded kill');
-assert(disposeHarness.processes[0].listenerCount('close') === 0, 'dispose must remove listeners');
+assert(disposeHarness.processes[0].listenerCount('close') === 1, 'unconfirmed dispose must retain close observation');
+assert(disposeHarness.processes[0].listenerCount('error') === 1, 'unconfirmed dispose must retain error observation');
+assert(disposeHarness.processes[0].stdout.listenerCount('data') === 0, 'unconfirmed dispose must detach stdout observation');
+assert(disposeHarness.processes[0].stderr.listenerCount('data') === 0, 'unconfirmed dispose must detach stderr observation');
 assert(liveTimers(disposeHarness).length === 0, 'dispose must clear every timer');
 assert(disposedSession.state === 'session-lost' && disposedSession.termination?.exitConfirmed === false, 'dispose without close must remain truthful');
 assertEventProof(disposedSession, 1, 1);
+assert(await disposeHarness.runtime.disposeAndWait(1) === false, 'disposeAndWait must report residual process truth before close');
+disposeHarness.processes[0].close(null, 'SIGTERM');
+assert(disposeHarness.processes[0].listenerCount('close') === 0, 'confirmed close must remove the retained observer');
+assert(await disposeHarness.runtime.disposeAndWait(50) === true, 'disposeAndWait may settle only after close confirmation');
 
 let shutdownProofCall = 0;
 const shutdownDuringProofHarness = createHarness(readyPolicy(), {
