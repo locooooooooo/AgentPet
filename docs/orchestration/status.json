@@ -2,12 +2,12 @@
   "identity": "[PM]#multi-agent-control@v0.1",
   "loopState": "active",
   "dispatchState": "active",
-  "target": "Deliver read-only local Agent application presence under accepted identity and Adapter truth boundaries while the broader four-contract Hub R0 batch and all external execution gates remain incomplete.",
+  "target": "Preserve delivered read-only local Agent application presence at 04524e8 and resume separately fenced Theme/SoundPack plus full UI truth work while all external execution gates remain closed.",
   "source": "docs/orchestration/index.md",
   "todayPlan": {
     "date": "2026-07-18",
     "session": "docs/orchestration/sessions/hub-r0-contract-freeze-2026-07-18.md",
-    "selectedRoute": "Selectively publish the accepted host-presence slice, then resume separately fenced Theme/SoundPack and full UI truth work",
+    "selectedRoute": "Preserve delivered host presence at 04524e8, then resume separately fenced Theme/SoundPack and full UI truth work",
     "progress": "docs/orchestration/sessions/hub-r0-contract-freeze-2026-07-18.md"
   },
   "p0Cards": [
@@ -36,7 +36,7 @@
       "progress": "docs/orchestration/sessions/daily-plan-2026-07-17.md"
     }
   ],
-  "blocker": "Host presence is accepted pending selective commit/push and remote parity. Full Hub R0 still lacks Theme/SoundPack contracts and separate acceptance of remaining synthetic avatar/status semantics. P0-C still lacks fresh explicit external execution authorization；外部 connector 仍 disabled；Codex 仅 draft/pending/discovery-only；Trae 为 draft/pending/enabled=false 且仍受 Models 配置与 fresh smoke authorization 阻塞；Qoder 为 disabled/rejected/enabled=false 且缺 headless API；transparent pointer input 仍受 Windows screenshot/input binding `SetIsBorderRequired failed (0x80004002)` 阻塞。",
+  "blocker": "Host presence is delivered and remote at 04524e8. Full Hub R0 still lacks Theme/SoundPack contracts and separate acceptance of remaining synthetic avatar/status semantics. P0-C still lacks fresh explicit external execution authorization；外部 connector 仍 disabled；Codex 仅 draft/pending/discovery-only；Trae 为 draft/pending/enabled=false 且仍受 Models 配置与 fresh smoke authorization 阻塞；Qoder 为 disabled/rejected/enabled=false 且缺 headless API；transparent pointer input 仍受 Windows screenshot/input binding `SetIsBorderRequired failed (0x80004002)` 阻塞。",
   "roles": [
     {
       "id": "pm",
@@ -448,7 +448,7 @@
       "title": "[PM]#daily-plan@2026-07-17",
       "owner": "主控",
       "status": "active",
-      "responsibility": "Preserve prior closeout evidence while the 2026-07-18 Hub R0 session drives selective host-presence delivery and keeps broader R0 work fenced.",
+      "responsibility": "Preserve prior closeout and delivered host-presence evidence while the 2026-07-18 Hub R0 session keeps broader R0 work fenced.",
       "tag": "⟦tag:v2|session|daily-plan-2026-07-17⟧",
       "evidence": "docs/orchestration/sessions/daily-plan-2026-07-17.md"
     },
@@ -484,7 +484,7 @@
       "title": "[PM]#weekly-requirements@2026-07-21",
       "owner": "主控",
       "status": "active",
-      "responsibility": "Own Hub R0 host-presence delivery after accepted scheduler 4508ce3; keep Theme/SoundPack, full UI truth and every external execution gate separately closed.",
+      "responsibility": "Own post-presence Hub R0 work after delivered 04524e8; keep Theme/SoundPack, full UI truth and every external execution gate separately closed.",
       "tag": "⟦tag:v2|session|weekly-requirements-2026-07-21⟧",
       "evidence": "docs/orchestration/sessions/weekly-requirements-2026-07-21.md"
     },
@@ -541,7 +541,7 @@
       "title": "每日计划督办",
       "role": "[PM]#daily-supervision@2026-07-02",
       "state": "active",
-      "nextAction": "Selectively publish the accepted host-presence slice, verify remote parity, and keep unrelated user work plus every external execution gate closed."
+      "nextAction": "Preserve delivered host presence at 04524e8 and keep unrelated user work plus every external execution gate closed."
     },
     {
       "id": "codex-evidence-closeout",
@@ -702,7 +702,7 @@
       "title": "Next-stage weekly requirements planning",
       "role": "[PM]#weekly-requirements@2026-07-21",
       "state": "active",
-      "nextAction": "Preserve 4508ce3 and 2a2f7f5; deliver host presence under accepted Manifest/Adapter boundaries, then resume separately fenced Theme/SoundPack work."
+      "nextAction": "Preserve 4508ce3, 2a2f7f5 and 04524e8; resume separately fenced Theme/SoundPack and full UI truth work."
     },
     {
       "id": "ranch-real-integration-r0-3-dryrun",

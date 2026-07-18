@@ -5,7 +5,7 @@
 
 loop state: active
 dispatch state: active
-status: active_hub_r0_presence_delivery
+status: active_hub_r0_post_presence_contracts
 
 > **Original planning window**: 2026-07-21 through 2026-07-27
 > **Compressed activation and DDL**: 2026-07-17
@@ -14,7 +14,7 @@ status: active_hub_r0_presence_delivery
 
 ## single goal
 
-- Deliver truthful read-only host presence under accepted identity/Adapter boundaries, while keeping the broader four-contract R0 batch and every external execution gate incomplete.
+- Preserve delivered truthful host presence at `04524e8`, then finish separately fenced Theme/SoundPack and full UI truth work while every external execution gate stays closed.
 
 ## accepted inputs
 
@@ -72,6 +72,7 @@ status: active_hub_r0_presence_delivery
 - Current live evidence is Kimi discovered as one unbound application with 9 primary processes; WorkBuddy/MiniMax are not observed running. None contributes to online or busy.
 - Electron control-cockpit replay visibly shows Kimi's process count, `Connector 0 · Codex Desktop 2`, and zero application tasks. Direct Windows capture remains unavailable, with isolated DevTools DOM/PNG used as the bounded fallback.
 - External Agent spawn, Connector binding/enabling, task inference from process/window/log facts, installer work, DockView and theme/sound implementation remain zero/non-goals.
+- Exact staged-snapshot gates passed and `04524e8` was pushed; local `HEAD`, `origin/main` and GitHub `main` match.
 
 ## accepted file history
 
@@ -93,7 +94,7 @@ The configurable-concurrency slice `4508ce3` changed only `src/lib/connectorRunt
 - PM independently reviews the diff and does not infer real Agent E2E from controlled local fixtures.
 
 next action:
-- Preserve `4508ce3` and `2a2f7f5`; selectively deliver the accepted host-presence slice, prove staged gates and remote parity, then return to separately fenced Theme/SoundPack and full UI truth work.
+- Preserve `4508ce3`, `2a2f7f5` and delivered presence commit `04524e8`; continue separately fenced Theme/SoundPack and full UI truth work.
 
 summary:
-- Next-stage requirements now govern presence-only delivery under two accepted contract boundaries. The full R0 batch and every external execution gate remain open/incomplete until the remaining contracts and separate UI truth acceptance pass.
+- Next-stage requirements now preserve the delivered presence slice under two accepted contract boundaries. The full R0 batch remains incomplete until the remaining contracts and separate UI truth acceptance pass; every external execution gate stays closed.

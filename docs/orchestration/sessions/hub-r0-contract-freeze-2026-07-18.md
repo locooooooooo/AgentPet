@@ -5,7 +5,7 @@
 
 loop state: active
 dispatch state: active
-status: presence_slice_accepted_pending_commit_push
+status: presence_slice_delivered_04524e8
 date: 2026-07-18
 ddl: 2026-07-18
 
@@ -49,23 +49,28 @@ No supervisor edited, staged, committed or pushed files. No supervisor ran an ex
 
 ## incomplete
 
-- The accepted presence slice is not delivered until its exact staged snapshot passes and the commit is pushed with remote parity.
 - HubTheme and HubSoundPack formal contracts remain missing, so the broader R0 contract batch is incomplete.
 - README, DockView, positioning and sound input documents remain unaccepted candidate changes.
 - Unrelated Workspace meter-removal hunks and the remaining synthetic avatar/status semantics are outside this acceptance.
 
 ## blockers
 
-- No platform, Agent quota or host-presence file-fence blocker is currently known.
+- No platform, Agent quota, delivery or host-presence file-fence blocker remains for the delivered slice.
 - Broader R0 completion remains blocked by missing Theme/SoundPack contracts and unresolved full UI truth semantics.
 - External Connector execution remains disabled and no P0-C authorization is inferred from host discovery.
 
 ## next action
 
-1. Stage only the two accepted contracts, host-presence implementation/tests and this orchestration update; partially stage Workspace host hunks and exclude unrelated meter-removal hunks.
-2. Verify the exact staged snapshot with recurring gates and a staged diff audit.
-3. Commit/push the presence slice and confirm `HEAD == origin/main` plus remote `main` parity.
-4. Keep Theme/SoundPack and broader UI truth work as the next separately fenced R0 contract lanes.
+1. Preserve delivered presence commit `04524e8` and its exact staged-snapshot/live evidence.
+2. Keep Theme/SoundPack and broader UI truth work as the next separately fenced R0 contract lanes.
+3. Continue to prohibit Adapter execution, Connector enabling and task inference from process facts.
+
+## delivery
+
+- Commit: `04524e8 feat(runtime): show local Agent host presence`.
+- Push: direct GitHub access reset; the repository's established `127.0.0.1:7897` proxy path succeeded.
+- Parity: local `HEAD`, local `origin/main` and remote `refs/heads/main` all equal `04524e8bca887222528e228bd3c6bbc3eb1f9c49`.
+- Unrelated README, DockView, positioning, sound input and Workspace meter-removal changes remain outside the commit.
 
 ## changed files
 

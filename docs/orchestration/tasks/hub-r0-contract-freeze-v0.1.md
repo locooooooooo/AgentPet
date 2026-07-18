@@ -5,7 +5,7 @@
 
 loop state: active
 dispatch state: active
-status: presence_slice_accepted_pending_delivery_full_contract_batch_incomplete
+status: presence_slice_delivered_04524e8_full_contract_batch_incomplete
 date: 2026-07-18
 ddl: 2026-07-18
 
@@ -115,5 +115,5 @@ changed files:
 - The administrator explicitly ordered Hub work to continue and workers to start. This authorizes bounded in-app contract work, not external Agent execution.
 - The control baseline already has remote parity at `2a2f7f5`. Manifest and Adapter contract candidates now exist and are accepted only for the presence slice described above.
 - Selectively stage the two accepted contracts, host-presence implementation/tests and this control update. Exclude README, DockView, positioning, sound input and unrelated Workspace hunks.
-- Commit, push and confirm remote parity before calling the presence slice delivered.
+- Presence implementation and contracts were committed as `04524e8 feat(runtime): show local Agent host presence`; local `HEAD`, `origin/main` and GitHub `main` match.
 - Theme/SoundPack cross-review, README/product-document reconciliation and full UI truth acceptance remain mandatory before the broader Hub R0 batch can close or any installer/Adapter execution lane can open.

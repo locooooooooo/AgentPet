@@ -1175,3 +1175,10 @@ pm.cmd run build pass; git diff --check only on the 11 protected-source whitespa
   - Live process evidence was 9 `Kimi.exe` plus one `kimi-webbridge`; WorkBuddy/MiniMax primary processes were absent. Isolated Electron replay at 1204x795 showed `未绑定发现项 Kimi（9 进程）`, `Connector 0 · Codex Desktop 2` and zero application tasks.
   - Direct Computer Use capture again failed with `SetIsBorderRequired failed (0x80004002)`. The isolated Electron DevTools DOM/PNG supplied visible fallback evidence; transparent ranch pointer input remains unaccepted.
   - Full orchestration/report/preflight/Connector-safety/realtime-truth/lint/build/diff gates passed. Next action is exact selective staging, staged-snapshot verification, commit, push and remote parity without absorbing README/product documents or unrelated Workspace meter-removal hunks.
+
+- [2026-07-18] Hub host-presence delivery closeout:
+  - Exact staged snapshot contained the two bounded contracts, host discovery/runtime/projection/renderer/test files and eight orchestration truth files. README, three candidate product documents and four Workspace meter-removal hunks remained outside the index.
+  - First staged orchestration run exposed three strict text-contract mismatches; PM restored the two required accountability phrases and exact target equality, then reran the complete staged snapshot instead of weakening the checker.
+  - Final staged orchestration check/report/preflight/Connector safety/realtime truth/lint/build and diff checks all passed; external Agent execution remained zero.
+  - Implementation commit `04524e8 feat(runtime): show local Agent host presence` was pushed through the established local proxy after direct GitHub access reset.
+  - Local `HEAD`, local `origin/main` and remote `refs/heads/main` all equal `04524e8bca887222528e228bd3c6bbc3eb1f9c49`. Presence is delivered; Theme/SoundPack, full UI truth and external execution remain separately gated.

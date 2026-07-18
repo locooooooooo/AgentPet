@@ -101,6 +101,7 @@ acceptance:
 - Manifest/InstallPlan and Adapter Capability are accepted only for identity and presence/Session separation; no Connector or Adapter support state is granted.
 - PM owns selective staging of the host-presence files and only the matching Workspace hunks. README, DockView, positioning, sound input and unrelated meter-removal hunks remain unstaged.
 - Delivery requires staged-snapshot gates, commit, push and remote parity. Theme/SoundPack and full UI truth remain open after that delivery.
+- Delivery closed at `04524e8`; local `HEAD`, `origin/main` and GitHub `main` matched. The active PM lanes now preserve that evidence and own only separately fenced remaining R0 work.
 
 non-goals:
 - Do not run Git repair, staging, commit, push, reset, clean, or file removal.

@@ -145,7 +145,7 @@ dispatch gate:
 - Supervisor owns drift detection, blocker surfacing, and minimum correction.
 
 current target:
-- Deliver read-only local Agent application presence under accepted identity and Adapter truth boundaries while the broader four-contract Hub R0 batch and all external execution gates remain incomplete.
+- Preserve delivered read-only local Agent application presence at 04524e8 and resume separately fenced Theme/SoundPack plus full UI truth work while all external execution gates remain closed.
 
 current role split:
 - `[PM]#multi-agent-control@v0.1`: maintain this index, dispatch bounded lanes, collect callbacks, write acceptance.
@@ -193,7 +193,7 @@ current role split:
 - `[PM]#realtime-cockpit-next-stage@2026-07-15`: summarized historical P0-C authorization control session; A7.1/B2 control commit `74d8f50` is already pushed.
 - `[PM]#weekly-requirements@2026-07-07`: summarized W27 (2026-07-07~2026-07-13) weekly-requirements history; final closeout is recorded in `weekly-closeout-2026-07-11.md`.
 - `[PM]#weekly-requirements@2026-07-14`: summarized W28 planner after early closeout under the administrator's full schedule waiver; seven carry-over items remain non-blocking.
-- `[PM]#weekly-requirements@2026-07-21`: active Hub R0 presence-delivery owner after accepted scheduler `4508ce3`; Manifest/Adapter boundaries admit host presence only, while Theme/SoundPack still block the broader batch.
+- `[PM]#weekly-requirements@2026-07-21`: active post-presence Hub R0 owner; `04524e8` is delivered, while Theme/SoundPack and full UI truth still block the broader batch.
 - `[PM]#daily-plan@2026-07-17`: active daily supervision owner preserving prior closeout while the 2026-07-18 Hub control session drives the current bounded dispatch.
 - `[PM]#cockpit-live-session-notification@2026-07-16`: summarized completed/pushed live Codex Desktop Session, Dock detail, completion bubble and sound evidence at `c21a60b`.
 - `[监督]#control-truth-projection@2026-07-17`: summarized accepted visible projection of the 2026-07-17 target, roles, Lanes and blockers.
@@ -207,7 +207,7 @@ current role split:
 - `[PM]#daily-plan@2026-07-10`: summarized 2026-07-10 daily plan;administrator decisions and W28/closeout preparation are retained as history.
 
 blockers:
-- Host-presence implementation and live Kimi visibility are accepted pending exact staged delivery. Full Hub R0 remains blocked by missing Theme/SoundPack contracts, unaccepted README/product inputs and remaining synthetic avatar/status semantics.
+- Host presence and live Kimi visibility are delivered at `04524e8`. Full Hub R0 remains blocked by missing Theme/SoundPack contracts, unaccepted README/product inputs and remaining synthetic avatar/status semantics.
 - External connector execution remains disabled; Codex is draft/pending/discovery-only, Trae is draft/pending with `Models is required`, and Qoder is rejected/disabled because no independent headless Agent API exists.
 - Real-time cockpit A6/A7.1, renderer truth and B2 controlled production slices are accepted only to the trusted/controlled-process boundary. P0-C real Agent E2E is still unexecuted; configured seeds, CLI discovery, controlled Node processes and simulated ticks must not be reported as online Agent sessions.
 - The historical service-side `403 DAILY_LIMIT_EXCEEDED` is not current availability truth: bounded in-app short workers were dispatched successfully on 2026-07-17. This does not enable any external Connector.
@@ -215,7 +215,7 @@ blockers:
 - Transparent Electron ranch pointer smoke remains incomplete: the 2026-07-17 Computer Use route enumerated both windows and eight animals, but screenshots failed with `SetIsBorderRequired failed (0x80004002)`, so safe coordinate input and direct click/drag/dock observation were blocked.
 
 next action:
-- Selectively stage the two accepted contracts, host-presence implementation/tests and control update; exclude unrelated user-owned README/product documents and Workspace meter-removal hunks, then run staged gates, commit, push and prove remote parity.
+- Preserve `04524e8` and resume only separately fenced Theme/SoundPack plus full UI truth work; keep unrelated user-owned changes and every external execution gate untouched.
 - Preserve pushed A7.1/B2 control commit `74d8f50`; keep the runtime worker count at zero.
 - Keep P0-C at `authorization_required_ready_for_decision` until a fresh explicit Codex execution authorization exists.
 - Do not execute or enable any external Agent Connector from this control closeout.
