@@ -1156,3 +1156,13 @@ pm.cmd run build pass; git diff --check only on the 11 protected-source whitespa
   - The replacement worker completed the runtime and C-01 through C-12 fixture diff before a second service-side 403 interrupted its final callback. PM independently reran all scheduler/runtime/reattach/truth/orchestration/Connector-safety/lint/build gates.
   - Shared and exact three-file isolated staged snapshots passed. Final counters: max global active/reserved `4/4`, same-Agent active/reserved `1/1`, invalid constructor side effects all `0`, external Agent spawn `0`, duplicate terminal `0`, residual process/timer `0/0`.
   - PM accepted/pushed implementation `4508ce3` with remote parity. `%TEMP%` staged-snapshot cleanup commands were blocked by local command policy; PM did not bypass the policy, and no repository or process residue remains.
+
+- [2026-07-18] Hub R0 contract-freeze supervision:
+  - The administrator ordered Hub work to continue and explicitly asked PM to start and supervise the workers. This authorizes bounded in-app contract work, not external Agent execution.
+  - PM reconstructed three read-only supervision lanes for Workspace truth semantics, orchestration intake and product-contract gaps. All three returned formal callbacks with `changed files: none`; no `403 DAILY_LIMIT_EXCEEDED` occurred.
+  - The UI audit accepted only the direction of removing pressure/battery/temperature meters. It rejected Hub truth acceptance because avatar animation and status color still consume synthetic local state.
+  - The contract audit confirmed that all four formal contracts are missing and identified three decisions. PM resolved them as independent evidence-derived support facets, one six-kind receipt vocabulary and a strictly isolated preview channel.
+  - `hub-r0-contract-freeze-v0.1.md` limits Wave A to three mutually exclusive contract files and gates Adapter Capability as Wave B after AgentManifest + InstallPlan acceptance.
+  - This control transition changes only eight orchestration files. README, Workspace, existing Hub/DockView/sound documents, source, Electron and Connector machine gates remain unstaged and unaccepted.
+  - A later managed-permission refresh restored Git metadata writes; the earlier `.git/index.lock` denial is no longer current availability truth.
+  - Next action: rerun gates, selectively commit/push the control baseline, confirm remote parity and only then dispatch Wave A contract workers.

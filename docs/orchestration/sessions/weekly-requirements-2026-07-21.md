@@ -5,7 +5,7 @@
 
 loop state: active
 dispatch state: active
-status: active_next_p1_buffer_after_configurable_concurrency
+status: active_hub_r0_contract_freeze
 
 > **Original planning window**: 2026-07-21 through 2026-07-27
 > **Compressed activation and DDL**: 2026-07-17
@@ -14,7 +14,7 @@ status: active_next_p1_buffer_after_configurable_concurrency
 
 ## single goal
 
-- Deliver and independently verify the smallest deterministic scheduler core: global concurrency `1`, same-Agent single-active admission, explicit dependencies, queued cancellation, spawn-based timeout and auditable retry/terminal transitions.
+- Freeze and independently accept Hub R0 positioning plus `AgentManifest + InstallPlan`, `Adapter Capability`, `HubTheme` and `HubSoundPack` contracts before any Hub implementation starts.
 
 ## accepted inputs
 
@@ -57,6 +57,14 @@ status: active_next_p1_buffer_after_configurable_concurrency
 - Product worker count returned to `0`; external Agent spawn stayed `0`, and no machine gate changed.
 - Priority, aging/starvation, cancellation DAG, Connector quota, Electron/preload/UI and dynamic reconfiguration are non-goals.
 
+## active Hub R0 contract-freeze slice
+
+- The scheduler baseline remains accepted at `4508ce3`; Hub does not reopen scheduler behavior or external execution.
+- `hub-r0-contract-freeze-v0.1.md` freezes three product decisions, four mutually exclusive contract files, Wave A/Wave B ordering and the negative-test acceptance gates.
+- Existing README, positioning, DockView, sound and Workspace changes remain unaccepted candidate inputs and stay outside the control-baseline commit.
+- Active control lanes remain `daily-supervision` and `weekly-requirements`; no third active implementation lane is introduced.
+- DDL is 2026-07-18 for the control baseline and contract batch. Date compression does not waive review, recurring gates, exact staging or remote parity.
+
 ## accepted file history
 
 The original minimum scheduler slice `ccedb15` used:
@@ -77,7 +85,7 @@ The configurable-concurrency slice `4508ce3` changed only `src/lib/connectorRunt
 - PM independently reviews the diff and does not infer real Agent E2E from controlled local fixtures.
 
 next action:
-- Preserve `4508ce3`; open a new bounded intake before priority/starvation, cancellation DAG or Connector quota implementation.
+- Preserve `4508ce3`; push the Hub R0 control baseline, run three non-overlapping Wave A contract workers, then start Adapter Capability only after AgentManifest + InstallPlan acceptance.
 
 summary:
-- Next-stage requirements remain active in buffer mode after the same-day local scheduler slice was accepted/pushed at `ccedb15`; every external execution gate remains closed.
+- Next-stage requirements now govern the Hub R0 contract freeze; every external execution and implementation gate remains closed until all four contracts pass.

@@ -65,6 +65,7 @@ tracked business cards:
 - task: ⟦tag:v2|task|realtime-p1-scheduler-intake-v0.1⟧ -> `docs/orchestration/tasks/realtime-p1-scheduler-intake-v0.1.md`
 - task: ⟦tag:v2|task|realtime-p1-scheduler-core-v0.1⟧ -> `docs/orchestration/tasks/realtime-p1-scheduler-core-v0.1.md`
 - task: ⟦tag:v2|task|realtime-p1-scheduler-configurable-concurrency-v0.1⟧ -> `docs/orchestration/tasks/realtime-p1-scheduler-configurable-concurrency-v0.1.md`
+- task: ⟦tag:v2|task|hub-r0-contract-freeze-v0.1⟧ -> `docs/orchestration/tasks/hub-r0-contract-freeze-v0.1.md`
 - task: ⟦tag:v2|task|realtime-agent-cockpit-p0-a6-trusted-authorizer-v0.1⟧ -> `docs/orchestration/tasks/realtime-agent-cockpit-p0-a6-trusted-authorizer-v0.1.md`
 - task: ⟦tag:v2|task|realtime-agent-cockpit-p0-a7-process-reattach-v0.1⟧ -> `docs/orchestration/tasks/realtime-agent-cockpit-p0-a7-process-reattach-v0.1.md`
 - task: ⟦tag:v2|task|realtime-agent-cockpit-p0-b2-production-path-e2e-v0.1⟧ -> `docs/orchestration/tasks/realtime-agent-cockpit-p0-b2-production-path-e2e-v0.1.md`
@@ -120,6 +121,7 @@ tracked business cards:
 - session: ⟦tag:v2|session|weekly-closeout-2026-07-20⟧ -> `docs/orchestration/sessions/weekly-closeout-2026-07-20.md`
 - session: ⟦tag:v2|session|realtime-p1-scheduler-core-evidence-2026-07-17⟧ -> `docs/orchestration/sessions/realtime-p1-scheduler-core-evidence-2026-07-17.md`
 - session: ⟦tag:v2|session|realtime-p1-scheduler-configurable-concurrency-evidence-2026-07-18⟧ -> `docs/orchestration/sessions/realtime-p1-scheduler-configurable-concurrency-evidence-2026-07-18.md`
+- session: ⟦tag:v2|session|hub-r0-contract-freeze-2026-07-18⟧ -> `docs/orchestration/sessions/hub-r0-contract-freeze-2026-07-18.md`
 - session: ⟦tag:v2|session|homepage-layout-density-2026-07-16⟧ -> `docs/orchestration/sessions/homepage-layout-density-2026-07-16.md`
 - session: ⟦tag:v2|session|weekly-closeout-2026-07-11⟧ -> `docs/orchestration/sessions/weekly-closeout-2026-07-11.md`
 - session: ⟦tag:v2|session|m5-five-day-development-2026-07-14⟧ -> `docs/orchestration/sessions/m5-five-day-development-2026-07-14.md`
@@ -143,7 +145,7 @@ dispatch gate:
 - Supervisor owns drift detection, blocker surfacing, and minimum correction.
 
 current target:
-- Preserve accepted/pushed configurable scheduler concurrency at `4508ce3`: limits `1..4`, same-Agent reservation `1` and C-01 through C-12 are complete; external Agent spawn remains `0` and the next P1 gap requires a new bounded card.
+- Freeze and independently accept Hub R0 positioning plus four versioned contracts before any installer, Adapter runtime, DockView, theme, sound asset or external Agent implementation starts.
 
 current role split:
 - `[PM]#multi-agent-control@v0.1`: maintain this index, dispatch bounded lanes, collect callbacks, write acceptance.
@@ -191,8 +193,8 @@ current role split:
 - `[PM]#realtime-cockpit-next-stage@2026-07-15`: summarized historical P0-C authorization control session; A7.1/B2 control commit `74d8f50` is already pushed.
 - `[PM]#weekly-requirements@2026-07-07`: summarized W27 (2026-07-07~2026-07-13) weekly-requirements history; final closeout is recorded in `weekly-closeout-2026-07-11.md`.
 - `[PM]#weekly-requirements@2026-07-14`: summarized W28 planner after early closeout under the administrator's full schedule waiver; seven carry-over items remain non-blocking.
-- `[PM]#weekly-requirements@2026-07-21`: active next-stage requirements truth, activated early with every original five-day DDL compressed to 2026-07-17.
-- `[PM]#daily-plan@2026-07-17`: active control owner for current truth sync, v3.2 P1/P2 acceptance, pointer evidence and closeout.
+- `[PM]#weekly-requirements@2026-07-21`: active Hub R0 contract-freeze owner after accepted scheduler `4508ce3`; four contract files must pass before implementation opens.
+- `[PM]#daily-plan@2026-07-17`: active daily supervision owner preserving prior closeout while the 2026-07-18 Hub control session drives the current bounded dispatch.
 - `[PM]#cockpit-live-session-notification@2026-07-16`: summarized completed/pushed live Codex Desktop Session, Dock detail, completion bubble and sound evidence at `c21a60b`.
 - `[监督]#control-truth-projection@2026-07-17`: summarized accepted visible projection of the 2026-07-17 target, roles, Lanes and blockers.
 - `[PM]#w28-closeout-readiness@2026-07-17`: summarized readiness route for the 7-18 template, 7-19 pre-closeout audit and real 7-20 closeout time gate.
@@ -205,6 +207,7 @@ current role split:
 - `[PM]#daily-plan@2026-07-10`: summarized 2026-07-10 daily plan;administrator decisions and W28/closeout preparation are retained as history.
 
 blockers:
+- Hub R0 implementation is blocked by four missing accepted contracts. Existing README, positioning, DockView, sound and UI diffs are candidate inputs only; UI animation/status semantics still mix real Session truth with synthetic local state.
 - External connector execution remains disabled; Codex is draft/pending/discovery-only, Trae is draft/pending with `Models is required`, and Qoder is rejected/disabled because no independent headless Agent API exists.
 - Real-time cockpit A6/A7.1, renderer truth and B2 controlled production slices are accepted only to the trusted/controlled-process boundary. P0-C real Agent E2E is still unexecuted; configured seeds, CLI discovery, controlled Node processes and simulated ticks must not be reported as online Agent sessions.
 - The historical service-side `403 DAILY_LIMIT_EXCEEDED` is not current availability truth: bounded in-app short workers were dispatched successfully on 2026-07-17. This does not enable any external Connector.
@@ -212,6 +215,7 @@ blockers:
 - Transparent Electron ranch pointer smoke remains incomplete: the 2026-07-17 Computer Use route enumerated both windows and eight animals, but screenshots failed with `SetIsBorderRequired failed (0x80004002)`, so safe coordinate input and direct click/drag/dock observation were blocked.
 
 next action:
+- Commit and push the eight-file Hub R0 orchestration baseline, then dispatch the three non-overlapping Wave A contract files; Adapter Capability remains Wave B after AgentManifest + InstallPlan acceptance.
 - Preserve pushed A7.1/B2 control commit `74d8f50`; keep the runtime worker count at zero.
 - Keep P0-C at `authorization_required_ready_for_decision` until a fresh explicit Codex execution authorization exists.
 - Do not execute or enable any external Agent Connector from this control closeout.

@@ -6,7 +6,7 @@
 
 loop state: active
 dispatch state: active
-status: active_supervision_after_control_closeout
+status: active_supervision_hub_r0_contract_freeze
 
 ## single goal
 
@@ -37,6 +37,7 @@ status: active_supervision_after_control_closeout
 | 10 | `[PM]#weekly-requirements@2026-07-21` | Next-stage requirements truth | active early / DDL 2026-07-17 | `weekly-requirements-2026-07-21.md` |
 | 11 | `[长工]#realtime-p1-scheduler-core@v0.1` | Local scheduler implementation only | summarized / accepted and pushed `ccedb15` | `realtime-p1-scheduler-core-v0.1.md` |
 | 12 | `[短工]#realtime-p1-scheduler-configurable-concurrency@v0.1` | Runtime-internal configurable concurrency | summarized / accepted and pushed `4508ce3` | `realtime-p1-scheduler-configurable-concurrency-v0.1.md` |
+| 13 | `[PM]#hub-r0-contract-freeze@v0.1` | Hub positioning and four versioned contracts only | active / control baseline | `hub-r0-contract-freeze-2026-07-18.md` |
 
 ## completed
 
@@ -97,6 +98,7 @@ status: active_supervision_after_control_closeout
 
 ## next action
 
+- Use the 2026-07-18 Hub R0 session as the current dispatch surface: push its docs-only control baseline, then start only the fenced contract workers.
 - Keep W28 summarized and the completed five-day board closed; no product worker remains active.
 - Preserve S-01 through S-16, R-01 through R-03 and selective-integration evidence at `ccedb15`.
 - Preserve accepted/pushed configurable concurrency `4508ce3`; require a new bounded card before the next scheduler P1 feature.

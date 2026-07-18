@@ -2,13 +2,13 @@
   "identity": "[PM]#multi-agent-control@v0.1",
   "loopState": "active",
   "dispatchState": "active",
-  "target": "Preserve accepted/pushed configurable scheduler concurrency at `4508ce3`: limits `1..4`, same-Agent reservation `1` and C-01 through C-12 are complete; external Agent spawn remains `0` and the next P1 gap requires a new bounded card.",
+  "target": "Freeze and independently accept Hub R0 positioning plus four versioned contracts before any installer, Adapter runtime, DockView, theme, sound asset or external Agent implementation starts.",
   "source": "docs/orchestration/index.md",
   "todayPlan": {
-    "date": "2026-07-17",
-    "session": "docs/orchestration/sessions/daily-plan-2026-07-17.md",
-    "selectedRoute": "Preserve accepted configurable concurrency 4508ce3 and require a new bounded card for the next scheduler P1 gap",
-    "progress": "docs/orchestration/sessions/daily-plan-2026-07-17.md"
+    "date": "2026-07-18",
+    "session": "docs/orchestration/sessions/hub-r0-contract-freeze-2026-07-18.md",
+    "selectedRoute": "Push the Hub R0 control baseline, then freeze four contracts under mutually exclusive file fences before implementation",
+    "progress": "docs/orchestration/sessions/hub-r0-contract-freeze-2026-07-18.md"
   },
   "p0Cards": [
     {
@@ -36,7 +36,7 @@
       "progress": "docs/orchestration/sessions/daily-plan-2026-07-17.md"
     }
   ],
-  "blocker": "P0-C still lacks a fresh explicit external execution authorization. 外部 connector 仍 disabled；Codex 仅 draft/pending/discovery-only；Trae 为 draft/pending/enabled=false 且仍受 Models 配置与 fresh smoke authorization 阻塞；Qoder 为 disabled/rejected/enabled=false 且缺 headless API；transparent pointer input 受 Windows screenshot/input binding `SetIsBorderRequired failed (0x80004002)` 阻塞。",
+  "blocker": "Hub implementation is blocked by four missing accepted contracts, and UI truth still mixes real Session labels with synthetic local animation/status semantics. P0-C still lacks a fresh explicit external execution authorization. 外部 connector 仍 disabled；Codex 仅 draft/pending/discovery-only；Trae 为 draft/pending/enabled=false 且仍受 Models 配置与 fresh smoke authorization 阻塞；Qoder 为 disabled/rejected/enabled=false 且缺 headless API；transparent pointer input 受 Windows screenshot/input binding `SetIsBorderRequired failed (0x80004002)` 阻塞。",
   "roles": [
     {
       "id": "pm",
@@ -448,7 +448,7 @@
       "title": "[PM]#daily-plan@2026-07-17",
       "owner": "主控",
       "status": "active",
-      "responsibility": "Preserve the completed 2026-07-17 truth sync, accepted v3.2 P1/P2, pointer blocker evidence and active PM supervision.",
+      "responsibility": "Preserve prior closeout evidence while the 2026-07-18 Hub R0 control session drives bounded contract dispatch and acceptance.",
       "tag": "⟦tag:v2|session|daily-plan-2026-07-17⟧",
       "evidence": "docs/orchestration/sessions/daily-plan-2026-07-17.md"
     },
@@ -484,7 +484,7 @@
       "title": "[PM]#weekly-requirements@2026-07-21",
       "owner": "主控",
       "status": "active",
-      "responsibility": "Own next-stage buffer truth after accepted scheduler commit ccedb15; preserve incomplete future P1 features and every external execution gate.",
+      "responsibility": "Own the Hub R0 contract freeze after accepted scheduler 4508ce3; keep implementation and every external execution gate closed until four contracts pass.",
       "tag": "⟦tag:v2|session|weekly-requirements-2026-07-21⟧",
       "evidence": "docs/orchestration/sessions/weekly-requirements-2026-07-21.md"
     },
@@ -541,7 +541,7 @@
       "title": "每日计划督办",
       "role": "[PM]#daily-supervision@2026-07-02",
       "state": "active",
-      "nextAction": "Preserve accepted same-day scheduler evidence, keep product worker count zero, and continue to prohibit external Agent execution."
+      "nextAction": "Push the Hub R0 docs-only control baseline, then collect fenced contract callbacks while implementation and external execution stay closed."
     },
     {
       "id": "codex-evidence-closeout",
@@ -702,7 +702,7 @@
       "title": "Next-stage weekly requirements planning",
       "role": "[PM]#weekly-requirements@2026-07-21",
       "state": "active",
-      "nextAction": "Preserve accepted 4508ce3; create a new bounded intake before priority/starvation, cancellation DAG or Connector quota work."
+      "nextAction": "Preserve 4508ce3; publish the Hub R0 baseline before Wave A, then gate Adapter Capability on AgentManifest + InstallPlan acceptance."
     },
     {
       "id": "ranch-real-integration-r0-3-dryrun",

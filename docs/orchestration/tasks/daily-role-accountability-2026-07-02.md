@@ -90,6 +90,13 @@ acceptance:
 - `npm.cmd run orchestration:check` passes.
 - `npm.cmd run orchestration:report` shows this ledger as standby, not active, and prints the active lane control, daily supervision closeout, daily decision coverage, and daily supervision closeout coverage summaries.
 
+2026-07-18 Hub accountability note:
+- `[PM]#multi-agent-control@v0.1` owns the eight-file Hub R0 control baseline, selective commit/push and final cross-contract acceptance.
+- `[监督]#multi-agent-control@v0.1` collected three formal read-only callbacks; all reported `changed files: none` and no service-side 403.
+- The active `daily-supervision` lane must keep existing README/UI/product-document changes unstaged until their separate acceptance.
+- The active `[PM]#weekly-requirements@2026-07-21` lane owns the Hub R0 contract freeze while preserving scheduler `4508ce3` and every external execution gate.
+- Wave A Owners are accountable for exactly one contract file each; Adapter Capability is Wave B and cannot start before AgentManifest + InstallPlan acceptance.
+
 non-goals:
 - Do not run Git repair, staging, commit, push, reset, clean, or file removal.
 - Do not accept, enable, execute, or bind Codex, Trae, Qoder, or any connector.
