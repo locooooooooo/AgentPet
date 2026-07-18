@@ -22,9 +22,11 @@ const RESERVED_STATES = new Set([...PROCESS_STATES, 'recovering']);
 const harnesses = [];
 const fixtureResults = [];
 const reviewResults = [];
+const configurableResults = [];
 const metrics = {
   maxGlobalActive: 0,
   maxSameAgentActive: 0,
+  maxSameAgentReserved: 0,
   maxGlobalReserved: 0,
   externalAgentSpawn: 0,
   maxGlobalWitness: [],
@@ -35,6 +37,23 @@ const reviewCounters = {
   unconfirmedNextSpawn: 0,
   recoverySpawnBeforeProof: 0,
   recoveryReleaseSpawn: 0
+};
+const configurableCounters = {
+  legalLimits: new Map(),
+  invalidCases: 0,
+  invalidSideEffects: {
+    load: 0,
+    publish: 0,
+    persist: 0,
+    timer: 0,
+    process: 0,
+    authorization: 0,
+    discovery: 0,
+    clock: 0,
+    id: 0
+  },
+  overCapTimeline: [],
+  externalAgentSpawn: 0
 };
 
 class FakeProcess extends EventEmitter {
@@ -104,17 +123,25 @@ function createHarness(options = {}) {
     timers: [],
     published: [],
     persisted: [],
+    recoveredProcesses: [],
+    maxGlobalActive: 0,
+    maxGlobalReserved: 0,
+    maxSameAgentActive: 0,
+    maxSameAgentReserved: 0,
+    configuredLimit: options.maxGlobalActive ?? 1,
     advance(ms) {
       nowMs += ms;
     }
   };
   harness.runtime = new ConnectorRuntime({
+    maxGlobalActive: options.maxGlobalActive,
     loadPolicy: options.loadPolicy ?? (() => options.policy ?? readyPolicy()),
     resolveExecutable: (command) => command === 'codex' ? 'C:\\fixture\\codex.exe' : null,
     spawnProcess: (file, args, spawnOptions) => {
       const process = new FakeProcess(7000 + harness.processes.length);
       harness.processes.push(process);
       harness.spawnCalls.push({ file, args, options: spawnOptions, process });
+      options.onSpawn?.(harness, process);
       return process;
     },
     workspaceRoot: 'E:\\fixture-workspace',
@@ -128,7 +155,8 @@ function createHarness(options = {}) {
     publish: (snapshot) => {
       const cloned = structuredClone(snapshot);
       harness.published.push(cloned);
-      observeConcurrency(cloned);
+      observeConcurrency(cloned, harness);
+      options.onPublish?.(harness, cloned);
     },
     persistSnapshot: (snapshot) => harness.persisted.push(structuredClone(snapshot)),
     now: () => new Date(nowMs),
@@ -151,9 +179,11 @@ function createHarness(options = {}) {
   return harness;
 }
 
-function observeConcurrency(snapshot) {
+function observeConcurrency(snapshot, harness) {
   const processSessions = snapshot.tasks.filter((task) => PROCESS_STATES.has(task.state));
   const reservedSessions = snapshot.tasks.filter((task) => RESERVED_STATES.has(task.state));
+  harness.maxGlobalActive = Math.max(harness.maxGlobalActive, processSessions.length);
+  harness.maxGlobalReserved = Math.max(harness.maxGlobalReserved, reservedSessions.length);
   metrics.maxGlobalReserved = Math.max(metrics.maxGlobalReserved, reservedSessions.length);
   if (processSessions.length > metrics.maxGlobalActive) {
     metrics.maxGlobalActive = processSessions.length;
@@ -167,6 +197,12 @@ function observeConcurrency(snapshot) {
   const byAgent = new Map();
   processSessions.forEach((task) => byAgent.set(task.agentId, (byAgent.get(task.agentId) ?? 0) + 1));
   const sameAgentActive = Math.max(0, ...byAgent.values());
+  const reservedByAgent = new Map();
+  reservedSessions.forEach((task) => reservedByAgent.set(task.agentId, (reservedByAgent.get(task.agentId) ?? 0) + 1));
+  const sameAgentReserved = Math.max(0, ...reservedByAgent.values());
+  harness.maxSameAgentActive = Math.max(harness.maxSameAgentActive, sameAgentActive);
+  harness.maxSameAgentReserved = Math.max(harness.maxSameAgentReserved, sameAgentReserved);
+  metrics.maxSameAgentReserved = Math.max(metrics.maxSameAgentReserved, sameAgentReserved);
   if (sameAgentActive > metrics.maxSameAgentActive) {
     metrics.maxSameAgentActive = sameAgentActive;
     metrics.maxSameAgentWitness = processSessions.map(({ taskId, taskName, agentId, state }) => ({
@@ -190,18 +226,18 @@ function request(overrides = {}) {
   };
 }
 
-function persistedActiveSnapshot(label) {
+function persistedActiveSnapshot(label, overrides = {}) {
   const now = '2026-07-17T00:00:00.000Z';
   const startedAt = '2026-07-16T23:59:59.000Z';
   return {
     version: 1,
     updatedAt: now,
     tasks: [{
-      taskId: `persisted-task-${label}`,
-      sessionId: `persisted-session-${label}`,
+      taskId: overrides.taskId ?? `persisted-task-${label}`,
+      sessionId: overrides.sessionId ?? `persisted-session-${label}`,
       connectorId: 'codex',
-      agentId: `recovered-${label}`,
-      taskName: `R03 recovered ${label}`,
+      agentId: overrides.agentId ?? `recovered-${label}`,
+      taskName: overrides.taskName ?? `R03 recovered ${label}`,
       requestedBy: 'explicit-user-action',
       source: 'runtime-spawn',
       capabilities: null,
@@ -212,10 +248,10 @@ function persistedActiveSnapshot(label) {
       processStartedAt: startedAt,
       queueWaitMs: 0,
       dependsOn: [],
-      pid: 9100,
+      pid: overrides.pid ?? 9100,
       processFingerprint: {
         version: 1,
-        pid: 9100,
+        pid: overrides.pid ?? 9100,
         executablePath: 'c:\\fixture\\codex.exe',
         startedAt,
         cwd: 'e:\\fixture-workspace',
@@ -263,6 +299,13 @@ function persistedActiveSnapshot(label) {
   };
 }
 
+function combinePersistedSnapshots(entries) {
+  const snapshots = entries.map(({ label, ...overrides }) => persistedActiveSnapshot(label, overrides));
+  const combined = structuredClone(snapshots[0]);
+  combined.tasks = snapshots.flatMap((snapshot) => snapshot.tasks);
+  return combined;
+}
+
 function deferred() {
   let resolve;
   const promise = new Promise((next) => {
@@ -305,6 +348,10 @@ function pass(id, detail) {
 
 function reviewPass(id, detail) {
   reviewResults.push({ id, detail });
+}
+
+function configurablePass(id, detail) {
+  configurableResults.push({ id, detail });
 }
 
 // S-01: one global slot across independent agents.
@@ -764,6 +811,411 @@ function reviewPass(id, detail) {
   reviewPass('R-03', 'recovery reserves slot; success close and fail/timeout release deterministically');
 }
 
+// C-01: absence preserves the accepted single-slot behavior.
+{
+  const h = createHarness();
+  const first = h.runtime.start(request({ agentId: 'c01-a', taskName: 'C01 first' }));
+  const second = h.runtime.start(request({ agentId: 'c01-b', taskName: 'C01 second' }));
+  assert.equal(h.processes.length, 1);
+  assert.equal(session(h, second)?.state, 'queued');
+  h.processes[0].confirmSpawn();
+  h.processes[0].close(0);
+  h.processes[1].confirmSpawn();
+  h.processes[1].close(0);
+  assert.equal(session(h, first)?.state, 'success');
+  configurableCounters.legalLimits.set(1, {
+    maxActive: h.maxGlobalActive,
+    maxReserved: h.maxGlobalReserved,
+    maxSameAgent: h.maxSameAgentReserved
+  });
+  configurablePass('C-01', 'setting absent preserves global limit 1');
+}
+
+// C-02: every legal configured value fills exactly its own capacity.
+{
+  for (const limit of [2, 3, 4]) {
+    const h = createHarness({ maxGlobalActive: limit });
+    const runs = Array.from({ length: limit }, (_, index) => h.runtime.start(request({
+      agentId: `c02-${limit}-${index}`,
+      taskName: `C02 limit ${limit} task ${index}`
+    })));
+    assert(runs.every((run) => run.status === 'accepted'));
+    assert.equal(h.processes.length, limit);
+    h.processes.forEach((process) => process.confirmSpawn());
+    assert.equal(h.runtime.getSnapshot().tasks.filter((task) => PROCESS_STATES.has(task.state)).length, limit);
+    configurableCounters.legalLimits.set(limit, {
+      maxActive: h.maxGlobalActive,
+      maxReserved: h.maxGlobalReserved,
+      maxSameAgent: h.maxSameAgentReserved
+    });
+    h.processes.forEach((process) => process.close(0));
+  }
+  configurablePass('C-02', 'legal limits 2/3/4 each fill exact capacity');
+}
+
+// C-03: global spare capacity never weakens same-Agent concurrency 1.
+{
+  const h = createHarness({ maxGlobalActive: 2 });
+  const first = h.runtime.start(request({ agentId: 'c03-shared', taskName: 'C03 shared first' }));
+  const second = h.runtime.start(request({ agentId: 'c03-shared', taskName: 'C03 shared second' }));
+  const independent = h.runtime.start(request({ agentId: 'c03-independent', taskName: 'C03 independent' }));
+  assert.equal(h.processes.length, 2);
+  h.processes[0].confirmSpawn();
+  h.processes[1].confirmSpawn();
+  assert.equal(session(h, second)?.state, 'queued');
+  h.processes[1].close(0);
+  assert.equal(h.processes.length, 2, 'free capacity must not bypass the active same-Agent reservation');
+  h.processes[0].close(0);
+  assert.equal(h.processes.length, 3);
+  h.processes[2].confirmSpawn();
+  h.processes[2].close(0);
+  assert.equal(session(h, first)?.state, 'success');
+  assert.equal(session(h, independent)?.state, 'success');
+  assert.equal(h.maxSameAgentReserved, 1);
+  configurablePass('C-03', 'same-Agent reservation remains 1 with global limit 2');
+}
+
+// C-04: one confirmed close refills exactly one configured slot.
+{
+  for (const limit of [2, 3, 4]) {
+    const h = createHarness({ maxGlobalActive: limit });
+    const runs = Array.from({ length: limit + 1 }, (_, index) => h.runtime.start(request({
+      agentId: `c04-${limit}-${index}`,
+      taskName: `C04 limit ${limit} task ${index}`
+    })));
+    assert.equal(h.processes.length, limit);
+    assert.equal(session(h, runs.at(-1))?.state, 'queued');
+    h.processes.slice(0, limit).forEach((process) => process.confirmSpawn());
+    h.processes[0].close(0);
+    assert.equal(h.processes.length, limit + 1);
+    assert.equal(h.runtime.getSnapshot().tasks.filter((task) => PROCESS_STATES.has(task.state)).length, limit);
+    h.processes[limit].confirmSpawn();
+    h.processes.slice(1, limit).forEach((process) => process.close(0));
+    h.processes[limit].close(0);
+    assert(h.maxGlobalReserved <= limit);
+  }
+  configurablePass('C-04', 'limits 2/3/4 queue one excess and refill once per close');
+}
+
+// C-05: equal queuedAt tasks fill multiple free slots by taskId order.
+{
+  const h = createHarness({ maxGlobalActive: 2 });
+  h.runtime.start(request({ agentId: 'c05-block-a', taskName: 'C05 blocker A' }));
+  h.runtime.start(request({ agentId: 'c05-block-b', taskName: 'C05 blocker B' }));
+  h.processes.forEach((process) => process.confirmSpawn());
+  const queued = [0, 1, 2].map((index) => h.runtime.start(request({
+    agentId: `c05-ready-${index}`,
+    taskName: `C05 ready ${index}`
+  })));
+  const orderedIds = queued.map((run) => run.taskId).sort((left, right) => left.localeCompare(right));
+  h.processes[0].close(0);
+  h.processes[1].close(0);
+  const startingIds = h.runtime.getSnapshot().tasks
+    .filter((task) => task.state === 'starting')
+    .map((task) => task.taskId)
+    .sort((left, right) => left.localeCompare(right));
+  assert.deepEqual(startingIds, orderedIds.slice(0, 2));
+  h.processes[2].confirmSpawn();
+  h.processes[3].confirmSpawn();
+  h.processes[2].close(0);
+  assert.equal(h.runtime.getSnapshot().tasks.find((task) => task.taskId === orderedIds[2])?.state, 'starting');
+  h.processes[4].confirmSpawn();
+  h.processes[3].close(0);
+  h.processes[4].close(0);
+  configurablePass('C-05', `two-slot tie-break=${orderedIds.slice(0, 2).join(',')}`);
+}
+
+// C-06: spare capacity cannot bypass waiting or failed dependencies.
+{
+  const success = createHarness({ maxGlobalActive: 2 });
+  const prerequisite = success.runtime.start(request({ agentId: 'c06-pre', taskName: 'C06 prerequisite' }));
+  success.processes[0].confirmSpawn();
+  const dependent = success.runtime.start(request({
+    agentId: 'c06-dependent',
+    taskName: 'C06 dependent',
+    dependsOn: [prerequisite.taskId]
+  }));
+  assert.equal(success.processes.length, 1);
+  assert.equal(session(success, dependent)?.state, 'queued');
+  success.processes[0].close(0);
+  success.processes[1].confirmSpawn();
+  success.processes[1].close(0);
+
+  const failed = createHarness({ maxGlobalActive: 2 });
+  const failedPrerequisite = failed.runtime.start(request({ agentId: 'c06-fail-pre', taskName: 'C06 failed prerequisite' }));
+  failed.processes[0].confirmSpawn();
+  const blocked = failed.runtime.start(request({
+    agentId: 'c06-blocked',
+    taskName: 'C06 blocked dependent',
+    dependsOn: [failedPrerequisite.taskId]
+  }));
+  failed.processes[0].close(9);
+  assert.equal(failed.processes.length, 1);
+  assert.equal(session(failed, blocked)?.state, 'dependency-blocked');
+  configurablePass('C-06', 'dependency waiting/failure wins over spare capacity');
+}
+
+// C-07: unconfirmed close retains one slot while genuinely free capacity refills.
+{
+  const h = createHarness({ maxGlobalActive: 2 });
+  const first = h.runtime.start(request({ agentId: 'c07-a', taskName: 'C07 unconfirmed' }));
+  h.runtime.start(request({ agentId: 'c07-b', taskName: 'C07 confirmed' }));
+  h.processes.forEach((process) => process.confirmSpawn());
+  const third = h.runtime.start(request({ agentId: 'c07-c', taskName: 'C07 third' }));
+  const fourth = h.runtime.start(request({ agentId: 'c07-d', taskName: 'C07 fourth' }));
+  h.runtime.stop({ taskId: first.taskId });
+  fireTimer(liveTimers(h, 100)[0]);
+  fireTimer(liveTimers(h, 100)[0]);
+  assert.equal(session(h, first)?.state, 'session-lost');
+  assert.equal(h.processes.length, 2);
+  h.processes[1].close(0);
+  assert.equal(h.processes.length, 3);
+  h.processes[2].confirmSpawn();
+  assert.equal(session(h, fourth)?.state, 'queued');
+  h.processes[0].close(null, 'SIGTERM');
+  assert.equal(h.processes.length, 4);
+  h.processes[3].confirmSpawn();
+  h.processes[2].close(0);
+  h.processes[3].close(0);
+  assert.equal(session(h, third)?.state, 'success');
+  configurablePass('C-07', 'unconfirmed close reserves one slot until real close');
+}
+
+// C-08: recovering/reattached Agent identity stays reserved while another Agent uses spare capacity.
+{
+  const proof = deferred();
+  const recoveredProcess = new FakeProcess(9301);
+  const snapshot = persistedActiveSnapshot('c08-shared', {
+    agentId: 'c08-shared-agent',
+    pid: 9301
+  });
+  const h = createHarness({
+    maxGlobalActive: 2,
+    persistedSnapshot: snapshot,
+    reattachProcess: () => proof.promise
+  });
+  h.recoveredProcesses.push(recoveredProcess);
+  const sameAgent = h.runtime.start(request({ agentId: 'c08-shared-agent', taskName: 'C08 same Agent' }));
+  h.runtime.start(request({ agentId: 'c08-different', taskName: 'C08 different Agent' }));
+  assert.equal(h.processes.length, 1);
+  h.processes[0].confirmSpawn();
+  assert.equal(session(h, sameAgent)?.state, 'queued');
+  proof.resolve({ process: recoveredProcess, provenAt: '2026-07-17T00:00:00.000Z' });
+  await settleAsync();
+  assert.equal(h.runtime.getSnapshot().tasks.find((task) => task.taskId === 'persisted-task-c08-shared')?.state, 'reattached');
+  h.processes[0].close(0);
+  assert.equal(h.processes.length, 1, 'reattached Agent identity must still block its queued task');
+  h.runtime.start(request({ agentId: 'c08-second-different', taskName: 'C08 second different Agent' }));
+  assert.equal(h.processes.length, 2);
+  h.processes[1].confirmSpawn();
+  h.processes[1].close(0);
+  recoveredProcess.close(0);
+  assert.equal(h.processes.length, 3);
+  h.processes[2].confirmSpawn();
+  h.processes[2].close(0);
+
+  const firstGate = deferred();
+  const secondGate = deferred();
+  const twoRecoveries = createHarness({
+    maxGlobalActive: 2,
+    persistedSnapshot: combinePersistedSnapshots([
+      { label: 'c08-a', agentId: 'c08-recovery-a', pid: 9311 },
+      { label: 'c08-b', agentId: 'c08-recovery-b', pid: 9312 }
+    ]),
+    reattachProcess: (sessionValue) => sessionValue.taskId.endsWith('c08-a') ? firstGate.promise : secondGate.promise
+  });
+  const waiting = twoRecoveries.runtime.start(request({ agentId: 'c08-ready', taskName: 'C08 waiting behind two recovery slots' }));
+  assert.equal(twoRecoveries.processes.length, 0);
+  fireTimer(liveTimers(twoRecoveries, 500)[0]);
+  assert.equal(twoRecoveries.processes.length, 1);
+  twoRecoveries.processes[0].confirmSpawn();
+  assert.equal(session(twoRecoveries, waiting)?.state, 'running');
+  fireTimer(liveTimers(twoRecoveries, 500)[0]);
+  firstGate.resolve(null);
+  secondGate.resolve(null);
+  await settleAsync();
+  twoRecoveries.processes[0].close(0);
+  configurablePass('C-08', 'recovering/reattached identity blocks same Agent while spare capacity admits others');
+}
+
+// C-09: three restored taskIds remain observed and release one reservation at a time under limit 2.
+{
+  const gates = new Map(['a', 'b', 'c'].map((label) => [label, deferred()]));
+  const recoveredA = new FakeProcess(9401);
+  const h = createHarness({
+    maxGlobalActive: 2,
+    persistedSnapshot: combinePersistedSnapshots([
+      { label: 'c09-a', agentId: 'c09-agent-a', pid: 9401 },
+      { label: 'c09-b', agentId: 'c09-agent-b', pid: 9402 },
+      { label: 'c09-c', agentId: 'c09-agent-c', pid: 9403 }
+    ]),
+    reattachProcess: (sessionValue) => gates.get(sessionValue.taskId.at(-1)).promise
+  });
+  h.recoveredProcesses.push(recoveredA);
+  const queuedA = h.runtime.start(request({ agentId: 'c09-new-a', taskName: 'C09 queued A' }));
+  const queuedB = h.runtime.start(request({ agentId: 'c09-new-b', taskName: 'C09 queued B' }));
+  const recordTimeline = (step) => {
+    const snapshotValue = h.runtime.getSnapshot();
+    const restored = snapshotValue.tasks
+      .filter((task) => task.taskId.startsWith('persisted-task-c09'))
+      .map((task) => `${task.taskId}:${task.state}`)
+      .sort();
+    const reserved = snapshotValue.tasks.filter((task) => RESERVED_STATES.has(task.state)).length;
+    configurableCounters.overCapTimeline.push({ step, reserved, spawn: h.processes.length, restored });
+  };
+  recordTimeline('initial');
+  assert.equal(h.processes.length, 0);
+  assert.equal(configurableCounters.overCapTimeline.at(-1).reserved, 3);
+
+  gates.get('a').resolve({ process: recoveredA, provenAt: '2026-07-17T00:00:00.000Z' });
+  await settleAsync();
+  recordTimeline('a-reattached');
+  assert.equal(configurableCounters.overCapTimeline.at(-1).reserved, 3);
+
+  gates.get('b').resolve(null);
+  await settleAsync();
+  recordTimeline('b-proof-failed-held');
+  assert.equal(configurableCounters.overCapTimeline.at(-1).reserved, 3);
+  fireTimer(liveTimers(h, 500)[0]);
+  recordTimeline('b-timeout-release');
+  assert.equal(configurableCounters.overCapTimeline.at(-1).reserved, 2);
+  assert.equal(h.processes.length, 0);
+
+  fireTimer(liveTimers(h, 500)[0]);
+  recordTimeline('c-timeout-refill');
+  assert.equal(h.processes.length, 1);
+  h.processes[0].confirmSpawn();
+  gates.get('c').resolve(null);
+  await settleAsync();
+  recoveredA.close(0);
+  recordTimeline('a-confirmed-close-refill');
+  assert.equal(h.processes.length, 2);
+  h.processes[1].confirmSpawn();
+  h.processes[0].close(0);
+  h.processes[1].close(0);
+  assert.equal(session(h, queuedA)?.state, 'success');
+  assert.equal(session(h, queuedB)?.state, 'success');
+  const restoredFinal = h.runtime.getSnapshot().tasks.filter((task) => task.taskId.startsWith('persisted-task-c09'));
+  assert.equal(restoredFinal.length, 3);
+  assert(restoredFinal.every((task) => terminalCount(task) === 1));
+  configurablePass('C-09', 'over-cap restored taskIds release through proof/timeout/confirmed-close timeline');
+}
+
+// C-10: retry admission respects spare capacity and same-Agent ownership.
+{
+  const h = createHarness({
+    maxGlobalActive: 2,
+    classifyFailure: (failure) => ({ ...failure, retryable: failure.kind === 'process-error' })
+  });
+  const retry = h.runtime.start(request({
+    agentId: 'c10-shared',
+    taskName: 'C10 retry',
+    retry: { maxRetries: 1, backoffMs: 100, budgetMs: 1_000 }
+  }));
+  h.processes[0].confirmSpawn();
+  const sameAgent = h.runtime.start(request({ agentId: 'c10-shared', taskName: 'C10 same Agent work' }));
+  h.runtime.start(request({ agentId: 'c10-independent', taskName: 'C10 independent' }));
+  h.processes[1].confirmSpawn();
+  h.processes[0].emit('error', new Error('C10 retryable fixture'));
+  h.processes[0].close(1);
+  assert.equal(h.processes.length, 3);
+  h.processes[2].confirmSpawn();
+  fireTimer(liveTimers(h, 100)[0]);
+  assert.equal(session(h, retry)?.state, 'queued');
+  h.processes[1].close(0);
+  assert.equal(h.processes.length, 3, 'global spare must not overlap retry with same-Agent active work');
+  h.processes[2].close(0);
+  assert.equal(h.processes.length, 4);
+  h.processes[3].confirmSpawn();
+  h.processes[3].close(0);
+  assert.equal(session(h, sameAgent)?.state, 'success');
+  assert.equal(session(h, retry)?.attempt, 2);
+  configurablePass('C-10', 'retry uses spare capacity fairly without same-Agent overlap');
+}
+
+// C-11: invalid constructor values fail before every injected dependency side effect.
+{
+  const invalidValues = [0, -1, 1.5, Number.NaN, Number.POSITIVE_INFINITY, 5];
+  for (const value of invalidValues) {
+    const sideEffects = Object.fromEntries(Object.keys(configurableCounters.invalidSideEffects).map((key) => [key, 0]));
+    assert.throws(() => new ConnectorRuntime({
+      maxGlobalActive: value,
+      loadPolicy: () => { sideEffects.load += 1; return readyPolicy(); },
+      resolveExecutable: () => { sideEffects.discovery += 1; return 'C:\\fixture\\codex.exe'; },
+      spawnProcess: () => { sideEffects.process += 1; return new FakeProcess(9500); },
+      workspaceRoot: 'E:\\fixture-workspace',
+      sourceEnv: { PATH: 'fixture-path' },
+      publish: () => { sideEffects.publish += 1; },
+      authorizeRun: () => { sideEffects.authorization += 1; return { authorized: true }; },
+      loadPersistedSnapshot: () => { sideEffects.load += 1; return null; },
+      persistSnapshot: () => { sideEffects.persist += 1; },
+      now: () => { sideEffects.clock += 1; return new Date('2026-07-17T00:00:00.000Z'); },
+      createId: () => { sideEffects.id += 1; return 'invalid'; },
+      setTimer: () => { sideEffects.timer += 1; return {}; },
+      clearTimer: () => {}
+    }), RangeError);
+    assert(Object.values(sideEffects).every((count) => count === 0), `invalid ${String(value)} must have zero side effects`);
+    configurableCounters.invalidCases += 1;
+    Object.keys(sideEffects).forEach((key) => {
+      configurableCounters.invalidSideEffects[key] += sideEffects[key];
+    });
+  }
+  configurablePass('C-11', 'six invalid classes reject before all injected side effects');
+}
+
+// C-12: duplicate/same-tick close and synchronous callbacks cannot oversubscribe limit 2.
+{
+  let spawnInjected = false;
+  let publishInjected = false;
+  const h = createHarness({
+    maxGlobalActive: 2,
+    onSpawn: (current) => {
+      if (!spawnInjected) {
+        spawnInjected = true;
+        current.runtime.start(request({ agentId: 'c12-spawn-callback', taskName: 'C12 spawn callback' }));
+      }
+    },
+    onPublish: (current, snapshotValue) => {
+      if (!publishInjected && snapshotValue.tasks.some((task) => task.taskName === 'C12 primary' && task.state === 'starting')) {
+        publishInjected = true;
+        current.runtime.start(request({ agentId: 'c12-publish-callback', taskName: 'C12 publish callback' }));
+      }
+    }
+  });
+  h.runtime.start(request({ agentId: 'c12-primary', taskName: 'C12 primary' }));
+  h.runtime.start(request({ agentId: 'c12-explicit', taskName: 'C12 explicit queued' }));
+  assert.equal(h.processes.length, 2);
+  h.processes[0].confirmSpawn();
+  h.processes[1].confirmSpawn();
+  h.processes[0].close(0);
+  h.processes[0].close(0);
+  h.processes[1].close(0);
+  h.processes[1].close(0);
+  assert.equal(h.processes.length, 4);
+  h.processes[2].confirmSpawn();
+  h.processes[3].confirmSpawn();
+  h.processes[2].close(0);
+  h.processes[2].close(0);
+  h.processes[3].close(0);
+  h.processes[3].close(0);
+  assert(h.maxGlobalActive <= 2 && h.maxGlobalReserved <= 2);
+  assert(h.runtime.getSnapshot().tasks.every((task) => terminalCount(task) === 1));
+
+  const disposing = createHarness({ maxGlobalActive: 2 });
+  disposing.runtime.start(request({ agentId: 'c12-dispose-a', taskName: 'C12 dispose A' }));
+  disposing.runtime.start(request({ agentId: 'c12-dispose-b', taskName: 'C12 dispose B' }));
+  disposing.runtime.start(request({ agentId: 'c12-dispose-c', taskName: 'C12 dispose queued' }));
+  disposing.processes.forEach((process) => process.confirmSpawn());
+  disposing.runtime.dispose();
+  disposing.runtime.dispose();
+  assert.equal(disposing.processes.length, 2);
+  disposing.processes.forEach((process) => process.close(null, 'SIGTERM'));
+  assert.equal(await disposing.runtime.disposeAndWait(50), true);
+  assert.equal(liveTimers(disposing).length, 0);
+  assert(disposing.runtime.getSnapshot().tasks.every((task) => terminalCount(task) === 1));
+  configurablePass('C-12', 'reentrant callbacks, duplicate closes and repeated dispose remain bounded');
+}
+
 // S-16: every spawn is an in-memory fixture invocation, never an external Agent CLI.
 {
   const spawnCalls = harnesses.flatMap((harness) => harness.spawnCalls);
@@ -776,30 +1228,44 @@ function reviewPass(id, detail) {
 
 const finalTasks = harnesses.flatMap((harness) => harness.runtime.getSnapshot().tasks);
 const duplicateTerminalCount = finalTasks.reduce((total, task) => total + Math.max(0, terminalCount(task) - 1), 0);
-const residualProcesses = harnesses.flatMap((harness) => harness.processes).filter((process) => !process.closed).length;
+const residualProcesses = harnesses
+  .flatMap((harness) => [...harness.processes, ...harness.recoveredProcesses])
+  .filter((process) => !process.closed).length;
 const residualTimers = harnesses.reduce((total, harness) => total + liveTimers(harness).length, 0);
 const fakeSpawnCount = harnesses.reduce((total, harness) => total + harness.spawnCalls.length, 0);
 
 assert.equal(fixtureResults.length, 16, 'S-01 through S-16 must all report');
 assert.equal(reviewResults.length, 3, 'R-01 through R-03 must all report');
+assert.equal(configurableResults.length, 12, 'C-01 through C-12 must all report');
 assert.equal(
   metrics.maxGlobalActive,
-  1,
-  `maximum global active process count must be 1; witness=${JSON.stringify(metrics.maxGlobalWitness)}`
+  4,
+  `maximum configured global active process count must be 4; witness=${JSON.stringify(metrics.maxGlobalWitness)}`
 );
 assert.equal(
   metrics.maxSameAgentActive,
   1,
   `maximum same-Agent active process count must be 1; witness=${JSON.stringify(metrics.maxSameAgentWitness)}`
 );
+assert.equal(metrics.maxSameAgentReserved, 1, 'maximum same-Agent reserved process count must remain 1');
+for (const limit of [1, 2, 3, 4]) {
+  const counter = configurableCounters.legalLimits.get(limit);
+  assert.deepEqual(counter, { maxActive: limit, maxReserved: limit, maxSameAgent: 1 });
+}
+assert.equal(configurableCounters.invalidCases, 6);
+assert(Object.values(configurableCounters.invalidSideEffects).every((count) => count === 0));
 assert.equal(duplicateTerminalCount, 0, 'duplicate terminal count must remain zero');
 assert.equal(residualProcesses, 0, 'fixture process residue must remain zero');
 assert.equal(residualTimers, 0, 'fixture timer residue must remain zero');
 
 fixtureResults.forEach(({ id, detail }) => console.log(`${id} PASS ${detail}`));
 reviewResults.forEach(({ id, detail }) => console.log(`${id} PASS ${detail}`));
+configurableResults.forEach(({ id, detail }) => console.log(`${id} PASS ${detail}`));
 console.log(`scheduler counters maxGlobalActive=${metrics.maxGlobalActive} maxSameAgentActive=${metrics.maxSameAgentActive}`);
-console.log(`scheduler counters maxGlobalReserved=${metrics.maxGlobalReserved}`);
+console.log(`scheduler counters maxGlobalReserved=${metrics.maxGlobalReserved} maxSameAgentReserved=${metrics.maxSameAgentReserved}`);
+console.log(`configurable limit counters ${JSON.stringify(Object.fromEntries(configurableCounters.legalLimits))}`);
+console.log(`invalid constructor counters cases=${configurableCounters.invalidCases} sideEffects=${JSON.stringify(configurableCounters.invalidSideEffects)}`);
+console.log(`over-cap timeline ${JSON.stringify(configurableCounters.overCapTimeline)}`);
 console.log(`scheduler counters fakeSpawn=${fakeSpawnCount} controlledLocalSpawn=0 externalAgentSpawn=${metrics.externalAgentSpawn}`);
 console.log(`scheduler counters duplicateTerminal=${duplicateTerminalCount} residualProcess=${residualProcesses} residualTimer=${residualTimers}`);
 console.log(`review counters policyDriftSpawn=${reviewCounters.policyDriftSpawn} unconfirmedNextSpawn=${reviewCounters.unconfirmedNextSpawn}`);

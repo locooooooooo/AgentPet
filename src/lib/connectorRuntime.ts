@@ -174,6 +174,7 @@ export interface ConnectorProcessFingerprintContext {
 }
 
 export interface ConnectorRuntimeDependencies {
+  maxGlobalActive?: number;
   loadPolicy: () => ConnectorPolicyConfig | null;
   resolveExecutable: (command: string) => string | null;
   spawnProcess: (file: string, args: string[], options: ConnectorSpawnOptions) => ConnectorRuntimeProcess;
@@ -1026,6 +1027,7 @@ export class ConnectorRuntime {
   private readonly processProofTimeoutMs: number;
   private readonly terminationGraceMs: number;
   private readonly outputFlushMs: number;
+  private readonly maxGlobalActive: number;
   private readonly active = new Map<string, ActiveExecution>();
   private readonly plans = new Map<string, ExecutionPlan>();
   private readonly retryTimers = new Map<string, NodeJS.Timeout>();
@@ -1039,6 +1041,7 @@ export class ConnectorRuntime {
   private scheduling = false;
 
   constructor(private readonly dependencies: ConnectorRuntimeDependencies) {
+    this.maxGlobalActive = readMaxGlobalActive(dependencies.maxGlobalActive);
     this.now = dependencies.now ?? (() => new Date());
     this.createId = dependencies.createId ?? (() => crypto.randomUUID());
     this.setTimer = dependencies.setTimer ?? ((callback, timeoutMs) => setTimeout(callback, timeoutMs));
@@ -1394,17 +1397,15 @@ export class ConnectorRuntime {
           this.sensitivePrompts.delete(session.taskId);
         });
 
-        if (this.active.size >= 1 || this.hasRecoveryReservation()) {
+        if (this.reservedSlotCount() >= this.maxGlobalActive) {
           break;
         }
-        const activeAgentIds = new Set([...this.active.keys()].map((taskId) => (
-          this.snapshot.tasks.find((session) => session.taskId === taskId)?.agentId
-        )).filter((agentId): agentId is string => typeof agentId === 'string'));
+        const reservedAgentIds = this.reservedAgentIds();
         const next = this.snapshot.tasks
           .filter((session) => session.state === 'queued' && this.plans.has(session.taskId))
           .sort(compareQueuedSessions)
           .find((session) => (
-            !activeAgentIds.has(session.agentId) && this.evaluateDependencies(session).status === 'ready'
+            !reservedAgentIds.has(session.agentId) && this.evaluateDependencies(session).status === 'ready'
           ));
         if (!next) {
           break;
@@ -1417,13 +1418,13 @@ export class ConnectorRuntime {
           ...session,
           events: appendEvent(session.events, this.createEvent(
             'scheduler',
-            'Scheduler dequeued the task into the single global slot.',
-            { queuedAt: session.queuedAt, globalConcurrency: 1 },
+            'Scheduler dequeued the task into a configured global slot.',
+            { queuedAt: session.queuedAt, maxGlobalActive: this.maxGlobalActive },
             'task-dequeued'
           ))
         }));
         this.launchAttempt(plan);
-        if (this.active.size >= 1) {
+        if (this.reservedSlotCount() >= this.maxGlobalActive) {
           break;
         }
       }
@@ -1448,8 +1449,25 @@ export class ConnectorRuntime {
     return { status: 'ready' };
   }
 
-  private hasRecoveryReservation() {
-    return this.snapshot.tasks.some((session) => session.state === 'recovering');
+  private reservedSlotTaskIds() {
+    const reserved = new Set(this.active.keys());
+    this.snapshot.tasks.forEach((session) => {
+      if (session.state === 'recovering') {
+        reserved.add(session.taskId);
+      }
+    });
+    return reserved;
+  }
+
+  private reservedSlotCount() {
+    return this.reservedSlotTaskIds().size;
+  }
+
+  private reservedAgentIds() {
+    const reservedTaskIds = this.reservedSlotTaskIds();
+    return new Set(this.snapshot.tasks
+      .filter((session) => reservedTaskIds.has(session.taskId))
+      .map((session) => session.agentId));
   }
 
   private blockDependencySession(
@@ -2198,8 +2216,8 @@ export class ConnectorRuntime {
         ...session,
         events: appendEvent(session.events, this.createEvent(
           'scheduler',
-          'Connector process released the single global scheduler slot.',
-          { globalConcurrency: 1 },
+          'Connector process released a configured global scheduler slot.',
+          { maxGlobalActive: this.maxGlobalActive },
           'slot-released'
         ))
       };
@@ -2485,14 +2503,7 @@ export class ConnectorRuntime {
     const recoverable = this.snapshot.tasks
       .filter((session) => ACTIVE_STATES.has(session.state))
       .sort(compareQueuedSessions);
-    recoverable.slice(1).forEach((session) => {
-      this.finishSession(session.taskId, 'session-lost', {
-        eventKind: 'recovery',
-        message: 'Persisted active task exceeded the single global recovery slot.',
-        payload: { recoveryDecision: 'global-concurrency-fail-closed' }
-      });
-    });
-    const admitted = recoverable.slice(0, 1);
+    const admitted = recoverable;
     if (admitted.length === 0) {
       return;
     }
@@ -3616,6 +3627,16 @@ function normalizeText(value: unknown, maxLength: number) {
 
 function numberOrUndefined(value: unknown) {
   return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+}
+
+function readMaxGlobalActive(value: unknown) {
+  if (value === undefined) {
+    return 1;
+  }
+  if (typeof value !== 'number' || !Number.isInteger(value) || value < 1 || value > 4) {
+    throw new RangeError('maxGlobalActive must be an integer from 1 through 4.');
+  }
+  return value;
 }
 
 function clampInteger(value: unknown, minimum: number, maximum: number, fallback: number) {
