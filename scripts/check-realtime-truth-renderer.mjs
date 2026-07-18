@@ -126,7 +126,8 @@ function runtimeSnapshot({
   state,
   lastSeen,
   capabilities = ['structured-events'],
-  hostFacts = []
+  hostFacts = [],
+  hostLifecycle = []
 }) {
   const hasSession = Boolean(state);
   const hostInstances = hostFacts.map((fact) => ({
@@ -166,6 +167,7 @@ function runtimeSnapshot({
       source: 'windows-process-list',
       observedAt: nowIso,
       facts: hostFacts,
+      lifecycle: hostLifecycle,
       detail: 'Presence-only renderer fixture.'
     }
   };
@@ -233,6 +235,8 @@ assert.match(browserCockpit, /Agent runtime · simulated/);
 assert.match(browserCockpit, /unavailable · browser-fallback/);
 assert.match(browserCockpit, /本地牧场表现/);
 assert.match(browserCockpit, /应用快照交互/);
+assert.match(browserCockpit, /Sessions 下发任务 任务队列 流式日志/);
+assert.match(browserCockpit, /未观察到 Session/);
 assert.match(browserHome, /已配置工位:8/);
 assert.match(browserHome, /真实在线 Session:0:unavailable · simulated · browser-fallback/);
 
@@ -246,7 +250,10 @@ const desktopHostCockpit = renderCockpit(browserProjection, desktopCodexHost);
 const desktopHostHome = renderHomeTruth(browserProjection, desktopCodexHost);
 assert.match(desktopHostCockpit, /在线 Session 2/);
 assert.match(desktopHostCockpit, /Connector 0 · Codex Desktop 2/);
-assert.match(desktopHostCockpit, /Codex Desktop 已开启 2 活动对话/);
+assert.match(desktopHostCockpit, /Codex Desktop 同步中 2 活动对话/);
+assert.match(desktopHostCockpit, /Codex Sessions 2 个真实观测项/);
+assert.match(desktopHostCockpit, /Codex · workspace-1 Codex Desktop/);
+assert.match(desktopHostCockpit, /Session ID desktop-session-1 来源 Codex Desktop 状态 working/);
 assert.match(desktopHostHome, /真实在线 Session:2:Codex Desktop 已开启 · 2 个活动对话/);
 
 const hostPresenceProjection = project(runtimeSnapshot({
@@ -299,6 +306,101 @@ assert.equal(
 assert.match(hostPresenceCockpit, /在线 Session 0/);
 assert.match(hostPresenceCockpit, /0 个应用任务运行中/);
 
+const hostLifecycleProjection = project(runtimeSnapshot({
+  hostFacts: [
+    {
+      agentId: 'workbuddy',
+      connectorId: 'workbuddy',
+      displayName: 'WorkBuddy',
+      running: true,
+      processCount: 3,
+      observedAt: nowIso
+    },
+    {
+      agentId: 'minimax',
+      connectorId: 'minimax',
+      displayName: 'MiniMax Code',
+      running: true,
+      processCount: 4,
+      observedAt: nowIso
+    }
+  ],
+  hostLifecycle: [
+    {
+      agentId: 'trae',
+      connectorId: 'trae',
+      displayName: 'Trae',
+      installed: true,
+      running: false,
+      processCount: 0,
+      state: 'stopped',
+      primaryAction: 'launch',
+      observedAt: nowIso,
+      detail: 'Application is installed but not running.'
+    },
+    {
+      agentId: 'workbuddy',
+      connectorId: 'workbuddy',
+      displayName: 'WorkBuddy',
+      installed: true,
+      running: true,
+      processCount: 3,
+      state: 'idle',
+      primaryAction: 'focus',
+      observedAt: nowIso,
+      detail: 'Application is running with no observed Hub task.'
+    },
+    {
+      agentId: 'qoder',
+      connectorId: 'qoder',
+      displayName: 'Qoder',
+      installed: true,
+      running: false,
+      processCount: 0,
+      state: 'stopped',
+      primaryAction: 'launch',
+      observedAt: nowIso,
+      detail: 'Application is installed but not running.'
+    },
+    {
+      agentId: 'minimax',
+      connectorId: 'minimax',
+      displayName: 'MiniMax Code',
+      installed: true,
+      running: true,
+      processCount: 4,
+      state: 'idle',
+      primaryAction: 'focus',
+      observedAt: nowIso,
+      detail: 'Application is running with no observed Hub task.'
+    },
+    {
+      agentId: 'openclaw',
+      connectorId: 'openclaw',
+      displayName: 'OpenClaw Gateway',
+      installed: true,
+      serviceInstalled: false,
+      running: false,
+      processCount: 0,
+      state: 'stopped',
+      primaryAction: 'install',
+      observedAt: nowIso,
+      detail: 'OpenClaw CLI is installed; Gateway service setup is required.'
+    }
+  ]
+}));
+const hostLifecycleCockpit = renderCockpit(hostLifecycleProjection);
+assert.match(hostLifecycleCockpit, /本机应用已安装 当前未启动/);
+assert.match(hostLifecycleCockpit, /打开 Trae/);
+assert.match(hostLifecycleCockpit, /聚焦 WorkBuddy/);
+assert.match(hostLifecycleCockpit, /打开 Qoder/);
+assert.match(hostLifecycleCockpit, /本机应用已打开 idle · 暂无任务/);
+assert.match(hostLifecycleCockpit, /聚焦 MiniMax Code/);
+assert.match(hostLifecycleCockpit, /OpenClaw CLI 已安装 Gateway 服务未配置/);
+assert.match(hostLifecycleCockpit, /安装服务/);
+assert.match(hostLifecycleCockpit, /\[4号位\] MiniMax 废话周会 🐎 UI 熟睡躺平/);
+assert.match(hostLifecycleCockpit, /\[5号位\] WorkBuddy 打水摸鱼 🐂 OPS 熟睡躺平/);
+
 const freshLastSeen = new Date(now.getTime() - 1_000).toISOString();
 const freshProjection = project(runtimeSnapshot({ state: 'running', lastSeen: freshLastSeen }));
 const freshTruth = truthFor(freshProjection);
@@ -349,6 +451,8 @@ console.log('realtime truth renderer check passed.');
 console.log('browser fallback DOM: configured=8, online=0, simulated/unavailable/source labels verified');
 console.log('Codex Desktop lifecycle DOM: host sessions contribute without changing Connector runtime truth');
 console.log('WorkBuddy/MiniMax host badges and one unbound Kimi fact render with online/busy=0: verified');
+console.log('Trae/WorkBuddy/Qoder launch-focus, MiniMax idle animation and OpenClaw service install controls: verified');
+console.log('selected Agent Sessions tab renders Codex sources and truthful empty state: verified');
 console.log('fresh/late/stale/session-lost DOM: KPI, presence/activity, provenance and reason labels verified');
 console.log('capabilities null and local ranch/application snapshot separation: verified');
 `;

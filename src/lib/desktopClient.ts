@@ -1,5 +1,6 @@
 import type {
   AgentSnapshot,
+  AgentHostActionRequest,
   CodexHostSnapshot,
   ConnectorAuthorizationCancelRequest,
   ConnectorAuthorizationIntent,
@@ -156,6 +157,7 @@ export function getDesktopApi(): DesktopApi {
         source: 'unsupported',
         observedAt: new Date().toISOString(),
         facts: [],
+        lifecycle: [],
         detail: 'The browser fallback cannot inspect local Agent applications.'
       },
       runtime: {
@@ -168,6 +170,12 @@ export function getDesktopApi(): DesktopApi {
     }),
     getConnectorSessionAudit: async (_sessionId: string): Promise<ConnectorSessionAudit | null> => null,
     onConnectorRuntimeSnapshotChanged: (_callback: (snapshot: ConnectorRuntimeSnapshot) => void) => () => {},
+    manageAgentHost: async (input: AgentHostActionRequest) => ({
+      status: 'blocked',
+      agentId: input.agentId,
+      action: input.action,
+      message: '浏览器预览无法管理本机 Agent。'
+    }),
     getCodexHostSnapshot: async (): Promise<CodexHostSnapshot> => (
       hasLocalDevelopmentBridge ? refreshBrowserCodexHostSnapshot() : codexHostSnapshot
     ),

@@ -1,6 +1,8 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import type {
   AgentSnapshot,
+  AgentHostActionRequest,
+  AgentHostActionResult,
   CodexHostSnapshot,
   ConnectorAuthorizationCancelRequest,
   ConnectorAuthorizationCancelResult,
@@ -70,6 +72,11 @@ const api = {
     ipcRenderer.on('connectors:runtime-snapshot-changed', listener);
     return () => ipcRenderer.removeListener('connectors:runtime-snapshot-changed', listener);
   },
+  manageAgentHost: (input: AgentHostActionRequest): Promise<AgentHostActionResult> =>
+    ipcRenderer.invoke('agents:manage-host', {
+      agentId: input.agentId,
+      action: input.action
+    }),
   getCodexHostSnapshot: (): Promise<CodexHostSnapshot> => ipcRenderer.invoke('codex:get-host-snapshot'),
   onCodexHostSnapshotChanged: (callback: (snapshot: CodexHostSnapshot) => void): (() => void) => {
     const listener = (_event: Electron.IpcRendererEvent, snapshot: CodexHostSnapshot) => callback(snapshot);

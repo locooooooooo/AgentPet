@@ -5,7 +5,7 @@
 
 loop state: active
 dispatch state: active
-status: presence_slice_delivered_04524e8
+status: content_contracts_implemented_pending_independent_review
 date: 2026-07-18
 ddl: 2026-07-18
 
@@ -49,20 +49,20 @@ No supervisor edited, staged, committed or pushed files. No supervisor ran an ex
 
 ## incomplete
 
-- HubTheme and HubSoundPack formal contracts remain missing, so the broader R0 contract batch is incomplete.
+- HubTheme and HubSoundPack canonical contracts now exist and pass automated valid/invalid example checks; independent exact-file review is still required by the freeze gate.
 - README, DockView, positioning and sound input documents remain unaccepted candidate changes.
 - Unrelated Workspace meter-removal hunks and the remaining synthetic avatar/status semantics are outside this acceptance.
 
 ## blockers
 
 - No platform, Agent quota, delivery or host-presence file-fence blocker remains for the delivered slice.
-- Broader R0 completion remains blocked by missing Theme/SoundPack contracts and unresolved full UI truth semantics.
+- Broader R0 completion remains blocked by independent Theme/SoundPack review and unresolved full UI truth semantics.
 - External Connector execution remains disabled and no P0-C authorization is inferred from host discovery.
 
 ## next action
 
 1. Preserve delivered presence commit `04524e8` and its exact staged-snapshot/live evidence.
-2. Keep Theme/SoundPack and broader UI truth work as the next separately fenced R0 contract lanes.
+2. Independently review the Theme/SoundPack exact files, then keep broader UI truth work in its separate R0 lane.
 3. Continue to prohibit Adapter execution, Connector enabling and task inference from process facts.
 
 ## delivery

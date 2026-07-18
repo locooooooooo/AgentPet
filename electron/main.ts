@@ -4,6 +4,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import type {
   AgentHostDiscoverySnapshot,
+  AgentHostActionRequest,
+  AgentHostActionResult,
   AgentInstance,
   AgentSnapshot,
   AgentTask,
@@ -60,6 +62,7 @@ import {
 } from '../src/lib/agentCore';
 import { CodexHostMonitor } from './codexHostMonitor';
 import { discoverAgentHosts } from './agentHostDiscovery';
+import { performAgentHostAction } from './agentHostActions';
 
 let mainWindow: BrowserWindow | null = null;
 let ranchWindow: BrowserWindow | null = null;
@@ -947,6 +950,20 @@ function composeConnectorRuntimeSnapshot(
   runtimeSnapshot: ConnectorRuntimeSnapshot
 ): ConnectorRuntimeSnapshot {
   const hostSnapshot = cloneAgentHostDiscoverySnapshot(agentHostDiscoverySnapshot);
+  const activeHostStates = new Set(['starting', 'running', 'stopping', 'retrying', 'recovering', 'reattached']);
+  hostSnapshot.lifecycle = hostSnapshot.lifecycle.map((host) => {
+    const hasActiveTask = runtimeSnapshot.tasks.some((task) => (
+      (task.agentId === host.agentId || task.connectorId === host.connectorId)
+      && activeHostStates.has(task.state)
+    ));
+    return host.running && hasActiveTask
+      ? {
+          ...host,
+          state: 'working',
+          detail: 'Application is running with an active Hub task.'
+        }
+      : host;
+  });
   const hostInstances: AgentInstance[] = hostSnapshot.availability === 'available'
     ? hostSnapshot.facts.map((fact) => ({
         instanceId: `host-process:${fact.agentId}`,
@@ -1015,7 +1032,8 @@ function cloneAgentHostDiscoverySnapshot(
 ): AgentHostDiscoverySnapshot {
   return {
     ...hostSnapshot,
-    facts: hostSnapshot.facts.map((fact) => ({ ...fact }))
+    facts: hostSnapshot.facts.map((fact) => ({ ...fact })),
+    lifecycle: hostSnapshot.lifecycle.map((fact) => ({ ...fact }))
   };
 }
 
@@ -1632,6 +1650,41 @@ function registerIpc() {
   ipcMain.handle('connectors:get-runtime-snapshot', (): ConnectorRuntimeSnapshot => (
     composeConnectorRuntimeSnapshot(connectorRuntime.getSnapshot())
   ));
+
+  ipcMain.handle(
+    'agents:manage-host',
+    async (event, input: AgentHostActionRequest): Promise<AgentHostActionResult> => {
+      const agentId = typeof input?.agentId === 'string' ? input.agentId.trim().toLowerCase() : '';
+      const action = input?.action;
+      if (
+        !isTrustedConnectorSender(event)
+        || (action !== 'install' && action !== 'launch' && action !== 'focus')
+      ) {
+        return {
+          status: 'blocked',
+          agentId,
+          action: action === 'launch' || action === 'focus' ? action : 'install',
+          message: '宿主动作请求无效或来源不可信。'
+        };
+      }
+      const lifecycle = agentHostDiscoverySnapshot.lifecycle.find((item) => item.agentId === agentId);
+      if (!lifecycle) {
+        return {
+          status: 'blocked',
+          agentId,
+          action,
+          message: '该 Agent 尚未纳入本机生命周期管理。'
+        };
+      }
+      const result = await performAgentHostAction({ agentId, action }, lifecycle);
+      if (result.status === 'started' || result.status === 'completed') {
+        setTimeout(() => {
+          void refreshAgentHostDiscovery();
+        }, 1_200);
+      }
+      return result;
+    }
+  );
 
   ipcMain.handle('codex:get-host-snapshot', (): CodexHostSnapshot => codexHostSnapshot);
 

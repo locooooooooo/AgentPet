@@ -82,7 +82,10 @@ export interface ProjectedRuntimeTask {
   sessionId: string;
   agentId: string;
   connectorId: string;
+  taskName: string;
   source: ConnectorSession['source'];
+  startedAt: string;
+  endedAt?: string;
   lastSeen?: string;
   pid?: number;
   sourceState: ConnectorRuntimeState;
@@ -262,12 +265,14 @@ function cloneHostDiscovery(
       source: 'unavailable',
       observedAt: now.toISOString(),
       facts: [],
+      lifecycle: [],
       detail: 'Host-process discovery is unavailable.'
     };
   }
   return {
     ...snapshot,
-    facts: snapshot.facts.map((fact) => ({ ...fact }))
+    facts: snapshot.facts.map((fact) => ({ ...fact })),
+    lifecycle: (snapshot.lifecycle ?? []).map((fact) => ({ ...fact }))
   };
 }
 
@@ -336,7 +341,10 @@ function projectTasks(
       sessionId: task.sessionId,
       agentId: task.agentId,
       connectorId: task.connectorId,
+      taskName: task.taskName,
       source: task.source,
+      startedAt: task.startedAt,
+      ...(task.endedAt ? { endedAt: task.endedAt } : {}),
       ...(task.liveness.lastSeen ? { lastSeen: task.liveness.lastSeen } : {}),
       ...(typeof task.pid === 'number' ? { pid: task.pid } : {}),
       sourceState: task.state,

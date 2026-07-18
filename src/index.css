@@ -968,7 +968,7 @@ button {
 
 .detail-tabs {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 4px;
   padding: 4px;
   border: 1px solid var(--border);
@@ -3691,6 +3691,10 @@ input:focus-visible {
   grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr);
 }
 
+.card-actions.has-host-action .host-primary-action {
+  grid-column: 1 / -1;
+}
+
 .card-actions .card-primary-action,
 .card-more-actions > summary {
   display: inline-flex;
@@ -3712,6 +3716,43 @@ input:focus-visible {
   height: 32px;
   border-color: color-mix(in srgb, var(--agent-accent) 44%, var(--border));
   background: color-mix(in srgb, var(--agent-accent) 14%, #151515);
+}
+
+.card-actions .host-primary-action {
+  display: inline-flex;
+  min-width: 0;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid rgba(34, 197, 94, 0.38);
+  border-radius: 6px;
+  background: rgba(20, 83, 45, 0.22);
+  color: #dcfce7;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.card-actions .host-primary-action > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-actions .host-primary-action:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.host-action-spinner {
+  animation: host-action-spin 900ms linear infinite;
+}
+
+@keyframes host-action-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .card-more-actions {
@@ -4704,9 +4745,211 @@ body:has(.workspace-shell) {
   color: #bbf7d0;
 }
 
+.workspace-shell .agent-host-status.is-stopped {
+  border-color: rgba(245, 158, 11, 0.34);
+  background: rgba(120, 53, 15, 0.18);
+  color: #fde68a;
+}
+
+.workspace-shell .agent-host-status.is-missing {
+  border-color: rgba(248, 113, 113, 0.34);
+  background: rgba(127, 29, 29, 0.18);
+  color: #fecaca;
+}
+
 .workspace-shell .agent-host-status span,
 .workspace-shell .agent-host-status strong {
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-shell .host-action-feedback {
+  margin-top: 5px;
+  padding: 5px 6px;
+  border: 1px solid var(--cockpit-border);
+  border-radius: 5px;
+  background: rgba(24, 27, 34, 0.92);
+  color: var(--cockpit-text-muted);
+  font-size: 9px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.workspace-shell .host-action-feedback.is-completed,
+.workspace-shell .host-action-feedback.is-started {
+  border-color: rgba(34, 197, 94, 0.32);
+  color: #bbf7d0;
+}
+
+.workspace-shell .host-action-feedback.is-failed,
+.workspace-shell .host-action-feedback.is-blocked {
+  border-color: rgba(248, 113, 113, 0.32);
+  color: #fecaca;
+}
+
+.workspace-shell .session-area {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.workspace-shell .session-heading > div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.workspace-shell .session-heading small {
+  color: var(--cockpit-text-muted);
+  font-size: 9px;
+}
+
+.workspace-shell .session-host-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  min-height: 30px;
+  padding: 0 8px;
+  border: 1px solid color-mix(in srgb, var(--agent-accent) 44%, var(--cockpit-border));
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--agent-accent) 14%, rgba(17, 19, 24, 0.94));
+  color: var(--cockpit-text);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.workspace-shell .session-host-action span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-shell .session-empty {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  min-height: 112px;
+  padding: 18px 12px;
+  border: 1px dashed rgba(148, 163, 184, 0.3);
+  border-radius: 6px;
+  color: var(--cockpit-text-muted);
+  text-align: center;
+}
+
+.workspace-shell .session-empty strong {
+  color: var(--cockpit-text);
+  font-size: 12px;
+}
+
+.workspace-shell .session-empty span {
+  max-width: 240px;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.workspace-shell .session-list {
+  display: grid;
+  gap: 5px;
+  max-height: 190px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.workspace-shell .session-row {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 2px 7px;
+  min-width: 0;
+  padding: 7px;
+  border: 1px solid var(--cockpit-border);
+  border-radius: 5px;
+  background: rgba(17, 19, 24, 0.72);
+  color: var(--cockpit-text);
+  text-align: left;
+}
+
+.workspace-shell .session-row:hover,
+.workspace-shell .session-row.is-selected {
+  border-color: color-mix(in srgb, var(--agent-accent) 58%, var(--cockpit-border));
+  background: color-mix(in srgb, var(--agent-accent) 9%, rgba(17, 19, 24, 0.9));
+}
+
+.workspace-shell .session-row strong,
+.workspace-shell .session-row small {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-shell .session-row strong {
+  font-size: 11px;
+}
+
+.workspace-shell .session-row small {
+  color: var(--cockpit-text-muted);
+  font-size: 9px;
+}
+
+.workspace-shell .session-state {
+  grid-row: 1 / span 2;
+  align-self: center;
+  padding: 3px 4px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 4px;
+  color: #cbd5e1;
+  font-size: 8px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.workspace-shell .session-state.is-working {
+  border-color: rgba(34, 197, 94, 0.42);
+  color: #bbf7d0;
+}
+
+.workspace-shell .session-state.is-idle {
+  border-color: rgba(245, 158, 11, 0.42);
+  color: #fde68a;
+}
+
+.workspace-shell .session-state.is-completed {
+  border-color: rgba(96, 165, 250, 0.42);
+  color: #bfdbfe;
+}
+
+.workspace-shell .session-state.is-failed {
+  border-color: rgba(248, 113, 113, 0.42);
+  color: #fecaca;
+}
+
+.workspace-shell .session-detail {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  margin: 0;
+  padding-top: 2px;
+}
+
+.workspace-shell .session-detail > div {
+  display: grid;
+  grid-template-columns: 66px minmax(0, 1fr);
+  gap: 8px;
+  min-width: 0;
+  font-size: 9px;
+}
+
+.workspace-shell .session-detail dt {
+  color: var(--cockpit-text-muted);
+}
+
+.workspace-shell .session-detail dd {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--cockpit-text);
   text-overflow: ellipsis;
   white-space: nowrap;
 }

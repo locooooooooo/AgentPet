@@ -288,13 +288,43 @@ export interface AgentHostProcessFact {
   observedAt: string;
 }
 
+export type AgentHostLifecycleState = 'not-installed' | 'stopped' | 'idle' | 'working';
+export type AgentHostPrimaryAction = 'install' | 'launch' | 'focus';
+
+export interface AgentHostLifecycleFact {
+  agentId: string;
+  connectorId: string;
+  displayName: string;
+  installed: boolean;
+  serviceInstalled?: boolean;
+  running: boolean;
+  processCount: number;
+  state: AgentHostLifecycleState;
+  primaryAction?: AgentHostPrimaryAction;
+  observedAt: string;
+  detail: string;
+}
+
 export interface AgentHostDiscoverySnapshot {
   version: 1;
   availability: AgentHostDiscoveryAvailability;
   source: AgentHostDiscoverySource;
   observedAt: string;
   facts: AgentHostProcessFact[];
+  lifecycle: AgentHostLifecycleFact[];
   detail: string;
+}
+
+export interface AgentHostActionRequest {
+  agentId: string;
+  action: AgentHostPrimaryAction;
+}
+
+export interface AgentHostActionResult {
+  status: 'started' | 'completed' | 'blocked' | 'failed';
+  agentId: string;
+  action: AgentHostPrimaryAction;
+  message: string;
 }
 
 export interface AgentInstance {
@@ -520,6 +550,8 @@ export type NiuMaStatus =
 
 export interface NiuMaRuntimeState {
   status: NiuMaStatus;
+  /** Transient host-truth override used by the renderer; never persisted as user intent. */
+  observedStatus?: NiuMaStatus;
   energy: number;
   stress: number;
   temperature: number;
@@ -683,6 +715,7 @@ export interface DesktopApi {
   getConnectorRuntimeSnapshot: () => Promise<ConnectorRuntimeSnapshot>;
   getConnectorSessionAudit: (sessionId: string) => Promise<ConnectorSessionAudit | null>;
   onConnectorRuntimeSnapshotChanged: (callback: (snapshot: ConnectorRuntimeSnapshot) => void) => () => void;
+  manageAgentHost: (input: AgentHostActionRequest) => Promise<AgentHostActionResult>;
   getCodexHostSnapshot: () => Promise<CodexHostSnapshot>;
   onCodexHostSnapshotChanged: (callback: (snapshot: CodexHostSnapshot) => void) => () => void;
   ranch: {

@@ -179,6 +179,9 @@ const AGENT_PERSONALITY: Record<string, NiuMaStatus> = {
 //  3. 用户手动切了态(runtime.customState)→ 沿用
 //  4. 默认按 agent.id 给"性格态"
 export function getNiuMaEffectiveStatus(agent: AIAgent, runtime: NiuMaRuntimeState): NiuMaStatus {
+  if (runtime.observedStatus) {
+    return runtime.observedStatus;
+  }
   const runningTask = agent.tasks.find((task) => task.status === 'running');
   if (runningTask) {
     if (runtime.isFueledByPie) {

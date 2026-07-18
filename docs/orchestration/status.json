@@ -2,13 +2,13 @@
   "identity": "[PM]#multi-agent-control@v0.1",
   "loopState": "active",
   "dispatchState": "active",
-  "target": "Preserve delivered read-only local Agent application presence at 04524e8 and resume separately fenced Theme/SoundPack plus full UI truth work while all external execution gates remain closed.",
+  "target": "Next Hub milestone: close or explicitly defer M0 decisions, then deliver verified lifecycle support for 3 Agents and a real, cancellable, auditable dependency workflow across 2 accepted Headless Agents.",
   "source": "docs/orchestration/index.md",
   "todayPlan": {
     "date": "2026-07-18",
-    "session": "docs/orchestration/sessions/hub-r0-contract-freeze-2026-07-18.md",
-    "selectedRoute": "Preserve delivered host presence at 04524e8, then resume separately fenced Theme/SoundPack and full UI truth work",
-    "progress": "docs/orchestration/sessions/hub-r0-contract-freeze-2026-07-18.md"
+    "session": "docs/orchestration/sessions/hub-next-stage-plan-2026-07-18.md",
+    "selectedRoute": "M0 acceptance decisions, M1 Agent Library lifecycle, then M2 two-Agent real workflow",
+    "progress": "docs/orchestration/sessions/hub-next-stage-plan-2026-07-18.md"
   },
   "p0Cards": [
     {
@@ -34,9 +34,33 @@
       "status": "ready-p0-c-authorization",
       "task": "docs/orchestration/tasks/realtime-agent-cockpit-v0.1.md",
       "progress": "docs/orchestration/sessions/daily-plan-2026-07-17.md"
+    },
+    {
+      "id": "hub-agent-lifecycle-p0",
+      "status": "action_smoke_and_screenshot_verified",
+      "task": "docs/orchestration/tasks/hub-agent-lifecycle-p0-v0.1.md",
+      "progress": "docs/orchestration/sessions/hub-agent-lifecycle-p0-2026-07-18.md"
+    },
+    {
+      "id": "hub-agent-session-view-p0-5",
+      "status": "implemented_click_verified",
+      "task": "docs/orchestration/tasks/hub-agent-session-view-p0-5-v0.1.md",
+      "progress": "docs/orchestration/sessions/hub-agent-session-view-p0-5-2026-07-18.md"
+    },
+    {
+      "id": "hub-r0-content-contracts",
+      "status": "implemented_automated_verified_pending_independent_review",
+      "task": "docs/orchestration/tasks/hub-r0-contract-freeze-v0.1.md",
+      "progress": "docs/orchestration/sessions/hub-blocker-remediation-2026-07-18.md"
+    },
+    {
+      "id": "hub-next-stage-requirements",
+      "status": "ready_for_execution_decision",
+      "task": "docs/orchestration/tasks/hub-next-stage-requirements-v0.1.md",
+      "progress": "docs/orchestration/sessions/hub-next-stage-plan-2026-07-18.md"
     }
   ],
-  "blocker": "Host presence is delivered and remote at 04524e8. Full Hub R0 still lacks Theme/SoundPack contracts and separate acceptance of remaining synthetic avatar/status semantics. P0-C still lacks fresh explicit external execution authorization；外部 connector 仍 disabled；Codex 仅 draft/pending/discovery-only；Trae 为 draft/pending/enabled=false 且仍受 Models 配置与 fresh smoke authorization 阻塞；Qoder 为 disabled/rejected/enabled=false 且缺 headless API；transparent pointer input 仍受 Windows screenshot/input binding `SetIsBorderRequired failed (0x80004002)` 阻塞。",
+  "blocker": "Lifecycle action smoke and a real packaged Electron screenshot are complete through the CDP route; OpenClaw risk/auth setup remains user-controlled. HubTheme/HubSoundPack contracts pass automated checks but await independent exact-file review, while full DockView and broader UI truth remain separate work. P0-C still lacks a confirmed cwd/task/timeout/read-set/write-ban/stop-condition authorization envelope；Codex/Trae/Qoder Connector machine gates remain unchanged and disabled。",
   "roles": [
     {
       "id": "pm",
@@ -484,7 +508,7 @@
       "title": "[PM]#weekly-requirements@2026-07-21",
       "owner": "主控",
       "status": "active",
-      "responsibility": "Own post-presence Hub R0 work after delivered 04524e8; keep Theme/SoundPack, full UI truth and every external execution gate separately closed.",
+      "responsibility": "Own post-presence Hub R0 work after delivered 04524e8; Theme/SoundPack candidates are automated-verified pending independent review, while full UI truth and every external execution gate remain separately controlled.",
       "tag": "⟦tag:v2|session|weekly-requirements-2026-07-21⟧",
       "evidence": "docs/orchestration/sessions/weekly-requirements-2026-07-21.md"
     },
@@ -702,7 +726,7 @@
       "title": "Next-stage weekly requirements planning",
       "role": "[PM]#weekly-requirements@2026-07-21",
       "state": "active",
-      "nextAction": "Preserve 4508ce3, 2a2f7f5 and 04524e8; resume separately fenced Theme/SoundPack and full UI truth work."
+      "nextAction": "Lifecycle action smoke and packaged Electron screenshot are verified; wait for user-controlled OpenClaw risk/auth completion and keep Connector acceptance separate."
     },
     {
       "id": "ranch-real-integration-r0-3-dryrun",

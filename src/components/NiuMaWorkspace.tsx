@@ -6,12 +6,17 @@ import {
   ChevronUp,
   Coffee,
   Copy,
+  Download,
   Eraser,
+  ExternalLink,
   Flame,
   Home,
   Info,
+  LoaderCircle,
+  MessagesSquare,
   PanelLeftOpen,
   Play,
+  Power,
   RefreshCcw,
   RotateCcw,
   Search,
@@ -27,6 +32,8 @@ import {
 } from 'lucide-react';
 import type {
   AIAgent,
+  AgentHostLifecycleFact,
+  AgentHostPrimaryAction,
   AgentSnapshot,
   AgentTask,
   AgentTaskRunner,
@@ -46,6 +53,10 @@ import {
   type ProjectedAgentTruth,
   type ProjectedRuntimeTask
 } from '../lib/agentInstanceProjection';
+import {
+  projectAgentSessions,
+  type AgentSession
+} from '../lib/agentSessionProjection';
 import { CONNECTOR_POLICY, ORCHESTRATION_STATUS } from '../lib/orchestrationStatus';
 import { getCodexHostOnlineContribution, getCombinedOnlineSessionCount } from '../lib/codexHostStatus';
 import NiuMaAvatar from './NiuMaAvatar';
@@ -61,14 +72,20 @@ interface NiuMaWorkspaceProps {
 }
 
 type SummaryTone = 'neutral' | 'positive' | 'info' | 'warning' | 'danger';
-type DetailTabId = 'command' | 'queue' | 'logs';
+type DetailTabId = 'sessions' | 'command' | 'queue' | 'logs';
 type GovernanceStateFilter = 'all' | 'active' | 'blocked' | 'standby' | 'summarized';
 type DockStatusId = 'snapshot' | 'sessions' | 'local-hosts' | 'codex-host' | 'governance';
 type CockpitRegionId = 'cockpit-health-region' | 'cockpit-agent-region' | 'cockpit-operator-region' | 'cockpit-governance-region';
+type HostActionFeedback = {
+  pending: boolean;
+  status?: 'started' | 'completed' | 'blocked' | 'failed';
+  message?: string;
+};
 
 const ACTIVE_COCKPIT_TASK_CARD_ID = 'c0-5';
 
 const detailTabs: Array<{ id: DetailTabId; label: string }> = [
+  { id: 'sessions', label: 'Sessions' },
   { id: 'command', label: '下发任务' },
   { id: 'queue', label: '任务队列' },
   { id: 'logs', label: '流式日志' }
@@ -132,6 +149,7 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, codexHost, o
   const [governancePanelOpen, setGovernancePanelOpen] = useState(false);
   const [activeDockStatus, setActiveDockStatus] = useState<DockStatusId | null>(null);
   const [completionToast, setCompletionToast] = useState<string | null>(null);
+  const [hostActionFeedback, setHostActionFeedback] = useState<Record<string, HostActionFeedback>>({});
   const completionHydratedRef = useRef(false);
   const lastCompletionKeyRef = useRef<string | null>(null);
   const completionToastTimerRef = useRef<number | null>(null);
@@ -147,7 +165,24 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, codexHost, o
         && task.connectorId === selectedAgentTruth.connectorId
       )) ?? null
     : null;
-  const runtime = selectedAgent ? snapshot.runtime[selectedAgent.id] : undefined;
+  const selectedAgentSessions = selectedAgent
+    ? projectAgentSessions({
+        agentId: selectedAgent.id,
+        connectorId: selectedAgentTruth?.connectorId ?? selectedAgent.id,
+        runtimeTasks: agentTruth.tasks,
+        codexHost
+      })
+    : [];
+  const hostLifecycleByAgent = new Map(
+    agentTruth.hostDiscovery.lifecycle.map((item) => [item.agentId, item])
+  );
+  const runtime = selectedAgent
+    ? getHostAwareRuntime(
+        snapshot.runtime[selectedAgent.id],
+        hostLifecycleByAgent.get(selectedAgent.id) ?? null,
+        selectedAgent.id === 'codex' ? codexHost : null
+      )
+    : undefined;
   const selectedTask = selectedAgent?.tasks.find((task) => task.status === 'running') ?? selectedAgent?.tasks[0];
   const selectedMeta = runtime ? STATE_METAS[runtime.status] : null;
 
@@ -337,6 +372,34 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, codexHost, o
     const nextSnapshot = await api.cycleNiuMaState(agent.id);
     onSnapshot(nextSnapshot);
     setSelectedAgentId(agent.id);
+  }
+
+  async function manageHost(agent: AIAgent, action: AgentHostPrimaryAction) {
+    setSelectedAgentId(agent.id);
+    setHostActionFeedback((current) => ({
+      ...current,
+      [agent.id]: { pending: true }
+    }));
+    try {
+      const result = await api.manageAgentHost({ agentId: agent.id, action });
+      setHostActionFeedback((current) => ({
+        ...current,
+        [agent.id]: {
+          pending: false,
+          status: result.status,
+          message: result.message
+        }
+      }));
+    } catch {
+      setHostActionFeedback((current) => ({
+        ...current,
+        [agent.id]: {
+          pending: false,
+          status: 'failed',
+          message: '本机 Agent 动作执行失败，请稍后重试。'
+        }
+      }));
+    }
   }
 
   async function resetSeed() {
@@ -862,20 +925,31 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, codexHost, o
             </div>
 
             <section className="agent-board" aria-label="多 Agent 工位">
-              {snapshot.agents.map((agent) => (
-                <AgentCard
+              {snapshot.agents.map((agent) => {
+                const agentRuntime = snapshot.runtime[agent.id];
+                if (!agentRuntime) {
+                  return null;
+                }
+                return <AgentCard
                   key={agent.id}
                   agent={agent}
-                  runtime={snapshot.runtime[agent.id]}
+                  runtime={getHostAwareRuntime(
+                    agentRuntime,
+                    hostLifecycleByAgent.get(agent.id) ?? null,
+                    agent.id === 'codex' ? codexHost : null
+                  )}
                   truth={selectAgentTruthByIdentity(agentTruth, agent.id, agent.id)}
+                  lifecycle={hostLifecycleByAgent.get(agent.id) ?? null}
                   hostStatus={agent.id === 'codex' ? codexHost : null}
+                  hostActionFeedback={hostActionFeedback[agent.id]}
                   selected={agent.id === selectedAgent?.id}
                   onSelect={() => setSelectedAgentId(agent.id)}
                   onRun={() => runTask(agent, undefined, undefined, 'simulated')}
                   onAction={(action) => applyAction(agent, action)}
                   onCycle={(event) => cycleState(agent, event)}
-                />
-              ))}
+                  onHostAction={(action) => void manageHost(agent, action)}
+                />;
+              })}
             </section>
           </section>
         </section>
@@ -909,12 +983,16 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, codexHost, o
                 runtime={runtime}
                 truth={selectedAgentTruth}
                 runtimeTask={selectedRuntimeTask}
+                sessions={selectedAgentSessions}
                 runtimeTruth={agentTruth.runtime}
                 codexHost={selectedAgent.id === 'codex' ? codexHost : null}
+                lifecycle={hostLifecycleByAgent.get(selectedAgent.id) ?? null}
+                hostActionFeedback={hostActionFeedback[selectedAgent.id]}
                 localRunnerAvailable={isDesktopRuntime}
                 onSnapshot={onSnapshot}
                 onRunTask={runTask}
                 onCycle={(event) => cycleState(selectedAgent, event)}
+                onHostAction={(action) => void manageHost(selectedAgent, action)}
               />
             </div>
           </aside>
@@ -977,11 +1055,6 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, codexHost, o
               <small>{selectedTask?.command ?? '等待派活'}</small>
             </div>
 
-            <div className="corner-assist-metrics">
-              <span>{runtime.stress}% stress</span>
-              <span>{runtime.energy}% energy</span>
-              <span>{Math.round(runtime.temperature)}°C</span>
-            </div>
           </div>
         </section>
       ) : null}
@@ -1111,15 +1184,31 @@ interface AgentCardProps {
   agent: AIAgent;
   runtime: NiuMaRuntimeState;
   truth: ProjectedAgentTruth | null;
+  lifecycle: AgentHostLifecycleFact | null;
   hostStatus: CodexHostSnapshot | null;
+  hostActionFeedback?: HostActionFeedback;
   selected: boolean;
   onSelect: () => void;
   onRun: () => void;
   onAction: (action: NiuMaAction) => void;
   onCycle: (event: ReactMouseEvent) => void;
+  onHostAction: (action: AgentHostPrimaryAction) => void;
 }
 
-function AgentCard({ agent, runtime, truth, hostStatus, selected, onSelect, onRun, onAction, onCycle }: AgentCardProps) {
+function AgentCard({
+  agent,
+  runtime,
+  truth,
+  lifecycle,
+  hostStatus,
+  hostActionFeedback,
+  selected,
+  onSelect,
+  onRun,
+  onAction,
+  onCycle,
+  onHostAction
+}: AgentCardProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuStyle, setMenuStyle] = useState<CSSProperties | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -1127,6 +1216,7 @@ function AgentCard({ agent, runtime, truth, hostStatus, selected, onSelect, onRu
   const meta = STATE_METAS[runtime.status];
   const running = agent.tasks.filter((task) => task.status === 'running').length;
   const hostProcessDiscovered = truth?.instances.some((instance) => instance.source === 'host-process') ?? false;
+  const hostPresentation = getHostPresentation(lifecycle, hostStatus);
 
   useEffect(() => {
     if (!selected) {
@@ -1190,13 +1280,16 @@ function AgentCard({ agent, runtime, truth, hostStatus, selected, onSelect, onRu
         </div>
 
         <div className="expression-line">本地牧场表现 · {meta.expression}</div>
-        {hostStatus?.clientRunning ? (
-          <div className={`agent-host-status ${hostStatus.activeSessionCount > 0 ? 'is-running' : 'is-idle'}`}>
-            <span>Codex Desktop 已开启</span>
-            <strong>{hostStatus.activeSessionCount} 活动对话</strong>
+        {hostPresentation ? (
+          <div
+            className={`agent-host-status is-${hostPresentation.tone}`}
+            data-host-lifecycle={hostPresentation.state}
+          >
+            <span>{hostPresentation.label}</span>
+            <strong>{hostPresentation.detail}</strong>
           </div>
         ) : null}
-        {hostProcessDiscovered ? (
+        {hostProcessDiscovered && !hostPresentation ? (
           <div className="agent-host-status is-idle" data-host-presence="discovered">
             <span>本机应用已运行</span>
             <strong>未观察到活动 Session</strong>
@@ -1204,12 +1297,20 @@ function AgentCard({ agent, runtime, truth, hostStatus, selected, onSelect, onRu
         ) : null}
       </button>
 
-      <div className="metric-stack">
-        <Meter label="牛马剩余电量" value={runtime.energy} tone={runtime.energy < 30 ? 'danger' : 'ok'} />
-        <Meter label="脑门发热度" value={Math.round(runtime.temperature)} suffix="°C" tone={runtime.temperature > 80 ? 'danger' : 'info'} max={120} />
-      </div>
-
-      <div className={`card-actions ${selected ? 'is-selected' : 'is-compact'}`}>
+      <div className={`card-actions ${selected ? 'is-selected' : 'is-compact'} ${lifecycle?.primaryAction ? 'has-host-action' : ''}`}>
+        {lifecycle?.primaryAction ? (
+          <button
+            type="button"
+            className="host-primary-action"
+            title={getHostActionLabel(lifecycle)}
+            aria-label={`${agent.name}：${getHostActionLabel(lifecycle)}`}
+            disabled={hostActionFeedback?.pending}
+            onClick={() => onHostAction(lifecycle.primaryAction!)}
+          >
+            <HostActionIcon action={lifecycle.primaryAction} pending={hostActionFeedback?.pending ?? false} />
+            <span>{getHostActionLabel(lifecycle)}</span>
+          </button>
+        ) : null}
         <button
           type="button"
           className="card-primary-action"
@@ -1238,6 +1339,11 @@ function AgentCard({ agent, runtime, truth, hostStatus, selected, onSelect, onRu
           </details>
         ) : null}
       </div>
+      {hostActionFeedback?.message ? (
+        <div className={`host-action-feedback is-${hostActionFeedback.status ?? 'completed'}`} role="status">
+          {hostActionFeedback.message}
+        </div>
+      ) : null}
       {selected && menuOpen && menuStyle ? createPortal(
         <div
           ref={menuRef}
@@ -1280,12 +1386,16 @@ interface AgentDetailPanelProps {
   runtime: NiuMaRuntimeState;
   truth: ProjectedAgentTruth | null;
   runtimeTask: ProjectedRuntimeTask | null;
+  sessions: readonly AgentSession[];
   runtimeTruth: AgentTruthProjection['runtime'];
   codexHost: CodexHostSnapshot | null;
+  lifecycle: AgentHostLifecycleFact | null;
+  hostActionFeedback?: HostActionFeedback;
   localRunnerAvailable: boolean;
   onSnapshot: (snapshot: AgentSnapshot) => void;
   onRunTask: (agent: AIAgent, taskName?: string, command?: string, runner?: AgentTaskRunner) => Promise<void>;
   onCycle: (event: ReactMouseEvent) => void;
+  onHostAction: (action: AgentHostPrimaryAction) => void;
 }
 
 function AgentDetailPanel({
@@ -1294,23 +1404,31 @@ function AgentDetailPanel({
   runtime,
   truth,
   runtimeTask,
+  sessions,
   runtimeTruth,
   codexHost,
+  lifecycle,
+  hostActionFeedback,
   localRunnerAvailable,
   onSnapshot,
   onRunTask,
-  onCycle
+  onCycle,
+  onHostAction
 }: AgentDetailPanelProps) {
   const [taskName, setTaskName] = useState('');
   const [command, setCommand] = useState('');
   const [runner, setRunner] = useState<AgentTaskRunner>(localRunnerAvailable ? 'local' : 'simulated');
   const [openTaskId, setOpenTaskId] = useState<string | null>(agent.tasks[0]?.id ?? null);
-  const [activeDetailTab, setActiveDetailTab] = useState<DetailTabId>('command');
+  const [activeDetailTab, setActiveDetailTab] = useState<DetailTabId>('sessions');
+  const [openSessionKey, setOpenSessionKey] = useState<string | null>(
+    sessions[0] ? getAgentSessionKey(sessions[0]) : null
+  );
   const meta = STATE_METAS[runtime.status];
   const quickTasks = useMemo(() => getQuickTasks(agent.id), [agent.id]);
   const openTask = agent.tasks.find((task) => task.id === openTaskId) ?? agent.tasks[0];
   const effectiveRunner: AgentTaskRunner = localRunnerAvailable ? runner : 'simulated';
   const primaryInstance = truth?.primaryInstance ?? null;
+  const openSession = sessions.find((session) => getAgentSessionKey(session) === openSessionKey) ?? sessions[0];
 
   async function submitTask(event: React.FormEvent) {
     event.preventDefault();
@@ -1349,6 +1467,7 @@ function AgentDetailPanel({
       data-runtime-primary-activity={primaryInstance?.activity ?? ''}
       data-codex-host-source={codexHost?.source ?? ''}
       data-codex-host-active-sessions={codexHost?.activeSessionCount ?? 0}
+      data-agent-session-count={sessions.length}
     >
       <div className="detail-identity detail-identity-compact">
         <NiuMaAvatar
@@ -1465,10 +1584,6 @@ function AgentDetailPanel({
               <span className="metric-value mono" title={agent.endpoint}>{agent.endpoint}</span>
             </div>
             <div className="metric-item-row">
-              <span className="metric-label">本地牧场表现:</span>
-              <span className="metric-value">{runtime.stress}% 压力 / {runtime.energy}% 电量 ({Math.round(runtime.temperature)}°C)</span>
-            </div>
-            <div className="metric-item-row">
               <span className="metric-label">应用快照交互:</span>
               <span className="metric-value">{formatDateTime(runtime.lastInteractionAt)}</span>
             </div>
@@ -1498,6 +1613,100 @@ function AgentDetailPanel({
       </div>
 
       <div className="detail-tab-content">
+        {activeDetailTab === 'sessions' ? (
+          <section
+            key="sessions"
+            id="detail-tab-panel-sessions"
+            className="detail-tab-panel session-area"
+            role="tabpanel"
+            aria-labelledby="detail-tab-sessions"
+          >
+            <div className="section-heading session-heading">
+              <div>
+                <h3>{agent.name} Sessions</h3>
+                <small>{sessions.length} 个真实观测项</small>
+              </div>
+              {lifecycle?.primaryAction ? (
+                <button
+                  type="button"
+                  className="session-host-action"
+                  disabled={hostActionFeedback?.pending}
+                  title={getHostActionLabel(lifecycle)}
+                  onClick={() => onHostAction(lifecycle.primaryAction!)}
+                >
+                  <HostActionIcon action={lifecycle.primaryAction} pending={hostActionFeedback?.pending ?? false} />
+                  <span>{getHostActionLabel(lifecycle)}</span>
+                </button>
+              ) : null}
+            </div>
+
+            {sessions.length === 0 ? (
+              <div className="session-empty" data-session-empty="true">
+                <MessagesSquare size={20} aria-hidden="true" />
+                <strong>未观察到 Session</strong>
+                <span>当前只有应用或工位状态，没有结构化 Session 证据。</span>
+              </div>
+            ) : (
+              <div className="session-list" aria-label={`${agent.name} Session 列表`}>
+                {sessions.map((session) => (
+                  <button
+                    key={`${session.source}:${session.sessionId}`}
+                    type="button"
+                    className={`session-row ${getAgentSessionKey(session) === (openSession ? getAgentSessionKey(openSession) : null) ? 'is-selected' : ''}`}
+                    data-session-source={session.source}
+                    data-session-status={session.status}
+                    aria-pressed={getAgentSessionKey(session) === (openSession ? getAgentSessionKey(openSession) : null)}
+                    onClick={() => setOpenSessionKey(getAgentSessionKey(session))}
+                  >
+                    <span className={`session-state is-${session.status}`}>{getSessionStatusLabel(session.status)}</span>
+                    <strong title={session.title}>{session.title}</strong>
+                    <small>{getSessionSourceLabel(session.source)} · {formatDateTime(session.updatedAt)}</small>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {openSession ? (
+              <dl className="session-detail" aria-label="Session 详情">
+                <div>
+                  <dt>Session ID</dt>
+                  <dd className="mono" title={openSession.sessionId}>{openSession.sessionId}</dd>
+                </div>
+                <div>
+                  <dt>来源</dt>
+                  <dd>{getSessionSourceLabel(openSession.source)}</dd>
+                </div>
+                <div>
+                  <dt>状态</dt>
+                  <dd>{getSessionStatusLabel(openSession.status)}</dd>
+                </div>
+                <div>
+                  <dt>更新时间</dt>
+                  <dd>{formatDateTime(openSession.updatedAt)}</dd>
+                </div>
+                {openSession.taskId ? (
+                  <div>
+                    <dt>Task ID</dt>
+                    <dd className="mono" title={openSession.taskId}>{openSession.taskId}</dd>
+                  </div>
+                ) : null}
+                {openSession.workspace ? (
+                  <div>
+                    <dt>工作区</dt>
+                    <dd className="mono" title={openSession.workspace}>{openSession.workspace}</dd>
+                  </div>
+                ) : null}
+              </dl>
+            ) : null}
+
+            {hostActionFeedback?.message ? (
+              <div className={`host-action-feedback is-${hostActionFeedback.status ?? 'completed'}`} role="status">
+                {hostActionFeedback.message}
+              </div>
+            ) : null}
+          </section>
+        ) : null}
+
         {activeDetailTab === 'command' ? (
           <section
             key="command"
@@ -1688,28 +1897,6 @@ function TaskRow({ task, selected, onOpen, onStop }: TaskRowProps) {
   );
 }
 
-interface MeterProps {
-  label: string;
-  value: number;
-  suffix?: string;
-  max?: number;
-  tone: 'ok' | 'danger' | 'info';
-}
-
-function Meter({ label, value, suffix = '%', max = 100, tone }: MeterProps) {
-  return (
-    <div className="meter">
-      <div>
-        <span>{label}</span>
-        <strong className={tone}>{value}{suffix}</strong>
-      </div>
-      <i>
-        <b className={tone} style={{ width: `${Math.min(100, (value / max) * 100)}%` }} />
-      </i>
-    </div>
-  );
-}
-
 function Metric({
   label,
   value,
@@ -1728,6 +1915,160 @@ function Metric({
       {detail ? <small className={mono ? 'mono' : ''}>{detail}</small> : null}
     </div>
   );
+}
+
+function getHostAwareRuntime(
+  runtime: NiuMaRuntimeState,
+  lifecycle: AgentHostLifecycleFact | null,
+  codexHost: CodexHostSnapshot | null
+): NiuMaRuntimeState;
+function getHostAwareRuntime(
+  runtime: NiuMaRuntimeState | undefined,
+  lifecycle: AgentHostLifecycleFact | null,
+  codexHost: CodexHostSnapshot | null
+): NiuMaRuntimeState | undefined;
+function getHostAwareRuntime(
+  runtime: NiuMaRuntimeState | undefined,
+  lifecycle: AgentHostLifecycleFact | null,
+  codexHost: CodexHostSnapshot | null
+): NiuMaRuntimeState | undefined {
+  if (!runtime) {
+    return undefined;
+  }
+  if (codexHost) {
+    const working = codexHost.clientRunning && codexHost.activeSessionCount > 0;
+    return {
+      ...runtime,
+      status: working ? 'coding' as const : 'idle' as const,
+      observedStatus: working ? 'coding' as const : 'idle' as const,
+      quote: working
+        ? `Codex 正在同步 ${codexHost.activeSessionCount} 个活动对话。`
+        : (codexHost.clientRunning ? 'Codex Desktop 已开启，当前空闲。' : 'Codex Desktop 尚未启动。'),
+      customState: null
+    };
+  }
+  if (!lifecycle) {
+    return runtime;
+  }
+  return {
+    ...runtime,
+    status: lifecycle.state === 'working' ? 'coding' as const : 'idle' as const,
+    observedStatus: lifecycle.state === 'working' ? 'coding' as const : 'idle' as const,
+    quote: lifecycle.state === 'working'
+      ? `${lifecycle.displayName} 正在执行 Hub 任务。`
+      : lifecycle.state === 'idle'
+        ? `${lifecycle.displayName} 已打开，当前空闲。`
+        : lifecycle.state === 'stopped'
+          ? `${lifecycle.displayName} 已安装，等待启动。`
+          : `${lifecycle.displayName} 尚未安装。`,
+    customState: null
+  };
+}
+
+function getHostPresentation(
+  lifecycle: AgentHostLifecycleFact | null,
+  codexHost: CodexHostSnapshot | null
+) {
+  if (codexHost) {
+    if (codexHost.clientRunning && codexHost.activeSessionCount > 0) {
+      return {
+        state: 'working',
+        tone: 'running',
+        label: 'Codex Desktop 同步中',
+        detail: `${codexHost.activeSessionCount} 活动对话`
+      } as const;
+    }
+    if (codexHost.clientRunning) {
+      return {
+        state: 'idle',
+        tone: 'idle',
+        label: 'Codex Desktop 已开启',
+        detail: 'idle · 暂无活动对话'
+      } as const;
+    }
+    return {
+      state: 'stopped',
+      tone: 'stopped',
+      label: 'Codex Desktop 未开启',
+      detail: '等待启动'
+    } as const;
+  }
+  if (!lifecycle) {
+    return null;
+  }
+  if (lifecycle.state === 'not-installed') {
+    return {
+      state: lifecycle.state,
+      tone: 'missing',
+      label: '本机未安装',
+      detail: lifecycle.agentId === 'openclaw' ? '可一键安装' : '暂无自动安装源'
+    } as const;
+  }
+  if (lifecycle.state === 'stopped') {
+    const serviceMissing = lifecycle.agentId === 'openclaw' && !lifecycle.serviceInstalled;
+    return {
+      state: lifecycle.state,
+      tone: 'stopped',
+      label: serviceMissing ? 'OpenClaw CLI 已安装' : '本机应用已安装',
+      detail: serviceMissing ? 'Gateway 服务未配置' : '当前未启动'
+    } as const;
+  }
+  if (lifecycle.state === 'working') {
+    return {
+      state: lifecycle.state,
+      tone: 'running',
+      label: '本机应用执行中',
+      detail: 'working · Hub 任务活跃'
+    } as const;
+  }
+  return {
+    state: lifecycle.state,
+    tone: 'idle',
+    label: '本机应用已打开',
+    detail: 'idle · 暂无任务'
+  } as const;
+}
+
+function getHostActionLabel(lifecycle: AgentHostLifecycleFact) {
+  if (lifecycle.primaryAction === 'install') {
+    return lifecycle.installed ? '安装服务' : '安装 OpenClaw';
+  }
+  if (lifecycle.primaryAction === 'launch') {
+    return lifecycle.agentId === 'openclaw' ? '启动服务' : `打开 ${lifecycle.displayName}`;
+  }
+  return `聚焦 ${lifecycle.displayName}`;
+}
+
+function HostActionIcon({ action, pending }: { action: AgentHostPrimaryAction; pending: boolean }) {
+  if (pending) {
+    return <LoaderCircle className="host-action-spinner" size={14} />;
+  }
+  if (action === 'install') {
+    return <Download size={14} />;
+  }
+  if (action === 'launch') {
+    return <Power size={14} />;
+  }
+  return <ExternalLink size={14} />;
+}
+
+function getSessionStatusLabel(status: AgentSession['status']) {
+  const labels: Record<AgentSession['status'], string> = {
+    idle: 'idle',
+    working: 'working',
+    completed: 'completed',
+    failed: 'failed',
+    unknown: 'unknown'
+  };
+  return labels[status];
+}
+
+function getSessionSourceLabel(source: AgentSession['source']) {
+  return source === 'codex-desktop' ? 'Codex Desktop' : 'Connector Runtime';
+}
+
+function getAgentSessionKey(session: AgentSession) {
+  return `${session.source}:${session.sessionId}`;
 }
 
 function getToneForState(state: string): SummaryTone {
