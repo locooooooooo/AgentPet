@@ -5,21 +5,29 @@
 
 loop state: active
 dispatch state: active
-status: accepted_for_contract_dispatch_after_remote_parity
+status: presence_slice_accepted_pending_delivery_full_contract_batch_incomplete
 date: 2026-07-18
 ddl: 2026-07-18
 
 ## single goal
 
-Freeze and independently accept Hub R0 positioning plus four versioned contracts before any installer, Adapter runtime, DockView, theme, sound asset or external Agent implementation starts.
+Accept the minimum identity and Adapter truth contracts needed for read-only host presence, deliver that presence slice without external execution, and keep the broader four-contract R0 batch closed until Theme and SoundPack contracts also pass.
 
 ## confirmed baseline
 
 - Scheduler configurable concurrency is accepted/pushed at `4508ce3`; S/R/C fixtures pass, same-Agent reservation remains `1`, and external Agent spawn remains `0`.
-- Dispatch baseline is `HEAD == origin/main == b4789cb` before this control update.
+- The docs-only control baseline is committed and pushed at `2a2f7f5`; local `HEAD`, `origin/main` and remote `main` matched before the presence slice.
 - The shared worktree contains user-owned candidate edits in `README.md`, `src/components/NiuMaWorkspace.tsx` and three Hub product documents. They remain unstaged and are not accepted by this card.
 - Three bounded read-only supervisors audited UI truth semantics, orchestration intake and contract gaps. All returned formal callbacks, changed no files and encountered no `403 DAILY_LIMIT_EXCEEDED`.
 - The current active control lanes remain `daily-supervision` and `weekly-requirements`; this task does not add a third active lane.
+
+## presence-only priority override
+
+- The administrator reported that locally running WorkBuddy, Kimi and MiniMax were absent from the panel. This makes truthful local application discovery the current product priority.
+- `docs/牛马Hub-AgentManifest与InstallPlan合同-v0.1.md` is independently accepted only for canonical Agent identity, exact executable binding and the rule that process presence cannot self-grant installed, Session or task state.
+- `docs/牛马Hub-AdapterCapability合同-v0.1.md` is independently accepted only for the host-presence / workstation-binding / Connector / Session / task separation. No Adapter capability is accepted as supported.
+- Theme and SoundPack contracts remain incomplete and still block the broader Hub R0 batch, but they do not improve or protect this read-only status fix and therefore do not block the presence-only slice.
+- The presence implementation is bounded to shared types, one Windows read-only probe, main-process snapshot composition, existing truth projection, existing control-cockpit rendering and deterministic fixtures. It does not read command lines, paths, window titles, prompts or logs and does not launch an external Agent.
 
 ## first-principles decisions
 
@@ -64,7 +72,7 @@ Contract-specific hard gates:
 - No DockView or multi-window implementation.
 - No theme or sound asset creation, download or playback-engine implementation.
 - No external application skinning, marketplace execution or plugin runtime.
-- No shared UI restructuring and no acceptance of the current README/UI candidate diff.
+- No shared UI restructuring and no acceptance of the current README or product-document candidate diffs. Only the host-presence hunks in the existing Workspace file are eligible for this slice; unrelated meter-removal hunks remain unstaged.
 
 ## acceptance gates
 
@@ -94,9 +102,18 @@ evidence:
 changed files:
 ```
 
+## presence slice acceptance
+
+- Host discovery, projection and renderer fixtures pass, including exact basename matching, Kimi multi-process aggregation, unavailable/unsupported fail-closed behavior and online/busy counts fixed at zero for host-only facts.
+- Full `orchestration:check`, report, preflight, Connector safety, realtime truth, lint, build and `git diff --check` pass in the shared worktree.
+- Live Windows evidence at 2026-07-18 16:26 +08:00 observed `Kimi.exe` count `9` plus one `kimi-webbridge` helper; WorkBuddy and MiniMax primary processes were absent.
+- An isolated Electron control-cockpit replay at `1204x795` displayed `1 个本机 Agent 应用已发现 · 未绑定发现项 Kimi（9 进程）`, while the online line remained `Connector 0 · Codex Desktop 2` and application-task count remained `0`.
+- Direct Computer Use screenshot binding still failed with `SetIsBorderRequired failed (0x80004002)`. The isolated Electron DevTools DOM and PNG capture supplied the visible fallback evidence; transparent ranch pointer acceptance remains a separate residual risk.
+
 ## current decision
 
 - The administrator explicitly ordered Hub work to continue and workers to start. This authorizes bounded in-app contract work, not external Agent execution.
-- Contract dispatch starts only after this docs-only control baseline is committed and pushed with remote parity.
-- Wave A may run in parallel because its three files do not overlap. Wave B starts only after the AgentManifest + InstallPlan contract passes independent review.
-- Four-contract cross-review, README/product-document reconciliation and UI truth acceptance remain mandatory before opening any implementation lane.
+- The control baseline already has remote parity at `2a2f7f5`. Manifest and Adapter contract candidates now exist and are accepted only for the presence slice described above.
+- Selectively stage the two accepted contracts, host-presence implementation/tests and this control update. Exclude README, DockView, positioning, sound input and unrelated Workspace hunks.
+- Commit, push and confirm remote parity before calling the presence slice delivered.
+- Theme/SoundPack cross-review, README/product-document reconciliation and full UI truth acceptance remain mandatory before the broader Hub R0 batch can close or any installer/Adapter execution lane can open.

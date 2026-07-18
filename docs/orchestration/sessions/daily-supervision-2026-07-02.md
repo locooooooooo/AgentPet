@@ -1166,3 +1166,12 @@ pm.cmd run build pass; git diff --check only on the 11 protected-source whitespa
   - This control transition changes only eight orchestration files. README, Workspace, existing Hub/DockView/sound documents, source, Electron and Connector machine gates remain unstaged and unaccepted.
   - A later managed-permission refresh restored Git metadata writes; the earlier `.git/index.lock` denial is no longer current availability truth.
   - Next action: rerun gates, selectively commit/push the control baseline, confirm remote parity and only then dispatch Wave A contract workers.
+
+- [2026-07-18 16:26 +08:00] Hub host-presence priority override and acceptance:
+  - The administrator's report that active WorkBuddy/Kimi/MiniMax applications were absent from the panel changed the immediate priority from the complete four-contract batch to the smallest truthful read-only presence slice.
+  - Control baseline `2a2f7f5` was already pushed with remote parity. Manifest/InstallPlan and Adapter Capability were independently reviewed and accepted only for canonical identity plus presence/Session separation; Theme/SoundPack still block the broader R0 batch.
+  - Host discovery uses exact Windows process basenames, publishes presence-only facts and reads no command line, path, title, prompt or log. It launches no external Agent and changes no Connector gate.
+  - Fixtures passed for unavailable/unsupported fail-closed behavior, Kimi multi-process aggregation, bound WorkBuddy/MiniMax, unbound Kimi and online/busy count zero for host-only facts.
+  - Live process evidence was 9 `Kimi.exe` plus one `kimi-webbridge`; WorkBuddy/MiniMax primary processes were absent. Isolated Electron replay at 1204x795 showed `未绑定发现项 Kimi（9 进程）`, `Connector 0 · Codex Desktop 2` and zero application tasks.
+  - Direct Computer Use capture again failed with `SetIsBorderRequired failed (0x80004002)`. The isolated Electron DevTools DOM/PNG supplied visible fallback evidence; transparent ranch pointer input remains unaccepted.
+  - Full orchestration/report/preflight/Connector-safety/realtime-truth/lint/build/diff gates passed. Next action is exact selective staging, staged-snapshot verification, commit, push and remote parity without absorbing README/product documents or unrelated Workspace meter-removal hunks.

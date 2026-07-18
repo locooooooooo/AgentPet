@@ -1,6 +1,7 @@
 import type {
   AgentInstance,
   AgentInstanceSource,
+  AgentHostDiscoverySnapshot,
   ConnectorCapabilitySource,
   ConnectorRuntimeAvailability,
   ConnectorRuntimeMode,
@@ -141,6 +142,7 @@ export interface AgentTruthProjection {
     observedAt: string;
     reason?: string;
   };
+  hostDiscovery: AgentHostDiscoverySnapshot;
   thresholds: AgentProjectionThresholds;
   projectedAt: string;
   agents: ProjectedAgentTruth[];
@@ -150,7 +152,7 @@ export interface AgentTruthProjection {
 }
 
 const REAL_RUNTIME_SOURCES = new Set<ConnectorRuntimeSource>(['electron-main', 'persisted-recovery']);
-const REAL_INSTANCE_SOURCES = new Set<AgentInstanceSource>(['connector-runtime', 'recovery-proof']);
+const REAL_INSTANCE_SOURCES = new Set<AgentInstanceSource>(['connector-runtime', 'recovery-proof', 'host-process']);
 const SESSION_INSTANCE_SOURCES = new Set<AgentInstanceSource>([
   'connector-runtime',
   'recovery-proof',
@@ -235,6 +237,7 @@ export function projectAgentInstances(input: AgentInstanceProjectionInput): Agen
 
   const projectionBase = {
     runtime: { ...input.runtimeSnapshot.runtime },
+    hostDiscovery: cloneHostDiscovery(input.runtimeSnapshot.hostDiscovery, now),
     thresholds,
     projectedAt: now.toISOString(),
     agents,
@@ -245,6 +248,26 @@ export function projectAgentInstances(input: AgentInstanceProjectionInput): Agen
   return {
     ...projectionBase,
     summary: selectAgentTruthSummary(projectionBase)
+  };
+}
+
+function cloneHostDiscovery(
+  snapshot: AgentHostDiscoverySnapshot | undefined,
+  now: Date
+): AgentHostDiscoverySnapshot {
+  if (!snapshot) {
+    return {
+      version: 1,
+      availability: 'unavailable',
+      source: 'unavailable',
+      observedAt: now.toISOString(),
+      facts: [],
+      detail: 'Host-process discovery is unavailable.'
+    };
+  }
+  return {
+    ...snapshot,
+    facts: snapshot.facts.map((fact) => ({ ...fact }))
   };
 }
 

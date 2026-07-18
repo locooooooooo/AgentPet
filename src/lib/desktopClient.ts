@@ -150,6 +150,14 @@ export function getDesktopApi(): DesktopApi {
       updatedAt: new Date().toISOString(),
       tasks: [],
       instances: [],
+      hostDiscovery: {
+        version: 1,
+        availability: 'unsupported',
+        source: 'unsupported',
+        observedAt: new Date().toISOString(),
+        facts: [],
+        detail: 'The browser fallback cannot inspect local Agent applications.'
+      },
       runtime: {
         availability: 'unavailable',
         mode: 'simulated',

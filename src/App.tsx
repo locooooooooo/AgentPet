@@ -222,6 +222,16 @@ function createFailClosedRuntimeSnapshot(now: number, reason: string): Connector
     updatedAt: observedAt,
     tasks: [],
     instances: [],
+    hostDiscovery: {
+      version: 1,
+      availability: 'unavailable',
+      source: isDesktopRuntime ? 'unavailable' : 'unsupported',
+      observedAt,
+      facts: [],
+      detail: isDesktopRuntime
+        ? 'Host-process discovery is unavailable.'
+        : 'The browser fallback cannot inspect local Agent applications.'
+    },
     runtime: {
       availability: 'unavailable',
       mode: isDesktopRuntime ? 'real' : 'simulated',

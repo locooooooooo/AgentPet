@@ -5,13 +5,13 @@
 
 loop state: active
 dispatch state: active
-status: control_baseline_ready_for_commit
+status: presence_slice_accepted_pending_commit_push
 date: 2026-07-18
 ddl: 2026-07-18
 
 ## single goal
 
-Move Hub from untracked candidate documents to a governed R0 contract-freeze lane without accepting implementation or overwriting user-owned worktree changes.
+Close the reported local-Agent visibility gap with read-only host presence, without confusing application processes with Session/task truth or absorbing unrelated user-owned worktree changes.
 
 ## supervision callbacks
 
@@ -37,26 +37,35 @@ No supervisor edited, staged, committed or pushed files. No supervisor ran an ex
 - Collected all three formal read-only callbacks and independently reran the baseline orchestration check/report plus `git diff --check`.
 - Frozen the four contract filenames, non-overlapping Owner fences, dependency order, negative-test expectations and full recurring gate set in `hub-r0-contract-freeze-v0.1.md`.
 
+## presence-only acceptance evidence
+
+- The docs-only control baseline was committed/pushed as `2a2f7f5`; local and remote refs matched before implementation review.
+- Manifest/InstallPlan passed exact-file review for identity, executable and fail-closed evidence boundaries. Adapter Capability passed exact-file review for host/workstation/Connector/Session/task separation. Neither contract enables a Connector or establishes a supported Adapter.
+- `realtime:truth-check` passed host discovery, projection and renderer fixtures. Kimi helpers aggregate into one discovered application; WorkBuddy/MiniMax bind only by exact identity; host-only facts leave online/busy at zero.
+- `orchestration:check` reported 122 cards; report, preflight, Connector safety, lint, build and `git diff --check` passed.
+- Live process evidence observed 9 `Kimi.exe` processes and one `kimi-webbridge`; no WorkBuddy or MiniMax primary process was present.
+- Isolated Electron replay at `1204x795` visibly rendered `未绑定发现项 Kimi（9 进程）`, `Connector 0 · Codex Desktop 2` and `0 个应用任务运行中`.
+- Computer Use window capture failed on the known `SetIsBorderRequired failed (0x80004002)` path. Read-only Electron DevTools DOM plus PNG capture provided the fallback evidence without clicking or typing in the user's active window.
+
 ## incomplete
 
-- This eight-file control baseline is not accepted until it passes recurring gates, is selectively committed and is pushed with remote parity.
-- The four contract files do not yet exist.
-- README, the three product documents and `NiuMaWorkspace.tsx` remain candidate changes, not accepted Hub R0 evidence.
-- UI truth remains mixed: real Session labels coexist with synthetic local animation/status semantics.
+- The accepted presence slice is not delivered until its exact staged snapshot passes and the commit is pushed with remote parity.
+- HubTheme and HubSoundPack formal contracts remain missing, so the broader R0 contract batch is incomplete.
+- README, DockView, positioning and sound input documents remain unaccepted candidate changes.
+- Unrelated Workspace meter-removal hunks and the remaining synthetic avatar/status semantics are outside this acceptance.
 
 ## blockers
 
-- No platform, Agent quota or contract file-fence blocker is currently known.
-- Product implementation remains blocked by the missing four accepted contracts.
-- UI acceptance remains blocked by synthetic business-state semantics outside the current docs-only fence.
+- No platform, Agent quota or host-presence file-fence blocker is currently known.
+- Broader R0 completion remains blocked by missing Theme/SoundPack contracts and unresolved full UI truth semantics.
+- External Connector execution remains disabled and no P0-C authorization is inferred from host discovery.
 
 ## next action
 
-1. Rerun the full control gates and exact eight-file diff review.
-2. Selectively commit/push only the Hub R0 orchestration baseline and confirm remote parity.
-3. Dispatch Wave A contract workers for AgentManifest + InstallPlan, HubTheme and HubSoundPack.
-4. Independently accept AgentManifest + InstallPlan, then dispatch Adapter Capability as Wave B.
-5. Cross-review all four contracts before any implementation lane opens.
+1. Stage only the two accepted contracts, host-presence implementation/tests and this orchestration update; partially stage Workspace host hunks and exclude unrelated meter-removal hunks.
+2. Verify the exact staged snapshot with recurring gates and a staged diff audit.
+3. Commit/push the presence slice and confirm `HEAD == origin/main` plus remote `main` parity.
+4. Keep Theme/SoundPack and broader UI truth work as the next separately fenced R0 contract lanes.
 
 ## changed files
 
@@ -68,3 +77,16 @@ No supervisor edited, staged, committed or pushed files. No supervisor ran an ex
 - `docs/orchestration/sessions/daily-plan-2026-07-17.md`
 - `docs/orchestration/sessions/daily-supervision-2026-07-02.md`
 - `docs/orchestration/tasks/daily-role-accountability-2026-07-02.md`
+- `docs/牛马Hub-AgentManifest与InstallPlan合同-v0.1.md`
+- `docs/牛马Hub-AdapterCapability合同-v0.1.md`
+- `electron/agentHostDiscovery.ts`
+- `electron/main.ts`
+- `src/types.ts`
+- `src/lib/agentInstanceProjection.ts`
+- `src/lib/desktopClient.ts`
+- `src/App.tsx`
+- `src/components/NiuMaWorkspace.tsx` host-presence hunks only
+- `scripts/check-agent-host-discovery.mjs`
+- `scripts/check-agent-instance-projection.mjs`
+- `scripts/check-realtime-truth-renderer.mjs`
+- `package.json`

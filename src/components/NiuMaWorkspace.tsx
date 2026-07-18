@@ -63,7 +63,7 @@ interface NiuMaWorkspaceProps {
 type SummaryTone = 'neutral' | 'positive' | 'info' | 'warning' | 'danger';
 type DetailTabId = 'command' | 'queue' | 'logs';
 type GovernanceStateFilter = 'all' | 'active' | 'blocked' | 'standby' | 'summarized';
-type DockStatusId = 'snapshot' | 'sessions' | 'codex-host' | 'governance';
+type DockStatusId = 'snapshot' | 'sessions' | 'local-hosts' | 'codex-host' | 'governance';
 type CockpitRegionId = 'cockpit-health-region' | 'cockpit-agent-region' | 'cockpit-operator-region' | 'cockpit-governance-region';
 
 const ACTIVE_COCKPIT_TASK_CARD_ID = 'c0-5';
@@ -171,6 +171,20 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, codexHost, o
   const latestMessage = snapshot.messages[0];
   const codexHostOnlineContribution = getCodexHostOnlineContribution(agentTruth, codexHost);
   const combinedOnlineSessionCount = getCombinedOnlineSessionCount(agentTruth, codexHost);
+  const configuredAgentIds = new Set(snapshot.agents.map((agent) => agent.id));
+  const hostProcessFacts = agentTruth.hostDiscovery.facts;
+  const unboundHostFacts = hostProcessFacts.filter((fact) => !configuredAgentIds.has(fact.agentId));
+  const hostDiscoveryRows: Array<[string, string]> = hostProcessFacts.length > 0
+    ? hostProcessFacts.map((fact) => [
+        fact.displayName,
+        `${fact.processCount} 个进程 · ${configuredAgentIds.has(fact.agentId) ? '已绑定工位' : '未绑定发现项'} · 不计在线 Session`
+      ])
+    : [[
+        '结果',
+        agentTruth.hostDiscovery.availability === 'available'
+          ? '未检测到已登记的本机 Agent 应用'
+          : agentTruth.hostDiscovery.detail
+      ]];
 
   // 左侧折叠状态
   const [rolesExpanded, setRolesExpanded] = useState(false);
@@ -411,6 +425,19 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, codexHost, o
         ['Codex Desktop 活动对话', `${codexHostOnlineContribution}`],
         ['Runtime', `${runtimeModeDetail} · ${formatDateTime(agentTruth.runtime.observedAt)}`],
         ['判定', '带受控 Session 证据或 Codex Desktop 生命周期 task_started，终态后退出在线计数。']
+      ]
+    },
+    {
+      id: 'local-hosts' as const,
+      label: '本机 Agent',
+      value: agentTruth.hostDiscovery.availability === 'available'
+        ? `${hostProcessFacts.length} 已运行`
+        : '探针不可用',
+      tone: hostProcessFacts.length > 0 ? 'success' : 'neutral',
+      rows: [
+        ['观测来源', `${agentTruth.hostDiscovery.source} · ${formatDateTime(agentTruth.hostDiscovery.observedAt)}`],
+        ...hostDiscoveryRows,
+        ['状态边界', '应用运行只表示 discovered；没有可信 Session 时 online/busy 均为 0。']
       ]
     },
     {
@@ -825,6 +852,12 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, codexHost, o
               />
               <div className="board-meta">
                 <span>{combinedOnlineSessionCount} 个在线 Session · {runningCount} 个应用任务运行中</span>
+                <span>
+                  {hostProcessFacts.length} 个本机 Agent 应用已发现
+                  {unboundHostFacts.length > 0
+                    ? ` · 未绑定发现项 ${unboundHostFacts.map((fact) => `${fact.displayName}（${fact.processCount} 进程）`).join('、')}`
+                    : ''}
+                </span>
               </div>
             </div>
 
@@ -834,6 +867,7 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, codexHost, o
                   key={agent.id}
                   agent={agent}
                   runtime={snapshot.runtime[agent.id]}
+                  truth={selectAgentTruthByIdentity(agentTruth, agent.id, agent.id)}
                   hostStatus={agent.id === 'codex' ? codexHost : null}
                   selected={agent.id === selectedAgent?.id}
                   onSelect={() => setSelectedAgentId(agent.id)}
@@ -1076,6 +1110,7 @@ function RanchSettingsChip({
 interface AgentCardProps {
   agent: AIAgent;
   runtime: NiuMaRuntimeState;
+  truth: ProjectedAgentTruth | null;
   hostStatus: CodexHostSnapshot | null;
   selected: boolean;
   onSelect: () => void;
@@ -1084,13 +1119,14 @@ interface AgentCardProps {
   onCycle: (event: ReactMouseEvent) => void;
 }
 
-function AgentCard({ agent, runtime, hostStatus, selected, onSelect, onRun, onAction, onCycle }: AgentCardProps) {
+function AgentCard({ agent, runtime, truth, hostStatus, selected, onSelect, onRun, onAction, onCycle }: AgentCardProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuStyle, setMenuStyle] = useState<CSSProperties | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const summaryRef = useRef<HTMLElement>(null);
   const meta = STATE_METAS[runtime.status];
   const running = agent.tasks.filter((task) => task.status === 'running').length;
+  const hostProcessDiscovered = truth?.instances.some((instance) => instance.source === 'host-process') ?? false;
 
   useEffect(() => {
     if (!selected) {
@@ -1158,6 +1194,12 @@ function AgentCard({ agent, runtime, hostStatus, selected, onSelect, onRun, onAc
           <div className={`agent-host-status ${hostStatus.activeSessionCount > 0 ? 'is-running' : 'is-idle'}`}>
             <span>Codex Desktop 已开启</span>
             <strong>{hostStatus.activeSessionCount} 活动对话</strong>
+          </div>
+        ) : null}
+        {hostProcessDiscovered ? (
+          <div className="agent-host-status is-idle" data-host-presence="discovered">
+            <span>本机应用已运行</span>
+            <strong>未观察到活动 Session</strong>
           </div>
         ) : null}
       </button>

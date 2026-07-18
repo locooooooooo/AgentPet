@@ -125,9 +125,26 @@ function runtimeSnapshot({
   reason,
   state,
   lastSeen,
-  capabilities = ['structured-events']
+  capabilities = ['structured-events'],
+  hostFacts = []
 }) {
   const hasSession = Boolean(state);
+  const hostInstances = hostFacts.map((fact) => ({
+    instanceId: 'host-process:' + fact.agentId,
+    agentId: fact.agentId,
+    connectorId: fact.connectorId,
+    status: 'configured',
+    source: 'host-process',
+    lastSeen: fact.observedAt,
+    capabilities: ['host-process-presence'],
+    capabilitySource: 'runtime-observed',
+    liveness: {
+      status: 'fresh',
+      source: 'host-process-probe',
+      lastSeen: fact.observedAt,
+      staleAfterMs: 15_000
+    }
+  }));
   return {
     version: 1,
     updatedAt: nowIso,
@@ -139,7 +156,18 @@ function runtimeSnapshot({
       ...(reason ? { reason } : {})
     },
     tasks: hasSession ? [session(state, lastSeen, capabilities)] : [],
-    instances: hasSession ? [instance(state, lastSeen, capabilities)] : []
+    instances: [
+      ...(hasSession ? [instance(state, lastSeen, capabilities)] : []),
+      ...hostInstances
+    ],
+    hostDiscovery: {
+      version: 1,
+      availability: 'available',
+      source: 'windows-process-list',
+      observedAt: nowIso,
+      facts: hostFacts,
+      detail: 'Presence-only renderer fixture.'
+    }
   };
 }
 
@@ -221,6 +249,56 @@ assert.match(desktopHostCockpit, /Connector 0 · Codex Desktop 2/);
 assert.match(desktopHostCockpit, /Codex Desktop 已开启 2 活动对话/);
 assert.match(desktopHostHome, /真实在线 Session:2:Codex Desktop 已开启 · 2 个活动对话/);
 
+const hostPresenceProjection = project(runtimeSnapshot({
+  hostFacts: [
+    {
+      agentId: 'workbuddy',
+      connectorId: 'workbuddy',
+      displayName: 'WorkBuddy',
+      running: true,
+      processCount: 1,
+      observedAt: nowIso
+    },
+    {
+      agentId: 'kimi',
+      connectorId: 'kimi',
+      displayName: 'Kimi',
+      running: true,
+      processCount: 6,
+      observedAt: nowIso
+    },
+    {
+      agentId: 'minimax',
+      connectorId: 'minimax',
+      displayName: 'MiniMax Code',
+      running: true,
+      processCount: 1,
+      observedAt: nowIso
+    }
+  ]
+}));
+const hostPresenceCockpit = renderCockpit(hostPresenceProjection);
+assert.equal(hostPresenceProjection.summary.onlineSessionCount, 0);
+assert.equal(hostPresenceProjection.summary.busySessionCount, 0);
+assert.match(hostPresenceCockpit, /未绑定发现项 Kimi（6 进程）/);
+assert.equal(
+  (hostPresenceCockpit.match(/未绑定发现项 Kimi/g) ?? []).length,
+  1,
+  'Six Kimi processes must render as one unbound application fact'
+);
+assert.equal(
+  (hostPresenceCockpit.match(/本机应用已运行/g) ?? []).length,
+  2,
+  'Bound WorkBuddy and MiniMax cards must each show one host-presence badge'
+);
+assert.equal(
+  (hostPresenceCockpit.match(/未观察到活动 Session/g) ?? []).length,
+  2,
+  'Host-presence badges must not fabricate a Session'
+);
+assert.match(hostPresenceCockpit, /在线 Session 0/);
+assert.match(hostPresenceCockpit, /0 个应用任务运行中/);
+
 const freshLastSeen = new Date(now.getTime() - 1_000).toISOString();
 const freshProjection = project(runtimeSnapshot({ state: 'running', lastSeen: freshLastSeen }));
 const freshTruth = truthFor(freshProjection);
@@ -270,6 +348,7 @@ assert.match(renderCockpit(unknownCapabilitiesProjection), /Capabilities: 未知
 console.log('realtime truth renderer check passed.');
 console.log('browser fallback DOM: configured=8, online=0, simulated/unavailable/source labels verified');
 console.log('Codex Desktop lifecycle DOM: host sessions contribute without changing Connector runtime truth');
+console.log('WorkBuddy/MiniMax host badges and one unbound Kimi fact render with online/busy=0: verified');
 console.log('fresh/late/stale/session-lost DOM: KPI, presence/activity, provenance and reason labels verified');
 console.log('capabilities null and local ranch/application snapshot separation: verified');
 `;

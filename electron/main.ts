@@ -3,6 +3,8 @@ import { spawn, spawnSync, type ChildProcessWithoutNullStreams } from 'node:chil
 import fs from 'node:fs';
 import path from 'node:path';
 import type {
+  AgentHostDiscoverySnapshot,
+  AgentInstance,
   AgentSnapshot,
   AgentTask,
   CodexHostSnapshot,
@@ -57,6 +59,7 @@ import {
   syncAgentTaskRuntime
 } from '../src/lib/agentCore';
 import { CodexHostMonitor } from './codexHostMonitor';
+import { discoverAgentHosts } from './agentHostDiscovery';
 
 let mainWindow: BrowserWindow | null = null;
 let ranchWindow: BrowserWindow | null = null;
@@ -67,12 +70,15 @@ let connectorRuntime: ConnectorRuntime;
 let connectorRunAuthorizer: ConnectorRunAuthorizer;
 let codexHostMonitor: CodexHostMonitor;
 let codexHostSnapshot: CodexHostSnapshot;
+let agentHostDiscoverySnapshot: AgentHostDiscoverySnapshot;
 let isQuitting = false;
 let shutdownInFlight: Promise<void> | null = null;
 let ranchUnreadCount = 0;
 let ranchMousePassthrough = false;
 let ranchHotzonePoll: NodeJS.Timeout | null = null;
 let codexHostPoll: NodeJS.Timeout | null = null;
+let agentHostPoll: NodeJS.Timeout | null = null;
+let agentHostDiscoveryInFlight = false;
 let ranchInteractiveRegions: RanchInteractiveRegion[] = [];
 const runningProcesses = new Map<string, ChildProcessWithoutNullStreams>();
 const connectorProcessProofService = createConnectorProcessProofService();
@@ -102,6 +108,7 @@ const runningProgressTimers = new Map<string, NodeJS.Timeout>();
 const notifiedCodexCompletions = new Set<string>();
 let lastCodexHostCompletionKey: string | null = null;
 let connectorCompletionNotificationsReady = false;
+const agentHostLivenessStaleMs = 15_000;
 
 function resolveAppPath(relativePath: string) {
   return path.join(app.isPackaged ? app.getAppPath() : process.cwd(), relativePath);
@@ -928,14 +935,100 @@ function createConnectorRuntime() {
     captureProcessFingerprint: (_child, _context, request) => connectorProcessProofService.prove(request),
     reattachProcess: reattachConnectorProcess,
     publish: (runtimeSnapshot) => {
-      BrowserWindow.getAllWindows().forEach((window) => {
-        window.webContents.send('connectors:runtime-snapshot-changed', runtimeSnapshot);
-      });
+      publishConnectorRuntimeSnapshot(runtimeSnapshot);
       if (connectorCompletionNotificationsReady) {
         notifyNewCodexConnectorCompletions(runtimeSnapshot);
       }
     }
   });
+}
+
+function composeConnectorRuntimeSnapshot(
+  runtimeSnapshot: ConnectorRuntimeSnapshot
+): ConnectorRuntimeSnapshot {
+  const hostSnapshot = cloneAgentHostDiscoverySnapshot(agentHostDiscoverySnapshot);
+  const hostInstances: AgentInstance[] = hostSnapshot.availability === 'available'
+    ? hostSnapshot.facts.map((fact) => ({
+        instanceId: `host-process:${fact.agentId}`,
+        agentId: fact.agentId,
+        connectorId: fact.connectorId,
+        status: 'configured',
+        source: 'host-process',
+        lastSeen: fact.observedAt,
+        capabilities: ['host-process-presence'],
+        capabilitySource: 'runtime-observed',
+        liveness: {
+          status: 'fresh',
+          source: 'host-process-probe',
+          lastSeen: fact.observedAt,
+          staleAfterMs: agentHostLivenessStaleMs
+        }
+      }))
+    : [];
+  const observedAt = latestIsoTimestamp(
+    runtimeSnapshot.runtime.observedAt,
+    hostSnapshot.observedAt
+  );
+  return {
+    ...runtimeSnapshot,
+    updatedAt: latestIsoTimestamp(runtimeSnapshot.updatedAt, observedAt),
+    instances: [
+      ...runtimeSnapshot.instances.filter((instance) => instance.source !== 'host-process'),
+      ...hostInstances
+    ],
+    runtime: {
+      ...runtimeSnapshot.runtime,
+      observedAt
+    },
+    hostDiscovery: hostSnapshot
+  };
+}
+
+function publishConnectorRuntimeSnapshot(runtimeSnapshot: ConnectorRuntimeSnapshot) {
+  const composedSnapshot = composeConnectorRuntimeSnapshot(runtimeSnapshot);
+  BrowserWindow.getAllWindows().forEach((window) => {
+    window.webContents.send('connectors:runtime-snapshot-changed', composedSnapshot);
+  });
+}
+
+async function refreshAgentHostDiscovery() {
+  if (agentHostDiscoveryInFlight || isQuitting) {
+    return;
+  }
+  agentHostDiscoveryInFlight = true;
+  try {
+    const nextSnapshot = await discoverAgentHosts();
+    if (JSON.stringify(nextSnapshot) === JSON.stringify(agentHostDiscoverySnapshot)) {
+      return;
+    }
+    agentHostDiscoverySnapshot = nextSnapshot;
+    if (connectorRuntime) {
+      publishConnectorRuntimeSnapshot(connectorRuntime.getSnapshot());
+    }
+  } finally {
+    agentHostDiscoveryInFlight = false;
+  }
+}
+
+function cloneAgentHostDiscoverySnapshot(
+  hostSnapshot: AgentHostDiscoverySnapshot
+): AgentHostDiscoverySnapshot {
+  return {
+    ...hostSnapshot,
+    facts: hostSnapshot.facts.map((fact) => ({ ...fact }))
+  };
+}
+
+function latestIsoTimestamp(left: string, right: string) {
+  const leftTime = Date.parse(left);
+  const rightTime = Date.parse(right);
+  if (!Number.isFinite(leftTime)) {
+    return right;
+  }
+  if (!Number.isFinite(rightTime)) {
+    return left;
+  }
+  return rightTime > leftTime ? right : left;
 }
 
 function notifyNewCodexConnectorCompletions(runtimeSnapshot: ConnectorRuntimeSnapshot) {
@@ -1537,7 +1630,7 @@ function registerIpc() {
   ));
 
   ipcMain.handle('connectors:get-runtime-snapshot', (): ConnectorRuntimeSnapshot => (
-    connectorRuntime.getSnapshot()
+    composeConnectorRuntimeSnapshot(connectorRuntime.getSnapshot())
   ));
 
   ipcMain.handle('codex:get-host-snapshot', (): CodexHostSnapshot => codexHostSnapshot);
@@ -1598,11 +1691,12 @@ function isTrustedConnectorSender(event: IpcMainInvokeEvent) {
   return Boolean(mainWindow && !mainWindow.isDestroyed() && event.sender === mainWindow.webContents);
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   snapshot = loadSnapshot();
   ranchPrefs = loadRanchPrefs();
   codexHostMonitor = new CodexHostMonitor();
   codexHostSnapshot = codexHostMonitor.getSnapshot();
+  agentHostDiscoverySnapshot = await discoverAgentHosts();
   lastCodexHostCompletionKey = codexHostSnapshot.lastCompletionKey ?? null;
   connectorRunAuthorizer = createConnectorRunAuthorizer();
   connectorRuntime = createConnectorRuntime();
@@ -1618,6 +1712,9 @@ app.whenReady().then(() => {
   createRanchWindow();
   createTray();
   codexHostPoll = setInterval(refreshCodexHostSnapshot, 1_000);
+  agentHostPoll = setInterval(() => {
+    void refreshAgentHostDiscovery();
+  }, 5_000);
 
   setInterval(() => {
     let nextSnapshot = progressRunningTasks(snapshot);
@@ -1660,6 +1757,10 @@ app.on('before-quit', (event) => {
   if (codexHostPoll) {
     clearInterval(codexHostPoll);
     codexHostPoll = null;
+  }
+  if (agentHostPoll) {
+    clearInterval(agentHostPoll);
+    agentHostPoll = null;
   }
   runningProcesses.forEach((child) => child.kill());
   runningProcesses.clear();

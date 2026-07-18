@@ -53,6 +53,38 @@ const discovered = project(snapshot({
 assert(discovered.instances[0].presence === 'discovered', 'real runtime instance without a Session must be discovered only');
 assert(discovered.summary.onlineSessionCount === 0, 'discovered command/runtime fact must not count online');
 
+const hostObservedAt = isoAgo(1_000);
+const hostDiscovered = projectAgentInstances({
+  configuredAgents: [...CONFIGURED_AGENTS, { id: 'workbuddy', connectorId: 'workbuddy' }],
+  runtimeSnapshot: snapshot({
+    instances: [
+      hostInstance('kimi', hostObservedAt),
+      hostInstance('workbuddy', hostObservedAt)
+    ],
+    hostDiscovery: {
+      version: 1,
+      availability: 'available',
+      source: 'windows-process-list',
+      observedAt: hostObservedAt,
+      facts: [
+        hostFact('kimi', 'Kimi', 6, hostObservedAt),
+        hostFact('workbuddy', 'WorkBuddy', 1, hostObservedAt)
+      ],
+      detail: 'Presence-only fixture.'
+    }
+  }),
+  now: NOW
+});
+const hostKimi = selectAgentTruthByIdentity(hostDiscovered, 'kimi', 'kimi');
+const hostWorkBuddy = selectAgentTruthByIdentity(hostDiscovered, 'workbuddy', 'workbuddy');
+assert(hostKimi && !hostKimi.configured, 'Host Kimi must remain an orphan discovered identity');
+assert(hostKimi.presence === 'discovered' && !hostKimi.isOnline, 'Host Kimi must be discovered, never online');
+assert(hostWorkBuddy?.configured, 'Host WorkBuddy must bind only to its exact configured identity');
+assert(hostWorkBuddy.presence === 'discovered' && !hostWorkBuddy.isOnline, 'Bound WorkBuddy host must remain discovered only');
+assert(hostDiscovered.summary.onlineSessionCount === 0, 'Host presence must not increase online Session count');
+assert(hostDiscovered.summary.busySessionCount === 0, 'Host presence must not increase busy Session count');
+assert(hostDiscovered.hostDiscovery.facts.length === 2, 'Host discovery facts must survive projection');
+
 const boundaryCases = [
   [5_000, 'online', true],
   [5_001, 'degraded', false],
@@ -373,6 +405,7 @@ console.log('configured/discovered/online/busy/degraded/offline/unknown/simulate
 console.log('heartbeat boundaries 5000/5001/14999/15000 and invalid/future evidence: verified');
 console.log('terminal precedence, observedAt causality and four-ID task association: verified');
 console.log('unique Session KPI, duplicate conflict fail-closed and configured identity pairs: verified');
+console.log('host-process Kimi orphan and bound WorkBuddy remain discovered with online/busy=0: verified');
 console.log('runtime unavailable, simulation, multi-Session ordering and input immutability: verified');
 
 function project(runtimeSnapshot) {
@@ -389,6 +422,7 @@ function snapshot(overrides = {}) {
     updatedAt: NOW.toISOString(),
     tasks: overrides.tasks ?? [],
     instances: overrides.instances ?? [],
+    ...(overrides.hostDiscovery ? { hostDiscovery: overrides.hostDiscovery } : {}),
     runtime: {
       availability: 'available',
       mode: 'real',
@@ -396,6 +430,36 @@ function snapshot(overrides = {}) {
       observedAt: NOW.toISOString(),
       ...(overrides.runtime ?? {})
     }
+  };
+}
+
+function hostInstance(agentId, observedAt) {
+  return {
+    instanceId: `host-process:${agentId}`,
+    agentId,
+    connectorId: agentId,
+    status: 'configured',
+    source: 'host-process',
+    lastSeen: observedAt,
+    capabilities: ['host-process-presence'],
+    capabilitySource: 'runtime-observed',
+    liveness: {
+      status: 'fresh',
+      source: 'host-process-probe',
+      lastSeen: observedAt,
+      staleAfterMs: 15_000
+    }
+  };
+}
+
+function hostFact(agentId, displayName, processCount, observedAt) {
+  return {
+    agentId,
+    connectorId: agentId,
+    displayName,
+    running: true,
+    processCount,
+    observedAt
   };
 }
 

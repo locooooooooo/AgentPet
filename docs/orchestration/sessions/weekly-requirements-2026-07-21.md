@@ -5,7 +5,7 @@
 
 loop state: active
 dispatch state: active
-status: active_hub_r0_contract_freeze
+status: active_hub_r0_presence_delivery
 
 > **Original planning window**: 2026-07-21 through 2026-07-27
 > **Compressed activation and DDL**: 2026-07-17
@@ -14,7 +14,7 @@ status: active_hub_r0_contract_freeze
 
 ## single goal
 
-- Freeze and independently accept Hub R0 positioning plus `AgentManifest + InstallPlan`, `Adapter Capability`, `HubTheme` and `HubSoundPack` contracts before any Hub implementation starts.
+- Deliver truthful read-only host presence under accepted identity/Adapter boundaries, while keeping the broader four-contract R0 batch and every external execution gate incomplete.
 
 ## accepted inputs
 
@@ -65,6 +65,14 @@ status: active_hub_r0_contract_freeze
 - Active control lanes remain `daily-supervision` and `weekly-requirements`; no third active implementation lane is introduced.
 - DDL is 2026-07-18 for the control baseline and contract batch. Date compression does not waive review, recurring gates, exact staging or remote parity.
 
+## accepted host-presence slice
+
+- User priority moved to the missing real status for locally running WorkBuddy, Kimi and MiniMax. The smallest truthful slice is application-process presence only.
+- AgentManifest + InstallPlan and Adapter Capability are independently accepted only for canonical identity and the presence/Session separation. Theme/SoundPack remain incomplete and still block the full R0 batch.
+- Current live evidence is Kimi discovered as one unbound application with 9 primary processes; WorkBuddy/MiniMax are not observed running. None contributes to online or busy.
+- Electron control-cockpit replay visibly shows Kimi's process count, `Connector 0 · Codex Desktop 2`, and zero application tasks. Direct Windows capture remains unavailable, with isolated DevTools DOM/PNG used as the bounded fallback.
+- External Agent spawn, Connector binding/enabling, task inference from process/window/log facts, installer work, DockView and theme/sound implementation remain zero/non-goals.
+
 ## accepted file history
 
 The original minimum scheduler slice `ccedb15` used:
@@ -85,7 +93,7 @@ The configurable-concurrency slice `4508ce3` changed only `src/lib/connectorRunt
 - PM independently reviews the diff and does not infer real Agent E2E from controlled local fixtures.
 
 next action:
-- Preserve `4508ce3`; push the Hub R0 control baseline, run three non-overlapping Wave A contract workers, then start Adapter Capability only after AgentManifest + InstallPlan acceptance.
+- Preserve `4508ce3` and `2a2f7f5`; selectively deliver the accepted host-presence slice, prove staged gates and remote parity, then return to separately fenced Theme/SoundPack and full UI truth work.
 
 summary:
-- Next-stage requirements now govern the Hub R0 contract freeze; every external execution and implementation gate remains closed until all four contracts pass.
+- Next-stage requirements now govern presence-only delivery under two accepted contract boundaries. The full R0 batch and every external execution gate remain open/incomplete until the remaining contracts and separate UI truth acceptance pass.

@@ -6,7 +6,7 @@
 
 loop state: active
 dispatch state: active
-status: active_supervision_hub_r0_contract_freeze
+status: active_supervision_hub_r0_presence_delivery
 
 ## single goal
 
@@ -37,7 +37,7 @@ status: active_supervision_hub_r0_contract_freeze
 | 10 | `[PM]#weekly-requirements@2026-07-21` | Next-stage requirements truth | active early / DDL 2026-07-17 | `weekly-requirements-2026-07-21.md` |
 | 11 | `[长工]#realtime-p1-scheduler-core@v0.1` | Local scheduler implementation only | summarized / accepted and pushed `ccedb15` | `realtime-p1-scheduler-core-v0.1.md` |
 | 12 | `[短工]#realtime-p1-scheduler-configurable-concurrency@v0.1` | Runtime-internal configurable concurrency | summarized / accepted and pushed `4508ce3` | `realtime-p1-scheduler-configurable-concurrency-v0.1.md` |
-| 13 | `[PM]#hub-r0-contract-freeze@v0.1` | Hub positioning and four versioned contracts only | active / control baseline | `hub-r0-contract-freeze-2026-07-18.md` |
+| 13 | `[PM]#hub-r0-contract-freeze@v0.1` | Presence-only acceptance under identity/Adapter boundaries; full four-contract batch remains incomplete | active / accepted pending delivery | `hub-r0-contract-freeze-2026-07-18.md` |
 
 ## completed
 
@@ -65,6 +65,16 @@ status: active_supervision_hub_r0_contract_freeze
 - Qoder requires an independent headless Agent API before reconsideration.
 - Full transparent Electron pointer input remains blocked because the current Windows capture route cannot produce the screenshot state required for safe coordinate input.
 - W28/scheduler schedule gates are waived; fresh gates, exact diff review, scheduler fixtures and Git publication remain mandatory evidence gates.
+- Host presence has no remaining code or runtime blocker. Its delivery still requires selective staging, staged-snapshot gates, commit, push and remote parity.
+- Full Hub R0 remains blocked by Theme/SoundPack contracts and separate acceptance of the remaining synthetic UI semantics.
+
+## 2026-07-18 host-presence acceptance
+
+- Accepted the user's priority override for truthful local application discovery without widening to Adapter execution or task inference.
+- Independently reviewed the Manifest/InstallPlan and Adapter Capability contracts for this limited slice.
+- Verified live Kimi presence as one unbound Agent application with 9 primary processes; WorkBuddy/MiniMax were absent and online/busy contribution stayed zero.
+- Passed host discovery, projection, renderer, orchestration, Connector safety, lint, build and diff gates.
+- Electron visible fallback at `1204x795` showed the Kimi process count and unchanged Connector/Codex online split. Computer Use's direct capture path remained blocked by the known Windows interface error.
 
 ## non-goals
 
@@ -98,7 +108,7 @@ status: active_supervision_hub_r0_contract_freeze
 
 ## next action
 
-- Use the 2026-07-18 Hub R0 session as the current dispatch surface: push its docs-only control baseline, then start only the fenced contract workers.
+- Use the 2026-07-18 Hub R0 session as the current delivery surface: selectively stage and publish the accepted presence slice, then resume only separately fenced remaining contract work.
 - Keep W28 summarized and the completed five-day board closed; no product worker remains active.
 - Preserve S-01 through S-16, R-01 through R-03 and selective-integration evidence at `ccedb15`.
 - Preserve accepted/pushed configurable concurrency `4508ce3`; require a new bounded card before the next scheduler P1 feature.

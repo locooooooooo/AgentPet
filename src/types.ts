@@ -257,7 +257,7 @@ export type ConnectorFailureKind =
   | 'permission-denied';
 
 export type ProcessLivenessStatus = 'unknown' | 'fresh' | 'stale';
-export type ProcessLivenessSource = 'none' | 'process-event' | 'recovery-proof';
+export type ProcessLivenessSource = 'none' | 'process-event' | 'recovery-proof' | 'host-process-probe';
 
 export interface ProcessLivenessEvidence {
   status: ProcessLivenessStatus;
@@ -271,9 +271,31 @@ export type AgentInstanceSource =
   | 'static-config'
   | 'connector-runtime'
   | 'recovery-proof'
+  | 'host-process'
   | 'session-lost'
   | 'simulated'
   | 'unknown';
+
+export type AgentHostDiscoveryAvailability = 'available' | 'unavailable' | 'unsupported';
+export type AgentHostDiscoverySource = 'windows-process-list' | 'unsupported' | 'unavailable';
+
+export interface AgentHostProcessFact {
+  agentId: string;
+  connectorId: string;
+  displayName: string;
+  running: true;
+  processCount: number;
+  observedAt: string;
+}
+
+export interface AgentHostDiscoverySnapshot {
+  version: 1;
+  availability: AgentHostDiscoveryAvailability;
+  source: AgentHostDiscoverySource;
+  observedAt: string;
+  facts: AgentHostProcessFact[];
+  detail: string;
+}
 
 export interface AgentInstance {
   instanceId: string;
@@ -396,6 +418,7 @@ export interface ConnectorRuntimeSnapshot {
   tasks: ConnectorSession[];
   instances: AgentInstance[];
   runtime: ConnectorRuntimeEnvelope;
+  hostDiscovery?: AgentHostDiscoverySnapshot;
 }
 
 export type CodexHostAvailability = 'available' | 'unavailable';
