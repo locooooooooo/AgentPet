@@ -1148,3 +1148,8 @@ pm.cmd run build pass; git diff --check only on the 11 protected-source whitespa
   - PM corrected C-02/C-04/C-08/C-09/C-11/C-12 and the acceptance counters without expanding the three-file candidate fence. Product worker and external Agent spawn remain `0` pending a second read-only review.
   - Second independent review returned `dispatch-ready PASS`: recovery identity/spare capacity, limits `2/3/4`, invalid zero-side-effect construction, over-cap taskId release evidence and re-entrant close are now explicit; no file-fence blocker remains.
   - PM accepts the intake for one serial short worker only after this control baseline is committed/pushed. The worker may change runtime, scheduler fixture and one evidence session only.
+
+- [2026-07-18] configurable-concurrency serial worker handoff:
+  - Accepted dispatch baseline `e237b7c` is pushed. The first short worker edited only `src/lib/connectorRuntime.ts`, then its turn failed with service-side `403 DAILY_LIMIT_EXCEEDED` before scheduler fixtures or evidence were created.
+  - PM inspected and preserved the partial allowed diff: runtime option validation, configurable reservation counting, reserved Agent identities and removal of single-recovery slicing are present but unaccepted.
+  - The evidence path is corrected to `realtime-p1-scheduler-configurable-concurrency-evidence-2026-07-18.md`; one replacement short worker may continue serially, with no overlapping worker and no scope expansion.

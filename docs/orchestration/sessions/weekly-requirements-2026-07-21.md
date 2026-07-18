@@ -5,7 +5,7 @@
 
 loop state: active
 dispatch state: active
-status: active_configurable_concurrency_dispatch_ready
+status: active_configurable_concurrency_implementation_resumed
 
 > **Original planning window**: 2026-07-21 through 2026-07-27
 > **Compressed activation and DDL**: 2026-07-17
@@ -46,7 +46,7 @@ status: active_configurable_concurrency_dispatch_ready
 ## incomplete after this slice
 
 - P0-C real Codex Agent E2E remains authorization-required and unexecuted.
-- Configurable concurrency intake at `realtime-p1-scheduler-configurable-concurrency-v0.1.md` is independently accepted/dispatch-ready; implementation remains pending the pushed control baseline and one serial short worker.
+- Configurable concurrency intake is accepted and dispatch baseline `e237b7c` is pushed. The first worker left an allowed partial runtime diff before a service-side 403; one replacement worker resumes serially on 2026-07-18.
 - Priority, starvation protection, recursive cancellation DAG and per-Connector quotas remain future P1 work.
 - Trae Models readiness, Qoder headless API, pointer evidence and AgentPet review remain separate carry-over items.
 
@@ -78,7 +78,7 @@ Everything else is forbidden unless the worker stops and PM explicitly expands t
 - PM independently reviews the diff and does not infer real Agent E2E from controlled local fixtures.
 
 next action:
-- Commit/push the accepted configurable-concurrency contract, then admit exactly one short code worker and independently review C-01 through C-12 evidence.
+- Continue one replacement short worker from the fenced partial runtime diff, complete C-01 through C-12 and 2026-07-18 evidence, then independently accept or reject the implementation.
 
 summary:
 - Next-stage requirements remain active in buffer mode after the same-day local scheduler slice was accepted/pushed at `ccedb15`; every external execution gate remains closed.

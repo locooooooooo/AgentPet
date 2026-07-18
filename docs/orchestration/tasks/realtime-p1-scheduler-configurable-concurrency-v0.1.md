@@ -5,9 +5,10 @@
 
 loop state: active
 dispatch state: active
-status: accepted_dispatch_ready_after_independent_review
+status: active_implementation_resumed_after_worker_403
 date: 2026-07-17
 ddl: 2026-07-17
+execution resumed: 2026-07-18
 
 ## single goal
 
@@ -77,7 +78,7 @@ A future implementation may be dispatched only after independent PM acceptance a
 
 - `src/lib/connectorRuntime.ts`
 - `scripts/check-connector-scheduler.mjs`
-- `docs/orchestration/sessions/realtime-p1-scheduler-configurable-concurrency-evidence-2026-07-17.md`
+- `docs/orchestration/sessions/realtime-p1-scheduler-configurable-concurrency-evidence-2026-07-18.md`
 
 `src/types.ts` is explicitly excluded while account-quota hunks remain owner-unresolved. Any need for it, `electron/**`, preload, Desktop API, UI, config files or another script requires a new PM fence-expansion decision before editing.
 
@@ -141,3 +142,5 @@ changed files:
 - First independent review rejected dispatch with three P1 gaps and one P2: recovering Agent identity/spare-capacity behavior, legal `3/4`, over-cap taskId release evidence and re-entrant close coverage were underspecified. The contract now makes each observable and keeps the same three-file fence.
 - Second independent review returned `dispatch-ready PASS`: all first-review findings are observable in C-02/C-04/C-08/C-09/C-11/C-12, and the three-file fence remains sufficient.
 - PM accepts the intake for dispatch. The accepted control baseline must be committed/pushed before exactly one short implementation worker starts.
+- Dispatch baseline `e237b7c` was pushed. The first short worker added a partial allowed runtime implementation, then stopped on service-side `403 DAILY_LIMIT_EXCEEDED` before fixtures or evidence; this is an incomplete worker callback, not a code rejection.
+- On 2026-07-18 PM preserved the fenced runtime diff, moved the evidence filename to the real execution date and authorized one serial replacement worker to continue the same task. No second worker may overlap it.
