@@ -3,9 +3,9 @@
 [短工]#realtime-p1-scheduler-configurable-concurrency@v0.1
 ⟦tag:v2|session|realtime-p1-scheduler-configurable-concurrency-evidence-2026-07-18⟧
 
-loop state: active
-dispatch state: active
-status: verification_complete_waiting_pm_commit
+loop state: summarized
+dispatch state: summarized
+status: accepted_pushed_4508ce3
 date: 2026-07-18
 dispatch baseline: `e237b7c`
 resume baseline: `c395feb`
@@ -151,9 +151,11 @@ completed:
 - Runtime and scheduler fixture implementation are complete inside the three-file fence.
 - Shared-worktree full gates pass with external Agent spawn `0`.
 - Isolated staged-snapshot gates pass for the exact three-file index.
+- PM accepted and pushed implementation commit `4508ce3`; local, `origin/main` and remote main matched after push.
 
 incomplete:
-- PM final cached-diff acceptance, implementation commit, push and closeout truth synchronization are still pending.
+- No implementation or evidence item remains incomplete in this slice.
+- Priority/starvation, cancellation DAG and Connector quotas remain separate future P1 work.
 
 blockers:
 - No implementation or file-fence blocker is currently known.
@@ -161,7 +163,7 @@ blockers:
 - `%TEMP%` staged-snapshot cleanup is blocked by local command policy; this is an operational residue outside the repository, not an implementation or test blocker.
 
 next action:
-- PM accepts only after final exact cached-diff review, implementation commit/push and remote parity.
+- Preserve `4508ce3`; open a new bounded task for the next scheduler P1 gap instead of reopening this evidence session.
 
 changed files:
 - `src/lib/connectorRuntime.ts`

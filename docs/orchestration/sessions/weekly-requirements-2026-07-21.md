@@ -5,7 +5,7 @@
 
 loop state: active
 dispatch state: active
-status: active_configurable_concurrency_implementation_resumed
+status: active_next_p1_buffer_after_configurable_concurrency
 
 > **Original planning window**: 2026-07-21 through 2026-07-27
 > **Compressed activation and DDL**: 2026-07-17
@@ -46,21 +46,20 @@ status: active_configurable_concurrency_implementation_resumed
 ## incomplete after this slice
 
 - P0-C real Codex Agent E2E remains authorization-required and unexecuted.
-- Configurable concurrency intake is accepted and dispatch baseline `e237b7c` is pushed. The first worker left an allowed partial runtime diff before a service-side 403; one replacement worker resumes serially on 2026-07-18.
 - Priority, starvation protection, recursive cancellation DAG and per-Connector quotas remain future P1 work.
 - Trae Models readiness, Qoder headless API, pointer evidence and AgentPet review remain separate carry-over items.
 
-## active P1 intake
+## completed configurable-concurrency slice
 
 - Single gap: runtime-internal immutable `maxGlobalActive` with default `1` and accepted range `1..4`.
 - Same-Agent active limit remains `1`; unconfirmed close and recovery proof continue to reserve slots.
-- Intake and two independent reviews changed docs only. Product worker count is `0` until the accepted baseline is pushed; external Agent spawn is `0`, and no machine gate changes.
-- Future candidate fence is `src/lib/connectorRuntime.ts`, `scripts/check-connector-scheduler.mjs` and one evidence session. Dirty `src/types.ts` account-quota hunks remain excluded.
+- Accepted implementation changed only `src/lib/connectorRuntime.ts`, `scripts/check-connector-scheduler.mjs` and the dated evidence session; unrelated shared-worktree files remained excluded.
+- Product worker count returned to `0`; external Agent spawn stayed `0`, and no machine gate changed.
 - Priority, aging/starvation, cancellation DAG, Connector quota, Electron/preload/UI and dynamic reconfiguration are non-goals.
 
-## file boundary
+## accepted file history
 
-Allowed only:
+The original minimum scheduler slice `ccedb15` used:
 
 - `src/types.ts`
 - `src/lib/connectorRuntime.ts`
@@ -68,17 +67,17 @@ Allowed only:
 - `scripts/check-connector-runtime.mjs` only for the legacy `selectorHarness` / `tieHarness` concurrency conflict confirmed by PM
 - `docs/orchestration/sessions/realtime-p1-scheduler-core-evidence-2026-07-17.md`
 
-Everything else is forbidden unless the worker stops and PM explicitly expands the fence. The runtime script expansion may not weaken unrelated safety assertions. In particular: no `electron/**`, UI/CSS, ranch, protected cockpit, package/config, Connector machine-gate, `README.md`, audio-spec, external Agent CLI or Git write.
+The configurable-concurrency slice `4508ce3` changed only `src/lib/connectorRuntime.ts`, `scripts/check-connector-scheduler.mjs` and `docs/orchestration/sessions/realtime-p1-scheduler-configurable-concurrency-evidence-2026-07-18.md`. Electron, UI/CSS, ranch, protected cockpit, package/config, Connector machine gates, README, Hub/DockView/sound/quota inputs and external Agent execution remained excluded.
 
 ## acceptance
 
-- Exactly one product worker is active at a time.
-- All S-01 through S-16 fixtures pass with maximum global active process `1`, maximum same-Agent active process `1`, external Agent CLI spawn `0` and duplicate terminal count `0`.
-- Existing connector runtime, reattach, realtime truth, orchestration, Connector safety, lint, build and `git diff --check` all pass.
+- Product worker concurrency never exceeded one during either accepted scheduler slice.
+- S-01 through S-16, R-01 through R-03 and C-01 through C-12 pass; configured global active/reserved limits `1..4` match exactly, same-Agent active/reserved remains `1`, external Agent CLI spawn is `0` and duplicate terminal count is `0`.
+- Existing connector runtime, reattach, realtime truth, orchestration, Connector safety, lint, build and diff checks pass in the shared worktree and exact staged snapshot.
 - PM independently reviews the diff and does not infer real Agent E2E from controlled local fixtures.
 
 next action:
-- Continue one replacement short worker from the fenced partial runtime diff, complete C-01 through C-12 and 2026-07-18 evidence, then independently accept or reject the implementation.
+- Preserve `4508ce3`; open a new bounded intake before priority/starvation, cancellation DAG or Connector quota implementation.
 
 summary:
 - Next-stage requirements remain active in buffer mode after the same-day local scheduler slice was accepted/pushed at `ccedb15`; every external execution gate remains closed.

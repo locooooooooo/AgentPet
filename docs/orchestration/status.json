@@ -2,12 +2,12 @@
   "identity": "[PM]#multi-agent-control@v0.1",
   "loopState": "active",
   "dispatchState": "active",
-  "target": "Continue the single configurable-concurrency worker on 2026-07-18 from the fenced partial runtime diff after the first worker's service-side 403; finish C-01 through C-12 while external Agent spawn remains `0`.",
+  "target": "Preserve accepted/pushed configurable scheduler concurrency at `4508ce3`: limits `1..4`, same-Agent reservation `1` and C-01 through C-12 are complete; external Agent spawn remains `0` and the next P1 gap requires a new bounded card.",
   "source": "docs/orchestration/index.md",
   "todayPlan": {
     "date": "2026-07-17",
     "session": "docs/orchestration/sessions/daily-plan-2026-07-17.md",
-    "selectedRoute": "Preserve the first worker's fenced partial runtime diff and serially resume with one replacement short worker on 2026-07-18",
+    "selectedRoute": "Preserve accepted configurable concurrency 4508ce3 and require a new bounded card for the next scheduler P1 gap",
     "progress": "docs/orchestration/sessions/daily-plan-2026-07-17.md"
   },
   "p0Cards": [
@@ -501,8 +501,8 @@
       "id": "realtime-p1-scheduler-configurable-concurrency",
       "title": "[短工]#realtime-p1-scheduler-configurable-concurrency@v0.1",
       "owner": "短工",
-      "status": "active",
-      "responsibility": "Serial implementation resumed on 2026-07-18 after the first worker's service-side 403; preserve the allowed runtime diff, complete C-01 through C-12 and dated evidence, and keep external Agent spawn zero.",
+      "status": "summarized",
+      "responsibility": "Accepted/pushed as 4508ce3: immutable maxGlobalActive 1..4, same-Agent reservation 1 and C-01 through C-12 pass in shared and isolated staged snapshots; external Agent spawn stayed zero.",
       "tag": "⟦tag:v2|task|realtime-p1-scheduler-configurable-concurrency-v0.1⟧",
       "evidence": "docs/orchestration/tasks/realtime-p1-scheduler-configurable-concurrency-v0.1.md"
     }
@@ -702,7 +702,7 @@
       "title": "Next-stage weekly requirements planning",
       "role": "[PM]#weekly-requirements@2026-07-21",
       "state": "active",
-      "nextAction": "Run exactly one replacement short worker from the allowed partial runtime diff, complete C-01 through C-12 plus 2026-07-18 evidence, then independently review its callback."
+      "nextAction": "Preserve accepted 4508ce3; create a new bounded intake before priority/starvation, cancellation DAG or Connector quota work."
     },
     {
       "id": "ranch-real-integration-r0-3-dryrun",

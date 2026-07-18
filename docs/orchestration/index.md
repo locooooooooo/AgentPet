@@ -119,6 +119,7 @@ tracked business cards:
 - session: ⟦tag:v2|session|next-five-day-development-2026-07-18⟧ -> `docs/orchestration/sessions/next-five-day-development-2026-07-18.md`
 - session: ⟦tag:v2|session|weekly-closeout-2026-07-20⟧ -> `docs/orchestration/sessions/weekly-closeout-2026-07-20.md`
 - session: ⟦tag:v2|session|realtime-p1-scheduler-core-evidence-2026-07-17⟧ -> `docs/orchestration/sessions/realtime-p1-scheduler-core-evidence-2026-07-17.md`
+- session: ⟦tag:v2|session|realtime-p1-scheduler-configurable-concurrency-evidence-2026-07-18⟧ -> `docs/orchestration/sessions/realtime-p1-scheduler-configurable-concurrency-evidence-2026-07-18.md`
 - session: ⟦tag:v2|session|homepage-layout-density-2026-07-16⟧ -> `docs/orchestration/sessions/homepage-layout-density-2026-07-16.md`
 - session: ⟦tag:v2|session|weekly-closeout-2026-07-11⟧ -> `docs/orchestration/sessions/weekly-closeout-2026-07-11.md`
 - session: ⟦tag:v2|session|m5-five-day-development-2026-07-14⟧ -> `docs/orchestration/sessions/m5-five-day-development-2026-07-14.md`
@@ -142,7 +143,7 @@ dispatch gate:
 - Supervisor owns drift detection, blocker surfacing, and minimum correction.
 
 current target:
-- Continue the single configurable-concurrency worker on 2026-07-18 from the fenced partial runtime diff after the first worker's service-side 403; finish C-01 through C-12 while external Agent spawn remains `0`.
+- Preserve accepted/pushed configurable scheduler concurrency at `4508ce3`: limits `1..4`, same-Agent reservation `1` and C-01 through C-12 are complete; external Agent spawn remains `0` and the next P1 gap requires a new bounded card.
 
 current role split:
 - `[PM]#multi-agent-control@v0.1`: maintain this index, dispatch bounded lanes, collect callbacks, write acceptance.
@@ -199,7 +200,7 @@ current role split:
 - `[PM]#weekly-closeout@2026-07-20`: summarized completed/pushed W28 closeout under the explicit full schedule waiver, with seven carry-over rows preserved as non-blocking.
 - `[短工]#realtime-p1-scheduler-intake@v0.1`: summarized accepted requirements; the administrator's same-day DDL instruction satisfies the local scheduler phase-waiver branch only.
 - `[长工]#realtime-p1-scheduler-core@v0.1`: summarized accepted/pushed local scheduler slice at `ccedb15`; S-01 through S-16 and R-01 through R-03 pass, max global/same-Agent/reserved are `1/1/1`, and external Agent spawn is `0`.
-- `[短工]#realtime-p1-scheduler-configurable-concurrency@v0.1`: active serial implementation resumed on 2026-07-18 after the first worker hit a service-side 403; partial runtime work is preserved, fixture/evidence remain incomplete, and `src/types.ts` stays excluded.
+- `[短工]#realtime-p1-scheduler-configurable-concurrency@v0.1`: summarized accepted/pushed slice at `4508ce3`; S-01 through S-16, R-01 through R-03 and C-01 through C-12 pass with limits `1..4`, same-Agent reservation `1` and external Agent spawn `0`.
 - `[PM]#daily-plan@2026-07-09`: summarized 2026-07-09 daily plan;B②/C short-worker/D 今天/E1 evidence is retained as history.
 - `[PM]#daily-plan@2026-07-10`: summarized 2026-07-10 daily plan;administrator decisions and W28/closeout preparation are retained as history.
 
@@ -226,5 +227,5 @@ next action:
 - M5 Day 5B correction `115c621` and final closeout `8df940c` are pushed to `origin/main`; preserve the residual-risk record and keep all M5 product lanes closed.
 - Keep M5 product dispatch closed. Direct tray/pointer and Windows notification visibility may only reopen through fresh bounded evidence lanes.
 - Preserve accepted scheduler commit `ccedb15`, its five-file selective integration and S/R regression evidence; no scheduler worker remains active.
-- Continue exactly one replacement short worker from the fenced runtime diff; complete C-01 through C-12 and write evidence dated 2026-07-18 before PM acceptance.
+- Preserve `4508ce3` and its shared-worktree plus isolated staged-snapshot evidence; open a new bounded card before priority/starvation, cancellation DAG or Connector quota work.
 - Keep priority, starvation protection, cancellation DAG and Connector quotas outside this intake; preserve all seven W28 carry-over blockers separately.

@@ -3,9 +3,9 @@
 [短工]#realtime-p1-scheduler-configurable-concurrency@v0.1
 ⟦tag:v2|task|realtime-p1-scheduler-configurable-concurrency-v0.1⟧
 
-loop state: active
-dispatch state: active
-status: active_implementation_resumed_after_worker_403
+loop state: summarized
+dispatch state: summarized
+status: accepted_pushed_4508ce3
 date: 2026-07-17
 ddl: 2026-07-17
 execution resumed: 2026-07-18
@@ -144,3 +144,6 @@ changed files:
 - PM accepts the intake for dispatch. The accepted control baseline must be committed/pushed before exactly one short implementation worker starts.
 - Dispatch baseline `e237b7c` was pushed. The first short worker added a partial allowed runtime implementation, then stopped on service-side `403 DAILY_LIMIT_EXCEEDED` before fixtures or evidence; this is an incomplete worker callback, not a code rejection.
 - On 2026-07-18 PM preserved the fenced runtime diff, moved the evidence filename to the real execution date and authorized one serial replacement worker to continue the same task. No second worker may overlap it.
+- The replacement worker completed runtime and fixtures before another service-side 403 interrupted its final callback. PM independently reran S-01 through S-16, R-01 through R-03, C-01 through C-12 and all recurring gates.
+- Shared-worktree and exact three-file isolated staged-snapshot gates passed. PM accepted and pushed implementation commit `4508ce3` with remote parity.
+- No product worker remains active. Priority/starvation, cancellation DAG and Connector quotas remain outside this summarized slice.
