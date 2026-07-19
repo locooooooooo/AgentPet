@@ -81,6 +81,12 @@ const lifecycle = (agentId, overrides = {}) => ({
   primaryAction: 'launch',
   observedAt: now,
   detail: 'fixture',
+  version: {
+    value: null,
+    source: 'not-observed',
+    status: 'unknown',
+    observedAt: now
+  },
   ...overrides
 });
 
@@ -108,7 +114,14 @@ assert(catalogued.every((entry) => entry.installed.value === 'unknown'));
 assert(catalogued.every((entry) => entry.connector.value !== 'ready' && entry.connector.value !== 'online'));
 
 const installed = project({
-  hostDiscovery: host({ lifecycle: [lifecycle('trae')] }),
+  hostDiscovery: host({ lifecycle: [lifecycle('trae', {
+    version: {
+      value: '1.96.0',
+      source: 'windows-uninstall-registry',
+      status: 'verified',
+      observedAt: now
+    }
+  })] }),
   agentTruth: truth({ agents: [{ agentId: 'trae', connectorId: 'trae', configured: true }] })
 });
 const trae = installed.find((entry) => entry.agentId === 'trae');
@@ -116,6 +129,8 @@ assert.equal(trae?.supportLevel, 'launchable');
 assert.equal(trae?.installed.value, 'yes');
 assert.equal(trae?.running.value, 'no');
 assert.equal(trae?.connector.value, 'blocked');
+assert.equal(trae?.version.value, '1.96.0');
+assert.equal(trae?.version.source, 'windows-uninstall-registry');
 
 const orphan = project({
   hostDiscovery: host({ facts: [{
@@ -124,13 +139,21 @@ const orphan = project({
     displayName: 'Kimi',
     running: true,
     processCount: 9,
-    observedAt: now
+    observedAt: now,
+    version: {
+      value: null,
+      source: 'identity-mismatch',
+      status: 'unknown',
+      observedAt: now
+    }
   }] })
 });
 const kimi = orphan.find((entry) => entry.agentId === 'kimi');
 assert(kimi && !kimi.catalogued, 'unbound Kimi must be visible as a discovery entry');
 assert.equal(kimi.supportLevel, 'detected');
 assert.equal(kimi.installed.value, 'unknown', 'process presence must not self-grant installed');
+assert.equal(kimi.version.value, null);
+assert.equal(kimi.version.source, 'identity-mismatch');
 assert.equal(kimi.running.value, 'yes');
 assert.equal(kimi.lifecycleState.value, 'detected', 'process presence must not self-grant working activity');
 assert.equal(kimi.connector.value, 'unregistered');
@@ -169,4 +192,4 @@ const qoder = catalogued.find((entry) => entry.agentId === 'qoder');
 assert.equal(qoder?.connector.value, 'blocked');
 
 console.log('agent library check passed.');
-console.log('catalogue, host-only discovery, installed/launchable, connector blocking, coordinatable and unavailable fail-closed paths verified.');
+console.log('catalogue, host-only discovery, verified/unknown version, installed/launchable, connector blocking, coordinatable and unavailable fail-closed paths verified.');

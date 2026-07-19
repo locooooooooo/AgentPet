@@ -6,9 +6,9 @@
   "source": "docs/orchestration/index.md",
   "todayPlan": {
     "date": "2026-07-19",
-    "session": "docs/orchestration/sessions/hub-agent-install-plan-review-m1-2026-07-19.md",
-    "selectedRoute": "Preserve the M1.2 review-only InstallPlan gate; keep execution closed while advancing independent lifecycle evidence",
-    "progress": "docs/orchestration/sessions/hub-agent-install-plan-review-m1-2026-07-19.md"
+    "session": "docs/orchestration/sessions/hub-agent-version-evidence-m1-2026-07-19.md",
+    "selectedRoute": "Preserve M1.3 independent version evidence; keep support and Connector state evidence-separated while choosing the next lifecycle or Adapter gate",
+    "progress": "docs/orchestration/sessions/hub-agent-version-evidence-m1-2026-07-19.md"
   },
   "p0Cards": [
     {
@@ -66,13 +66,19 @@
       "progress": "docs/orchestration/sessions/hub-agent-install-plan-review-m1-2026-07-19.md"
     },
     {
+      "id": "hub-agent-version-evidence-m1",
+      "status": "implemented_live_packaged_verified",
+      "task": "docs/orchestration/tasks/hub-agent-version-evidence-m1-v0.1.md",
+      "progress": "docs/orchestration/sessions/hub-agent-version-evidence-m1-2026-07-19.md"
+    },
+    {
       "id": "hub-next-stage-requirements",
       "status": "ready_for_execution_decision",
       "task": "docs/orchestration/tasks/hub-next-stage-requirements-v0.1.md",
       "progress": "docs/orchestration/sessions/hub-next-stage-plan-2026-07-18.md"
     }
   ],
-  "blocker": "Lifecycle action smoke, M1.1 Agent Library and the M1.2 review-only InstallPlan gate are packaged and verified. Kimi publisher/artifact/document/signature trust remains unknown, so the Plan is draft and execution stays closed. OpenClaw risk/auth setup remains user-controlled. HubTheme/HubSoundPack contracts pass automated checks and independent exact-file review at the contract boundary, while full DockView, unaccepted product inputs, version evidence and broader UI truth remain separate work. P0-C still lacks a confirmed cwd/task/timeout/read-set/write-ban/stop-condition authorization envelope；Codex/Trae/Qoder Connector machine gates remain unchanged and disabled。",
+  "blocker": "Lifecycle action smoke, M1.1 Agent Library, M1.2 review-only InstallPlan and M1.3 live version evidence are packaged and verified. Kimi publisher/artifact/document/signature trust remains unknown, so the Plan is draft and execution stays closed. OpenClaw risk/auth setup remains user-controlled. HubTheme/HubSoundPack contracts pass automated checks and independent exact-file review at the contract boundary, while full DockView, unaccepted product inputs and broader UI truth remain separate work. P0-C still lacks a confirmed cwd/task/timeout/read-set/write-ban/stop-condition authorization envelope；Codex/Trae/Qoder Connector machine gates remain unchanged and disabled。",
   "roles": [
     {
       "id": "pm",

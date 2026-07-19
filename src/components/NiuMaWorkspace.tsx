@@ -1416,8 +1416,8 @@ function AgentLibraryDialog({
                     <small>{entry.lifecycleState.value}</small>
                   </td>
                   <td>
-                    <code>{entry.version.value ?? 'unknown'}</code>
-                    <small>{entry.version.source}</small>
+                    <code title={entry.version.value ?? 'unknown'}>{entry.version.value ?? 'unknown'}</code>
+                    <small title={entry.version.source}>{entry.version.source}</small>
                   </td>
                   <td>
                     <span className={`agent-library-evidence is-${entry.installed.value}`}>{entry.installed.value}</span>

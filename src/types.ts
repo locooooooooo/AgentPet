@@ -278,6 +278,19 @@ export type AgentInstanceSource =
 
 export type AgentHostDiscoveryAvailability = 'available' | 'unavailable' | 'unsupported';
 export type AgentHostDiscoverySource = 'windows-process-list' | 'unsupported' | 'unavailable';
+export type AgentHostVersionSource =
+  | 'windows-process-file-version'
+  | 'windows-uninstall-registry'
+  | 'not-observed'
+  | 'conflict'
+  | 'identity-mismatch';
+
+export interface AgentHostVersionEvidence {
+  value: string | null;
+  source: AgentHostVersionSource;
+  status: 'verified' | 'unknown' | 'conflict';
+  observedAt: string;
+}
 
 export interface AgentHostProcessFact {
   agentId: string;
@@ -286,6 +299,7 @@ export interface AgentHostProcessFact {
   running: true;
   processCount: number;
   observedAt: string;
+  version?: AgentHostVersionEvidence;
 }
 
 export type AgentHostLifecycleState = 'not-installed' | 'stopped' | 'idle' | 'working';
@@ -303,6 +317,7 @@ export interface AgentHostLifecycleFact {
   primaryAction?: AgentHostPrimaryAction;
   observedAt: string;
   detail: string;
+  version?: AgentHostVersionEvidence;
 }
 
 export interface AgentHostDiscoverySnapshot {

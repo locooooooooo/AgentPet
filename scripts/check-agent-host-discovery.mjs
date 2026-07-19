@@ -44,6 +44,34 @@ assert.deepEqual(kimi.facts[0], {
   displayName: 'Kimi',
   running: true,
   processCount: 3,
+  observedAt: OBSERVED_AT,
+  version: {
+    value: null,
+    source: 'not-observed',
+    status: 'unknown',
+    observedAt: OBSERVED_AT
+  }
+});
+
+const versionedFacts = collectAgentHostFacts(
+  ['WorkBuddy.exe', 'Kimi.exe'],
+  OBSERVED_AT,
+  [
+    { agentId: 'workbuddy', version: '2.7.1', identity: 'WorkBuddy', source: 'windows-process-file-version' },
+    { agentId: 'workbuddy', version: '2.7.1', identity: 'WorkBuddy', source: 'windows-uninstall-registry' },
+    { agentId: 'kimi', version: '1.2.3', identity: 'Kimi Helper', source: 'windows-process-file-version' }
+  ]
+);
+assert.deepEqual(versionedFacts[0].version, {
+  value: '2.7.1',
+  source: 'windows-process-file-version',
+  status: 'verified',
+  observedAt: OBSERVED_AT
+});
+assert.deepEqual(versionedFacts[1].version, {
+  value: null,
+  source: 'identity-mismatch',
+  status: 'unknown',
   observedAt: OBSERVED_AT
 });
 
@@ -63,7 +91,14 @@ assert.deepEqual(
 const managedLifecycle = collectAgentHostLifecycleFacts({
   processNames: ['WorkBuddy.exe', 'MiniMax Code.exe'],
   installedAgentIds: ['trae', 'workbuddy', 'qoder', 'minimax', 'openclaw'],
-  serviceInstalledAgentIds: []
+  serviceInstalledAgentIds: [],
+  versionRecords: [
+    { agentId: 'trae', version: '1.0.0', identity: 'Trae', source: 'windows-process-file-version' },
+    { agentId: 'trae', version: '1.1.0', identity: 'Trae', source: 'windows-uninstall-registry' },
+    { agentId: 'workbuddy', version: '2.7.1', identity: 'WorkBuddy', source: 'windows-process-file-version' },
+    { agentId: 'qoder', version: '3.2.0', identity: 'Qoder Helper', source: 'windows-process-file-version' },
+    { agentId: 'minimax', version: '5.4.0', identity: 'MiniMax Code', source: 'windows-uninstall-registry' }
+  ]
 }, OBSERVED_AT);
 assert.deepEqual(
   managedLifecycle.map((fact) => [
@@ -71,14 +106,17 @@ assert.deepEqual(
     fact.installed,
     fact.state,
     fact.primaryAction ?? null,
-    fact.serviceInstalled ?? null
+    fact.serviceInstalled ?? null,
+    fact.version?.value ?? null,
+    fact.version?.status ?? null,
+    fact.version?.source ?? null
   ]),
   [
-    ['trae', true, 'stopped', 'launch', null],
-    ['workbuddy', true, 'idle', 'focus', null],
-    ['qoder', true, 'stopped', 'launch', null],
-    ['minimax', true, 'idle', 'focus', null],
-    ['openclaw', true, 'stopped', 'install', false]
+    ['trae', true, 'stopped', 'launch', null, null, 'conflict', 'conflict'],
+    ['workbuddy', true, 'idle', 'focus', null, '2.7.1', 'verified', 'windows-process-file-version'],
+    ['qoder', true, 'stopped', 'launch', null, null, 'unknown', 'identity-mismatch'],
+    ['minimax', true, 'idle', 'focus', null, '5.4.0', 'verified', 'windows-uninstall-registry'],
+    ['openclaw', true, 'stopped', 'install', false, null, 'unknown', 'not-observed']
   ],
   'Managed lifecycle must distinguish installed/stopped, running/idle and OpenClaw service setup'
 );
@@ -137,8 +175,8 @@ for (const snapshot of [kimi, unavailable, unsupported]) {
   snapshot.facts.forEach((fact) => {
     assert.deepEqual(
       Object.keys(fact).sort(),
-      ['agentId', 'connectorId', 'displayName', 'observedAt', 'processCount', 'running'].sort(),
-      'Host facts must remain presence-only'
+      ['agentId', 'connectorId', 'displayName', 'observedAt', 'processCount', 'running', 'version'].sort(),
+      'Host facts may expose bounded version evidence but no execution or Session fields'
     );
     assert.equal('online' in fact, false);
     assert.equal('busy' in fact, false);
@@ -150,6 +188,10 @@ assert.match(source, /execFile\(\s*'powershell\.exe'/s, 'Default Windows probe m
 assert.match(source, /Get-Process -ErrorAction Stop/);
 assert.match(source, /Get-CimInstance Win32_Process/, 'Gateway detection may inspect a fixed process command-line pattern');
 assert.match(source, /Get-StartApps/, 'Installation detection must use Windows app registration');
+assert.match(source, /MainModule\.FileVersionInfo/, 'Running primary versions must use read-only file metadata');
+assert.match(source, /Windows\\CurrentVersion\\Uninstall/, 'Stopped application versions may use fixed uninstall registry roots');
+assert.match(source, /windows-process-file-version/);
+assert.match(source, /windows-uninstall-registry/);
 assert.match(source, /ByteDance\.Trae/, 'Trae installation detection must use the fixed Windows AppID');
 assert.match(source, /WorkBuddy\.WorkBuddy/, 'WorkBuddy installation detection must use the fixed Windows AppID');
 assert.match(source, /Get-ScheduledTask -TaskName 'OpenClaw Gateway'/, 'OpenClaw service detection must use the fixed service name');
@@ -159,10 +201,12 @@ assert.doesNotMatch(
   /execFile\(\s*['"](?:Trae|WorkBuddy|Kimi|MiniMax Code)(?:\.exe)?['"]/s,
   'Discovery must never launch an Agent executable'
 );
+assert.doesNotMatch(source, /--version|\s-version\b|version\s+command/i, 'Version discovery must not execute an Agent CLI');
 assert.equal(injectedProcessListCalls, 2, 'Fixtures must use the injected read-only process list');
 
 console.log('agent host discovery check passed.');
 console.log('Kimi multi-process aggregation and Trae/WorkBuddy/Kimi/MiniMax exact matching: verified');
+console.log('exact primary/registry version evidence, conflict and identity-mismatch fail-closed paths: verified');
 console.log('Trae/Qoder stopped, WorkBuddy/MiniMax idle and OpenClaw service-missing lifecycle states: verified');
 console.log('paths/helpers/approximate names ignored; unavailable/unsupported fail closed: verified');
 console.log('renderer facts expose no session/online/busy/path/command/title fields: verified');

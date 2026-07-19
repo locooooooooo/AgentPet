@@ -74,6 +74,7 @@ try {
   assert.ok(library.rowIds.includes('codex') && library.rowIds.includes('trae') && library.rowIds.includes('openclaw'));
   assert.ok(library.levels.length === library.registeredRows, 'Agent Library rows must expose support levels');
   assert.ok(library.evidenceSources.every((source) => source.length > 0), 'Agent Library rows must expose evidence sources');
+  assert.ok(library.verifiedVersionCount >= 3, `Agent Library must expose independent versions for at least three lifecycle candidates: ${JSON.stringify(library)}`);
   assert.ok(library.tableOverflow <= 1, `Agent Library table has horizontal overflow: ${JSON.stringify(library)}`);
   const libraryScreenshot = libraryScreenshotPath ? await captureScreenshot(cdp, libraryScreenshotPath) : null;
   await clickElement(cdp, `document.querySelector('[data-agent-library="true"] button[aria-label="审阅 Kimi InstallPlan"]')`);
@@ -316,7 +317,10 @@ async function readAgentLibrary(client) {
       registeredRows: dialog?.querySelectorAll('tbody tr[data-catalogued="true"]').length || 0,
       rowIds: Array.from(dialog?.querySelectorAll('tbody tr[data-catalogued="true"]') || []).map((row) => row.getAttribute('data-agent-library-row')),
       levels: Array.from(dialog?.querySelectorAll('tbody tr[data-catalogued="true"]') || []).map((row) => row.getAttribute('data-support-level')),
+      versionValues: Array.from(dialog?.querySelectorAll('tbody tr[data-catalogued="true"] td:nth-child(3) code') || []).map((code) => code.textContent?.trim() || ''),
+      versionSources: Array.from(dialog?.querySelectorAll('tbody tr[data-catalogued="true"] td:nth-child(3) small') || []).map((item) => item.textContent?.trim() || ''),
       evidenceSources: Array.from(dialog?.querySelectorAll('tbody tr[data-catalogued="true"] td:nth-child(8) code') || []).map((code) => code.textContent?.trim() || ''),
+      verifiedVersionCount: Array.from(dialog?.querySelectorAll('tbody tr[data-catalogued="true"] td:nth-child(3) code') || []).filter((code) => code.textContent?.trim() && code.textContent.trim() !== 'unknown').length,
       tableOverflow: table ? table.scrollWidth - table.clientWidth : 0
     };
   })()`);

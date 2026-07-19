@@ -1,6 +1,7 @@
 import type {
   AgentHostDiscoverySnapshot,
   AgentHostLifecycleFact,
+  AgentHostVersionEvidence,
   CodexHostSnapshot,
   ConnectorConfig,
   ConnectorGateResult
@@ -161,7 +162,7 @@ function projectManifestEntry(context: {
       supportSource(supportLevel, manifest, lifecycle, connectorEvidence),
       lifecycleObservedAt
     ),
-    version: evidence(null, 'version-not-observed', lifecycleObservedAt),
+    version: projectVersionEvidence(lifecycle?.version, lifecycleObservedAt),
     installed: evidence(
       installed,
       lifecycle ? 'windows-app-registration' : hasCodexObservation ? projectionInput.codexHost.source : 'not-observed',
@@ -207,7 +208,7 @@ function projectOrphanEntry(
     lifecycleManaged: false,
     supportLevel,
     support: evidence(supportLevel, 'windows-process-list', observedAt),
-    version: evidence(null, 'version-not-observed', observedAt),
+    version: projectVersionEvidence(fact.version, observedAt),
     installed: evidence('unknown', 'process-presence-does-not-prove-installed', observedAt),
     running: evidence(detected ? 'yes' : 'unknown', 'windows-process-list', observedAt),
     lifecycleState: evidence(detected ? 'detected' : 'unknown', 'windows-process-list', observedAt),
@@ -282,6 +283,20 @@ function supportSource(
 
 function evidence<T>(value: T, source: string, observedAt: string): AgentLibraryEvidence<T> {
   return { value, source, observedAt };
+}
+
+function projectVersionEvidence(
+  version: AgentHostVersionEvidence | undefined,
+  fallbackObservedAt: string
+): AgentLibraryEvidence<string | null> {
+  if (!version) {
+    return evidence(null, 'version-not-observed', fallbackObservedAt);
+  }
+  return evidence(
+    version.status === 'verified' ? version.value : null,
+    version.source,
+    version.observedAt || fallbackObservedAt
+  );
 }
 
 function normalizeDate(value: string | number | Date): string {

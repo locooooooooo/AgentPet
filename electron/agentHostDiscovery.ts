@@ -3,7 +3,9 @@ import type {
   AgentHostDiscoverySnapshot,
   AgentHostLifecycleFact,
   AgentHostPrimaryAction,
-  AgentHostProcessFact
+  AgentHostProcessFact,
+  AgentHostVersionEvidence,
+  AgentHostVersionSource
 } from '../src/types';
 
 export type AgentHostProcessList = readonly string[];
@@ -13,6 +15,14 @@ export interface AgentHostMachineProbe {
   processNames: string[];
   installedAgentIds: string[];
   serviceInstalledAgentIds: string[];
+  versionRecords?: AgentHostVersionRecord[];
+}
+
+export interface AgentHostVersionRecord {
+  agentId: string;
+  version: string;
+  identity: string;
+  source: Extract<AgentHostVersionSource, 'windows-process-file-version' | 'windows-uninstall-registry'>;
 }
 
 export interface AgentHostDiscoveryOptions {
@@ -27,6 +37,7 @@ interface SupportedAgentHost {
   connectorId: string;
   displayName: string;
   processName: string;
+  versionIdentityAliases: readonly string[];
   lifecycleManaged?: boolean;
 }
 
@@ -36,6 +47,7 @@ const SUPPORTED_AGENT_HOSTS: readonly SupportedAgentHost[] = Object.freeze([
     connectorId: 'trae',
     displayName: 'Trae',
     processName: 'Trae.exe',
+    versionIdentityAliases: ['Trae'],
     lifecycleManaged: true
   }),
   Object.freeze({
@@ -43,19 +55,22 @@ const SUPPORTED_AGENT_HOSTS: readonly SupportedAgentHost[] = Object.freeze([
     connectorId: 'workbuddy',
     displayName: 'WorkBuddy',
     processName: 'WorkBuddy.exe',
+    versionIdentityAliases: ['WorkBuddy'],
     lifecycleManaged: true
   }),
   Object.freeze({
     agentId: 'kimi',
     connectorId: 'kimi',
     displayName: 'Kimi',
-    processName: 'Kimi.exe'
+    processName: 'Kimi.exe',
+    versionIdentityAliases: ['Kimi', 'Kimi Desktop']
   }),
   Object.freeze({
     agentId: 'qoder',
     connectorId: 'qoder',
     displayName: 'Qoder',
     processName: 'Qoder.exe',
+    versionIdentityAliases: ['Qoder'],
     lifecycleManaged: true
   }),
   Object.freeze({
@@ -63,6 +78,7 @@ const SUPPORTED_AGENT_HOSTS: readonly SupportedAgentHost[] = Object.freeze([
     connectorId: 'minimax',
     displayName: 'MiniMax Code',
     processName: 'MiniMax Code.exe',
+    versionIdentityAliases: ['MiniMax', 'MiniMax Agent', 'MiniMax Code'],
     lifecycleManaged: true
   }),
   Object.freeze({
@@ -70,6 +86,7 @@ const SUPPORTED_AGENT_HOSTS: readonly SupportedAgentHost[] = Object.freeze([
     connectorId: 'openclaw',
     displayName: 'OpenClaw Gateway',
     processName: 'OpenClaw Gateway.exe',
+    versionIdentityAliases: ['OpenClaw', 'OpenClaw Gateway'],
     lifecycleManaged: true
   })
 ]);
@@ -86,7 +103,7 @@ export async function discoverAgentHosts(
 
   try {
     const probe = await getMachineProbe(options);
-    const facts = collectAgentHostFacts(probe.processNames, observedAt);
+    const facts = collectAgentHostFacts(probe.processNames, observedAt, probe.versionRecords);
     const lifecycle = collectAgentHostLifecycleFacts(probe, observedAt);
     return {
       version: 1,
@@ -104,7 +121,8 @@ export async function discoverAgentHosts(
 
 export function collectAgentHostFacts(
   processNames: AgentHostProcessList,
-  observedAt: string
+  observedAt: string,
+  versionRecords: readonly AgentHostVersionRecord[] = []
 ): AgentHostProcessFact[] {
   const counts = countProcessNames(processNames);
   return SUPPORTED_AGENT_HOSTS.flatMap((host) => {
@@ -115,7 +133,8 @@ export function collectAgentHostFacts(
       displayName: host.displayName,
       running: true as const,
       processCount,
-      observedAt
+      observedAt,
+      version: resolveAgentHostVersion(host, versionRecords, observedAt)
     }];
   });
 }
@@ -127,6 +146,7 @@ export function collectAgentHostLifecycleFacts(
   const counts = countProcessNames(probe.processNames);
   const installedAgentIds = new Set(probe.installedAgentIds.map(normalizeAgentId));
   const serviceInstalledAgentIds = new Set(probe.serviceInstalledAgentIds.map(normalizeAgentId));
+  const versionRecords = probe.versionRecords ?? [];
 
   return SUPPORTED_AGENT_HOSTS
     .filter((host) => host.lifecycleManaged)
@@ -139,6 +159,7 @@ export function collectAgentHostLifecycleFacts(
         : undefined;
       const state = !installed ? 'not-installed' as const : (running ? 'idle' as const : 'stopped' as const);
       const primaryAction = selectPrimaryAction(host.agentId, installed, running, serviceInstalled);
+      const version = resolveAgentHostVersion(host, versionRecords, observedAt);
       return {
         agentId: host.agentId,
         connectorId: host.connectorId,
@@ -150,7 +171,8 @@ export function collectAgentHostLifecycleFacts(
         state,
         ...(primaryAction ? { primaryAction } : {}),
         observedAt,
-        detail: lifecycleDetail(host.agentId, installed, running, serviceInstalled)
+        detail: lifecycleDetail(host.agentId, installed, running, serviceInstalled),
+        version
       };
     });
 }
@@ -211,28 +233,38 @@ async function getMachineProbe(options: AgentHostDiscoveryOptions): Promise<Agen
     return {
       processNames: [...await options.listProcesses()],
       installedAgentIds: [],
-      serviceInstalledAgentIds: []
+      serviceInstalledAgentIds: [],
+      versionRecords: []
     };
   }
   return normalizeMachineProbe(await probeWindowsAgentHosts());
 }
 
 function normalizeMachineProbe(value: AgentHostMachineProbe): AgentHostMachineProbe {
+  const versionRecords = value?.versionRecords ?? [];
   if (
     !value
     || !Array.isArray(value.processNames)
     || !Array.isArray(value.installedAgentIds)
     || !Array.isArray(value.serviceInstalledAgentIds)
+    || !Array.isArray(versionRecords)
     || !value.processNames.every((item) => typeof item === 'string')
     || !value.installedAgentIds.every((item) => typeof item === 'string')
     || !value.serviceInstalledAgentIds.every((item) => typeof item === 'string')
+    || !versionRecords.every(isVersionRecord)
   ) {
     throw new Error('Windows Agent host probe returned an invalid payload.');
   }
   return {
     processNames: [...value.processNames],
     installedAgentIds: [...new Set(value.installedAgentIds.map(normalizeAgentId).filter(Boolean))],
-    serviceInstalledAgentIds: [...new Set(value.serviceInstalledAgentIds.map(normalizeAgentId).filter(Boolean))]
+    serviceInstalledAgentIds: [...new Set(value.serviceInstalledAgentIds.map(normalizeAgentId).filter(Boolean))],
+    versionRecords: versionRecords.map((record) => ({
+      agentId: normalizeAgentId(record.agentId),
+      version: record.version.trim(),
+      identity: record.identity.trim(),
+      source: record.source
+    }))
   };
 }
 
@@ -266,9 +298,69 @@ function normalizeAgentId(value: string) {
   return value.trim().toLocaleLowerCase('en-US');
 }
 
+function resolveAgentHostVersion(
+  host: SupportedAgentHost,
+  records: readonly AgentHostVersionRecord[],
+  observedAt: string
+): AgentHostVersionEvidence {
+  const candidates = records.filter((record) => normalizeAgentId(record.agentId) === host.agentId);
+  if (candidates.length === 0) {
+    return { value: null, source: 'not-observed', status: 'unknown', observedAt };
+  }
+  const identities = new Set(host.versionIdentityAliases.map(normalizeIdentity));
+  const identityMatches = candidates.filter((record) => identities.has(normalizeIdentity(record.identity)));
+  if (identityMatches.length === 0) {
+    return { value: null, source: 'identity-mismatch', status: 'unknown', observedAt };
+  }
+  const validCandidates = identityMatches.filter((record) => isVersionValue(record.version));
+  const versions = [...new Set(validCandidates.map((record) => record.version.trim()))];
+  if (versions.length !== 1) {
+    return {
+      value: null,
+      source: versions.length > 1 ? 'conflict' : 'not-observed',
+      status: versions.length > 1 ? 'conflict' : 'unknown',
+      observedAt
+    };
+  }
+  const preferred = validCandidates.find((record) => record.source === 'windows-process-file-version')
+    ?? validCandidates[0];
+  return {
+    value: versions[0],
+    source: preferred.source,
+    status: 'verified',
+    observedAt
+  };
+}
+
+function isVersionRecord(value: unknown): value is AgentHostVersionRecord {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return false;
+  }
+  const record = value as Record<string, unknown>;
+  return typeof record.agentId === 'string'
+    && typeof record.version === 'string'
+    && typeof record.identity === 'string'
+    && (record.source === 'windows-process-file-version' || record.source === 'windows-uninstall-registry');
+}
+
+function isVersionValue(value: string) {
+  return /^\d+(?:\.\d+){1,3}(?:[-+][0-9A-Za-z.-]+)?$/.test(value.trim());
+}
+
+function normalizeIdentity(value: string) {
+  return value.trim().toLocaleLowerCase('en-US');
+}
+
 const WINDOWS_HOST_PROBE_SCRIPT = [
   '[Console]::OutputEncoding = [System.Text.Encoding]::UTF8',
-  "$processNames = @(Get-Process -ErrorAction Stop | ForEach-Object { $_.ProcessName + '.exe' })",
+  '$processes = @(Get-Process -ErrorAction Stop)',
+  "$processNames = @($processes | ForEach-Object { $_.ProcessName + '.exe' })",
+  '$versionRecords = @()',
+  "$processVersionTargets = @{ 'Trae' = @('trae', 'Trae'); 'WorkBuddy' = @('workbuddy', 'WorkBuddy'); 'Kimi' = @('kimi', 'Kimi'); 'Qoder' = @('qoder', 'Qoder'); 'MiniMax Code' = @('minimax', 'MiniMax Code') }",
+  "$processVersionTargets.GetEnumerator() | ForEach-Object { $target = $_; $processes | Where-Object { $_.ProcessName -eq $target.Key } | ForEach-Object { try { $info = $_.MainModule.FileVersionInfo; if ($info.FileVersion -and $info.ProductName) { $versionRecords += [pscustomobject]@{ agentId = $target.Value[0]; version = $info.FileVersion; identity = $info.ProductName; source = 'windows-process-file-version' } } } catch {} } }",
+  "$registryVersionTargets = @{ 'Trae' = 'trae'; 'WorkBuddy' = 'workbuddy'; 'Kimi' = 'kimi'; 'Qoder' = 'qoder'; 'MiniMax Code' = 'minimax'; 'OpenClaw' = 'openclaw' }",
+  "$uninstallRoots = @('HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*', 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*', 'HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*')",
+  "$uninstallRoots | ForEach-Object { Get-ItemProperty -Path $_ -ErrorAction SilentlyContinue | Where-Object { $_.DisplayVersion -and $registryVersionTargets.ContainsKey([string]$_.DisplayName) } | ForEach-Object { $versionRecords += [pscustomobject]@{ agentId = $registryVersionTargets[[string]$_.DisplayName]; version = [string]$_.DisplayVersion; identity = [string]$_.DisplayName; source = 'windows-uninstall-registry' } } }",
   "$gatewayProcesses = @(Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | Where-Object { ($_.Name -eq 'node.exe' -or $_.Name -eq 'openclaw.exe') -and $_.CommandLine -match '(?i)(openclaw\\.mjs|openclaw\\.cmd).*gateway(?:\\s+run)?' })",
   "$gatewayProcesses | ForEach-Object { $processNames += 'OpenClaw Gateway.exe' }",
   '$installed = @()',
@@ -282,7 +374,7 @@ const WINDOWS_HOST_PROBE_SCRIPT = [
   "if (Get-ScheduledTask -TaskName 'OpenClaw Gateway' -ErrorAction SilentlyContinue) { $serviceInstalled += 'openclaw' }",
   "$startupGateway = Join-Path $env:APPDATA 'Microsoft\\Windows\\Start Menu\\Programs\\Startup\\OpenClaw Gateway.cmd'",
   "if (Test-Path -LiteralPath $startupGateway) { $serviceInstalled += 'openclaw' }",
-  "[pscustomobject]@{ processNames = $processNames; installedAgentIds = @($installed | Select-Object -Unique); serviceInstalledAgentIds = @($serviceInstalled | Select-Object -Unique) } | ConvertTo-Json -Compress -Depth 3"
+  "[pscustomobject]@{ processNames = $processNames; installedAgentIds = @($installed | Select-Object -Unique); serviceInstalledAgentIds = @($serviceInstalled | Select-Object -Unique); versionRecords = @($versionRecords) } | ConvertTo-Json -Compress -Depth 4"
 ].join('; ');
 
 function probeWindowsAgentHosts(): Promise<AgentHostMachineProbe> {
