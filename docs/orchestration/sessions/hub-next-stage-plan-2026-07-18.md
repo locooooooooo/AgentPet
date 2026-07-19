@@ -18,8 +18,8 @@ date: 2026-07-18
 ## blocked decisions
 
 - User completes or defers OpenClaw onboarding.
-- Independent reviewer accepts or corrects Theme/Sound contracts.
 - User provides the complete P0-C envelope or keeps Codex external execution disabled.
+- Product inputs and full UI truth are reconciled before the broader R0 batch is closed.
 
 ## evidence
 

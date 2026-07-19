@@ -5,7 +5,7 @@
 
 loop state: active
 dispatch state: active
-status: active_hub_r0_post_presence_contracts
+status: active_hub_r0_contracts_reviewed
 
 > **Original planning window**: 2026-07-21 through 2026-07-27
 > **Compressed activation and DDL**: 2026-07-17
@@ -14,7 +14,7 @@ status: active_hub_r0_post_presence_contracts
 
 ## single goal
 
-- Preserve delivered truthful host presence at `04524e8`, then finish separately fenced Theme/SoundPack and full UI truth work while every external execution gate stays closed.
+- Preserve delivered truthful host presence at `04524e8`, preserve exact-file accepted Theme/SoundPack contracts, then reconcile product inputs and full UI truth while every external execution gate stays closed.
 
 ## accepted inputs
 
@@ -68,7 +68,7 @@ status: active_hub_r0_post_presence_contracts
 ## accepted host-presence slice
 
 - User priority moved to the missing real status for locally running WorkBuddy, Kimi and MiniMax. The smallest truthful slice is application-process presence only.
-- AgentManifest + InstallPlan and Adapter Capability are independently accepted only for canonical identity and the presence/Session separation. Theme/SoundPack remain incomplete and still block the full R0 batch.
+- AgentManifest + InstallPlan and Adapter Capability are independently accepted only for canonical identity and the presence/Session separation. Theme/SoundPack are exact-file accepted at the contract boundary; the full R0 batch remains open for product-input and full-UI-truth reconciliation.
 - Current live evidence is Kimi discovered as one unbound application with 9 primary processes; WorkBuddy/MiniMax are not observed running. None contributes to online or busy.
 - Electron control-cockpit replay visibly shows Kimi's process count, `Connector 0 · Codex Desktop 2`, and zero application tasks. Direct Windows capture remains unavailable, with isolated DevTools DOM/PNG used as the bounded fallback.
 - External Agent spawn, Connector binding/enabling, task inference from process/window/log facts, installer work, DockView and theme/sound implementation remain zero/non-goals.
@@ -94,7 +94,7 @@ The configurable-concurrency slice `4508ce3` changed only `src/lib/connectorRunt
 - PM independently reviews the diff and does not infer real Agent E2E from controlled local fixtures.
 
 next action:
-- Preserve `4508ce3`, `2a2f7f5` and delivered presence commit `04524e8`; continue separately fenced Theme/SoundPack and full UI truth work.
+- Preserve `4508ce3`, `2a2f7f5` and delivered presence commit `04524e8`; preserve the exact-file contract review and open only a separately fenced reconciliation or M1 lifecycle card after remaining M0 decisions.
 
 summary:
-- Next-stage requirements now preserve the delivered presence slice under two accepted contract boundaries. The full R0 batch remains incomplete until the remaining contracts and separate UI truth acceptance pass; every external execution gate stays closed.
+- Next-stage requirements now preserve the delivered presence slice and exact-file accepted content contracts. The full R0 batch remains incomplete until product-input and separate UI truth acceptance pass; every external execution gate stays closed.

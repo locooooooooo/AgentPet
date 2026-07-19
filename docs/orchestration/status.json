@@ -49,9 +49,9 @@
     },
     {
       "id": "hub-r0-content-contracts",
-      "status": "implemented_automated_verified_pending_independent_review",
+      "status": "accepted_exact_file_reviewed_contract_boundary",
       "task": "docs/orchestration/tasks/hub-r0-contract-freeze-v0.1.md",
-      "progress": "docs/orchestration/sessions/hub-blocker-remediation-2026-07-18.md"
+      "progress": "docs/orchestration/sessions/hub-content-contract-review-2026-07-19.md"
     },
     {
       "id": "hub-next-stage-requirements",
@@ -60,7 +60,7 @@
       "progress": "docs/orchestration/sessions/hub-next-stage-plan-2026-07-18.md"
     }
   ],
-  "blocker": "Lifecycle action smoke and a real packaged Electron screenshot are complete through the CDP route; OpenClaw risk/auth setup remains user-controlled. HubTheme/HubSoundPack contracts pass automated checks but await independent exact-file review, while full DockView and broader UI truth remain separate work. P0-C still lacks a confirmed cwd/task/timeout/read-set/write-ban/stop-condition authorization envelope；Codex/Trae/Qoder Connector machine gates remain unchanged and disabled。",
+  "blocker": "Lifecycle action smoke and a real packaged Electron screenshot are complete through the CDP route; OpenClaw risk/auth setup remains user-controlled. HubTheme/HubSoundPack contracts pass automated checks and independent exact-file review at the contract boundary, while full DockView, unaccepted product inputs and broader UI truth remain separate work. P0-C still lacks a confirmed cwd/task/timeout/read-set/write-ban/stop-condition authorization envelope；Codex/Trae/Qoder Connector machine gates remain unchanged and disabled。",
   "roles": [
     {
       "id": "pm",
@@ -508,7 +508,7 @@
       "title": "[PM]#weekly-requirements@2026-07-21",
       "owner": "主控",
       "status": "active",
-      "responsibility": "Own post-presence Hub R0 work after delivered 04524e8; Theme/SoundPack candidates are automated-verified pending independent review, while full UI truth and every external execution gate remain separately controlled.",
+      "responsibility": "Own post-presence Hub R0 work after delivered 04524e8; Theme/SoundPack contracts are exact-file reviewed at the contract boundary, while full UI truth and every external execution gate remain separately controlled.",
       "tag": "⟦tag:v2|session|weekly-requirements-2026-07-21⟧",
       "evidence": "docs/orchestration/sessions/weekly-requirements-2026-07-21.md"
     },

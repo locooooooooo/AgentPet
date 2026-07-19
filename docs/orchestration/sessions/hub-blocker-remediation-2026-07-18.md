@@ -20,7 +20,7 @@ priority: P0/R0
 ## external acceptance still required
 
 - OpenClaw Gateway is not installed until the user accepts the visible official risk prompt and completes authentication; code must not do this automatically.
-- Theme/SoundPack automated checks pass, but the R0 freeze requires an independent exact-file review before final accepted status.
+- Theme/SoundPack automated checks and the 2026-07-19 independent exact-file review pass at the contract boundary; broader R0 acceptance still requires product-input and full-UI-truth reconciliation.
 - P0-C remains unauthorized because the current user message does not confirm cwd, exact read-only task, timeout, allowed read set, write prohibition and stop conditions required by its hard precondition.
 - Connector machine gates remain unchanged and disabled.
 
@@ -30,3 +30,4 @@ priority: P0/R0
 - Screenshot route: `electron-cdp-page-capture`; Windows `SetIsBorderRequired` was not invoked.
 - OpenClaw action smoke: `official-wizard-started`; standalone visible terminal PID `40732`.
 - Contract checker: theme valid + two invalid, sound valid + two invalid, HT-01~12 and HS-01~15 complete.
+- Exact-file review: `docs/orchestration/sessions/hub-content-contract-review-2026-07-19.md`; R3 theme/sound implementation remains outside this acceptance.

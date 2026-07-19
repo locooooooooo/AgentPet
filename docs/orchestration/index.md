@@ -131,6 +131,7 @@ tracked business cards:
 - session: ⟦tag:v2|session|hub-agent-session-view-p0-5-2026-07-18⟧ -> `docs/orchestration/sessions/hub-agent-session-view-p0-5-2026-07-18.md`
 - session: ⟦tag:v2|session|hub-blocker-remediation-2026-07-18⟧ -> `docs/orchestration/sessions/hub-blocker-remediation-2026-07-18.md`
 - session: ⟦tag:v2|session|hub-next-stage-plan-2026-07-18⟧ -> `docs/orchestration/sessions/hub-next-stage-plan-2026-07-18.md`
+- session: ⟦tag:v2|session|hub-content-contract-review-2026-07-19⟧ -> `docs/orchestration/sessions/hub-content-contract-review-2026-07-19.md`
 - session: ⟦tag:v2|session|homepage-layout-density-2026-07-16⟧ -> `docs/orchestration/sessions/homepage-layout-density-2026-07-16.md`
 - session: ⟦tag:v2|session|weekly-closeout-2026-07-11⟧ -> `docs/orchestration/sessions/weekly-closeout-2026-07-11.md`
 - session: ⟦tag:v2|session|m5-five-day-development-2026-07-14⟧ -> `docs/orchestration/sessions/m5-five-day-development-2026-07-14.md`
@@ -202,7 +203,7 @@ current role split:
 - `[PM]#realtime-cockpit-next-stage@2026-07-15`: summarized historical P0-C authorization control session; A7.1/B2 control commit `74d8f50` is already pushed.
 - `[PM]#weekly-requirements@2026-07-07`: summarized W27 (2026-07-07~2026-07-13) weekly-requirements history; final closeout is recorded in `weekly-closeout-2026-07-11.md`.
 - `[PM]#weekly-requirements@2026-07-14`: summarized W28 planner after early closeout under the administrator's full schedule waiver; seven carry-over items remain non-blocking.
-- `[PM]#weekly-requirements@2026-07-21`: active post-presence Hub R0 owner; Theme/SoundPack contract candidates and automated checks are delivered, while independent review and full UI truth still block broader acceptance.
+- `[PM]#weekly-requirements@2026-07-21`: active post-presence Hub R0 owner; Theme/SoundPack contracts are exact-file reviewed and accepted at the contract boundary, while product inputs and full UI truth remain separately gated.
 - `[PM]#daily-plan@2026-07-17`: active daily supervision owner preserving prior closeout while the 2026-07-18 Hub control session drives the current bounded dispatch.
 - `[PM]#cockpit-live-session-notification@2026-07-16`: summarized completed/pushed live Codex Desktop Session, Dock detail, completion bubble and sound evidence at `c21a60b`.
 - `[监督]#control-truth-projection@2026-07-17`: summarized accepted visible projection of the 2026-07-17 target, roles, Lanes and blockers.
@@ -217,7 +218,7 @@ current role split:
 
 blockers:
 - The selected-Agent Session slice is packaged and click-verified, but full DockView D0-D4 (free docking, persistence, profiles and Electron pop-outs) remains a separate unmet requirement.
-- HubTheme/HubSoundPack contracts now exist and pass automated valid/invalid example checks; independent exact-file review, unaccepted product inputs and remaining synthetic avatar/status semantics still block broader R0 acceptance.
+- HubTheme/HubSoundPack contracts pass automated valid/invalid example checks and independent exact-file review; unaccepted product inputs and remaining synthetic avatar/status semantics still block broader R0 acceptance.
 - External connector execution remains disabled; Codex is draft/pending/discovery-only, Trae is draft/pending with `Models is required`, and Qoder is rejected/disabled because no independent headless Agent API exists.
 - Real-time cockpit A6/A7.1, renderer truth and B2 controlled production slices are accepted only to the trusted/controlled-process boundary. P0-C real Agent E2E is still unexecuted; configured seeds, CLI discovery, controlled Node processes and simulated ticks must not be reported as online Agent sessions.
 - The historical service-side `403 DAILY_LIMIT_EXCEEDED` is not current availability truth: bounded in-app short workers were dispatched successfully on 2026-07-17. This does not enable any external Connector.
@@ -227,7 +228,7 @@ blockers:
 next action:
 - Use `docs/牛马Hub下一阶段需求与目标-v0.1-2026-07-18.md` as the canonical product and acceptance source; close the three M0 decisions before opening M1 implementation.
 - Preserve the packaged Session slice and open a separately fenced DockView D0 architecture probe before adding drag/drop, saved layouts or native pop-out windows.
-- Independently review the two content contracts, then reconcile product inputs and full UI truth; do not conflate R0 contract acceptance with R3 theme/sound product implementation.
+- Preserve the independently accepted content-contract boundary, then reconcile product inputs and full UI truth; do not conflate R0 contract acceptance with R3 theme/sound product implementation.
 - Preserve pushed A7.1/B2 control commit `74d8f50`; keep the runtime worker count at zero.
 - Keep P0-C at `authorization_required_ready_for_decision` until a fresh explicit Codex execution authorization exists.
 - Do not execute or enable any external Agent Connector from this control closeout.

@@ -20,7 +20,7 @@ priority: P0 planning
 ## readiness
 
 - Lifecycle/Session P0.5 implementation, contracts, package and screenshot evidence exist in the current delivery.
-- M0 still needs user-controlled OpenClaw setup, independent Theme/Sound review and a complete P0-C authorization envelope or explicit defer decision.
+- M0 still needs user-controlled OpenClaw setup, a complete P0-C authorization envelope or explicit defer decision, and product-input/full-UI-truth reconciliation for broader R0 closure. Theme/Sound contracts are exact-file reviewed at the contract boundary.
 - No implementation worker is authorized by this planning card.
 
 ## next action
