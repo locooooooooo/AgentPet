@@ -63,6 +63,11 @@ import {
   type AgentLibraryEntry,
   type AgentLibrarySupportLevel
 } from '../lib/agentLibrary';
+import {
+  AGENT_INSTALL_PLAN_REVIEWS,
+  type InstallPlanReview,
+  type InstallPlanReviewStatus
+} from '../lib/agentInstallPlan';
 import { CONNECTOR_POLICY, ORCHESTRATION_STATUS } from '../lib/orchestrationStatus';
 import { getCodexHostOnlineContribution, getCombinedOnlineSessionCount } from '../lib/codexHostStatus';
 import NiuMaAvatar from './NiuMaAvatar';
@@ -332,13 +337,18 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, codexHost, o
     if (!agentLibraryOpen) {
       return undefined;
     }
+    const previousBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         setAgentLibraryOpen(false);
       }
     };
     window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = previousBodyOverflow;
+    };
   }, [agentLibraryOpen]);
 
   useEffect(() => {
@@ -762,6 +772,7 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, codexHost, o
         <AgentLibraryDialog
           entries={filteredAgentLibrary}
           totalEntries={agentLibrary.length}
+          installPlans={AGENT_INSTALL_PLAN_REVIEWS}
           query={agentLibraryQuery}
           level={agentLibraryLevel}
           onQueryChange={setAgentLibraryQuery}
@@ -1270,6 +1281,7 @@ const agentLibraryLevelOptions: Array<{ value: 'all' | AgentLibrarySupportLevel;
 interface AgentLibraryDialogProps {
   entries: readonly AgentLibraryEntry[];
   totalEntries: number;
+  installPlans: readonly InstallPlanReview[];
   query: string;
   level: 'all' | AgentLibrarySupportLevel;
   onQueryChange: (value: string) => void;
@@ -1281,6 +1293,7 @@ interface AgentLibraryDialogProps {
 function AgentLibraryDialog({
   entries,
   totalEntries,
+  installPlans,
   query,
   level,
   onQueryChange,
@@ -1288,9 +1301,12 @@ function AgentLibraryDialog({
   onClose,
   onSelectAgent
 }: AgentLibraryDialogProps) {
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   const installedCount = entries.filter((entry) => entry.installed.value === 'yes').length;
   const runningCount = entries.filter((entry) => entry.running.value === 'yes').length;
   const coordinatableCount = entries.filter((entry) => entry.supportLevel === 'coordinatable').length;
+  const selectedPlan = installPlans.find((plan) => plan.planId === selectedPlanId) ?? null;
+  const installPlanByAgent = new Map(installPlans.map((plan) => [plan.agentId, plan]));
 
   return (
     <div
@@ -1313,9 +1329,22 @@ function AgentLibraryDialog({
             <span>Manifest registry</span>
             <h2 id="agent-library-title">Agent Library</h2>
           </div>
-          <button type="button" className="icon-button" onClick={onClose} title="关闭 Agent Library" aria-label="关闭 Agent Library">
-            <X size={15} aria-hidden="true" />
-          </button>
+          <div className="agent-library-head-actions">
+            <button
+              type="button"
+              className="safe-status agent-library-plan-trigger"
+              disabled={installPlans.length === 0}
+              onClick={() => setSelectedPlanId(installPlans[0]?.planId ?? null)}
+              aria-label={installPlans[0] ? `审阅 ${installPlans[0].displayName} InstallPlan` : '没有可审阅的 InstallPlan'}
+            >
+              <ShieldAlert size={14} aria-hidden="true" />
+              <span>InstallPlan</span>
+              <strong>{installPlans.length}</strong>
+            </button>
+            <button type="button" className="icon-button" onClick={onClose} title="关闭 Agent Library" aria-label="关闭 Agent Library">
+              <X size={15} aria-hidden="true" />
+            </button>
+          </div>
         </header>
 
         <div className="agent-library-summary" aria-label="Agent Library 摘要">
@@ -1323,6 +1352,7 @@ function AgentLibraryDialog({
           <span><small>Installed</small><strong>{installedCount}</strong></span>
           <span><small>Running</small><strong>{runningCount}</strong></span>
           <span><small>Coordinatable</small><strong>{coordinatableCount}</strong></span>
+          <span><small>Plans</small><strong>{installPlans.length}</strong></span>
         </div>
 
         <div className="agent-library-tools" role="search" aria-label="搜索和过滤 Agent Library">
@@ -1359,20 +1389,24 @@ function AgentLibraryDialog({
                 <th>Installed</th>
                 <th>Running</th>
                 <th>Connector</th>
+                <th>InstallPlan</th>
                 <th>Evidence</th>
                 <th><span className="sr-only">查看工位</span></th>
               </tr>
             </thead>
             <tbody>
-              {entries.map((entry) => (
-                <tr
-                  key={`${entry.agentId}:${entry.connectorId}`}
-                  data-agent-library-row={entry.agentId}
-                  data-catalogued={entry.catalogued ? 'true' : 'false'}
-                  data-support-level={entry.supportLevel}
-                  data-installed={entry.installed.value}
-                  data-running={entry.running.value}
-                >
+              {entries.map((entry) => {
+                const installPlan = installPlanByAgent.get(entry.agentId);
+                return (
+                  <tr
+                    key={`${entry.agentId}:${entry.connectorId}`}
+                    data-agent-library-row={entry.agentId}
+                    data-catalogued={entry.catalogued ? 'true' : 'false'}
+                    data-support-level={entry.supportLevel}
+                    data-installed={entry.installed.value}
+                    data-running={entry.running.value}
+                    data-install-plan-status={installPlan?.status ?? 'unavailable'}
+                  >
                   <td>
                     <strong>{entry.displayName}</strong>
                     <small>{entry.agentId} · {entry.catalogued ? 'registered' : 'unbound'}</small>
@@ -1398,30 +1432,226 @@ function AgentLibraryDialog({
                     <small>{entry.connectorId}</small>
                   </td>
                   <td>
+                    <span className={`install-plan-state is-${installPlan?.status ?? 'unavailable'}`}>
+                      {installPlan?.status ?? 'unavailable'}
+                    </span>
+                    <small>{installPlan?.planId ?? 'no plan'}</small>
+                  </td>
+                  <td>
                     <code title={entry.sources.join(' · ')}>{entry.support.source}</code>
                     <small>{formatDateTime(entry.support.observedAt)}</small>
                   </td>
                   <td>
-                    <button
-                      type="button"
-                      className="icon-button agent-library-open-agent"
-                      disabled={!entry.boundAgent.value}
-                      onClick={() => onSelectAgent(entry.agentId)}
-                      title={entry.boundAgent.value ? `查看 ${entry.displayName} 工位` : `${entry.displayName} 尚未绑定工位`}
-                      aria-label={entry.boundAgent.value ? `查看 ${entry.displayName} 工位` : `${entry.displayName} 尚未绑定工位`}
-                    >
-                      <ExternalLink size={14} aria-hidden="true" />
-                    </button>
+                    <div className="agent-library-row-actions">
+                      <button
+                        type="button"
+                        className="icon-button agent-library-open-agent"
+                        disabled={!installPlan}
+                        onClick={() => setSelectedPlanId(installPlan?.planId ?? null)}
+                        title={installPlan ? `审阅 ${entry.displayName} InstallPlan` : `${entry.displayName} 没有可审阅计划`}
+                        aria-label={installPlan ? `审阅 ${entry.displayName} InstallPlan` : `${entry.displayName} 没有可审阅计划`}
+                      >
+                        <Info size={14} aria-hidden="true" />
+                      </button>
+                      <button
+                        type="button"
+                        className="icon-button agent-library-open-agent"
+                        disabled={!entry.boundAgent.value}
+                        onClick={() => onSelectAgent(entry.agentId)}
+                        title={entry.boundAgent.value ? `查看 ${entry.displayName} 工位` : `${entry.displayName} 尚未绑定工位`}
+                        aria-label={entry.boundAgent.value ? `查看 ${entry.displayName} 工位` : `${entry.displayName} 尚未绑定工位`}
+                      >
+                        <ExternalLink size={14} aria-hidden="true" />
+                      </button>
+                    </div>
                   </td>
-                </tr>
-              ))}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
           {entries.length === 0 ? (
             <div className="agent-library-empty" role="status">没有匹配的 Agent。</div>
           ) : null}
         </div>
+
+        {selectedPlan ? (
+          <InstallPlanReviewDrawer review={selectedPlan} onClose={() => setSelectedPlanId(null)} />
+        ) : null}
       </section>
+    </div>
+  );
+}
+
+const installPlanStatusLabels: Record<InstallPlanReviewStatus, string> = {
+  unavailable: 'unavailable',
+  draft: 'draft',
+  'valid-review-only': 'valid review only',
+  rejected: 'rejected'
+};
+
+function InstallPlanReviewDrawer({ review, onClose }: { review: InstallPlanReview; onClose: () => void }) {
+  const plan = review.document;
+  const summary = review.summary;
+  if (!plan || !summary) {
+    return null;
+  }
+
+  const permissionRows = [
+    ['network', summary.networkHosts.length > 0 ? summary.networkHosts.join(', ') : 'none'],
+    ['elevation', summary.elevationRequired ? summary.elevationReason : 'not required'],
+    ['filesystem reads', `${summary.filesystemReads.length} declared scope(s)`],
+    ['filesystem writes', `${summary.filesystemWrites.length} declared scope(s)`],
+    ['PATH', summary.pathMutation.required ? summary.pathMutation.scope ?? 'scope unresolved' : 'unchanged'],
+    ['shell profile', summary.shellProfileMutation.required ? summary.shellProfileMutation.files.join(', ') : 'unchanged'],
+    ['services', summary.serviceChanges.length > 0 ? `${summary.serviceChanges.length} declared change(s)` : 'none'],
+    ['processes', summary.processLaunches.length > 0 ? `${summary.processLaunches.length} declared launch(es)` : 'none'],
+    ['credentials', summary.credentialAccess.required ? summary.credentialAccess.kinds.join(', ') : 'none']
+  ] as const;
+
+  return (
+    <div
+      className="install-plan-layer"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <aside
+        className="install-plan-drawer"
+        aria-labelledby="install-plan-title"
+        data-install-plan-drawer="true"
+        data-plan-agent={review.agentId}
+        data-plan-status={review.status}
+        data-plan-execution-enabled="false"
+      >
+        <header className="install-plan-head">
+          <div>
+            <span>Review gate · execution closed</span>
+            <h3 id="install-plan-title">{review.displayName} InstallPlan</h3>
+          </div>
+          <div className="install-plan-head-actions">
+            <span className={`install-plan-state is-${review.status}`}>{installPlanStatusLabels[review.status]}</span>
+            <button type="button" className="icon-button" onClick={onClose} title="关闭 InstallPlan" aria-label="关闭 InstallPlan">
+              <X size={15} aria-hidden="true" />
+            </button>
+          </div>
+        </header>
+
+        <div className="install-plan-scroll">
+          <section className="install-plan-section" data-install-plan-metadata="true">
+            <div className="install-plan-section-head">
+              <span>Plan identity</span>
+              <strong>{plan.schemaVersion}</strong>
+            </div>
+            <dl className="install-plan-meta-grid">
+              <div><dt>Plan</dt><dd>{plan.planId}</dd></div>
+              <div><dt>Version</dt><dd>{plan.planVersion}</dd></div>
+              <div><dt>Manifest</dt><dd>{plan.manifestVersionRange}</dd></div>
+              <div><dt>Method</dt><dd>{plan.method}</dd></div>
+              <div><dt>Platform</dt><dd>{plan.platform.os} · {plan.platform.architecture}</dd></div>
+              <div><dt>Lifecycle</dt><dd>{plan.lifecycle}</dd></div>
+            </dl>
+          </section>
+
+          <section className="install-plan-section" data-install-plan-trust="true">
+            <div className="install-plan-section-head">
+              <span>Source & integrity</span>
+              <strong>{plan.sourceArtifacts.length} artifact(s)</strong>
+            </div>
+            <dl className="install-plan-trust-grid">
+              <div data-plan-source="true"><dt>Source</dt><dd>{summary.source}</dd></div>
+              <div data-plan-publisher="true"><dt>Publisher</dt><dd>{summary.publishers.join(', ')}</dd></div>
+              <div data-plan-artifact-digest="true"><dt>Artifact digest</dt><dd>{summary.artifactDigests.join(', ') || 'unresolved'}</dd></div>
+              <div><dt>Document digest</dt><dd>{plan.integrity.documentSha256 ?? 'unresolved'}</dd></div>
+            </dl>
+          </section>
+
+          <section className="install-plan-section" data-install-plan-permissions="true">
+            <div className="install-plan-section-head">
+              <span>Declared permissions & effects</span>
+              <strong>{permissionRows.length}</strong>
+            </div>
+            <div className="install-plan-permission-list">
+              {permissionRows.map(([label, value]) => (
+                <div key={label} data-plan-permission={label}>
+                  <span>{label}</span>
+                  <strong title={value}>{value}</strong>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="install-plan-section" data-install-plan-steps="true">
+            <div className="install-plan-section-head">
+              <span>Structured step DAG</span>
+              <strong>{plan.steps.length} steps · {summary.totalTimeoutSeconds}s</strong>
+            </div>
+            <div className="install-plan-step-list">
+              {plan.steps.map((step, index) => (
+                <div key={step.stepId} data-plan-step={step.stepId}>
+                  <span className="install-plan-step-index">{index + 1}</span>
+                  <div>
+                    <strong>{step.kind}</strong>
+                    <small>{step.stepId} · after {step.dependsOn.join(', ') || 'gate'}</small>
+                  </div>
+                  <div className="install-plan-step-policy">
+                    <span>{step.cancellability}</span>
+                    <span>{step.idempotency}</span>
+                    <span>{step.timeoutSeconds}s</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="install-plan-section" data-install-plan-safety="true">
+            <div className="install-plan-section-head">
+              <span>Cancellation, recovery & Journal</span>
+              <strong>fail closed</strong>
+            </div>
+            <dl className="install-plan-safety-grid">
+              <div data-plan-cancellation="true"><dt>Cancellation</dt><dd>no new normal step · authorized compensation only</dd></div>
+              <div data-plan-recovery="true"><dt>Recovery</dt><dd>{summary.recovery}</dd></div>
+              <div data-plan-journal="true"><dt>Journal</dt><dd>{summary.journal.join(' · ')}</dd></div>
+              <div><dt>Idempotency</dt><dd>{summary.idempotency.join(' · ')}</dd></div>
+            </dl>
+          </section>
+
+          <section className="install-plan-section" data-install-plan-validation="true">
+            <div className="install-plan-section-head">
+              <span>Validation result</span>
+              <strong>{review.issues.length} open item(s)</strong>
+            </div>
+            <div className="install-plan-issue-list">
+              {review.issues.map((issue) => (
+                <div key={`${issue.code}:${issue.path}`} data-plan-issue={issue.code}>
+                  <ShieldAlert size={14} aria-hidden="true" />
+                  <div><strong>{issue.code}</strong><small>{issue.path} · {issue.message}</small></div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="install-plan-section install-plan-consent" data-install-plan-consent="true">
+            <div className="install-plan-section-head">
+              <span>Consent binding preview</span>
+              <strong>not granted</strong>
+            </div>
+            <code>{review.consent?.binding ?? 'unavailable'}</code>
+            <small>{review.consent?.effectsFingerprint ?? 'effects unresolved'}</small>
+          </section>
+        </div>
+
+        <footer className="install-plan-footer">
+          <span><ShieldAlert size={14} aria-hidden="true" /> Review only · no IPC · no machine effects</span>
+          <button type="button" disabled data-install-plan-execute="disabled">
+            <Power size={14} aria-hidden="true" />
+            执行未开放
+          </button>
+        </footer>
+      </aside>
     </div>
   );
 }

@@ -72,6 +72,7 @@ tracked business cards:
 - task: ⟦tag:v2|task|hub-sound-pack-contract-v0.1⟧ -> `docs/orchestration/tasks/hub-sound-pack-contract-v0.1.md`
 - task: ⟦tag:v2|task|hub-next-stage-requirements-v0.1⟧ -> `docs/orchestration/tasks/hub-next-stage-requirements-v0.1.md`
 - task: ⟦tag:v2|task|hub-agent-library-m1-v0.1⟧ -> `docs/orchestration/tasks/hub-agent-library-m1-v0.1.md`
+- task: ⟦tag:v2|task|hub-agent-install-plan-review-m1-v0.1⟧ -> `docs/orchestration/tasks/hub-agent-install-plan-review-m1-v0.1.md`
 - task: ⟦tag:v2|task|realtime-agent-cockpit-p0-a6-trusted-authorizer-v0.1⟧ -> `docs/orchestration/tasks/realtime-agent-cockpit-p0-a6-trusted-authorizer-v0.1.md`
 - task: ⟦tag:v2|task|realtime-agent-cockpit-p0-a7-process-reattach-v0.1⟧ -> `docs/orchestration/tasks/realtime-agent-cockpit-p0-a7-process-reattach-v0.1.md`
 - task: ⟦tag:v2|task|realtime-agent-cockpit-p0-b2-production-path-e2e-v0.1⟧ -> `docs/orchestration/tasks/realtime-agent-cockpit-p0-b2-production-path-e2e-v0.1.md`
@@ -134,6 +135,7 @@ tracked business cards:
 - session: ⟦tag:v2|session|hub-next-stage-plan-2026-07-18⟧ -> `docs/orchestration/sessions/hub-next-stage-plan-2026-07-18.md`
 - session: ⟦tag:v2|session|hub-content-contract-review-2026-07-19⟧ -> `docs/orchestration/sessions/hub-content-contract-review-2026-07-19.md`
 - session: ⟦tag:v2|session|hub-agent-library-m1-2026-07-19⟧ -> `docs/orchestration/sessions/hub-agent-library-m1-2026-07-19.md`
+- session: ⟦tag:v2|session|hub-agent-install-plan-review-m1-2026-07-19⟧ -> `docs/orchestration/sessions/hub-agent-install-plan-review-m1-2026-07-19.md`
 - session: ⟦tag:v2|session|homepage-layout-density-2026-07-16⟧ -> `docs/orchestration/sessions/homepage-layout-density-2026-07-16.md`
 - session: ⟦tag:v2|session|weekly-closeout-2026-07-11⟧ -> `docs/orchestration/sessions/weekly-closeout-2026-07-11.md`
 - session: ⟦tag:v2|session|m5-five-day-development-2026-07-14⟧ -> `docs/orchestration/sessions/m5-five-day-development-2026-07-14.md`
@@ -207,6 +209,7 @@ current role split:
 - `[PM]#weekly-requirements@2026-07-14`: summarized W28 planner after early closeout under the administrator's full schedule waiver; seven carry-over items remain non-blocking.
 - `[PM]#weekly-requirements@2026-07-21`: active post-presence Hub R0 owner; Theme/SoundPack contracts are exact-file reviewed and accepted at the contract boundary, while product inputs and full UI truth remain separately gated.
 - `[PM]#hub-agent-library-m1@v0.1`: summarized M1.1 read-only Agent Library; six registered candidates plus unbound host discovery are packaged and CDP verified, while InstallPlan/version probes and execution remain closed.
+- `[PM]#hub-agent-install-plan-review-m1@v0.1`: summarized M1.2 review-only InstallPlan gate; strict validation and desktop/narrow packaged evidence pass, while publisher/artifact/version trust and all execution remain closed.
 - `[PM]#daily-plan@2026-07-17`: active daily supervision owner preserving prior closeout while the 2026-07-18 Hub control session drives the current bounded dispatch.
 - `[PM]#cockpit-live-session-notification@2026-07-16`: summarized completed/pushed live Codex Desktop Session, Dock detail, completion bubble and sound evidence at `c21a60b`.
 - `[监督]#control-truth-projection@2026-07-17`: summarized accepted visible projection of the 2026-07-17 target, roles, Lanes and blockers.
@@ -222,7 +225,7 @@ current role split:
 blockers:
 - The selected-Agent Session slice is packaged and click-verified, but full DockView D0-D4 (free docking, persistence, profiles and Electron pop-outs) remains a separate unmet requirement.
 - HubTheme/HubSoundPack contracts pass automated valid/invalid example checks and independent exact-file review; unaccepted product inputs and remaining synthetic avatar/status semantics still block broader R0 acceptance.
-- M1.1 read-only Agent Library is packaged and verified, but full M1 still lacks InstallPlan execution, independent version evidence and three lifecycle rollback closures; this slice does not establish Headless or workflow readiness.
+- M1.1 Agent Library and the M1.2 review-only InstallPlan gate are packaged and verified, but full M1 still lacks an accepted executable Plan, independent version evidence and three lifecycle rollback closures; neither slice establishes Headless or workflow readiness.
 - External connector execution remains disabled; Codex is draft/pending/discovery-only, Trae is draft/pending with `Models is required`, and Qoder is rejected/disabled because no independent headless Agent API exists.
 - Real-time cockpit A6/A7.1, renderer truth and B2 controlled production slices are accepted only to the trusted/controlled-process boundary. P0-C real Agent E2E is still unexecuted; configured seeds, CLI discovery, controlled Node processes and simulated ticks must not be reported as online Agent sessions.
 - The historical service-side `403 DAILY_LIMIT_EXCEEDED` is not current availability truth: bounded in-app short workers were dispatched successfully on 2026-07-17. This does not enable any external Connector.

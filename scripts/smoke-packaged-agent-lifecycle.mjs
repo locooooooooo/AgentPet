@@ -16,6 +16,14 @@ const libraryScreenshotArgument = process.argv.find((argument) => argument.start
 const libraryScreenshotPath = libraryScreenshotArgument
   ? path.resolve(libraryScreenshotArgument.slice('--library-screenshot='.length))
   : null;
+const planScreenshotArgument = process.argv.find((argument) => argument.startsWith('--plan-screenshot='));
+const planScreenshotPath = planScreenshotArgument
+  ? path.resolve(planScreenshotArgument.slice('--plan-screenshot='.length))
+  : null;
+const planMobileScreenshotArgument = process.argv.find((argument) => argument.startsWith('--plan-mobile-screenshot='));
+const planMobileScreenshotPath = planMobileScreenshotArgument
+  ? path.resolve(planMobileScreenshotArgument.slice('--plan-mobile-screenshot='.length))
+  : null;
 const hostFocusBudgetMs = 5_000;
 const hostLaunchBudgetMs = 15_000;
 const processTimeoutMs = 45_000;
@@ -68,6 +76,33 @@ try {
   assert.ok(library.evidenceSources.every((source) => source.length > 0), 'Agent Library rows must expose evidence sources');
   assert.ok(library.tableOverflow <= 1, `Agent Library table has horizontal overflow: ${JSON.stringify(library)}`);
   const libraryScreenshot = libraryScreenshotPath ? await captureScreenshot(cdp, libraryScreenshotPath) : null;
+  await clickElement(cdp, `document.querySelector('[data-agent-library="true"] button[aria-label="审阅 Kimi InstallPlan"]')`);
+  await waitForExpression(cdp, `Boolean(document.querySelector('[data-install-plan-drawer="true"]'))`, 2_000);
+  const installPlan = await readInstallPlan(cdp);
+  assert.equal(installPlan.agentId, 'kimi');
+  assert.equal(installPlan.status, 'draft');
+  assert.equal(installPlan.executionEnabled, false);
+  assert.equal(installPlan.permissionCount, 9, 'InstallPlan review must expose every PermissionManifest category');
+  assert.equal(installPlan.stepCount, 3, 'Kimi existing-install draft must expose all structured steps');
+  assert.ok(installPlan.source.includes('local-observation:kimi:windows:2026-07-18'));
+  assert.equal(installPlan.publisher, 'unknown');
+  assert.equal(installPlan.artifactDigest, 'unresolved');
+  assert.equal(installPlan.executionControls, 1, 'Review-only drawer must expose only the disabled execution control');
+  assert.ok(installPlan.drawerOverflow <= 1, `InstallPlan drawer has horizontal overflow: ${JSON.stringify(installPlan)}`);
+  const planScreenshot = planScreenshotPath ? await captureScreenshot(cdp, planScreenshotPath) : null;
+  await cdp.send('Emulation.setDeviceMetricsOverride', {
+    width: 720,
+    height: 760,
+    deviceScaleFactor: 1,
+    mobile: false
+  });
+  await delay(150);
+  const installPlanMobile = await readInstallPlan(cdp);
+  assert.ok(installPlanMobile.drawerOverflow <= 1, `Mobile InstallPlan drawer has horizontal overflow: ${JSON.stringify(installPlanMobile)}`);
+  const planMobileScreenshot = planMobileScreenshotPath ? await captureScreenshot(cdp, planMobileScreenshotPath) : null;
+  await cdp.send('Emulation.clearDeviceMetricsOverride');
+  await clickElement(cdp, `document.querySelector('[data-install-plan-drawer="true"] button[aria-label="关闭 InstallPlan"]')`);
+  await waitForExpression(cdp, `!document.querySelector('[data-install-plan-drawer="true"]')`, 2_000);
   await clickElement(cdp, `document.querySelector('[data-agent-library="true"] button[aria-label="关闭 Agent Library"]')`);
   await waitForExpression(cdp, `!document.querySelector('[data-agent-library="true"]')`, 2_000);
   const traeBefore = getAgent(initial, 'Trae');
@@ -160,6 +195,10 @@ try {
     sessions: { trae: traeSessions, workbuddy: workBuddySessions, codex: codexSessions },
     library,
     libraryScreenshot,
+    installPlan,
+    planScreenshot,
+    installPlanMobile,
+    planMobileScreenshot,
     layout,
     screenshot,
     openclaw: openClawResult,
@@ -277,8 +316,27 @@ async function readAgentLibrary(client) {
       registeredRows: dialog?.querySelectorAll('tbody tr[data-catalogued="true"]').length || 0,
       rowIds: Array.from(dialog?.querySelectorAll('tbody tr[data-catalogued="true"]') || []).map((row) => row.getAttribute('data-agent-library-row')),
       levels: Array.from(dialog?.querySelectorAll('tbody tr[data-catalogued="true"]') || []).map((row) => row.getAttribute('data-support-level')),
-      evidenceSources: Array.from(dialog?.querySelectorAll('tbody tr[data-catalogued="true"] td:nth-child(7) code') || []).map((code) => code.textContent?.trim() || ''),
+      evidenceSources: Array.from(dialog?.querySelectorAll('tbody tr[data-catalogued="true"] td:nth-child(8) code') || []).map((code) => code.textContent?.trim() || ''),
       tableOverflow: table ? table.scrollWidth - table.clientWidth : 0
+    };
+  })()`);
+}
+
+async function readInstallPlan(client) {
+  return evaluate(client, `(() => {
+    const drawer = document.querySelector('[data-install-plan-drawer="true"]');
+    const scroll = drawer?.querySelector('.install-plan-scroll');
+    return {
+      agentId: drawer?.getAttribute('data-plan-agent') || '',
+      status: drawer?.getAttribute('data-plan-status') || '',
+      executionEnabled: drawer?.getAttribute('data-plan-execution-enabled') === 'true',
+      permissionCount: drawer?.querySelectorAll('[data-plan-permission]').length || 0,
+      stepCount: drawer?.querySelectorAll('[data-plan-step]').length || 0,
+      source: drawer?.querySelector('[data-plan-source] dd')?.textContent?.trim() || '',
+      publisher: drawer?.querySelector('[data-plan-publisher] dd')?.textContent?.trim() || '',
+      artifactDigest: drawer?.querySelector('[data-plan-artifact-digest] dd')?.textContent?.trim() || '',
+      executionControls: drawer?.querySelectorAll('[data-install-plan-execute="disabled"]').length || 0,
+      drawerOverflow: scroll ? scroll.scrollWidth - scroll.clientWidth : 0
     };
   })()`);
 }

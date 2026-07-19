@@ -5176,6 +5176,7 @@ body:has(.workspace-shell) {
 }
 
 .agent-library-dialog {
+  position: relative;
   display: grid;
   grid-template-rows: auto auto auto minmax(0, 1fr);
   width: min(1180px, calc(100vw - 48px));
@@ -5203,6 +5204,17 @@ body:has(.workspace-shell) {
   min-width: 0;
 }
 
+.agent-library-head .agent-library-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.agent-library-plan-trigger {
+  min-height: 30px;
+  padding-inline: 9px;
+}
+
 .agent-library-head span {
   color: var(--cockpit-text-muted);
   font-size: var(--cockpit-type-meta);
@@ -5218,7 +5230,7 @@ body:has(.workspace-shell) {
 
 .agent-library-summary {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 8px;
   padding: 12px 18px;
   border-bottom: 1px solid var(--cockpit-border);
@@ -5303,7 +5315,7 @@ body:has(.workspace-shell) {
 
 .agent-library-table {
   width: 100%;
-  min-width: 860px;
+  min-width: 1040px;
   border-collapse: collapse;
   table-layout: fixed;
 }
@@ -5364,7 +5376,8 @@ body:has(.workspace-shell) {
 
 .agent-library-level,
 .agent-library-evidence,
-.agent-library-connector {
+.agent-library-connector,
+.install-plan-state {
   display: inline-flex;
   align-items: center;
   min-height: 21px;
@@ -5411,9 +5424,39 @@ body:has(.workspace-shell) {
   background: rgba(51, 65, 85, 0.28);
 }
 
+.install-plan-state.is-draft {
+  border-color: rgba(245, 158, 11, 0.48);
+  color: #fde68a;
+  background: rgba(120, 53, 15, 0.24);
+}
+
+.install-plan-state.is-valid-review-only {
+  border-color: rgba(34, 197, 94, 0.44);
+  color: #bbf7d0;
+  background: rgba(20, 83, 45, 0.25);
+}
+
+.install-plan-state.is-rejected {
+  border-color: rgba(248, 113, 113, 0.44);
+  color: #fecaca;
+  background: rgba(127, 29, 29, 0.24);
+}
+
+.install-plan-state.is-unavailable {
+  color: var(--cockpit-text-muted);
+  background: rgba(51, 65, 85, 0.28);
+}
+
 .agent-library-open-agent {
   width: 28px;
   height: 28px;
+}
+
+.agent-library-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: max-content;
 }
 
 .agent-library-empty {
@@ -5422,6 +5465,315 @@ body:has(.workspace-shell) {
   place-items: center;
   color: var(--cockpit-text-muted);
   font-size: var(--cockpit-type-control);
+}
+
+.install-plan-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  justify-content: flex-end;
+  min-width: 0;
+  background: rgba(2, 6, 23, 0.72);
+  backdrop-filter: blur(4px);
+}
+
+.install-plan-drawer {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  width: min(720px, 88%);
+  min-width: 0;
+  min-height: 0;
+  border-left: 1px solid rgba(245, 158, 11, 0.44);
+  background: #07111f;
+  box-shadow: -24px 0 64px rgba(0, 0, 0, 0.46);
+}
+
+.install-plan-head,
+.install-plan-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px 16px;
+}
+
+.install-plan-head {
+  border-bottom: 1px solid var(--cockpit-border);
+}
+
+.install-plan-head > div:first-child {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.install-plan-head span,
+.install-plan-section-head span {
+  color: #fbbf24;
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: var(--cockpit-type-meta);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.install-plan-head h3 {
+  margin: 0;
+  overflow: hidden;
+  color: var(--cockpit-text);
+  font-size: 17px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.install-plan-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.install-plan-scroll {
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.install-plan-section {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--cockpit-border);
+}
+
+.install-plan-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+
+.install-plan-section-head strong {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--cockpit-text-muted);
+  font-size: var(--cockpit-type-meta);
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.install-plan-meta-grid,
+.install-plan-trust-grid,
+.install-plan-safety-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 16px;
+  margin: 0;
+}
+
+.install-plan-meta-grid > div,
+.install-plan-trust-grid > div,
+.install-plan-safety-grid > div {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 8px;
+  min-width: 0;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.install-plan-meta-grid dt,
+.install-plan-trust-grid dt,
+.install-plan-safety-grid dt {
+  color: var(--cockpit-text-muted);
+  font-size: var(--cockpit-type-meta);
+}
+
+.install-plan-meta-grid dd,
+.install-plan-trust-grid dd,
+.install-plan-safety-grid dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--cockpit-text-body);
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: var(--cockpit-type-meta);
+  line-height: 1.45;
+}
+
+.install-plan-permission-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px 12px;
+}
+
+.install-plan-permission-list > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.install-plan-permission-list span {
+  color: var(--cockpit-text-muted);
+  font-size: var(--cockpit-type-meta);
+  text-transform: uppercase;
+}
+
+.install-plan-permission-list strong {
+  overflow: hidden;
+  color: var(--cockpit-text-body);
+  font-size: var(--cockpit-type-control);
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.install-plan-step-list,
+.install-plan-issue-list {
+  display: grid;
+}
+
+.install-plan-step-list > div {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.install-plan-step-index {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  border: 1px solid rgba(245, 158, 11, 0.38);
+  border-radius: 50%;
+  color: #fde68a;
+  font-size: var(--cockpit-type-meta);
+  font-weight: 900;
+}
+
+.install-plan-step-list > div > div:nth-child(2) {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.install-plan-step-list strong,
+.install-plan-step-list small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.install-plan-step-list strong {
+  color: var(--cockpit-text-body);
+  font-size: var(--cockpit-type-control);
+}
+
+.install-plan-step-list small {
+  color: var(--cockpit-text-muted);
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: var(--cockpit-type-meta);
+}
+
+.install-plan-step-policy {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.install-plan-step-policy span {
+  min-height: 20px;
+  padding: 3px 5px;
+  border: 1px solid var(--cockpit-border);
+  border-radius: 4px;
+  color: var(--cockpit-text-muted);
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: var(--cockpit-type-meta);
+  white-space: nowrap;
+}
+
+.install-plan-issue-list > div {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  gap: 8px;
+  min-width: 0;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(248, 113, 113, 0.14);
+  color: #fca5a5;
+}
+
+.install-plan-issue-list > div > div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.install-plan-issue-list strong {
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: var(--cockpit-type-meta);
+}
+
+.install-plan-issue-list small {
+  overflow-wrap: anywhere;
+  color: #fecaca;
+  font-size: var(--cockpit-type-meta);
+  line-height: 1.4;
+}
+
+.install-plan-consent code,
+.install-plan-consent small {
+  display: block;
+  overflow-wrap: anywhere;
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: var(--cockpit-type-meta);
+  line-height: 1.45;
+}
+
+.install-plan-consent code {
+  color: #c7e9d4;
+}
+
+.install-plan-consent small {
+  color: var(--cockpit-text-muted);
+}
+
+.install-plan-footer {
+  border-top: 1px solid var(--cockpit-border);
+  background: rgba(15, 23, 42, 0.96);
+}
+
+.install-plan-footer > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: #fde68a;
+  font-size: var(--cockpit-type-meta);
+}
+
+.install-plan-footer button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 126px;
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 6px;
+  background: rgba(51, 65, 85, 0.34);
+  color: #94a3b8;
+  font-weight: 800;
+  cursor: not-allowed;
 }
 
 @media (max-width: 1120px) {
@@ -5455,5 +5807,30 @@ body:has(.workspace-shell) {
 
   .agent-library-table-wrap {
     padding-inline: 10px;
+  }
+
+  .install-plan-drawer {
+    width: 100%;
+  }
+
+  .install-plan-meta-grid,
+  .install-plan-trust-grid,
+  .install-plan-safety-grid,
+  .install-plan-permission-list {
+    grid-template-columns: 1fr;
+  }
+
+  .install-plan-step-list > div {
+    grid-template-columns: 24px minmax(0, 1fr);
+  }
+
+  .install-plan-step-policy {
+    grid-column: 2;
+    flex-wrap: wrap;
+  }
+
+  .install-plan-footer {
+    align-items: stretch;
+    flex-direction: column;
   }
 }
