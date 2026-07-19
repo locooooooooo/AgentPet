@@ -14,7 +14,7 @@ status: active_hub_r0_contracts_reviewed
 
 ## single goal
 
-- Preserve delivered truthful host presence at `04524e8`, preserve exact-file accepted Theme/SoundPack contracts, then reconcile product inputs and full UI truth while every external execution gate stays closed.
+- Preserve delivered truthful host presence at `04524e8`, preserve exact-file accepted Theme/SoundPack contracts, and carry the packaged M1.1 read-only Agent Library forward while every external execution gate stays closed.
 
 ## accepted inputs
 
@@ -74,6 +74,13 @@ status: active_hub_r0_contracts_reviewed
 - External Agent spawn, Connector binding/enabling, task inference from process/window/log facts, installer work, DockView and theme/sound implementation remain zero/non-goals.
 - Exact staged-snapshot gates passed and `04524e8` was pushed; local `HEAD`, `origin/main` and GitHub `main` match.
 
+## accepted M1.1 read-only Agent Library slice
+
+- M1.1 adds a pure registry/projection plus a searchable/filterable packaged Library dialog for six registered candidates and unbound host discovery.
+- Support level, version, lifecycle, Connector readiness and evidence source/time remain separate fields; `unknown` is explicit and process presence cannot self-grant installed.
+- The packaged CDP smoke opens/closes the dialog, sees six registered rows, verifies support/evidence columns and records table overflow `0` in `hub-agent-library-m1-2026-07-19.md`.
+- This slice changed no main/preload IPC, Connector gate, external execution state, InstallPlan executor, Headless Adapter or dependency workflow.
+
 ## accepted file history
 
 The original minimum scheduler slice `ccedb15` used:
@@ -94,7 +101,7 @@ The configurable-concurrency slice `4508ce3` changed only `src/lib/connectorRunt
 - PM independently reviews the diff and does not infer real Agent E2E from controlled local fixtures.
 
 next action:
-- Preserve `4508ce3`, `2a2f7f5` and delivered presence commit `04524e8`; preserve the exact-file contract review and open only a separately fenced reconciliation or M1 lifecycle card after remaining M0 decisions.
+- Preserve `4508ce3`, `2a2f7f5` and delivered presence commit `04524e8`; preserve M1.1 and open only a separately fenced M1.2 lifecycle execution card after remaining M0 decisions.
 
 summary:
-- Next-stage requirements now preserve the delivered presence slice and exact-file accepted content contracts. The full R0 batch remains incomplete until product-input and separate UI truth acceptance pass; every external execution gate stays closed.
+- Next-stage requirements now preserve the delivered presence slice, exact-file accepted content contracts and packaged M1.1 Library. Full M1/R0 remain incomplete until InstallPlan/version, product-input and separate UI truth acceptance pass; every external execution gate stays closed.

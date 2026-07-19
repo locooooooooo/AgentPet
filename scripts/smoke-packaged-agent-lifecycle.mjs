@@ -12,6 +12,10 @@ const screenshotArgument = process.argv.find((argument) => argument.startsWith('
 const screenshotPath = screenshotArgument
   ? path.resolve(screenshotArgument.slice('--screenshot='.length))
   : null;
+const libraryScreenshotArgument = process.argv.find((argument) => argument.startsWith('--library-screenshot='));
+const libraryScreenshotPath = libraryScreenshotArgument
+  ? path.resolve(libraryScreenshotArgument.slice('--library-screenshot='.length))
+  : null;
 const hostFocusBudgetMs = 5_000;
 const hostLaunchBudgetMs = 15_000;
 const processTimeoutMs = 45_000;
@@ -55,6 +59,17 @@ try {
   await waitForExpression(cdp, `Boolean(document.querySelector('.workspace-shell'))`, 5_000);
 
   const initial = await readLifecycle(cdp);
+  await clickElement(cdp, `Array.from(document.querySelectorAll('button')).find((button) => button.textContent.includes('Agent Library'))`);
+  await waitForExpression(cdp, `Boolean(document.querySelector('[data-agent-library="true"]'))`, 2_000);
+  const library = await readAgentLibrary(cdp);
+  assert.equal(library.registeredRows, 6, 'Agent Library must expose the six registered lifecycle candidates');
+  assert.ok(library.rowIds.includes('codex') && library.rowIds.includes('trae') && library.rowIds.includes('openclaw'));
+  assert.ok(library.levels.length === library.registeredRows, 'Agent Library rows must expose support levels');
+  assert.ok(library.evidenceSources.every((source) => source.length > 0), 'Agent Library rows must expose evidence sources');
+  assert.ok(library.tableOverflow <= 1, `Agent Library table has horizontal overflow: ${JSON.stringify(library)}`);
+  const libraryScreenshot = libraryScreenshotPath ? await captureScreenshot(cdp, libraryScreenshotPath) : null;
+  await clickElement(cdp, `document.querySelector('[data-agent-library="true"] button[aria-label="关闭 Agent Library"]')`);
+  await waitForExpression(cdp, `!document.querySelector('[data-agent-library="true"]')`, 2_000);
   const traeBefore = getAgent(initial, 'Trae');
   const workBuddyBefore = getAgent(initial, 'WorkBuddy');
   const qoder = getAgent(initial, 'Qoder');
@@ -143,6 +158,8 @@ try {
       launchBudgetMs: hostLaunchBudgetMs
     },
     sessions: { trae: traeSessions, workbuddy: workBuddySessions, codex: codexSessions },
+    library,
+    libraryScreenshot,
     layout,
     screenshot,
     openclaw: openClawResult,
@@ -248,6 +265,20 @@ async function readSelectedSessions(client) {
       empty: Boolean(panel?.querySelector('[data-session-empty="true"]')),
       sources: Array.from(panel?.querySelectorAll('[data-session-source]') || []).map((item) => item.getAttribute('data-session-source')),
       statuses: Array.from(panel?.querySelectorAll('[data-session-status]') || []).map((item) => item.getAttribute('data-session-status'))
+    };
+  })()`);
+}
+
+async function readAgentLibrary(client) {
+  return evaluate(client, `(() => {
+    const dialog = document.querySelector('[data-agent-library="true"]');
+    const table = dialog?.querySelector('.agent-library-table');
+    return {
+      registeredRows: dialog?.querySelectorAll('tbody tr[data-catalogued="true"]').length || 0,
+      rowIds: Array.from(dialog?.querySelectorAll('tbody tr[data-catalogued="true"]') || []).map((row) => row.getAttribute('data-agent-library-row')),
+      levels: Array.from(dialog?.querySelectorAll('tbody tr[data-catalogued="true"]') || []).map((row) => row.getAttribute('data-support-level')),
+      evidenceSources: Array.from(dialog?.querySelectorAll('tbody tr[data-catalogued="true"] td:nth-child(7) code') || []).map((code) => code.textContent?.trim() || ''),
+      tableOverflow: table ? table.scrollWidth - table.clientWidth : 0
     };
   })()`);
 }

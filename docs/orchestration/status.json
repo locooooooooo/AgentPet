@@ -5,10 +5,10 @@
   "target": "Next Hub milestone: close or explicitly defer M0 decisions, then deliver verified lifecycle support for 3 Agents and a real, cancellable, auditable dependency workflow across 2 accepted Headless Agents.",
   "source": "docs/orchestration/index.md",
   "todayPlan": {
-    "date": "2026-07-18",
-    "session": "docs/orchestration/sessions/hub-next-stage-plan-2026-07-18.md",
-    "selectedRoute": "M0 acceptance decisions, M1 Agent Library lifecycle, then M2 two-Agent real workflow",
-    "progress": "docs/orchestration/sessions/hub-next-stage-plan-2026-07-18.md"
+    "date": "2026-07-19",
+    "session": "docs/orchestration/sessions/hub-agent-library-m1-2026-07-19.md",
+    "selectedRoute": "Preserve M1.1 read-only Agent Library; close or defer remaining M0 decisions before M1.2 execution",
+    "progress": "docs/orchestration/sessions/hub-agent-library-m1-2026-07-19.md"
   },
   "p0Cards": [
     {
@@ -54,13 +54,19 @@
       "progress": "docs/orchestration/sessions/hub-content-contract-review-2026-07-19.md"
     },
     {
+      "id": "hub-agent-library-m1",
+      "status": "implemented_packaged_smoke_verified",
+      "task": "docs/orchestration/tasks/hub-agent-library-m1-v0.1.md",
+      "progress": "docs/orchestration/sessions/hub-agent-library-m1-2026-07-19.md"
+    },
+    {
       "id": "hub-next-stage-requirements",
       "status": "ready_for_execution_decision",
       "task": "docs/orchestration/tasks/hub-next-stage-requirements-v0.1.md",
       "progress": "docs/orchestration/sessions/hub-next-stage-plan-2026-07-18.md"
     }
   ],
-  "blocker": "Lifecycle action smoke and a real packaged Electron screenshot are complete through the CDP route; OpenClaw risk/auth setup remains user-controlled. HubTheme/HubSoundPack contracts pass automated checks and independent exact-file review at the contract boundary, while full DockView, unaccepted product inputs and broader UI truth remain separate work. P0-C still lacks a confirmed cwd/task/timeout/read-set/write-ban/stop-condition authorization envelope；Codex/Trae/Qoder Connector machine gates remain unchanged and disabled。",
+  "blocker": "Lifecycle action smoke and a real packaged Electron screenshot are complete through the CDP route; M1.1 read-only Agent Library is packaged and verified. OpenClaw risk/auth setup remains user-controlled. HubTheme/HubSoundPack contracts pass automated checks and independent exact-file review at the contract boundary, while full DockView, unaccepted product inputs, InstallPlan/version evidence and broader UI truth remain separate work. P0-C still lacks a confirmed cwd/task/timeout/read-set/write-ban/stop-condition authorization envelope；Codex/Trae/Qoder Connector machine gates remain unchanged and disabled。",
   "roles": [
     {
       "id": "pm",

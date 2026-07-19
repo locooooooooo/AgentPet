@@ -12,6 +12,7 @@ import {
   Flame,
   Home,
   Info,
+  LibraryBig,
   LoaderCircle,
   MessagesSquare,
   PanelLeftOpen,
@@ -57,6 +58,11 @@ import {
   projectAgentSessions,
   type AgentSession
 } from '../lib/agentSessionProjection';
+import {
+  projectAgentLibrary,
+  type AgentLibraryEntry,
+  type AgentLibrarySupportLevel
+} from '../lib/agentLibrary';
 import { CONNECTOR_POLICY, ORCHESTRATION_STATUS } from '../lib/orchestrationStatus';
 import { getCodexHostOnlineContribution, getCombinedOnlineSessionCount } from '../lib/codexHostStatus';
 import NiuMaAvatar from './NiuMaAvatar';
@@ -145,6 +151,9 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, codexHost, o
   const [connectorGateResults, setConnectorGateResults] = useState<Record<string, ConnectorGateResult>>({});
   const [ranchPrefs, setRanchPrefs] = useState<RanchPrefs | null>(null);
   const [ranchSettingsOpen, setRanchSettingsOpen] = useState(false);
+  const [agentLibraryOpen, setAgentLibraryOpen] = useState(false);
+  const [agentLibraryQuery, setAgentLibraryQuery] = useState('');
+  const [agentLibraryLevel, setAgentLibraryLevel] = useState<'all' | AgentLibrarySupportLevel>('all');
   const [cornerPanelOpen, setCornerPanelOpen] = useState(false);
   const [governancePanelOpen, setGovernancePanelOpen] = useState(false);
   const [activeDockStatus, setActiveDockStatus] = useState<DockStatusId | null>(null);
@@ -221,6 +230,31 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, codexHost, o
           : agentTruth.hostDiscovery.detail
       ]];
 
+  const agentLibrary = useMemo(() => projectAgentLibrary({
+    hostDiscovery: agentTruth.hostDiscovery,
+    agentTruth,
+    codexHost,
+    connectors: CONNECTOR_POLICY.connectors,
+    gateResults: connectorGateResults,
+    now: agentTruth.projectedAt
+  }), [agentTruth, codexHost, connectorGateResults]);
+  const filteredAgentLibrary = useMemo(() => {
+    const query = agentLibraryQuery.trim().toLocaleLowerCase();
+    return agentLibrary.filter((entry) => {
+      const matchesLevel = agentLibraryLevel === 'all' || entry.supportLevel === agentLibraryLevel;
+      const matchesQuery = !query || [
+        entry.agentId,
+        entry.displayName,
+        entry.connectorId,
+        entry.supportLevel,
+        entry.lifecycleState.value,
+        entry.connector.value,
+        entry.version.value ?? 'unknown'
+      ].some((value) => value.toLocaleLowerCase().includes(query));
+      return matchesLevel && matchesQuery;
+    });
+  }, [agentLibrary, agentLibraryLevel, agentLibraryQuery]);
+
   // 左侧折叠状态
   const [rolesExpanded, setRolesExpanded] = useState(false);
   const [lanesExpanded, setLanesExpanded] = useState(false);
@@ -293,6 +327,19 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, codexHost, o
       mounted = false;
     };
   }, [api]);
+
+  useEffect(() => {
+    if (!agentLibraryOpen) {
+      return undefined;
+    }
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setAgentLibraryOpen(false);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [agentLibraryOpen]);
 
   useEffect(() => {
     const completionKey = codexHost.lastCompletionKey ?? null;
@@ -601,6 +648,18 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, codexHost, o
             </button>
           ) : null}
 
+          <button
+            type="button"
+            className={`safe-status ${agentLibraryOpen ? 'is-active' : ''}`}
+            onClick={() => setAgentLibraryOpen((open) => !open)}
+            aria-expanded={agentLibraryOpen}
+            aria-haspopup="dialog"
+          >
+            <LibraryBig size={14} aria-hidden="true" />
+            <span>Agent Library</span>
+            <strong>{agentLibrary.length}</strong>
+          </button>
+
           <StatusStrip
             connectors={CONNECTOR_POLICY.connectors}
             gateResults={connectorGateResults}
@@ -698,6 +757,24 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, codexHost, o
           </button>
         </div>
       </header>
+
+      {agentLibraryOpen ? (
+        <AgentLibraryDialog
+          entries={filteredAgentLibrary}
+          totalEntries={agentLibrary.length}
+          query={agentLibraryQuery}
+          level={agentLibraryLevel}
+          onQueryChange={setAgentLibraryQuery}
+          onLevelChange={setAgentLibraryLevel}
+          onClose={() => setAgentLibraryOpen(false)}
+          onSelectAgent={(agentId) => {
+            if (snapshot.agents.some((agent) => agent.id === agentId)) {
+              setSelectedAgentId(agentId);
+            }
+            setAgentLibraryOpen(false);
+          }}
+        />
+      ) : null}
 
       <main className={`workspace-grid cockpit-grid ${!leftRailOpen ? 'left-collapsed' : ''} ${!rightRailOpen ? 'right-collapsed' : ''}`}>
         <aside className={`left-rail ${leftRailOpen ? 'is-open' : 'is-collapsed'}`}>
@@ -1177,6 +1254,175 @@ function RanchSettingsChip({
     <button type="button" className={active ? 'is-active' : ''} onClick={onClick}>
       {label}
     </button>
+  );
+}
+
+const agentLibraryLevelOptions: Array<{ value: 'all' | AgentLibrarySupportLevel; label: string }> = [
+  { value: 'all', label: '全部等级' },
+  { value: 'catalogued', label: 'catalogued' },
+  { value: 'detected', label: 'detected' },
+  { value: 'installed', label: 'installed' },
+  { value: 'launchable', label: 'launchable' },
+  { value: 'connectable', label: 'connectable' },
+  { value: 'coordinatable', label: 'coordinatable' }
+];
+
+interface AgentLibraryDialogProps {
+  entries: readonly AgentLibraryEntry[];
+  totalEntries: number;
+  query: string;
+  level: 'all' | AgentLibrarySupportLevel;
+  onQueryChange: (value: string) => void;
+  onLevelChange: (value: 'all' | AgentLibrarySupportLevel) => void;
+  onClose: () => void;
+  onSelectAgent: (agentId: string) => void;
+}
+
+function AgentLibraryDialog({
+  entries,
+  totalEntries,
+  query,
+  level,
+  onQueryChange,
+  onLevelChange,
+  onClose,
+  onSelectAgent
+}: AgentLibraryDialogProps) {
+  const installedCount = entries.filter((entry) => entry.installed.value === 'yes').length;
+  const runningCount = entries.filter((entry) => entry.running.value === 'yes').length;
+  const coordinatableCount = entries.filter((entry) => entry.supportLevel === 'coordinatable').length;
+
+  return (
+    <div
+      className="agent-library-overlay"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <section
+        className="agent-library-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="agent-library-title"
+        data-agent-library="true"
+      >
+        <header className="agent-library-head">
+          <div>
+            <span>Manifest registry</span>
+            <h2 id="agent-library-title">Agent Library</h2>
+          </div>
+          <button type="button" className="icon-button" onClick={onClose} title="关闭 Agent Library" aria-label="关闭 Agent Library">
+            <X size={15} aria-hidden="true" />
+          </button>
+        </header>
+
+        <div className="agent-library-summary" aria-label="Agent Library 摘要">
+          <span><small>Entries</small><strong>{totalEntries}</strong></span>
+          <span><small>Installed</small><strong>{installedCount}</strong></span>
+          <span><small>Running</small><strong>{runningCount}</strong></span>
+          <span><small>Coordinatable</small><strong>{coordinatableCount}</strong></span>
+        </div>
+
+        <div className="agent-library-tools" role="search" aria-label="搜索和过滤 Agent Library">
+          <label className="agent-library-search">
+            <Search size={14} aria-hidden="true" />
+            <span className="sr-only">搜索 Agent</span>
+            <input
+              type="search"
+              value={query}
+              placeholder="搜索 Agent、Connector 或状态"
+              onChange={(event) => onQueryChange(event.target.value)}
+            />
+          </label>
+          <label className="agent-library-filter">
+            <span>支持等级</span>
+            <select
+              value={level}
+              onChange={(event) => onLevelChange(event.target.value as 'all' | AgentLibrarySupportLevel)}
+            >
+              {agentLibraryLevelOptions.map((option) => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        <div className="agent-library-table-wrap">
+          <table className="agent-library-table">
+            <thead>
+              <tr>
+                <th>Agent</th>
+                <th>支持等级</th>
+                <th>Version</th>
+                <th>Installed</th>
+                <th>Running</th>
+                <th>Connector</th>
+                <th>Evidence</th>
+                <th><span className="sr-only">查看工位</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              {entries.map((entry) => (
+                <tr
+                  key={`${entry.agentId}:${entry.connectorId}`}
+                  data-agent-library-row={entry.agentId}
+                  data-catalogued={entry.catalogued ? 'true' : 'false'}
+                  data-support-level={entry.supportLevel}
+                  data-installed={entry.installed.value}
+                  data-running={entry.running.value}
+                >
+                  <td>
+                    <strong>{entry.displayName}</strong>
+                    <small>{entry.agentId} · {entry.catalogued ? 'registered' : 'unbound'}</small>
+                  </td>
+                  <td>
+                    <span className={`agent-library-level is-${entry.supportLevel}`}>{entry.supportLevel}</span>
+                    <small>{entry.lifecycleState.value}</small>
+                  </td>
+                  <td>
+                    <code>{entry.version.value ?? 'unknown'}</code>
+                    <small>{entry.version.source}</small>
+                  </td>
+                  <td>
+                    <span className={`agent-library-evidence is-${entry.installed.value}`}>{entry.installed.value}</span>
+                    <small>{entry.installed.source}</small>
+                  </td>
+                  <td>
+                    <span className={`agent-library-evidence is-${entry.running.value}`}>{entry.running.value}</span>
+                    <small>{entry.running.source}</small>
+                  </td>
+                  <td>
+                    <span className={`agent-library-connector is-${entry.connector.value}`}>{entry.connector.value}</span>
+                    <small>{entry.connectorId}</small>
+                  </td>
+                  <td>
+                    <code title={entry.sources.join(' · ')}>{entry.support.source}</code>
+                    <small>{formatDateTime(entry.support.observedAt)}</small>
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      className="icon-button agent-library-open-agent"
+                      disabled={!entry.boundAgent.value}
+                      onClick={() => onSelectAgent(entry.agentId)}
+                      title={entry.boundAgent.value ? `查看 ${entry.displayName} 工位` : `${entry.displayName} 尚未绑定工位`}
+                      aria-label={entry.boundAgent.value ? `查看 ${entry.displayName} 工位` : `${entry.displayName} 尚未绑定工位`}
+                    >
+                      <ExternalLink size={14} aria-hidden="true" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {entries.length === 0 ? (
+            <div className="agent-library-empty" role="status">没有匹配的 Agent。</div>
+          ) : null}
+        </div>
+      </section>
+    </div>
   );
 }
 

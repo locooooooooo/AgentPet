@@ -13,7 +13,7 @@
     "orchestration:preflight": "node scripts/connector-preflight.mjs",
     "orchestration:connector-safety": "node scripts/check-connector-gate.mjs && node scripts/check-preload-connector-api.mjs && node scripts/check-ui-connector-status-only.mjs",
     "hub:contracts-check": "node scripts/check-hub-content-contracts.mjs",
-    "realtime:truth-check": "node scripts/check-agent-host-discovery.mjs && node scripts/check-agent-host-actions.mjs && node scripts/check-agent-instance-projection.mjs && node scripts/check-agent-session-projection.mjs && node scripts/check-realtime-truth-renderer.mjs",
+    "realtime:truth-check": "node scripts/check-agent-host-discovery.mjs && node scripts/check-agent-host-actions.mjs && node scripts/check-agent-instance-projection.mjs && node scripts/check-agent-session-projection.mjs && node scripts/check-agent-library.mjs && node scripts/check-realtime-truth-renderer.mjs",
     "realtime:packaged-smoke": "node scripts/smoke-packaged-agent-lifecycle.mjs",
     "realtime:electron-latency": "node scripts/check-electron-runtime-latency.mjs",
     "build": "vite build && esbuild electron/main.ts --bundle --platform=node --format=cjs --packages=external --outfile=dist-electron/main.cjs && esbuild electron/preload.ts --bundle --platform=node --format=cjs --packages=external --outfile=dist-electron/preload.cjs",
