@@ -26,4 +26,3 @@ This is a read-only long-worker lane. It may inspect the repository and run exis
 - Run `npm.cmd run orchestration:check`, `npm.cmd run orchestration:connector-safety`, `npm.cmd run lint`, `npm.cmd run build` and `git diff --check` as read-only checks where available.
 - Report completed, blockers, exact envelope and unchanged external spawn count.
 - Do not claim P0-C acceptance or real Agent execution.
-

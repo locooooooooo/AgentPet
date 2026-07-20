@@ -34,4 +34,3 @@ All other files are read-only. Do not modify Connector gates, Electron IPC, UI, 
 - `npx.cmd tsc --noEmit --pretty false`
 - `git diff --check` on the two fenced files
 - No package, external execution or acceptance claim.
-

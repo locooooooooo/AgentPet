@@ -38,4 +38,3 @@ All other files are read-only. Preserve the protected central 4x2 cockpit grid a
 - `npm.cmd run build`
 - `git diff --check`
 - No package, external execution or acceptance claim.
-

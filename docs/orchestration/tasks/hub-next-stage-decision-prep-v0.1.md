@@ -27,4 +27,3 @@ This is a read-only long-worker lane. It may inspect code, task cards, sessions,
 - Reconcile `status.json`, `index.md`, the canonical Hub requirements and current task/session evidence.
 - Run only read-only repository checks needed to prove the matrix.
 - Report execute/defer options, blockers and stale-control discrepancies; do not claim acceptance.
-
