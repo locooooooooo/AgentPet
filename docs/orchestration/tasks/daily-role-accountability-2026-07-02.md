@@ -63,7 +63,8 @@ role ledger:
 | `[PM]#next-five-day-development@2026-07-18` | summarized | `docs/orchestration/sessions/next-five-day-development-2026-07-18.md` | Preserve the completed same-day board and its serial closeout/dispatch/acceptance evidence through `ccedb15`. |
 | `[PM]#weekly-closeout@2026-07-20` | summarized | `docs/orchestration/sessions/weekly-closeout-2026-07-20.md` | Preserve seven carry-over rows and attach final Git evidence through the current PM transition. |
 | `[短工]#realtime-p1-scheduler-intake@v0.1` | summarized | `docs/orchestration/tasks/realtime-p1-scheduler-intake-v0.1.md` | Preserve the accepted contract and explicit local-only phase waiver; do not infer external Agent authorization. |
-| `[PM]#weekly-requirements@2026-07-21` | active | `docs/orchestration/sessions/weekly-requirements-2026-07-21.md` | Own presence-only delivery under Manifest/Adapter boundaries and keep broader R0 plus external execution gates closed. |
+| `[PM]#weekly-requirements@2026-07-21` | summarized | `docs/orchestration/sessions/weekly-requirements-2026-07-21.md` | Preserve the compressed plan as historical evidence; do not use it as current weekly authority. |
+| `[PM]#weekly-development-plan@2026-07-20` | active | `docs/orchestration/sessions/weekly-development-plan-2026-07-20.md` | Own the serial Adapter-admission and InstallRun-recovery plan; open external acceptance only through its fresh prerequisite-specific gates. |
 | `[长工]#realtime-p1-scheduler-core@v0.1` | summarized | `docs/orchestration/sessions/realtime-p1-scheduler-core-evidence-2026-07-17.md` | Preserve accepted/pushed `ccedb15`, S-01 through S-16, R-01 through R-03 and selective-integration evidence; no worker remains active. |
 | `[短工]#realtime-p1-scheduler-configurable-concurrency@v0.1` | summarized | `docs/orchestration/sessions/realtime-p1-scheduler-configurable-concurrency-evidence-2026-07-18.md` | Preserve accepted/pushed `4508ce3`, C-01 through C-12 and external spawn `0`; future P1 work needs a new bounded card. |
 | `[PM]#ranch-real-integration-r0-3-dryrun@v0.1` | standby | `docs/orchestration/tasks/ranch-real-integration-r0-3-dryrun-v0.1.md` | Keep the W28 route standby; do not invoke Codex or touch machine-gate fields without a second execution-window confirmation. |
@@ -71,7 +72,7 @@ role ledger:
 | `[长工]#homepage-ui-design@v0.1` homepage-ui-design lane | summarized | `docs/orchestration/sessions/homepage-ui-p0-c0-6-style-2026-07-07.md` | C · 华丽 HomePage is verified; do not create a duplicate thread and keep §〇·quarter selling-point files untouched. |
 | `[PM]#weekly-requirements@2026-07-07` | summarized | `docs/orchestration/sessions/weekly-requirements-2026-07-07.md` | Preserve W27 accepted outcomes and final closeout evidence as history. |
 | `[PM]#weekly-requirements@2026-07-14` | summarized | `docs/orchestration/sessions/weekly-requirements-2026-07-14.md` | Preserve the early W28 closeout and seven non-blocking carry-over rows as summarized history. |
-| `[PM]#weekly-requirements@2026-07-21` weekly-requirements lane | active | `docs/orchestration/status.json` | Own the active weekly lane for selective Hub host-presence delivery. |
+| `[PM]#weekly-development-plan@2026-07-20` weekly-requirements lane | active | `docs/orchestration/status.json` | Own the active weekly lane, keep product worker concurrency at one and keep external Agent execution at zero until an exact gate opens. |
 | `[PM]#daily-plan@2026-07-09` | summarized | `docs/orchestration/sessions/daily-plan-2026-07-09.md` | Retain B②/C short-worker/D 今天/E1 as summarized historical evidence. |
 | `[PM]#daily-plan@2026-07-10` | summarized | `docs/orchestration/sessions/daily-plan-2026-07-10.md` | Preserve the administrator decisions and W27/W28 preparation as summarized history. |
 | `[PM]#m5-longworker-dispatch@v0.1` | summarized | `docs/orchestration/tasks/m5-longworker-dispatch-v0.1.md` | Preserve the completed five-card dispatch history and authorize no further M5 product worker. |
@@ -94,7 +95,7 @@ acceptance:
 - `[PM]#multi-agent-control@v0.1` owns the eight-file Hub R0 control baseline, selective commit/push and final cross-contract acceptance.
 - `[监督]#multi-agent-control@v0.1` collected three formal read-only callbacks; all reported `changed files: none` and no service-side 403.
 - The active `daily-supervision` lane must keep existing README/UI/product-document changes unstaged until their separate acceptance.
-- The active `[PM]#weekly-requirements@2026-07-21` lane owns the Hub R0 contract freeze while preserving scheduler `4508ce3` and every external execution gate.
+- The historical `[PM]#weekly-requirements@2026-07-21` lane owned the Hub R0 contract freeze; active weekly control now belongs to `[PM]#weekly-development-plan@2026-07-20` while scheduler `4508ce3` and every external execution gate remain preserved.
 - Wave A Owners are accountable for exactly one contract file each; Adapter Capability is Wave B and cannot start before AgentManifest + InstallPlan acceptance.
 
 2026-07-18 host-presence accountability update:

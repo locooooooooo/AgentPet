@@ -5,10 +5,10 @@
   "target": "Next Hub milestone: close or explicitly defer M0 decisions, then deliver verified lifecycle support for 3 Agents and a real, cancellable, auditable dependency workflow across 2 accepted Headless Agents.",
   "source": "docs/orchestration/index.md",
   "todayPlan": {
-    "date": "2026-07-19",
-    "session": "docs/orchestration/sessions/hub-agent-version-evidence-m1-2026-07-19.md",
-    "selectedRoute": "Preserve M1.3 independent version evidence; keep support and Connector state evidence-separated while choosing the next lifecycle or Adapter gate",
-    "progress": "docs/orchestration/sessions/hub-agent-version-evidence-m1-2026-07-19.md"
+    "date": "2026-07-20",
+    "session": "docs/orchestration/sessions/weekly-development-plan-2026-07-20.md",
+    "selectedRoute": "Run the 2026-07-20 through 2026-07-26 serial plan: accept Adapter admission and InstallRun recovery foundations first, then open real Connector and dual-Agent acceptance only through fresh prerequisite-specific authorization gates",
+    "progress": "docs/orchestration/sessions/weekly-development-plan-2026-07-20.md"
   },
   "p0Cards": [
     {
@@ -525,10 +525,19 @@
       "id": "weekly-requirements-next",
       "title": "[PM]#weekly-requirements@2026-07-21",
       "owner": "主控",
-      "status": "active",
-      "responsibility": "Own post-presence Hub R0 work after delivered 04524e8; Theme/SoundPack contracts are exact-file reviewed at the contract boundary, while full UI truth and every external execution gate remain separately controlled.",
+      "status": "summarized",
+      "responsibility": "Preserve the compressed post-presence Hub R0 plan as historical evidence; active weekly control moved to the 2026-07-20 development plan.",
       "tag": "⟦tag:v2|session|weekly-requirements-2026-07-21⟧",
       "evidence": "docs/orchestration/sessions/weekly-requirements-2026-07-21.md"
+    },
+    {
+      "id": "weekly-development-plan-2026-07-20",
+      "title": "[PM]#weekly-development-plan@2026-07-20",
+      "owner": "主控",
+      "status": "active",
+      "responsibility": "Own the 2026-07-20 through 2026-07-26 serial plan for Adapter admission, InstallRun recovery foundations and authorization-gated real Adapter/workflow acceptance.",
+      "tag": "⟦tag:v2|session|weekly-development-plan-2026-07-20⟧",
+      "evidence": "docs/orchestration/sessions/weekly-development-plan-2026-07-20.md"
     },
     {
       "id": "realtime-p1-scheduler-core",
@@ -741,10 +750,10 @@
     },
     {
       "id": "weekly-requirements",
-      "title": "Next-stage weekly requirements planning",
-      "role": "[PM]#weekly-requirements@2026-07-21",
+      "title": "2026-07-20 weekly development control",
+      "role": "[PM]#weekly-development-plan@2026-07-20",
       "state": "active",
-      "nextAction": "Lifecycle action smoke and packaged Electron screenshot are verified; wait for user-controlled OpenClaw risk/auth completion and keep Connector acceptance separate."
+      "nextAction": "Open Tuesday's bounded Adapter Capability admission intake; keep product worker concurrency at one and external Agent execution at zero until a fresh exact authorization gate opens."
     },
     {
       "id": "ranch-real-integration-r0-3-dryrun",

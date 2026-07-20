@@ -3,9 +3,11 @@
 [PM]#weekly-requirements@2026-07-21
 ⟦tag:v2|session|weekly-requirements-2026-07-21⟧
 
-loop state: active
-dispatch state: active
-status: active_hub_r0_contracts_reviewed
+loop state: summarized
+dispatch state: summarized
+status: superseded_by_weekly_development_plan_2026_07_20
+
+> **Lifecycle note**: Preserved as historical compressed-plan evidence. Active weekly control moved to `weekly-development-plan-2026-07-20.md`; the historical body below is unchanged.
 
 > **Original planning window**: 2026-07-21 through 2026-07-27
 > **Compressed activation and DDL**: 2026-07-17

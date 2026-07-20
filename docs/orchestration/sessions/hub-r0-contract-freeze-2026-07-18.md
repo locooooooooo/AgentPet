@@ -3,9 +3,9 @@
 [PM]#weekly-requirements@2026-07-21
 ⟦tag:v2|session|hub-r0-contract-freeze-2026-07-18⟧
 
-loop state: active
-dispatch state: active
-status: content_contracts_implemented_pending_independent_review
+loop state: summarized
+dispatch state: summarized
+status: content_contracts_exact_file_reviewed_and_preserved
 date: 2026-07-18
 ddl: 2026-07-18
 
