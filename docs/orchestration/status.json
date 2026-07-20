@@ -7,7 +7,7 @@
   "todayPlan": {
     "date": "2026-07-20",
     "session": "docs/orchestration/sessions/weekly-development-plan-2026-07-20.md",
-    "selectedRoute": "Run four exact-fence P0 long-worker lanes: P0-C authorization readiness, lifecycle execution closure, next-stage decision preparation and Session View DockView D0; no per-worker package acceptance",
+    "selectedRoute": "Four P0 callbacks are ready for one user review: P0-C authorization envelope, Lifecycle executor/rollback implementation, M0/M1/M2 decision matrix and Session View DockView D0; no per-worker package acceptance",
     "progress": "docs/orchestration/sessions/weekly-development-plan-2026-07-20.md"
   },
   "p0Cards": [
@@ -33,19 +33,19 @@
       "id": "realtime-agent-cockpit-p0",
       "status": "ready-p0-c-authorization",
       "task": "docs/orchestration/tasks/realtime-agent-cockpit-v0.1.md",
-      "progress": "docs/orchestration/sessions/daily-plan-2026-07-17.md"
+      "progress": "docs/orchestration/tasks/p0-c-authorization-prep-v0.1.md"
     },
     {
       "id": "hub-agent-lifecycle-p0",
-      "status": "action_smoke_and_screenshot_verified",
+      "status": "execution_foundation_implemented_tested_awaiting_user_acceptance",
       "task": "docs/orchestration/tasks/hub-agent-lifecycle-p0-v0.1.md",
-      "progress": "docs/orchestration/sessions/hub-agent-lifecycle-p0-2026-07-18.md"
+      "progress": "docs/orchestration/tasks/hub-lifecycle-execution-closure-v0.1.md"
     },
     {
       "id": "hub-agent-session-view-p0-5",
-      "status": "implemented_click_verified",
+      "status": "dockview_d0_implemented_tested_awaiting_user_acceptance",
       "task": "docs/orchestration/tasks/hub-agent-session-view-p0-5-v0.1.md",
-      "progress": "docs/orchestration/sessions/hub-agent-session-view-p0-5-2026-07-18.md"
+      "progress": "docs/orchestration/tasks/hub-session-dockview-d0-v0.1.md"
     },
     {
       "id": "hub-r0-content-contracts",
@@ -73,12 +73,12 @@
     },
     {
       "id": "hub-next-stage-requirements",
-      "status": "ready_for_execution_decision",
+      "status": "decision_matrix_ready_for_user",
       "task": "docs/orchestration/tasks/hub-next-stage-requirements-v0.1.md",
-      "progress": "docs/orchestration/sessions/hub-next-stage-plan-2026-07-18.md"
+      "progress": "docs/orchestration/tasks/hub-next-stage-decision-prep-v0.1.md"
     }
   ],
-  "blocker": "Lifecycle action smoke, M1.1 Agent Library, M1.2 review-only InstallPlan and M1.3 live version evidence are packaged and verified. Kimi publisher/artifact/document/signature trust remains unknown, so the Plan is draft and execution stays closed. OpenClaw risk/auth setup remains user-controlled. HubTheme/HubSoundPack contracts pass automated checks and independent exact-file review at the contract boundary, while full DockView, unaccepted product inputs and broader UI truth remain separate work. P0-C still lacks a confirmed cwd/task/timeout/read-set/write-ban/stop-condition authorization envelope；Codex/Trae/Qoder Connector machine gates remain unchanged and disabled。",
+  "blocker": "Lifecycle action smoke plus M1.1 Library, M1.2 review-only Plan and M1.3 version evidence remain verified. A pure executable Plan/rollback matrix is now implemented and tested, but Kimi publisher/artifact/document/signature trust and real three-Agent Windows rollback evidence remain missing. DockView D0 is implemented and tested while D1-D4, product-input reconciliation and broader UI truth remain open. The exact P0-C read-only envelope is prepared; fresh explicit user authorization and the real C-01 through C-12 run are still missing. OpenClaw risk/auth remains user-controlled, and Codex/Trae/Qoder Connector machine gates remain unchanged and disabled.",
   "roles": [
     {
       "id": "pm",
@@ -588,8 +588,8 @@
       "id": "hub-lifecycle-execution-closure",
       "title": "[长工]#hub-lifecycle-execution-closure@v0.1",
       "owner": "长工",
-      "status": "active",
-      "responsibility": "Implement pure executable InstallPlan and rollback closure fixtures inside an exact two-file fence without machine effects.",
+      "status": "standby",
+      "responsibility": "Preserve the implemented/tested pure executable InstallPlan and rollback closure matrix; user acceptance and real machine evidence remain open.",
       "tag": "⟦tag:v2|task|hub-lifecycle-execution-closure-v0.1⟧",
       "evidence": "docs/orchestration/tasks/hub-lifecycle-execution-closure-v0.1.md"
     },
@@ -597,8 +597,8 @@
       "id": "hub-next-stage-decision-prep",
       "title": "[长工]#hub-next-stage-decision-prep@v0.1",
       "owner": "长工",
-      "status": "active",
-      "responsibility": "Prepare a read-only M0/M1/M2 execute-or-defer decision matrix; do not make user-owned product decisions.",
+      "status": "standby",
+      "responsibility": "Preserve the ready M0/M1/M2 execute-or-defer decision matrix; final product choices remain user-owned.",
       "tag": "⟦tag:v2|task|hub-next-stage-decision-prep-v0.1⟧",
       "evidence": "docs/orchestration/tasks/hub-next-stage-decision-prep-v0.1.md"
     },
@@ -606,8 +606,8 @@
       "id": "hub-session-dockview-d0",
       "title": "[长工]#hub-session-dockview-d0@v0.1",
       "owner": "长工",
-      "status": "active",
-      "responsibility": "Implement bounded Session View/DockView D0 registry and layout projection while preserving Session truth and protected cockpit boundaries.",
+      "status": "standby",
+      "responsibility": "Preserve the implemented/tested bounded Session View/DockView D0 registry and layout projection; D1-D4 remain out of scope.",
       "tag": "⟦tag:v2|task|hub-session-dockview-d0-v0.1⟧",
       "evidence": "docs/orchestration/tasks/hub-session-dockview-d0-v0.1.md"
     },
@@ -825,7 +825,7 @@
       "title": "2026-07-20 combined long-worker control",
       "role": "[PM]#weekly-development-plan@2026-07-20",
       "state": "active",
-      "nextAction": "Run the four active P0 long-worker lanes under exact fences; keep external Agent execution at zero until P0-C has fresh user authorization."
+      "nextAction": "Keep the four P0 lanes parked and hand the combined callbacks to the user: authorize or defer P0-C, choose M0 options, and review Lifecycle/DockView implementation together."
     },
     {
       "id": "ranch-real-integration-r0-3-dryrun",

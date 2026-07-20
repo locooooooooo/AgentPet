@@ -224,10 +224,10 @@ current role split:
 - `[长工]#hub-install-run-core@v0.1`: standby after implemented/tested pure InstallRun Journal/cancel/recovery delivery; no machine effects or acceptance claim.
 - `[长工]#hub-dependency-workflow-core@v0.1`: standby after implemented/tested pure two-Agent dependency/cancel/audit delivery; fixture truth remains unaccepted.
 - `[长工]#hub-runtime-foundation-integration@v0.1`: standby after implemented/tested two-file coordinator delivery; the foundation batch remains separate from the active P0 follow-up batch.
-- `[长工]#p0-c-authorization-prep@v0.1`: active read-only P0-C authorization-preparation owner; no external CLI or Connector execution.
-- `[长工]#hub-lifecycle-execution-closure@v0.1`: active P0 pure InstallPlan executor/rollback owner inside a new two-file fence; no machine effects.
-- `[长工]#hub-next-stage-decision-prep@v0.1`: active read-only M0/M1/M2 decision-package owner; final decisions remain user-owned.
-- `[长工]#hub-session-dockview-d0@v0.1`: active bounded Session View/DockView D0 owner; D1-D4 and native pop-outs remain out of scope.
+- `[长工]#p0-c-authorization-prep@v0.1`: standby with a ready exact read-only P0-C authorization envelope; no external CLI or Connector execution has occurred.
+- `[长工]#hub-lifecycle-execution-closure@v0.1`: standby after implemented/tested pure InstallPlan executor and rollback matrix; user acceptance and real machine evidence remain open.
+- `[长工]#hub-next-stage-decision-prep@v0.1`: standby with the M0/M1/M2 execute-or-defer decision matrix ready for the user; no user decision was substituted.
+- `[长工]#hub-session-dockview-d0@v0.1`: standby after independent D0 script, truth, TypeScript and build checks; D1-D4 and native pop-outs remain out of scope.
 - `[PM]#hub-agent-library-m1@v0.1`: summarized M1.1 read-only Agent Library; six registered candidates plus unbound host discovery are packaged and CDP verified, while InstallPlan/version probes and execution remain closed.
 - `[PM]#hub-agent-install-plan-review-m1@v0.1`: summarized M1.2 review-only InstallPlan gate; strict validation and desktop/narrow packaged evidence pass, while publisher/artifact/version trust and all execution remain closed.
 - `[PM]#hub-agent-version-evidence-m1@v0.1`: summarized M1.3 read-only version evidence; four registered lifecycle candidates plus unbound Kimi have live packaged version proof, while support and Connector gates remain unchanged.
@@ -244,23 +244,23 @@ current role split:
 - `[PM]#daily-plan@2026-07-10`: summarized 2026-07-10 daily plan;administrator decisions and W28/closeout preparation are retained as history.
 
 blockers:
-- The selected-Agent Session slice is packaged and click-verified, but full DockView D0-D4 (free docking, persistence, profiles and Electron pop-outs) remains a separate unmet requirement.
+- The selected-Agent Session slice remains packaged/click-verified and DockView D0 registry/layout is implemented/tested; D1-D4 free docking, profiles, persistence adapters and Electron pop-outs remain separate unmet requirements.
 - HubTheme/HubSoundPack contracts pass automated valid/invalid example checks and independent exact-file review; unaccepted product inputs and remaining synthetic avatar/status semantics still block broader R0 acceptance.
-- M1.1 Agent Library, M1.2 review-only InstallPlan gate and M1.3 independent version evidence are packaged and verified, but full M1 still lacks an accepted executable Plan and three lifecycle rollback closures; none establishes Headless or workflow readiness.
+- M1.1 Agent Library, M1.2 review-only InstallPlan gate and M1.3 independent version evidence remain packaged/verified. The pure executable Plan and three rollback fixture classes are implemented/tested but unaccepted; real trusted Plan and three-Agent Windows rollback evidence still block full M1.
 - External connector execution remains disabled; Codex is draft/pending/discovery-only, Trae is draft/pending with `Models is required`, and Qoder is rejected/disabled because no independent headless Agent API exists.
-- Real-time cockpit A6/A7.1, renderer truth and B2 controlled production slices are accepted only to the trusted/controlled-process boundary. P0-C real Agent E2E is still unexecuted; configured seeds, CLI discovery, controlled Node processes and simulated ticks must not be reported as online Agent sessions.
+- Real-time cockpit A6/A7.1, renderer truth and B2 controlled production slices are accepted only to the trusted/controlled-process boundary. The exact P0-C envelope is ready but the real Agent E2E remains unauthorized/unexecuted; configured seeds, CLI discovery, controlled Node processes and simulated ticks must not be reported as online Agent sessions.
 - The historical service-side `403 DAILY_LIMIT_EXCEEDED` is not current availability truth: bounded in-app short workers were dispatched successfully on 2026-07-17. This does not enable any external Connector.
 - Control-cockpit central 4x2 grid and protected selling-point files remain locked; M4 header settings entry has been completed and accepted.
 - Transparent Electron ranch pointer smoke remains incomplete: the 2026-07-17 Computer Use route enumerated both windows and eight animals, but screenshots failed with `SetIsBorderRequired failed (0x80004002)`, so safe coordinate input and direct click/drag/dock observation were blocked.
 
 next action:
-- Use `docs/orchestration/sessions/weekly-development-plan-2026-07-20.md` as the active no-time-gate truth; the four P0 long-worker lanes are now the active follow-up batch, with final acceptance reserved for the user.
+- Use `docs/orchestration/sessions/weekly-development-plan-2026-07-20.md` as the active no-time-gate truth; the four P0 callbacks are ready for one user review, with P0-C and M0 choices still user-owned.
 - The active P0 batch is tracked by four exact-fence long-worker cards: P0-C readiness, lifecycle execution closure, next-stage decision preparation and Session View DockView D0.
 - Use `docs/牛马Hub下一阶段需求与目标-v0.1-2026-07-18.md` as the canonical product and acceptance source; close or explicitly defer the remaining M0 decisions before expanding M1 beyond the accepted read-only Library slice.
 - Preserve the packaged Session slice and open a separately fenced DockView D0 architecture probe before adding drag/drop, saved layouts or native pop-out windows.
 - Preserve the independently accepted content-contract boundary, then reconcile product inputs and full UI truth; do not conflate R0 contract acceptance with R3 theme/sound product implementation.
 - Preserve pushed A7.1/B2 control commit `74d8f50`; keep the runtime worker count at zero.
-- Keep P0-C at `authorization_required_ready_for_decision` until a fresh explicit Codex execution authorization exists.
+- Keep P0-C at `ready_for_user_authorization` with the prepared exact envelope until a fresh explicit Codex execution authorization exists.
 - Do not execute or enable any external Agent Connector from this control closeout.
 - Keep M3 code gates accepted as passed after `lint`, `build`, and `orchestration:check`; use the identified Windows MCP Snapshot route only as capture evidence until full transparent-window pointer input is observed.
 - Keep connector policy and `connector-acceptance-review-v0.1` on standby: do not rerun Trae before Models configuration plus fresh authorization, and do not reconsider Qoder before a headless API exists.

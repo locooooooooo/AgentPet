@@ -70,6 +70,10 @@ import {
 } from '../lib/agentInstallPlan';
 import { CONNECTOR_POLICY, ORCHESTRATION_STATUS } from '../lib/orchestrationStatus';
 import { getCodexHostOnlineContribution, getCombinedOnlineSessionCount } from '../lib/codexHostStatus';
+import {
+  projectDockViewLayout,
+  type DockViewId
+} from '../lib/dockViewRegistry';
 import NiuMaAvatar from './NiuMaAvatar';
 import StatusStrip from './StatusStrip';
 
@@ -162,6 +166,8 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, codexHost, o
   const [cornerPanelOpen, setCornerPanelOpen] = useState(false);
   const [governancePanelOpen, setGovernancePanelOpen] = useState(false);
   const [activeDockStatus, setActiveDockStatus] = useState<DockStatusId | null>(null);
+  const [activeDockView, setActiveDockView] = useState<DockViewId>('session-detail');
+  const [selectedSessionKey, setSelectedSessionKey] = useState<string | null>(null);
   const [completionToast, setCompletionToast] = useState<string | null>(null);
   const [hostActionFeedback, setHostActionFeedback] = useState<Record<string, HostActionFeedback>>({});
   const completionHydratedRef = useRef(false);
@@ -179,14 +185,23 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, codexHost, o
         && task.connectorId === selectedAgentTruth.connectorId
       )) ?? null
     : null;
-  const selectedAgentSessions = selectedAgent
+  const selectedAgentSessions = useMemo(() => selectedAgent
     ? projectAgentSessions({
         agentId: selectedAgent.id,
         connectorId: selectedAgentTruth?.connectorId ?? selectedAgent.id,
         runtimeTasks: agentTruth.tasks,
         codexHost
       })
-    : [];
+    : [], [agentTruth.tasks, codexHost, selectedAgent, selectedAgentTruth?.connectorId]);
+  const selectedSessionKeys = selectedAgentSessions.map(getAgentSessionKey).join('\u001f');
+  const selectedSession = selectedAgentSessions.find((session) => getAgentSessionKey(session) === selectedSessionKey)
+    ?? selectedAgentSessions[0]
+    ?? null;
+  const dockLayout = projectDockViewLayout({
+    activeView: activeDockView,
+    selectedAgentId: selectedAgent?.id ?? null,
+    selectedSessionKey: selectedSession ? getAgentSessionKey(selectedSession) : null
+  });
   const hostLifecycleByAgent = new Map(
     agentTruth.hostDiscovery.lifecycle.map((item) => [item.agentId, item])
   );
@@ -295,6 +310,15 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, codexHost, o
     return matchesState && matchesQuery;
   }), [governanceStateFilter, normalizedGovernanceQuery]);
   const governanceFilterActive = normalizedGovernanceQuery.length > 0 || governanceStateFilter !== 'all';
+
+  useEffect(() => {
+    setSelectedSessionKey((current) => {
+      if (current && selectedAgentSessions.some((session) => getAgentSessionKey(session) === current)) {
+        return current;
+      }
+      return selectedAgentSessions[0] ? getAgentSessionKey(selectedAgentSessions[0]) : null;
+    });
+  }, [selectedAgentId, selectedSessionKeys]);
 
   useEffect(() => {
     // Connector gate display is status-only, not executable; do not add run/start actions here.
@@ -591,7 +615,13 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, codexHost, o
   const activeDockDetail = dockStatuses.find((status) => status.id === activeDockStatus) ?? null;
 
   return (
-    <div className="workspace-shell">
+    <div
+      className="workspace-shell"
+      data-dock-layout-version={dockLayout.version}
+      data-dock-active-view={dockLayout.activeView}
+      data-dock-selected-agent-id={dockLayout.selectedAgentId ?? ''}
+      data-dock-selected-session-key={dockLayout.selectedSessionKey ?? ''}
+    >
       <nav className="cockpit-region-jumps" aria-label="控制舱区域跳转">
         <button type="button" onClick={() => focusCockpitRegion('cockpit-health-region')}>全局健康</button>
         <button type="button" onClick={() => focusCockpitRegion('cockpit-agent-region')}>Agent 矩阵</button>
@@ -661,7 +691,10 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, codexHost, o
           <button
             type="button"
             className={`safe-status ${agentLibraryOpen ? 'is-active' : ''}`}
-            onClick={() => setAgentLibraryOpen((open) => !open)}
+            onClick={() => {
+              setAgentLibraryOpen((open) => !open);
+              setActiveDockView('agent-library');
+            }}
             aria-expanded={agentLibraryOpen}
             aria-haspopup="dialog"
           >
@@ -781,6 +814,7 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, codexHost, o
           onSelectAgent={(agentId) => {
             if (snapshot.agents.some((agent) => agent.id === agentId)) {
               setSelectedAgentId(agentId);
+              setActiveDockView('session-detail');
             }
             setAgentLibraryOpen(false);
           }}
@@ -1031,7 +1065,10 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, codexHost, o
                   hostStatus={agent.id === 'codex' ? codexHost : null}
                   hostActionFeedback={hostActionFeedback[agent.id]}
                   selected={agent.id === selectedAgent?.id}
-                  onSelect={() => setSelectedAgentId(agent.id)}
+                  onSelect={() => {
+                    setSelectedAgentId(agent.id);
+                    setActiveDockView('session-detail');
+                  }}
                   onRun={() => runTask(agent, undefined, undefined, 'simulated')}
                   onAction={(action) => applyAction(agent, action)}
                   onCycle={(event) => cycleState(agent, event)}
@@ -1072,6 +1109,7 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, codexHost, o
                 truth={selectedAgentTruth}
                 runtimeTask={selectedRuntimeTask}
                 sessions={selectedAgentSessions}
+                selectedSessionKey={dockLayout.selectedSessionKey}
                 runtimeTruth={agentTruth.runtime}
                 codexHost={selectedAgent.id === 'codex' ? codexHost : null}
                 lifecycle={hostLifecycleByAgent.get(selectedAgent.id) ?? null}
@@ -1081,6 +1119,11 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, codexHost, o
                 onRunTask={runTask}
                 onCycle={(event) => cycleState(selectedAgent, event)}
                 onHostAction={(action) => void manageHost(selectedAgent, action)}
+                onSelectSession={(sessionKey) => {
+                  setSelectedSessionKey(sessionKey);
+                  setActiveDockView('session-detail');
+                }}
+                onActiveViewChange={setActiveDockView}
               />
             </div>
           </aside>
@@ -1187,7 +1230,10 @@ export default function NiuMaWorkspace({ api, snapshot, agentTruth, codexHost, o
             key={status.id}
             type="button"
             className={`dock-item grow dock-status-button ${status.tone} ${activeDockStatus === status.id ? 'is-active' : ''}`}
-            onClick={() => setActiveDockStatus((current) => current === status.id ? null : status.id)}
+            onClick={() => {
+              setActiveDockStatus((current) => current === status.id ? null : status.id);
+              setActiveDockView('control-status');
+            }}
             aria-expanded={activeDockStatus === status.id}
             aria-controls="cockpit-dock-detail"
           >
@@ -1863,6 +1909,7 @@ interface AgentDetailPanelProps {
   truth: ProjectedAgentTruth | null;
   runtimeTask: ProjectedRuntimeTask | null;
   sessions: readonly AgentSession[];
+  selectedSessionKey: string | null;
   runtimeTruth: AgentTruthProjection['runtime'];
   codexHost: CodexHostSnapshot | null;
   lifecycle: AgentHostLifecycleFact | null;
@@ -1872,6 +1919,8 @@ interface AgentDetailPanelProps {
   onRunTask: (agent: AIAgent, taskName?: string, command?: string, runner?: AgentTaskRunner) => Promise<void>;
   onCycle: (event: ReactMouseEvent) => void;
   onHostAction: (action: AgentHostPrimaryAction) => void;
+  onSelectSession: (sessionKey: string) => void;
+  onActiveViewChange: (viewId: DockViewId) => void;
 }
 
 function AgentDetailPanel({
@@ -1881,6 +1930,7 @@ function AgentDetailPanel({
   truth,
   runtimeTask,
   sessions,
+  selectedSessionKey,
   runtimeTruth,
   codexHost,
   lifecycle,
@@ -1889,22 +1939,21 @@ function AgentDetailPanel({
   onSnapshot,
   onRunTask,
   onCycle,
-  onHostAction
+  onHostAction,
+  onSelectSession,
+  onActiveViewChange
 }: AgentDetailPanelProps) {
   const [taskName, setTaskName] = useState('');
   const [command, setCommand] = useState('');
   const [runner, setRunner] = useState<AgentTaskRunner>(localRunnerAvailable ? 'local' : 'simulated');
   const [openTaskId, setOpenTaskId] = useState<string | null>(agent.tasks[0]?.id ?? null);
   const [activeDetailTab, setActiveDetailTab] = useState<DetailTabId>('sessions');
-  const [openSessionKey, setOpenSessionKey] = useState<string | null>(
-    sessions[0] ? getAgentSessionKey(sessions[0]) : null
-  );
   const meta = STATE_METAS[runtime.status];
   const quickTasks = useMemo(() => getQuickTasks(agent.id), [agent.id]);
   const openTask = agent.tasks.find((task) => task.id === openTaskId) ?? agent.tasks[0];
   const effectiveRunner: AgentTaskRunner = localRunnerAvailable ? runner : 'simulated';
   const primaryInstance = truth?.primaryInstance ?? null;
-  const openSession = sessions.find((session) => getAgentSessionKey(session) === openSessionKey) ?? sessions[0];
+  const openSession = sessions.find((session) => getAgentSessionKey(session) === selectedSessionKey) ?? sessions[0];
 
   async function submitTask(event: React.FormEvent) {
     event.preventDefault();
@@ -2080,7 +2129,10 @@ function AgentDetailPanel({
               className={`detail-tab-button ${active ? 'is-active' : ''}`}
               aria-selected={active}
               aria-controls={`detail-tab-panel-${tab.id}`}
-              onClick={() => setActiveDetailTab(tab.id)}
+              onClick={() => {
+                setActiveDetailTab(tab.id);
+                onActiveViewChange(tab.id === 'logs' ? 'logs' : 'session-detail');
+              }}
             >
               {tab.label}
             </button>
@@ -2132,7 +2184,7 @@ function AgentDetailPanel({
                     data-session-source={session.source}
                     data-session-status={session.status}
                     aria-pressed={getAgentSessionKey(session) === (openSession ? getAgentSessionKey(openSession) : null)}
-                    onClick={() => setOpenSessionKey(getAgentSessionKey(session))}
+                    onClick={() => onSelectSession(getAgentSessionKey(session))}
                   >
                     <span className={`session-state is-${session.status}`}>{getSessionStatusLabel(session.status)}</span>
                     <strong title={session.title}>{session.title}</strong>

@@ -5,7 +5,7 @@
 
 loop state: standby
 dispatch state: standby
-status: ready_for_execution_decision
+status: decision_matrix_ready_for_user
 date: 2026-07-18
 priority: P0 planning
 

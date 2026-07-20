@@ -2,9 +2,9 @@
 
 [长工]#hub-next-stage-decision-prep@v0.1
 ⟦tag:v2|task|hub-next-stage-decision-prep-v0.1⟧
-loop state: active
-dispatch state: active
-status: implementation_in_progress_waiting_user_decision
+loop state: standby
+dispatch state: standby
+status: decision_matrix_ready_for_user
 priority: P0 planning
 
 ## goal

@@ -70,6 +70,13 @@ Combined verification state:
 
 These four P0 workers are dispatched as one batch. Authorization and user decisions remain user-owned gates, not schedule gates. No worker performs package acceptance; all callbacks return to one combined user review.
 
+P0 callback state:
+
+- P0-C: `ready_for_user_authorization`; exact Codex-only read-only envelope prepared, external spawn remains `0`.
+- Lifecycle execution closure: `implemented_tested_awaiting_user_acceptance`; pure executor matrix and three rollback fixture classes pass, real machine evidence remains open.
+- Next-stage decision preparation: `decision_matrix_ready_for_user`; execute/defer options are prepared without substituting user decisions.
+- Session View DockView D0: `implemented_tested_awaiting_user_acceptance`; D0 registry/layout, Session truth, TypeScript and build checks pass, while D1-D4 remain open.
+
 ## external execution boundary
 
 - Codex P0-C, Trae smoke and OpenClaw risk/auth are not time gates. They are external execution permissions and remain closed until their exact prerequisites are supplied.
@@ -111,4 +118,4 @@ These four P0 workers are dispatched as one batch. Authorization and user decisi
 - `user_accepted`: may be set only after the user's unified review.
 
 next action:
-- Run the four active P0 long-worker lanes under their exact fences. Keep external Agent execution at zero until P0-C receives a fresh user authorization envelope.
+- Keep all four P0 workers parked and hand one combined review to the user. P0-C execution remains forbidden until the user explicitly authorizes the prepared envelope.
