@@ -7,7 +7,7 @@
   "todayPlan": {
     "date": "2026-07-20",
     "session": "docs/orchestration/sessions/weekly-development-plan-2026-07-20.md",
-    "selectedRoute": "Run the 2026-07-20 through 2026-07-26 serial plan: accept Adapter admission and InstallRun recovery foundations first, then open real Connector and dual-Agent acceptance only through fresh prerequisite-specific authorization gates",
+    "selectedRoute": "Run one combined no-time-gate batch: three non-overlapping foundation long workers, then one integration long worker; no per-worker package or PM acceptance, with final acceptance reserved for the user",
     "progress": "docs/orchestration/sessions/weekly-development-plan-2026-07-20.md"
   },
   "p0Cards": [
@@ -535,9 +535,36 @@
       "title": "[PM]#weekly-development-plan@2026-07-20",
       "owner": "主控",
       "status": "active",
-      "responsibility": "Own the 2026-07-20 through 2026-07-26 serial plan for Adapter admission, InstallRun recovery foundations and authorization-gated real Adapter/workflow acceptance.",
+      "responsibility": "Own the combined no-time-gate batch for three parallel foundation long workers, bounded integration and user-owned unified acceptance.",
       "tag": "⟦tag:v2|session|weekly-development-plan-2026-07-20⟧",
       "evidence": "docs/orchestration/sessions/weekly-development-plan-2026-07-20.md"
+    },
+    {
+      "id": "hub-adapter-capability",
+      "title": "[长工]#hub-adapter-capability@v0.1",
+      "owner": "长工",
+      "status": "active",
+      "responsibility": "Implement the pure fail-closed Adapter Capability admission evaluator inside its exact two-file fence; no external execution or acceptance claim.",
+      "tag": "⟦tag:v2|task|hub-adapter-capability-implementation-v0.1⟧",
+      "evidence": "docs/orchestration/tasks/hub-adapter-capability-implementation-v0.1.md"
+    },
+    {
+      "id": "hub-install-run-core",
+      "title": "[长工]#hub-install-run-core@v0.1",
+      "owner": "长工",
+      "status": "active",
+      "responsibility": "Implement the pure InstallRunJournal, cancellation, compensation and recovery core inside its exact two-file fence; no machine effects or acceptance claim.",
+      "tag": "⟦tag:v2|task|hub-install-run-core-v0.1⟧",
+      "evidence": "docs/orchestration/tasks/hub-install-run-core-v0.1.md"
+    },
+    {
+      "id": "hub-dependency-workflow-core",
+      "title": "[长工]#hub-dependency-workflow-core@v0.1",
+      "owner": "长工",
+      "status": "active",
+      "responsibility": "Implement the pure two-Agent dependency, cancellation propagation and audit-correlation core inside its exact two-file fence; fixture truth remains unaccepted.",
+      "tag": "⟦tag:v2|task|hub-dependency-workflow-core-v0.1⟧",
+      "evidence": "docs/orchestration/tasks/hub-dependency-workflow-core-v0.1.md"
     },
     {
       "id": "realtime-p1-scheduler-core",
@@ -750,10 +777,10 @@
     },
     {
       "id": "weekly-requirements",
-      "title": "2026-07-20 weekly development control",
+      "title": "2026-07-20 combined long-worker control",
       "role": "[PM]#weekly-development-plan@2026-07-20",
       "state": "active",
-      "nextAction": "Open Tuesday's bounded Adapter Capability admission intake; keep product worker concurrency at one and external Agent execution at zero until a fresh exact authorization gate opens."
+      "nextAction": "Run the three non-overlapping foundation long workers together, then dispatch one bounded integration long worker; skip per-worker packaging and reserve acceptance for the user."
     },
     {
       "id": "ranch-real-integration-r0-3-dryrun",

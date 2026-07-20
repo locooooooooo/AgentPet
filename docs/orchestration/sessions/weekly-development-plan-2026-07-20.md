@@ -4,9 +4,9 @@
 ⟦tag:v2|session|weekly-development-plan-2026-07-20⟧
 loop state: active
 dispatch state: active
-status: active_serial_weekly_control
+status: active_parallel_longworker_batch
 date: 2026-07-20
-window: 2026-07-20 through 2026-07-26
+time gate: none
 
 ## one goal
 
@@ -30,63 +30,58 @@ window: 2026-07-20 through 2026-07-26
 - Codex is the primary conditional Adapter candidate. Trae is the second conditional candidate only after non-secret Models configuration and a fresh authorized smoke.
 - DockView expansion, Theme/SoundPack product implementation, transparent ranch pointer acceptance and broad UI redesign are not this week's development lanes.
 
-## committed weekly outcomes
+## combined implementation batch
 
-1. Accept a pure Adapter Capability admission evaluator with deterministic fail-closed fixtures and no external Agent process execution.
-2. Accept an InstallRunJournal, cancellation and recovery core against local fixtures, with no installer, elevation, service, credential or Connector side effect.
-3. Reconcile control truth, run package regression and publish an evidence-based weekly closeout that keeps `implemented`, `tested`, `accepted`, `committed` and `pushed` separate.
+All work below belongs to one combined weekly batch. Calendar order, DDL and per-day entry gates are removed.
 
-## conditional outcomes
+| Owner | Scope | File fence | Worker exit |
+| --- | --- | --- | --- |
+| `[长工]#hub-adapter-capability@v0.1` | Pure fail-closed Adapter Capability admission evaluator | `src/lib/adapterCapability.ts`; `scripts/check-adapter-capability.mjs` | Implementation and targeted fixtures complete; not accepted |
+| `[长工]#hub-install-run-core@v0.1` | Pure InstallRunJournal, cancellation, compensation and recovery core | `src/lib/installRunJournal.ts`; `scripts/check-install-run-journal.mjs` | Implementation and targeted fixtures complete; not accepted |
+| `[长工]#hub-dependency-workflow-core@v0.1` | Pure two-Agent dependency, cancellation propagation and audit-correlation core | `src/lib/dependencyWorkflow.ts`; `scripts/check-dependency-workflow.mjs` | Implementation and targeted fixtures complete; not accepted |
+| `[长工]#hub-runtime-foundation-integration@v0.1` | Integrate the three completed foundations with existing runtime boundaries | Separate fence set after the three foundation callbacks | Integrated implementation and regression evidence complete; not accepted |
 
-- Accept Codex P0-C only after a fresh exact authorization envelope is supplied and every required receipt, timeout, stop and audit check passes.
-- Accept Trae only after Models readiness and a separate fresh authorization exist and the same Adapter admission policy passes.
-- Open a real cancellable two-Agent dependency workflow only after two Headless Adapters are accepted. One accepted Adapter is not enough.
-- Close real lifecycle rollback rows only from separately authorized machine-effect evidence; local Journal fixtures cannot satisfy those rows.
+The first three long workers run in parallel because their write fences do not overlap. The integration long worker starts when all three foundation callbacks and diffs are available; this is a code dependency, not a date or PM acceptance gate.
 
-## daily board
+## external execution boundary
 
-| Day | Primary slice | Entry gate | Exit evidence | Fallback when gate is closed |
-| --- | --- | --- | --- | --- |
-| Mon 07-20 | Baseline reconciliation, decision queue and authorization envelopes | Current Git/control truth | This active weekly card, synchronized index/status, zero external spawn, pushed parity | Keep all execution gates closed |
-| Tue 07-21 | Adapter Capability admission evaluator | Separately fenced implementation card | Schema/policy negative matrix, evidence freshness/integrity, identity/receipt/cancel/error checks, regression gates | Expand evaluator fixtures only |
-| Wed 07-22 | InstallRunJournal, cancellation and recovery core | Tuesday slice accepted or explicitly isolated | Deterministic state transitions, idempotent cancel, safe-point compensation, crash recovery and LKG failure evidence | Keep machine effects absent and close local defects |
-| Thu 07-23 | Codex P0-C acceptance | Fresh exact Codex-only authorization | Real read-only task/session identity, bounded timeout, terminal receipt, stop semantics, redacted audit and residue check | No Connector run; strengthen admission/recovery negatives |
-| Fri 07-24 | Trae Adapter acceptance | Non-secret Models configuration plus fresh Trae-only authorization | Successful structured response and full Adapter admission evidence | Preserve Trae draft/pending/disabled; continue local recovery coverage |
-| Sat 07-25 | Two-Agent dependency workflow | Two accepted Headless Adapters | Real two-node dependency order, cancellation propagation, audit correlation and terminal idempotency | Keep M2 unopened; harden admission and recovery infrastructure |
-| Sun 07-26 | Package regression and weekly closeout | All accepted slices frozen | Orchestration/safety/lint/build/package gates, packaged smoke where applicable, evidence reconciliation and Git parity | Close only verified local slices and carry external gates forward |
+- Codex P0-C, Trae smoke and OpenClaw risk/auth are not time gates. They are external execution permissions and remain closed until their exact prerequisites are supplied.
+- Long workers may implement and test local contracts without executing Codex, Trae, Qoder, OpenClaw or any other external Agent.
+- Real Connector evidence and real lifecycle rollback rows remain `unverified` until separately authorized execution occurs; local fixtures cannot satisfy them.
+- Qoder remains excluded from any accepted Headless Adapter count until an independent Headless API exists.
 
-## dispatch and acceptance gates
+## dispatch rules
 
-- Keep one product implementation worker active at a time. PM dispatch, independent review and acceptance happen between slices.
-- Every implementation day requires a separately tracked task card with an exact file fence before code work starts.
+- Dispatch the three foundation long workers together under their separately tracked task cards and exact non-overlapping file fences.
+- Workers may read the full repository but may edit only their fenced files. They do not stage, commit, push or change orchestration truth.
+- Each worker reports `implemented`, targeted test results, incomplete items, blockers and exact changed files. No worker claims acceptance.
+- The manager reviews overlap, integrates callbacks, opens the bounded integration worker and keeps final state `awaiting_user_acceptance`.
 - Adapter admission must reject unknown fields, stale or mismatched evidence, incompatible versions, incomplete permission/error/session contracts, missing cancellation semantics and unverified event bindings.
 - InstallRun recovery must fail closed on Journal integrity failure, consent drift, missing LKG state, duplicate terminal events and unsafe compensation.
-- P0-C authorization must name the exact cwd, read-only task, allowed read set, timeout no greater than 120 seconds, write prohibition and stop conditions. This plan is not that authorization.
-- Trae authorization cannot substitute for Models readiness, and Codex authorization cannot be reused for Trae.
+- Dependency workflow execution must fail closed on missing adapters, self/duplicate/cyclic dependencies, failed prerequisites, duplicate terminal events and cancellation races.
 - Process discovery, package presence, synthetic callback, controlled Node process or fixture success is not Headless Adapter acceptance.
 
-## verification floor
+## worker verification floor
 
-- Slice-specific deterministic checks and negative matrix pass.
-- `npm.cmd run realtime:truth-check` passes for any runtime or Session truth change.
-- `npm.cmd run orchestration:connector-safety` passes for any Adapter, Connector or execution-boundary change.
-- `npm.cmd run orchestration:check`, `npm.cmd run lint`, `npm.cmd run build` and `git diff --check` pass before acceptance.
-- `npm.cmd run package:win` and packaged CDP smoke are required for user-visible or Electron behavior changes.
-- PM reviews the exact diff and evidence before commit; local, tracking and remote hashes are compared after push.
+- Each foundation worker runs its own deterministic script and `git diff --check` for its fenced files.
+- The integration pass runs relevant runtime/truth/Connector safety checks plus repository lint and build.
+- No per-worker Windows package, packaged CDP smoke, PM acceptance or acceptance session is required.
+- After the combined batch is implemented and tested, the manager reports one exact integrated diff and one verification summary to the user.
+- Only the user performs the unified product acceptance requested for this batch.
 
-## fallback contract
+## no-fabrication boundary
 
 - No fresh authorization means no external Connector execution.
-- No second accepted Adapter means the M2 dependency workflow remains unopened.
 - No trusted executable Plan means no real install, update, repair or uninstall effect.
-- Blocked external time is reinvested in admission, Journal, cancellation and recovery infrastructure; it is never converted into simulated acceptance.
+- A locally implemented workflow core is not a real two-Agent acceptance result.
+- `implemented`, `tested`, `integrated`, `committed`, `pushed` and `user_accepted` remain separate states.
 
-## weekly exit states
+## combined handoff state
 
-- `minimum_success`: both committed local foundation slices are accepted, regression is green, and external blockers remain truthfully recorded.
-- `conditional_success`: Codex and Trae are both accepted and the real dual-Agent workflow passes all dependency/cancel/audit gates.
-- `carry_over`: any authorization, Models, trust, API or second-Adapter prerequisite remains missing; only the affected row carries forward.
-- `failure`: a committed local slice lacks deterministic acceptance or regresses orchestration/safety/build/package truth.
+- `in_progress`: one or more foundation/integration long workers have not returned a complete callback.
+- `implemented_tested_awaiting_user_acceptance`: all in-scope code and integrated tests are complete; no acceptance is claimed.
+- `externally_blocked`: implementation is complete but real Agent or machine-effect evidence still lacks its explicit prerequisite.
+- `user_accepted`: may be set only after the user's unified review.
 
 next action:
-- Freeze and push this control baseline, then open Tuesday's bounded Adapter Capability admission intake. Do not start product implementation or any external Agent execution from this planning request alone.
+- Push the no-time-gate control baseline and dispatch the three fenced foundation long workers together. Do not run external Agents or perform per-worker package acceptance.
