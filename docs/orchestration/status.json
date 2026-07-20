@@ -7,7 +7,7 @@
   "todayPlan": {
     "date": "2026-07-20",
     "session": "docs/orchestration/sessions/weekly-development-plan-2026-07-20.md",
-    "selectedRoute": "Run one combined no-time-gate batch: three non-overlapping foundation long workers, then one integration long worker; no per-worker package or PM acceptance, with final acceptance reserved for the user",
+    "selectedRoute": "Three non-overlapping foundation long workers are implemented/tested; run the bounded integration long worker next, with no per-worker package or PM acceptance and final acceptance reserved for the user",
     "progress": "docs/orchestration/sessions/weekly-development-plan-2026-07-20.md"
   },
   "p0Cards": [
@@ -543,8 +543,8 @@
       "id": "hub-adapter-capability",
       "title": "[长工]#hub-adapter-capability@v0.1",
       "owner": "长工",
-      "status": "active",
-      "responsibility": "Implement the pure fail-closed Adapter Capability admission evaluator inside its exact two-file fence; no external execution or acceptance claim.",
+      "status": "standby",
+      "responsibility": "Preserve the implemented/tested pure Adapter Capability admission evaluator and targeted matrix pending the user's combined acceptance.",
       "tag": "⟦tag:v2|task|hub-adapter-capability-implementation-v0.1⟧",
       "evidence": "docs/orchestration/tasks/hub-adapter-capability-implementation-v0.1.md"
     },
@@ -552,8 +552,8 @@
       "id": "hub-install-run-core",
       "title": "[长工]#hub-install-run-core@v0.1",
       "owner": "长工",
-      "status": "active",
-      "responsibility": "Implement the pure InstallRunJournal, cancellation, compensation and recovery core inside its exact two-file fence; no machine effects or acceptance claim.",
+      "status": "standby",
+      "responsibility": "Preserve the implemented/tested pure InstallRunJournal, cancellation, compensation and recovery core pending the user's combined acceptance.",
       "tag": "⟦tag:v2|task|hub-install-run-core-v0.1⟧",
       "evidence": "docs/orchestration/tasks/hub-install-run-core-v0.1.md"
     },
@@ -561,10 +561,19 @@
       "id": "hub-dependency-workflow-core",
       "title": "[长工]#hub-dependency-workflow-core@v0.1",
       "owner": "长工",
-      "status": "active",
-      "responsibility": "Implement the pure two-Agent dependency, cancellation propagation and audit-correlation core inside its exact two-file fence; fixture truth remains unaccepted.",
+      "status": "standby",
+      "responsibility": "Preserve the implemented/tested pure two-Agent dependency, cancellation propagation and audit-correlation core pending the user's combined acceptance.",
       "tag": "⟦tag:v2|task|hub-dependency-workflow-core-v0.1⟧",
       "evidence": "docs/orchestration/tasks/hub-dependency-workflow-core-v0.1.md"
+    },
+    {
+      "id": "hub-runtime-foundation-integration",
+      "title": "[长工]#hub-runtime-foundation-integration@v0.1",
+      "owner": "长工",
+      "status": "active",
+      "responsibility": "Compose the three implemented/tested foundations behind one pure Hub execution coordinator inside an exact two-file fence; no external execution, package or acceptance claim.",
+      "tag": "⟦tag:v2|task|hub-runtime-foundation-integration-v0.1⟧",
+      "evidence": "docs/orchestration/tasks/hub-runtime-foundation-integration-v0.1.md"
     },
     {
       "id": "realtime-p1-scheduler-core",
@@ -780,7 +789,7 @@
       "title": "2026-07-20 combined long-worker control",
       "role": "[PM]#weekly-development-plan@2026-07-20",
       "state": "active",
-      "nextAction": "Run the three non-overlapping foundation long workers together, then dispatch one bounded integration long worker; skip per-worker packaging and reserve acceptance for the user."
+      "nextAction": "Dispatch the bounded Hub execution coordinator integration long worker; skip packaging and PM acceptance, then hand the combined implementation to the user."
     },
     {
       "id": "ranch-real-integration-r0-3-dryrun",

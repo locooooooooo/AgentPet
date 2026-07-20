@@ -4,7 +4,7 @@
 ⟦tag:v2|session|weekly-development-plan-2026-07-20⟧
 loop state: active
 dispatch state: active
-status: active_parallel_longworker_batch
+status: active_integration_longworker
 date: 2026-07-20
 time gate: none
 
@@ -42,6 +42,13 @@ All work below belongs to one combined weekly batch. Calendar order, DDL and per
 | `[长工]#hub-runtime-foundation-integration@v0.1` | Integrate the three completed foundations with existing runtime boundaries | Separate fence set after the three foundation callbacks | Integrated implementation and regression evidence complete; not accepted |
 
 The first three long workers run in parallel because their write fences do not overlap. The integration long worker starts when all three foundation callbacks and diffs are available; this is a code dependency, not a date or PM acceptance gate.
+
+Foundation callback state:
+
+- Adapter Capability: `implemented_tested_awaiting_user_acceptance`.
+- InstallRun core: `implemented_tested_awaiting_user_acceptance`.
+- Dependency workflow core: `implemented_tested_awaiting_user_acceptance`.
+- Manager independent replay: all three targeted matrices and full TypeScript check pass; external execution remains `0`.
 
 ## external execution boundary
 
@@ -84,4 +91,4 @@ The first three long workers run in parallel because their write fences do not o
 - `user_accepted`: may be set only after the user's unified review.
 
 next action:
-- Push the no-time-gate control baseline and dispatch the three fenced foundation long workers together. Do not run external Agents or perform per-worker package acceptance.
+- Dispatch the bounded integration long worker for `hubExecutionCoordinator`; do not run external Agents or perform per-worker package acceptance.
