@@ -579,8 +579,8 @@
       "id": "p0-c-authorization-prep",
       "title": "[长工]#p0-c-authorization-prep@v0.1",
       "owner": "长工",
-      "status": "active",
-      "responsibility": "Prepare the exact Codex P0-C read-only authorization envelope and current blockers without executing any external CLI.",
+      "status": "standby",
+      "responsibility": "Preserve the exact Codex P0-C read-only authorization envelope; wait for a fresh user authorization and keep external CLI execution at zero.",
       "tag": "⟦tag:v2|task|p0-c-authorization-prep-v0.1⟧",
       "evidence": "docs/orchestration/tasks/p0-c-authorization-prep-v0.1.md"
     },

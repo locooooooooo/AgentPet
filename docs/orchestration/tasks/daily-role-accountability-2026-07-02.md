@@ -69,7 +69,7 @@ role ledger:
 | `[长工]#hub-install-run-core@v0.1` | standby | `docs/orchestration/tasks/hub-install-run-core-v0.1.md` | Preserve implemented/tested InstallRun output and wait for the combined user acceptance. |
 | `[长工]#hub-dependency-workflow-core@v0.1` | standby | `docs/orchestration/tasks/hub-dependency-workflow-core-v0.1.md` | Preserve implemented/tested workflow output and wait for the combined user acceptance. |
 | `[长工]#hub-runtime-foundation-integration@v0.1` | standby | `docs/orchestration/tasks/hub-runtime-foundation-integration-v0.1.md` | Preserve implemented/tested coordinator output and wait with the three foundation workers for combined user acceptance. |
-| `[长工]#p0-c-authorization-prep@v0.1` | active | `docs/orchestration/tasks/p0-c-authorization-prep-v0.1.md` | Prepare exact P0-C authorization readiness without executing an external CLI. |
+| `[长工]#p0-c-authorization-prep@v0.1` | standby | `docs/orchestration/tasks/p0-c-authorization-prep-v0.1.md` | Preserve the exact P0-C authorization envelope and wait for fresh user authorization; no external CLI execution. |
 | `[长工]#hub-lifecycle-execution-closure@v0.1` | active | `docs/orchestration/tasks/hub-lifecycle-execution-closure-v0.1.md` | Implement pure executable Plan and rollback fixtures; no machine effects or acceptance claim. |
 | `[长工]#hub-next-stage-decision-prep@v0.1` | active | `docs/orchestration/tasks/hub-next-stage-decision-prep-v0.1.md` | Reconcile M0/M1/M2 truth and prepare user-owned execute/defer choices. |
 | `[长工]#hub-session-dockview-d0@v0.1` | active | `docs/orchestration/tasks/hub-session-dockview-d0-v0.1.md` | Implement bounded D0 registry/layout only; preserve Session truth and defer D1-D4. |

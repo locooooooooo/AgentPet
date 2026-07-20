@@ -2,9 +2,9 @@
 
 [长工]#p0-c-authorization-prep@v0.1
 ⟦tag:v2|task|p0-c-authorization-prep-v0.1⟧
-loop state: active
-dispatch state: active
-status: implementation_in_progress_waiting_user_authorization
+loop state: standby
+dispatch state: standby
+status: ready_for_user_authorization
 priority: P0-C
 
 ## goal
