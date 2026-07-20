@@ -219,7 +219,7 @@ current role split:
 - `[长工]#hub-adapter-capability@v0.1`: standby after implemented/tested pure Adapter admission delivery; no external Agent execution and no acceptance claim.
 - `[长工]#hub-install-run-core@v0.1`: standby after implemented/tested pure InstallRun Journal/cancel/recovery delivery; no machine effects or acceptance claim.
 - `[长工]#hub-dependency-workflow-core@v0.1`: standby after implemented/tested pure two-Agent dependency/cancel/audit delivery; fixture truth remains unaccepted.
-- `[长工]#hub-runtime-foundation-integration@v0.1`: active two-file integration owner composing the three foundations behind one pure coordinator; no external execution, package or acceptance claim.
+- `[长工]#hub-runtime-foundation-integration@v0.1`: standby after implemented/tested two-file coordinator delivery; all four long workers now await the user's combined acceptance.
 - `[PM]#hub-agent-library-m1@v0.1`: summarized M1.1 read-only Agent Library; six registered candidates plus unbound host discovery are packaged and CDP verified, while InstallPlan/version probes and execution remain closed.
 - `[PM]#hub-agent-install-plan-review-m1@v0.1`: summarized M1.2 review-only InstallPlan gate; strict validation and desktop/narrow packaged evidence pass, while publisher/artifact/version trust and all execution remain closed.
 - `[PM]#hub-agent-version-evidence-m1@v0.1`: summarized M1.3 read-only version evidence; four registered lifecycle candidates plus unbound Kimi have live packaged version proof, while support and Connector gates remain unchanged.
@@ -246,7 +246,7 @@ blockers:
 - Transparent Electron ranch pointer smoke remains incomplete: the 2026-07-17 Computer Use route enumerated both windows and eight animals, but screenshots failed with `SetIsBorderRequired failed (0x80004002)`, so safe coordinate input and direct click/drag/dock observation were blocked.
 
 next action:
-- Use `docs/orchestration/sessions/weekly-development-plan-2026-07-20.md` as the active no-time-gate execution source; the three foundation long workers are implemented/tested and the bounded integration long worker is next, with final acceptance reserved for the user.
+- Use `docs/orchestration/sessions/weekly-development-plan-2026-07-20.md` as the active no-time-gate truth; all four long workers are implemented/tested and parked, with final acceptance reserved for the user.
 - Use `docs/牛马Hub下一阶段需求与目标-v0.1-2026-07-18.md` as the canonical product and acceptance source; close or explicitly defer the remaining M0 decisions before expanding M1 beyond the accepted read-only Library slice.
 - Preserve the packaged Session slice and open a separately fenced DockView D0 architecture probe before adding drag/drop, saved layouts or native pop-out windows.
 - Preserve the independently accepted content-contract boundary, then reconcile product inputs and full UI truth; do not conflate R0 contract acceptance with R3 theme/sound product implementation.

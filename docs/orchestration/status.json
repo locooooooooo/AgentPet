@@ -7,7 +7,7 @@
   "todayPlan": {
     "date": "2026-07-20",
     "session": "docs/orchestration/sessions/weekly-development-plan-2026-07-20.md",
-    "selectedRoute": "Three non-overlapping foundation long workers are implemented/tested; run the bounded integration long worker next, with no per-worker package or PM acceptance and final acceptance reserved for the user",
+    "selectedRoute": "All three foundation long workers and the bounded integration long worker are implemented/tested and parked; no package or PM acceptance was performed, and final combined acceptance is reserved for the user",
     "progress": "docs/orchestration/sessions/weekly-development-plan-2026-07-20.md"
   },
   "p0Cards": [
@@ -570,8 +570,8 @@
       "id": "hub-runtime-foundation-integration",
       "title": "[长工]#hub-runtime-foundation-integration@v0.1",
       "owner": "长工",
-      "status": "active",
-      "responsibility": "Compose the three implemented/tested foundations behind one pure Hub execution coordinator inside an exact two-file fence; no external execution, package or acceptance claim.",
+      "status": "standby",
+      "responsibility": "Preserve the implemented/tested Hub execution coordinator and integrated matrix pending the user's combined acceptance; no external execution or package was performed.",
       "tag": "⟦tag:v2|task|hub-runtime-foundation-integration-v0.1⟧",
       "evidence": "docs/orchestration/tasks/hub-runtime-foundation-integration-v0.1.md"
     },
@@ -789,7 +789,7 @@
       "title": "2026-07-20 combined long-worker control",
       "role": "[PM]#weekly-development-plan@2026-07-20",
       "state": "active",
-      "nextAction": "Dispatch the bounded Hub execution coordinator integration long worker; skip packaging and PM acceptance, then hand the combined implementation to the user."
+      "nextAction": "Keep all four long workers parked and hand the combined implemented/tested diff to the user for unified acceptance; do not infer real Agent acceptance from fixture evidence."
     },
     {
       "id": "ranch-real-integration-r0-3-dryrun",

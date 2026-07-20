@@ -2,9 +2,9 @@
 
 [长工]#hub-runtime-foundation-integration@v0.1
 ⟦tag:v2|task|hub-runtime-foundation-integration-v0.1⟧
-loop state: active
-dispatch state: active
-status: implementation_in_progress_awaiting_user_acceptance
+loop state: standby
+dispatch state: standby
+status: implemented_tested_awaiting_user_acceptance
 priority: M1/M2 integration
 
 ## goal

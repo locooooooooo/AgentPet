@@ -4,7 +4,7 @@
 ⟦tag:v2|session|weekly-development-plan-2026-07-20⟧
 loop state: active
 dispatch state: active
-status: active_integration_longworker
+status: implemented_tested_awaiting_user_acceptance
 date: 2026-07-20
 time gate: none
 
@@ -48,7 +48,16 @@ Foundation callback state:
 - Adapter Capability: `implemented_tested_awaiting_user_acceptance`.
 - InstallRun core: `implemented_tested_awaiting_user_acceptance`.
 - Dependency workflow core: `implemented_tested_awaiting_user_acceptance`.
+- Hub execution coordinator integration: `implemented_tested_awaiting_user_acceptance`.
 - Manager independent replay: all three targeted matrices and full TypeScript check pass; external execution remains `0`.
+
+Combined verification state:
+
+- Adapter, InstallRun, dependency workflow and coordinator matrices pass.
+- `npm.cmd run lint`, `npm.cmd run build`, `npm.cmd run realtime:truth-check`, `npm.cmd run orchestration:connector-safety` and `npm.cmd run orchestration:check` pass.
+- External Agent/Connector/process/filesystem/registry/service/network/credential/elevation effects from this batch: `0`.
+- No Windows package, packaged smoke, PM acceptance or acceptance session was produced.
+- Eight implementation files are ready for one combined user review; real Agent execution evidence remains separate and unverified.
 
 ## external execution boundary
 
@@ -91,4 +100,4 @@ Foundation callback state:
 - `user_accepted`: may be set only after the user's unified review.
 
 next action:
-- Dispatch the bounded integration long worker for `hubExecutionCoordinator`; do not run external Agents or perform per-worker package acceptance.
+- Keep all four long workers parked and hand the combined implemented/tested diff to the user for unified acceptance. Do not infer real Agent acceptance from fixture evidence.
