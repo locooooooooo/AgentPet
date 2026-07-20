@@ -7,7 +7,7 @@
   "todayPlan": {
     "date": "2026-07-20",
     "session": "docs/orchestration/sessions/weekly-development-plan-2026-07-20.md",
-    "selectedRoute": "All three foundation long workers and the bounded integration long worker are implemented/tested and parked; no package or PM acceptance was performed, and final combined acceptance is reserved for the user",
+    "selectedRoute": "Run four exact-fence P0 long-worker lanes: P0-C authorization readiness, lifecycle execution closure, next-stage decision preparation and Session View DockView D0; no per-worker package acceptance",
     "progress": "docs/orchestration/sessions/weekly-development-plan-2026-07-20.md"
   },
   "p0Cards": [
@@ -576,6 +576,42 @@
       "evidence": "docs/orchestration/tasks/hub-runtime-foundation-integration-v0.1.md"
     },
     {
+      "id": "p0-c-authorization-prep",
+      "title": "[长工]#p0-c-authorization-prep@v0.1",
+      "owner": "长工",
+      "status": "active",
+      "responsibility": "Prepare the exact Codex P0-C read-only authorization envelope and current blockers without executing any external CLI.",
+      "tag": "⟦tag:v2|task|p0-c-authorization-prep-v0.1⟧",
+      "evidence": "docs/orchestration/tasks/p0-c-authorization-prep-v0.1.md"
+    },
+    {
+      "id": "hub-lifecycle-execution-closure",
+      "title": "[长工]#hub-lifecycle-execution-closure@v0.1",
+      "owner": "长工",
+      "status": "active",
+      "responsibility": "Implement pure executable InstallPlan and rollback closure fixtures inside an exact two-file fence without machine effects.",
+      "tag": "⟦tag:v2|task|hub-lifecycle-execution-closure-v0.1⟧",
+      "evidence": "docs/orchestration/tasks/hub-lifecycle-execution-closure-v0.1.md"
+    },
+    {
+      "id": "hub-next-stage-decision-prep",
+      "title": "[长工]#hub-next-stage-decision-prep@v0.1",
+      "owner": "长工",
+      "status": "active",
+      "responsibility": "Prepare a read-only M0/M1/M2 execute-or-defer decision matrix; do not make user-owned product decisions.",
+      "tag": "⟦tag:v2|task|hub-next-stage-decision-prep-v0.1⟧",
+      "evidence": "docs/orchestration/tasks/hub-next-stage-decision-prep-v0.1.md"
+    },
+    {
+      "id": "hub-session-dockview-d0",
+      "title": "[长工]#hub-session-dockview-d0@v0.1",
+      "owner": "长工",
+      "status": "active",
+      "responsibility": "Implement bounded Session View/DockView D0 registry and layout projection while preserving Session truth and protected cockpit boundaries.",
+      "tag": "⟦tag:v2|task|hub-session-dockview-d0-v0.1⟧",
+      "evidence": "docs/orchestration/tasks/hub-session-dockview-d0-v0.1.md"
+    },
+    {
       "id": "realtime-p1-scheduler-core",
       "title": "[长工]#realtime-p1-scheduler-core@v0.1",
       "owner": "长工",
@@ -789,7 +825,7 @@
       "title": "2026-07-20 combined long-worker control",
       "role": "[PM]#weekly-development-plan@2026-07-20",
       "state": "active",
-      "nextAction": "Keep all four long workers parked and hand the combined implemented/tested diff to the user for unified acceptance; do not infer real Agent acceptance from fixture evidence."
+      "nextAction": "Run the four active P0 long-worker lanes under exact fences; keep external Agent execution at zero until P0-C has fresh user authorization."
     },
     {
       "id": "ranch-real-integration-r0-3-dryrun",

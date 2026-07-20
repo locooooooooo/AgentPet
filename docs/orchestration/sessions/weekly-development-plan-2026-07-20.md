@@ -59,6 +59,17 @@ Combined verification state:
 - No Windows package, packaged smoke, PM acceptance or acceptance session was produced.
 - Eight implementation files are ready for one combined user review; real Agent execution evidence remains separate and unverified.
 
+## active P0 long-worker batch
+
+| Owner | P0 slice | Mode | File fence / output |
+| --- | --- | --- | --- |
+| `[长工]#p0-c-authorization-prep@v0.1` | P0-C Codex E2E readiness | Read-only preparation | Current authorization envelope and exact blockers; no CLI execution |
+| `[长工]#hub-lifecycle-execution-closure@v0.1` | Lifecycle executable Plan and rollback closure | Pure implementation | `src/lib/installPlanExecutor.ts`; `scripts/check-install-plan-executor.mjs` |
+| `[长工]#hub-next-stage-decision-prep@v0.1` | M0/M1/M2 execute-or-defer decision | Read-only preparation | User decision matrix; no control-plane rewrite |
+| `[长工]#hub-session-dockview-d0@v0.1` | Session View P0.5 / DockView D0 | Bounded UI/model implementation | `src/lib/dockViewRegistry.ts`; `src/components/NiuMaWorkspace.tsx`; `src/index.css`; `scripts/check-dock-view-d0.mjs` |
+
+These four P0 workers are dispatched as one batch. Authorization and user decisions remain user-owned gates, not schedule gates. No worker performs package acceptance; all callbacks return to one combined user review.
+
 ## external execution boundary
 
 - Codex P0-C, Trae smoke and OpenClaw risk/auth are not time gates. They are external execution permissions and remain closed until their exact prerequisites are supplied.
@@ -100,4 +111,4 @@ Combined verification state:
 - `user_accepted`: may be set only after the user's unified review.
 
 next action:
-- Keep all four long workers parked and hand the combined implemented/tested diff to the user for unified acceptance. Do not infer real Agent acceptance from fixture evidence.
+- Run the four active P0 long-worker lanes under their exact fences. Keep external Agent execution at zero until P0-C receives a fresh user authorization envelope.

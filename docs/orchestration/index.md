@@ -78,6 +78,10 @@ tracked business cards:
 - task: ⟦tag:v2|task|hub-install-run-core-v0.1⟧ -> `docs/orchestration/tasks/hub-install-run-core-v0.1.md`
 - task: ⟦tag:v2|task|hub-dependency-workflow-core-v0.1⟧ -> `docs/orchestration/tasks/hub-dependency-workflow-core-v0.1.md`
 - task: ⟦tag:v2|task|hub-runtime-foundation-integration-v0.1⟧ -> `docs/orchestration/tasks/hub-runtime-foundation-integration-v0.1.md`
+- task: ⟦tag:v2|task|p0-c-authorization-prep-v0.1⟧ -> `docs/orchestration/tasks/p0-c-authorization-prep-v0.1.md`
+- task: ⟦tag:v2|task|hub-lifecycle-execution-closure-v0.1⟧ -> `docs/orchestration/tasks/hub-lifecycle-execution-closure-v0.1.md`
+- task: ⟦tag:v2|task|hub-next-stage-decision-prep-v0.1⟧ -> `docs/orchestration/tasks/hub-next-stage-decision-prep-v0.1.md`
+- task: ⟦tag:v2|task|hub-session-dockview-d0-v0.1⟧ -> `docs/orchestration/tasks/hub-session-dockview-d0-v0.1.md`
 - task: ⟦tag:v2|task|realtime-agent-cockpit-p0-a6-trusted-authorizer-v0.1⟧ -> `docs/orchestration/tasks/realtime-agent-cockpit-p0-a6-trusted-authorizer-v0.1.md`
 - task: ⟦tag:v2|task|realtime-agent-cockpit-p0-a7-process-reattach-v0.1⟧ -> `docs/orchestration/tasks/realtime-agent-cockpit-p0-a7-process-reattach-v0.1.md`
 - task: ⟦tag:v2|task|realtime-agent-cockpit-p0-b2-production-path-e2e-v0.1⟧ -> `docs/orchestration/tasks/realtime-agent-cockpit-p0-b2-production-path-e2e-v0.1.md`
@@ -219,7 +223,11 @@ current role split:
 - `[长工]#hub-adapter-capability@v0.1`: standby after implemented/tested pure Adapter admission delivery; no external Agent execution and no acceptance claim.
 - `[长工]#hub-install-run-core@v0.1`: standby after implemented/tested pure InstallRun Journal/cancel/recovery delivery; no machine effects or acceptance claim.
 - `[长工]#hub-dependency-workflow-core@v0.1`: standby after implemented/tested pure two-Agent dependency/cancel/audit delivery; fixture truth remains unaccepted.
-- `[长工]#hub-runtime-foundation-integration@v0.1`: standby after implemented/tested two-file coordinator delivery; all four long workers now await the user's combined acceptance.
+- `[长工]#hub-runtime-foundation-integration@v0.1`: standby after implemented/tested two-file coordinator delivery; the foundation batch remains separate from the active P0 follow-up batch.
+- `[长工]#p0-c-authorization-prep@v0.1`: active read-only P0-C authorization-preparation owner; no external CLI or Connector execution.
+- `[长工]#hub-lifecycle-execution-closure@v0.1`: active P0 pure InstallPlan executor/rollback owner inside a new two-file fence; no machine effects.
+- `[长工]#hub-next-stage-decision-prep@v0.1`: active read-only M0/M1/M2 decision-package owner; final decisions remain user-owned.
+- `[长工]#hub-session-dockview-d0@v0.1`: active bounded Session View/DockView D0 owner; D1-D4 and native pop-outs remain out of scope.
 - `[PM]#hub-agent-library-m1@v0.1`: summarized M1.1 read-only Agent Library; six registered candidates plus unbound host discovery are packaged and CDP verified, while InstallPlan/version probes and execution remain closed.
 - `[PM]#hub-agent-install-plan-review-m1@v0.1`: summarized M1.2 review-only InstallPlan gate; strict validation and desktop/narrow packaged evidence pass, while publisher/artifact/version trust and all execution remain closed.
 - `[PM]#hub-agent-version-evidence-m1@v0.1`: summarized M1.3 read-only version evidence; four registered lifecycle candidates plus unbound Kimi have live packaged version proof, while support and Connector gates remain unchanged.
@@ -246,7 +254,8 @@ blockers:
 - Transparent Electron ranch pointer smoke remains incomplete: the 2026-07-17 Computer Use route enumerated both windows and eight animals, but screenshots failed with `SetIsBorderRequired failed (0x80004002)`, so safe coordinate input and direct click/drag/dock observation were blocked.
 
 next action:
-- Use `docs/orchestration/sessions/weekly-development-plan-2026-07-20.md` as the active no-time-gate truth; all four long workers are implemented/tested and parked, with final acceptance reserved for the user.
+- Use `docs/orchestration/sessions/weekly-development-plan-2026-07-20.md` as the active no-time-gate truth; the four P0 long-worker lanes are now the active follow-up batch, with final acceptance reserved for the user.
+- The active P0 batch is tracked by four exact-fence long-worker cards: P0-C readiness, lifecycle execution closure, next-stage decision preparation and Session View DockView D0.
 - Use `docs/牛马Hub下一阶段需求与目标-v0.1-2026-07-18.md` as the canonical product and acceptance source; close or explicitly defer the remaining M0 decisions before expanding M1 beyond the accepted read-only Library slice.
 - Preserve the packaged Session slice and open a separately fenced DockView D0 architecture probe before adding drag/drop, saved layouts or native pop-out windows.
 - Preserve the independently accepted content-contract boundary, then reconcile product inputs and full UI truth; do not conflate R0 contract acceptance with R3 theme/sound product implementation.
